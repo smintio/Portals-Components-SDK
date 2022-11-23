@@ -1,0 +1,76 @@
+{
+    "name": "@smintio/ui-example-hello-world-1",
+    "description": "Smint.io Portals UI example component hello world",
+    "version": "0.0.0",
+    "author": "Smint.io GmbH",
+    "private": false,
+    "type-check": "tsc",
+    "main": "./lib/portals-ui-component.umd.min.js",
+    "typings": "./lib/PortalsUiComponent.vue.d.ts",
+    "scripts": {
+        "build": "npm run build:dist && npm run build:resources",
+        "build:dist": "rollup -c --environment BUILD:production",
+        "build:resources": "portals-resource-builder-cli",
+        "lint": "vue-cli-service lint",
+        "lint:fix": "vue-cli-service lint --fix",
+        "watch": "rollup -c -w --environment BUILD:development",
+        "smint-io-pc:development": "npm publish && npm info --json | smint-io-pc -env development",
+        "smint-io-pc": "npm publish && npm info --json | smint-io-pc -env staging",
+        "smint-io-pc:production": "npm publish && npm info --json | smint-io-pc -env production"
+    },
+    "dependencies": {
+        "@smintio/helpers": "1.4.7",
+        "@smintio/mpa-page-helpers": "0.6.1",
+        "@smintio/portals-component-sdk": "1.3.7",
+        "@smintio/portals-components": "5.1.2",
+        "vue": "2.6.14",
+        "vue-property-decorator": "9.1.2",
+        "vue-router": "3.5.2",
+        "vuetify": "2.5.9"
+    },
+    "devDependencies": {
+        "@babel/core": "7.15.5",
+        "@babel/plugin-transform-runtime": "7.15.0",
+        "@babel/preset-env": "7.15.6",
+        "@babel/runtime": "7.15.4",
+        "@babel/runtime-corejs3": "7.15.4",
+        "@rollup/plugin-babel": "5.3.0",
+        "@rollup/plugin-commonjs": "20.0.0",
+        "@rollup/plugin-node-resolve": "13.0.5",
+        "@smintio/portals-resource-builder-cli": "1.1.2",
+        "@types/babel__core": "7.1.16",
+        "@types/lodash": "4.14.175",
+        "@types/vue-router": "2.0.0",
+        "@vue/cli-plugin-eslint": "4.5.13",
+        "@vue/cli-service": "4.5.13",
+        "rollup": "2.57.0",
+        "rollup-plugin-delete": "2.0.0",
+        "rollup-plugin-terser": "7.0.2",
+        "rollup-plugin-typescript2": "0.30.0",
+        "rollup-plugin-vue": "5.1.9",
+        "typescript": "4.4.3",
+        "vue-template-compiler": "2.6.14"
+    },
+    "files": [
+        "lib/*",        
+        "resources/*",
+        "portals-page-template.json",
+        "portals-ui-component.json",
+        "!*~",
+        "!**/*~"
+    ],
+    "publishConfig": {
+        "registry": "https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Public/npm/registry/"
+    },
+    "postcss": {
+        "plugins": {
+            "autoprefixer": {}
+        }
+    },
+    "browserslist": [
+        "> 2%",
+        "last 2 versions",
+        "safari >= 10",
+        "ie >= 11"
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "formFieldValues": {
+        "values": [
+            {
+                "id": "componentText",
+                "dataType": "resource_id",
+                "resourceIdValue": "component_text"
+            }
+        ]
+    },
+    "defaultSettings": {},
+    "resources": []
+}
