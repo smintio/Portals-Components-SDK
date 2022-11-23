@@ -1,0 +1,13 @@
+.idea
+.vs
+
+obj
+bin
+
+
+.DS_Store
+*~
+*.tmp
+*.rej
+*.orig
+

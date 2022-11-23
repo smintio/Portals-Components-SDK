@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Connector-SharePoint", "Connectors\Connector-SharePoint\Connector-SharePoint.csproj", "{E4D9A904-9D9C-40CE-889E-CE792723E4BE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAdapter-SharePoint", "DataAdapters\DataAdapter-SharePoint\DataAdapter-SharePoint.csproj", "{A17187AE-DFB6-4390-A1DB-E4B6AD9AE418}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portals-Connector-SDK-TestDriver.Sharepoint.Test", "DataAdapters\Portals-Sharepoint-TestDriver\Portals-Connector-SDK-TestDriver.Sharepoint.Test.csproj", "{5B0318F6-F405-4D7B-9012-2441F95FA491}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Connector-Picturepark", "Connectors\Connector-Picturepark\Connector-Picturepark.csproj", "{A151B152-DAB6-4A6E-A4AB-562315AB9CC2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAdapter-Picturepark", "DataAdapters\DataAdapter-Picturepark\DataAdapter-Picturepark.csproj", "{3D0F904D-81DD-44D6-B861-295FADFEFB5B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portals-Connector-SDK-TestDriver.Picturepark.Test", "DataAdapters\Portals-Picturepark-TestDriver\Portals-Connector-SDK-TestDriver.Picturepark.Test.csproj", "{B11A5FFB-E708-4FEC-AE21-F2DB4A279F96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4D9A904-9D9C-40CE-889E-CE792723E4BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4D9A904-9D9C-40CE-889E-CE792723E4BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4D9A904-9D9C-40CE-889E-CE792723E4BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4D9A904-9D9C-40CE-889E-CE792723E4BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A17187AE-DFB6-4390-A1DB-E4B6AD9AE418}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A17187AE-DFB6-4390-A1DB-E4B6AD9AE418}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A17187AE-DFB6-4390-A1DB-E4B6AD9AE418}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A17187AE-DFB6-4390-A1DB-E4B6AD9AE418}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B0318F6-F405-4D7B-9012-2441F95FA491}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B0318F6-F405-4D7B-9012-2441F95FA491}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B0318F6-F405-4D7B-9012-2441F95FA491}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B0318F6-F405-4D7B-9012-2441F95FA491}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A151B152-DAB6-4A6E-A4AB-562315AB9CC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A151B152-DAB6-4A6E-A4AB-562315AB9CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A151B152-DAB6-4A6E-A4AB-562315AB9CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A151B152-DAB6-4A6E-A4AB-562315AB9CC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D0F904D-81DD-44D6-B861-295FADFEFB5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D0F904D-81DD-44D6-B861-295FADFEFB5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D0F904D-81DD-44D6-B861-295FADFEFB5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D0F904D-81DD-44D6-B861-295FADFEFB5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B11A5FFB-E708-4FEC-AE21-F2DB4A279F96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B11A5FFB-E708-4FEC-AE21-F2DB4A279F96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B11A5FFB-E708-4FEC-AE21-F2DB4A279F96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B11A5FFB-E708-4FEC-AE21-F2DB4A279F96}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7D55F05D-2F40-4AAD-B2F9-B4E04FAAB3DB}
+	EndGlobalSection
+EndGlobal

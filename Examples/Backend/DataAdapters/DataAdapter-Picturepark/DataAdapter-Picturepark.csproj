@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>SmintIo.Portals.DataAdapter.Picturepark</RootNamespace>
+    <AssemblyName>SmintIo.Portals.DataAdapter.Picturepark</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="DotLiquid" Version="2.2.656" />
+    <PackageReference Include="Picturepark.SDK.V1" Version="11.4.42" />
+    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="4.4.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Connectors\Connector-Picturepark\Connector-Picturepark.csproj" />
+  </ItemGroup>
+</Project>
