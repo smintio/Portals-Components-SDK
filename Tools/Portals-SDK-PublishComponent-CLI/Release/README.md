@@ -65,7 +65,7 @@ Please request your specific `SmintIo` configuration `ApiUrl` and `Auth` values 
 
 The `AuthorizationHeader` value is used during publishing of a frontend component to authorize the CLI tool against the client private npm feed.
 
-Keep in mind that the `AuthorizationHeader` value is not provided by Smint.io
+Keep in mind that the `AuthorizationHeader` value is not provided by Smint.io.
 
 Parameters
 ==========
