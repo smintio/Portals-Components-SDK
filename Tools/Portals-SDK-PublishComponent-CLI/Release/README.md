@@ -44,7 +44,22 @@ For each of those environments, you can specify different connection data:
 - appsettings.Development.json contains settings for local development (inherits from appsettings.json, if a setting is not given)
 - appsettings.Staging.json contains settings to stage developed components (inherits from appsettings.json, if a setting is not given)
 
-TODO YOSIF: please provide sample file content
+Sample `appsettings.Development.json`
+
+```json
+{
+  "RedirectUrl": "http://development-portal.smint.io:43450/signin-oidc",
+  "SmintIo": {
+    "ApiUrl": "https://portals-development.portalsapib.smint.io:43444",
+    "Auth": {
+      "Authority": "https://development-login.smint.io:40443/",
+      "ClientId": "smintio",
+      "ClientSecret": "********-****-****-****-4f105a645134"
+    },
+    "AuthorizationHeader": "Basic ************************************************************************YTZ6ajRh"
+  }
+}
+```
 
 Please request your specific configuration values from [support@smint.io](mailto:support@smint.io).
 
