@@ -52,7 +52,7 @@ The CLI tool has parameters that can be listed by executing the binary with one 
 
 Example would be `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe /?`
 
-- The only parameter that has to be specified is for the desired environment in which to deploy.
+1. The only parameter that has to be specified is for the desired environment in which to deploy.
 
 This can be done by running the tool with `-env` or `--environment` argument followed by the environment name.
 
@@ -60,20 +60,20 @@ Possible values are "Development", "Staging" or "Production".
 
 The parameter can be skipped if the `ASPNETCORE_ENVIRONMENT` environment variable is set with a desired environment value.
 
-- Optional parameter is `-dir` or `--directory`
+1. Optional parameter is `-dir` or `--directory`
 
 This is in case a different target path needs to be specified than the current from where the binary is being executed.
 
-- Optional parameter is `-all` or `--all-tenants`
+1. Optional parameter is `-all` or `--all-tenants`
 
 Intended for internal use.
 
-- Lastly `--version` shows the tool version
+1. Lastly `--version` shows the tool version
 
 Publish and deploy
 ==================
 
-- Front-end components 
+1. Front-end components 
 
 The target component's "package.json" file can be extended with additional "scripts" properties.
 
@@ -100,7 +100,7 @@ Please note that the examples target a Windows environment.
 
 For Linux, the correct environment variable syntax must be used.
 
-- Back-end components
+1. Back-end components
 
 Like front-end components, a single command can be used to publish and deploy.
 
