@@ -52,7 +52,7 @@ Sample `appsettings.Staging.json`
   "SmintIo": {
     "ApiUrl": "https://someone-staging.portalsapib.smint.io",
     "Auth": {
-      "Authority": "https://staging-login.smint.io/",
+      "Authority": "https://someone-staging.smint.io/",
       "ClientId": "someone",
       "ClientSecret": "********-****-****-****-4a215b643134"
     },
