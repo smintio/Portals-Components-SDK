@@ -52,20 +52,23 @@ The CLI tool has parameters that can be listed by executing the binary with one 
 
 Example would be `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe /?`
 
-The only parameter that has to be specified is for the desired environment in which to deploy.
-This can be done by running the tool with `-env` or `--environment` argument followed by the environment name .
+- The only parameter that has to be specified is for the desired environment in which to deploy.
+
+This can be done by running the tool with `-env` or `--environment` argument followed by the environment name.
+
 Possible values are "Development", "Staging" or "Production".
+
 The parameter can be skipped if the `ASPNETCORE_ENVIRONMENT` environment variable is set with a desired environment value.
 
-Optional parameter is `-dir` or `--directory`
+- Optional parameter is `-dir` or `--directory`
 
 This is in case a different target path needs to be specified than the current from where the binary is being executed.
 
-Optional parameter is `-all` or `--all-tenants`
+- Optional parameter is `-all` or `--all-tenants`
 
 Intended for internal use.
 
-Lastly `--version` shows the tool version
+- Lastly `--version` shows the tool version
 
 Publish and deploy
 ==================
@@ -101,13 +104,13 @@ For Linux, the correct environment variable syntax must be used.
 
 Like front-end components, a single command can be used to publish and deploy.
 
-Under a command prompt in a target component folder run.
+Under a command prompt in a target component folder run
 
 ```console
-~\Portals-Components-SDK\Examples\Backend\DataAdapters\DataAdapter-SharePoint> %SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development
+%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development
 ```
 
-Behind the scenes the publish component tool will look for *.csproj file to compile, package and deploy the component.
+Behind the scenes the publish component tool will look for `*.csproj` file to compile, package and deploy the component.
 
 Please note that all project and external package references will be included in the package.
 
@@ -118,28 +121,28 @@ Optionally the backend developers can register the tool as a global CLI tool.
 ## Install
 1. Install as a global tool
 	- dotnet tool install --global --add-source `<SMINT-IO-PRIVATE-FEED-SOURCE>` SmintIo.Portals.SDK.PublishComponent.CLI
-2. Confirm the message
+1. Confirm the message
 	- You can invoke the tool using the following command: smint-io-pc
 	- Tool 'smintio.portals.sdk.publishcomponent.cli' (version '1.0.0.0') was successfully installed
 	- The version number may vary
-3. Go to dotnet global tools folder
+1. Go to dotnet global tools folder
 	- For Windows go to '%USERPROFILE%\.dotnet\tools'
 	- For Linux go to '$HOME/.dotnet/tools'
-4. Go to folder '.store\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\tools\net6.0\any'
+1. Go to folder '.store\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\tools\net6.0\any'
 	- The version number may vary
-5. Edit the applicable development, staging, and/or production app settings files similarly to [App Settings](#app-settings)
-6. Useful links
+1. Edit the applicable development, staging, and/or production app settings files similarly to [App Settings](#app-settings)
+1. Useful links
 	- https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools-how-to-use
 	- https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install
 
 ## Uninstall
 1. Run
 	- dotnet tool uninstall --global SmintIo.Portals.SDK.PublishComponent.CLI
-2. Confirm the message
+1. Confirm the message
 	- 'Tool 'smintio.portals.sdk.publishcomponent.cli' (version '1.0.0.0') was successfully uninstalled.'
 
 Then the simplified command would be 
 
 ```console
-~\Portals-Components-SDK\Examples\Backend\DataAdapters\DataAdapter-SharePoint> smint-io-pc -env development
+smint-io-pc -env development
 ```
