@@ -164,4 +164,5 @@ smint-io-pc -env development
 Contributors
 ============
 
-- Yanko Belov, Smint.io GmbH
+- Yosif Velev, Smint.io GmbH
+- Reinhard Holzner, Smint.io GmbH
