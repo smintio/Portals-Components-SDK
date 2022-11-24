@@ -60,15 +60,15 @@ Possible values are "Development", "Staging" or "Production".
 
 The parameter can be skipped if the `ASPNETCORE_ENVIRONMENT` environment variable is set with a desired environment value.
 
-1. Optional parameter is `-dir` or `--directory`
+2. Optional parameter is `-dir` or `--directory`
 
 This is in case a different target path needs to be specified than the current from where the binary is being executed.
 
-1. Optional parameter is `-all` or `--all-tenants`
+3. Optional parameter is `-all` or `--all-tenants`
 
 Intended for internal use.
 
-1. Lastly `--version` shows the tool version
+4. Lastly `--version` shows the tool version
 
 Publish and deploy
 ==================
@@ -100,7 +100,7 @@ Please note that the examples target a Windows environment.
 
 For Linux, the correct environment variable syntax must be used.
 
-1. Back-end components
+2. Back-end components
 
 Like front-end components, a single command can be used to publish and deploy.
 
