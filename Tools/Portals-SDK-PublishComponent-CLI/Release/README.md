@@ -91,11 +91,10 @@ Publish and deploy
 
 The target component's npm "package.json" file can be extended with additional "scripts" properties.
 
-```javascript
+```json
 "scripts": {
-    ...
-    "smint-io-pc:development": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development",
-    "smint-io-pc:staging": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging",
+    "smint-io-pc:development": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development",
+    "smint-io-pc:staging": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging",
     ...
 }
 ```

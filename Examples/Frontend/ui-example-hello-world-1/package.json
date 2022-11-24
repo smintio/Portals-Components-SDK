@@ -14,9 +14,9 @@
         "lint": "vue-cli-service lint",
         "lint:fix": "vue-cli-service lint --fix",
         "watch": "rollup -c -w --environment BUILD:development",
-        "smint-io-pc:development": "npm publish && npm info --json | smint-io-pc -env development",
-        "smint-io-pc": "npm publish && npm info --json | smint-io-pc -env staging",
-        "smint-io-pc:production": "npm publish && npm info --json | smint-io-pc -env production"
+        "smint-io-pc:development": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development",
+		"smint-io-pc": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging",
+		"smint-io-pc:production": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env production"
     },
     "dependencies": {
         "@smintio/helpers": "1.4.7",
