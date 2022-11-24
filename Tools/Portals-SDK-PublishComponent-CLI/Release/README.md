@@ -48,7 +48,6 @@ Sample `appsettings.Staging.json`
 
 ```json
 {
-  "RedirectUrl": "http://someone-staging.smint.io/signin-oidc",
   "SmintIo": {
     "ApiUrl": "https://someone-staging.portalsapib.smint.io",
     "Auth": {
@@ -66,6 +65,9 @@ Please request your specific `SmintIo` configuration `ApiUrl` and `Auth` values 
 The `AuthorizationHeader` value is used during publishing of a frontend component to authorize the CLI tool against the client private npm feed.
 
 Keep in mind that the `AuthorizationHeader` value is not provided by Smint.io.
+
+*Note: by default, the authorization process needs to listen to port 43450 on your machine.
+In the unlikely case, that this port is not available on your machine, please [get in touch](mailto:support@smint.io).*
 
 Parameters
 ==========
