@@ -50,7 +50,7 @@ Sample `appsettings.Staging.json`
 {
   "RedirectUrl": "http://staging-portal.smint.io/signin-oidc",
   "SmintIo": {
-    "ApiUrl": "https://staging-development.portalsapib.smint.io",
+    "ApiUrl": "https://tenant-id-staging.portalsapib.smint.io",
     "Auth": {
       "Authority": "https://staging-login.smint.io/",
       "ClientId": "smintio",
