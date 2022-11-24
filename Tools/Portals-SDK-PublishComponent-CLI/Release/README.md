@@ -112,7 +112,7 @@ npm run smint-io-pc:development
 
 ### Backend components
 
-Like frontend components, a single command can be used to publish and deploy your backend component to Smint.io.
+Like for frontend components, a single command can be used to publish and deploy your backend component to Smint.io.
 
 Under a command prompt in the component folder run
 
@@ -133,12 +133,12 @@ Optionally, backend developers can register the tool as a global CLI tool:
 1. Install as a global tool
     - dotnet tool install --global --add-source `<SMINT-IO-PRIVATE-SOURCE-FEED>` SmintIo.Portals.SDK.PublishComponent.CLI
 1. Confirm the message
-	- You can invoke the tool using the following command: smint-io-pc
-	- Tool 'smintio.portals.sdk.publishcomponent.cli' (version '1.0.0.0') was successfully installed
+    - Tool 'smintio.portals.sdk.publishcomponent.cli' (version '1.0.0.0') was successfully installed
 	- The version number may vary
-1. Go to dotnet global tools folder
-	- For Windows go to '%USERPROFILE%\.dotnet\tools'
-	- For Linux go to '$HOME/.dotnet/tools'
+	- You can then invoke the tool using the following command: *smint-io-pc*
+1. Go to the .NET global tools folder
+	- For Windows, go to '%USERPROFILE%\.dotnet\tools'
+	- For Linux, go to '$HOME/.dotnet/tools'
 1. Go to folder '.store\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\tools\net6.0\any'
 	- The version number may vary
 1. Edit the applicable development, staging, and/or production app settings files similarly to [App Settings](#app-settings)
