@@ -61,7 +61,11 @@ Sample `appsettings.Staging.json`
 }
 ```
 
-Please request your specific configuration values from [support@smint.io](mailto:support@smint.io).
+Please request your specific `SmintIo` configuration `ApiUrl` and `Auth` values from [support@smint.io](mailto:support@smint.io).
+
+The `AuthorizationHeader` value is used during publishing of a frontend component to authorize the CLI tool against the client private npm feed.
+
+Keep in mind that the `AuthorizationHeader` value is not provided by Smint.io
 
 Parameters
 ==========
@@ -135,7 +139,7 @@ Optionally, backend developers can register the tool as a global CLI tool:
 1. Confirm the message
     - Tool 'smintio.portals.sdk.publishcomponent.cli' (version '1.0.0.0') was successfully installed
 	- The version number may vary
-	- You can then invoke the tool using the following command: *smint-io-pc*
+	- You can then invoke the tool using the following command: `smint-io-pc`
 1. Go to the .NET global tools folder
 	- For Windows, go to `%USERPROFILE%\.dotnet\tools`
 	- For Linux, go to `$HOME/.dotnet/tools`
