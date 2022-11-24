@@ -37,7 +37,7 @@ Doing so will allow the publishing tool to be invoked from different locations.
 App settings
 ============
 
-You can manage three different environments for your component development efforts ("Development", "Staging" and "Production").
+You can manage three different environments for your component development efforts (`Development`, `Staging` and `Production`).
 For each of those environments, you can specify different connection data:
 
 - appsettings.json contains production settings for publishing of components
@@ -72,7 +72,7 @@ Example: `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe /?`
 
 - The only parameter that has to be specified is for the desired environment to which to deploy.
     - This can be done by running the tool with `-env` or `--environment` argument followed by the environment name.
-    - Possible values are "Development", "Staging" or "Production".
+    - Possible values are `Development`, `Staging` or `Production`.
     - The parameter can be skipped if the `ASPNETCORE_ENVIRONMENT` environment variable is set with a desired environment value.
 - Optional parameter is `-dir` or `--directory`
     - Use this in case the working directory is different from the directory where the binary is being executed.
@@ -137,9 +137,9 @@ Optionally, backend developers can register the tool as a global CLI tool:
 	- The version number may vary
 	- You can then invoke the tool using the following command: *smint-io-pc*
 1. Go to the .NET global tools folder
-	- For Windows, go to '%USERPROFILE%\.dotnet\tools'
-	- For Linux, go to '$HOME/.dotnet/tools'
-1. Go to folder '.store\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\tools\net6.0\any'
+	- For Windows, go to `%USERPROFILE%\.dotnet\tools`
+	- For Linux, go to `$HOME/.dotnet/tools`
+1. Go to folder `.store\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\tools\net6.0\any`
 	- The version number may vary
 1. Edit the applicable development, staging, and/or production app settings files similarly to [App Settings](#app-settings)
 1. Useful links
