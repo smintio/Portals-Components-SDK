@@ -8,7 +8,7 @@
 Description
 ===========
 
-The purpose of the Portals-SDK-PublishComponent-CLI tool is to enable developers with a short cycle to publish and deploy front-end and back-end components to the Smint.io environments/
+The purpose of the Portals-SDK-PublishComponent-CLI tool is to enable developers with a short cycle to publish and deploy frontend and backend components to the Smint.io environments.
 
 This document contains all the steps needed to configure and run the Smint.io component publishing tool.
 
@@ -22,7 +22,7 @@ Current version of this document is: 1.0.0 (as of 24th of November, 2022)
 Download
 ========
 
-Download the zip archive suitable for the target environment to a convinient location.
+Download the ZIP archive suitable for the target environment to a convenient location.
 
 Extract the archive.
 
@@ -37,37 +37,40 @@ Doing so will allow the publishing tool to be invoked from different locations.
 App settings
 ============
 
-Smint.io has multiple environments and for that we allow multiple configuration files.
+You can manage three different environments for your component development efforts ("Development", "Staging" and "Production").
+For each of those environments, you can specify different connection data:
 
-- appsettings.Development.json contains settings usually for local development and publishing of components
-- appsettings.Staging.json contains staging settings for publishing of components
 - appsettings.json contains production settings for publishing of components
+- appsettings.Development.json contains settings for local development (inherits from appsettings.json, if a setting is not given)
+- appsettings.Staging.json contains settings to stage developed components (inherits from appsettings.json, if a setting is not given)
 
-All configurations values can be requested from [support@smint.io](mailto:support@smint.io)
+TODO YOSIF: please provide sample file content
+
+Please request your specific configuration values from [support@smint.io](mailto:support@smint.io).
 
 Parameters
 ==========
 
 The CLI tool has parameters that can be listed by executing the binary with one of the arguments `/?`, `/help` or `--help`
 
-Example would be `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe /?`
+Example: `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe /?`
 
 - The only parameter that has to be specified is for the desired environment in which to deploy.
     - This can be done by running the tool with `-env` or `--environment` argument followed by the environment name.
     - Possible values are "Development", "Staging" or "Production".
     - The parameter can be skipped if the `ASPNETCORE_ENVIRONMENT` environment variable is set with a desired environment value.
 - Optional parameter is `-dir` or `--directory`
-    - This is in case a different target path needs to be specified than the current from where the binary is being executed.
+    - This is in case a the working directory should be different from the directory where the binary is being executed.
 - Optional parameter is `-all` or `--all-tenants`
-    - Intended for internal use.
+    - Intended for use by the Smint.io staff only.
 - Lastly `--version` shows the tool version
 
 Publish and deploy
 ==================
 
-### Front-end components 
+### Frontend components 
 
-The target component's "package.json" file can be extended with additional "scripts" properties.
+The target component's npm "package.json" file can be extended with additional "scripts" properties.
 
 ```javascript
 "scripts": {
@@ -80,9 +83,9 @@ The target component's "package.json" file can be extended with additional "scri
 
 The CLI executable requires the value of `npm info --json` as standard input so that it can determine the component name, version, and npm repository.
 
-When the target component is ready for publish.
+#### When the target component is ready for publish:
 
-In component folder a single command can push it to a npm repository and then deploy it to a Smint.io environment.
+In the component folder, issue a single command to push your component to a npm repository and then deploy it to Smint.io from there.
 
 ```console
 npm run smint-io-pc:development
@@ -92,11 +95,11 @@ Please note that the examples target a Windows environment.
 
 For Linux, the correct environment variable syntax must be used.
 
-### Back-end components
+### Backend components
 
-Like front-end components, a single command can be used to publish and deploy.
+Like front-end components, a single command can be used to publish and deploy the backend component to Smint.io.
 
-Under a command prompt in a target component folder run
+Under a command prompt in a component folder run
 
 ```console
 %SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development
@@ -108,9 +111,10 @@ Please note that all project and external package references will be included in
 
 For a development environment only, the component will be compiled using the debug profile. Others will use the release profile.
 
-Optionally the backend developers can register the tool as a global CLI tool.
+Optionally backend developers can register the tool as a global CLI tool.
 
-#### Install
+#### Register the tool as a global CLI tool
+
 1. Install as a global tool
     - dotnet tool install --global --add-source `<SMINT-IO-PRIVATE-SOURCE-FEED>` SmintIo.Portals.SDK.PublishComponent.CLI
 1. Confirm the message
@@ -127,14 +131,22 @@ Optionally the backend developers can register the tool as a global CLI tool.
 	- https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools-how-to-use
 	- https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install
 
-#### Uninstall
+#### Uninstall the global CLI tool
+
 1. Run
 	- dotnet tool uninstall --global SmintIo.Portals.SDK.PublishComponent.CLI
 1. Confirm the message
 	- 'Tool 'smintio.portals.sdk.publishcomponent.cli' (version '1.0.0.0') was successfully uninstalled.'
 
-Then the simplified command would be 
+#### Publish using the registered global CLI tool
+
+If you registered our tool as a global CLI tool, you can use this simplified command for publishing to Smint.io:
 
 ```console
 smint-io-pc -env development
 ```
+
+Contributors
+============
+
+- Yanko Belov, Smint.io GmbH
