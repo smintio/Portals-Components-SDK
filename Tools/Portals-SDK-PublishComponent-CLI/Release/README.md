@@ -8,7 +8,7 @@
 Description
 ===========
 
-The purpose of the Portals-SDK-PublishComponent-CLI tool is to enable developers with a short cycle to publish and deploy frontend and backend components to the Smint.io environments.
+The purpose of the Portals-SDK-PublishComponent-CLI tool is to enable developers with a short cycle to publish and deploy frontend and backend components to Smint.io.
 
 This document contains all the steps needed to configure and run the Smint.io component publishing tool.
 
