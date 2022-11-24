@@ -42,7 +42,7 @@ For each of those environments, you can specify different connection data:
 
 - appsettings.json contains production settings for publishing of components
 - appsettings.Development.json contains settings for local development (inherits from appsettings.json, if a setting is not given)
-- appsettings.Staging.json contains settings to stage developed components (inherits from appsettings.json, if a setting is not given)
+- appsettings.Staging.json contains settings for staging developed components (inherits from appsettings.json, if a setting is not given)
 
 Sample `appsettings.Development.json`
 
@@ -70,15 +70,15 @@ The CLI tool has parameters that can be listed by executing the binary with one 
 
 Example: `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe /?`
 
-- The only parameter that has to be specified is for the desired environment in which to deploy.
+- The only parameter that has to be specified is for the desired environment to which to deploy.
     - This can be done by running the tool with `-env` or `--environment` argument followed by the environment name.
     - Possible values are "Development", "Staging" or "Production".
     - The parameter can be skipped if the `ASPNETCORE_ENVIRONMENT` environment variable is set with a desired environment value.
 - Optional parameter is `-dir` or `--directory`
-    - This is in case a the working directory should be different from the directory where the binary is being executed.
+    - Use this in case the working directory is different from the directory where the binary is being executed.
 - Optional parameter is `-all` or `--all-tenants`
-    - Intended for use by the Smint.io staff only.
-- Lastly `--version` shows the tool version
+    - Intended for use by Smint.io staff only.
+- Lastly, `--version` shows the tool version
 
 Publish and deploy
 ==================
@@ -106,15 +106,15 @@ In the component folder, issue a single command to push your component to a npm 
 npm run smint-io-pc:development
 ```
 
-Please note that the examples target a Windows environment.
+*Please note that the NPM repository needs to be publicly available, so that Smint.io can retrieve your component.*
 
-For Linux, the correct environment variable syntax must be used.
+*Please note that the examples target a Windows environment. For Linux, the correct environment variable syntax must be used.*
 
 ### Backend components
 
-Like front-end components, a single command can be used to publish and deploy the backend component to Smint.io.
+Like frontend components, a single command can be used to publish and deploy your backend component to Smint.io.
 
-Under a command prompt in a component folder run
+Under a command prompt in the component folder run
 
 ```console
 %SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development
@@ -124,9 +124,9 @@ Behind the scenes the publish component tool will look for `*.csproj` file to co
 
 Please note that all project and external package references will be included in the package.
 
-For a development environment only, the component will be compiled using the debug profile. Others will use the release profile.
+For the development environment only, the component will be compiled using the debug build profile. All other environments will use the release build profile.
 
-Optionally backend developers can register the tool as a global CLI tool.
+Optionally, backend developers can register the tool as a global CLI tool:
 
 #### Register the tool as a global CLI tool
 
