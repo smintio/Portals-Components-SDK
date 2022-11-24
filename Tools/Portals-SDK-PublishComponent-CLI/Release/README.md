@@ -52,15 +52,15 @@ The CLI tool has parameters that can be listed by executing the binary with one 
 
 Example would be `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe /?`
 
-1. The only parameter that has to be specified is for the desired environment in which to deploy.
+- The only parameter that has to be specified is for the desired environment in which to deploy.
     - This can be done by running the tool with `-env` or `--environment` argument followed by the environment name.
     - Possible values are "Development", "Staging" or "Production".
     - The parameter can be skipped if the `ASPNETCORE_ENVIRONMENT` environment variable is set with a desired environment value.
-1. Optional parameter is `-dir` or `--directory`
+- Optional parameter is `-dir` or `--directory`
     - This is in case a different target path needs to be specified than the current from where the binary is being executed.
-1. Optional parameter is `-all` or `--all-tenants`
+- Optional parameter is `-all` or `--all-tenants`
     - Intended for internal use.
-1. Lastly `--version` shows the tool version
+- Lastly `--version` shows the tool version
 
 Publish and deploy
 ==================
