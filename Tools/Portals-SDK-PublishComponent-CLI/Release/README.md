@@ -22,7 +22,7 @@ Current version of this document is: 1.0.0 (as of 24th of November, 2022)
 Download
 ========
 
-Download the ZIP archive suitable for the target environment to a convenient location.
+Download the ZIP archive suitable for your operating system to a convenient location.
 
 Extract the archive.
 
