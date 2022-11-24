@@ -66,7 +66,7 @@ The `AuthorizationHeader` value is used during publishing of a frontend componen
 
 Keep in mind that the `AuthorizationHeader` value is not provided by Smint.io.
 
-*Note: by default, the authorization process needs to listen to port 43450 on your machine. In the unlikely case, that this port is not 
+*Note: by default, the authorization process needs to listen to port `43450` on your machine. In the unlikely case that this port is not 
 available on your machine, you can override the `RedirectUrl` setting inherited from `appsettings.json` and set another port there.*
 
 Parameters
