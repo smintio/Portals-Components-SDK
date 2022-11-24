@@ -53,25 +53,19 @@ The CLI tool has parameters that can be listed by executing the binary with one 
 Example would be `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe /?`
 
 1. The only parameter that has to be specified is for the desired environment in which to deploy.
-
-- This can be done by running the tool with `-env` or `--environment` argument followed by the environment name.
-- Possible values are "Development", "Staging" or "Production".
-- The parameter can be skipped if the `ASPNETCORE_ENVIRONMENT` environment variable is set with a desired environment value.
-
-2. Optional parameter is `-dir` or `--directory`
-
-- This is in case a different target path needs to be specified than the current from where the binary is being executed.
-
-3. Optional parameter is `-all` or `--all-tenants`
-
-- Intended for internal use.
-
-4. Lastly `--version` shows the tool version
+    - This can be done by running the tool with `-env` or `--environment` argument followed by the environment name.
+    - Possible values are "Development", "Staging" or "Production".
+    - The parameter can be skipped if the `ASPNETCORE_ENVIRONMENT` environment variable is set with a desired environment value.
+1. Optional parameter is `-dir` or `--directory`
+    - This is in case a different target path needs to be specified than the current from where the binary is being executed.
+1. Optional parameter is `-all` or `--all-tenants`
+    - Intended for internal use.
+1. Lastly `--version` shows the tool version
 
 Publish and deploy
 ==================
 
-#### Front-end components 
+### Front-end components 
 
 The target component's "package.json" file can be extended with additional "scripts" properties.
 
@@ -98,7 +92,7 @@ Please note that the examples target a Windows environment.
 
 For Linux, the correct environment variable syntax must be used.
 
-#### Back-end components
+### Back-end components
 
 Like front-end components, a single command can be used to publish and deploy.
 
@@ -116,9 +110,9 @@ For a development environment only, the component will be compiled using the deb
 
 Optionally the backend developers can register the tool as a global CLI tool.
 
-## Install
+#### Install
 1. Install as a global tool
-	- dotnet tool install --global --add-source `<SMINT-IO-PRIVATE-FEED-SOURCE>` SmintIo.Portals.SDK.PublishComponent.CLI
+    - dotnet tool install --global --add-source `<SMINT-IO-PRIVATE-FEED-SOURCE>` SmintIo.Portals.SDK.PublishComponent.CLI
 1. Confirm the message
 	- You can invoke the tool using the following command: smint-io-pc
 	- Tool 'smintio.portals.sdk.publishcomponent.cli' (version '1.0.0.0') was successfully installed
@@ -133,7 +127,7 @@ Optionally the backend developers can register the tool as a global CLI tool.
 	- https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools-how-to-use
 	- https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install
 
-## Uninstall
+#### Uninstall
 1. Run
 	- dotnet tool uninstall --global SmintIo.Portals.SDK.PublishComponent.CLI
 1. Confirm the message
