@@ -143,8 +143,8 @@ Optionally, backend developers can register the tool as a global CLI tool:
 	- The version number may vary
 1. Edit the applicable development, staging, and/or production app settings files similarly to [App Settings](#app-settings)
 1. Useful links
-	- https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools-how-to-use
-	- https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install
+	- [Install and use a .NET global tool using the .NET CLI](https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools-how-to-use)
+	- [dotnet tool install](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install)
 
 #### Uninstall the global CLI tool
 
