@@ -112,7 +112,7 @@ Optionally the backend developers can register the tool as a global CLI tool.
 
 #### Install
 1. Install as a global tool
-    - dotnet tool install --global --add-source `<SMINT-IO-PRIVATE-FEED-SOURCE>` SmintIo.Portals.SDK.PublishComponent.CLI
+    - dotnet tool install --global --add-source `<SMINT-IO-PRIVATE-SOURCE-FEED>` SmintIo.Portals.SDK.PublishComponent.CLI
 1. Confirm the message
 	- You can invoke the tool using the following command: smint-io-pc
 	- Tool 'smintio.portals.sdk.publishcomponent.cli' (version '1.0.0.0') was successfully installed
