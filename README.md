@@ -1,7 +1,3 @@
-Content
-=======
-1. [Description](#description)
-
 Description
 ===========
 
