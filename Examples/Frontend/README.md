@@ -268,7 +268,7 @@ An example would be
 }
 ```
 
-Executing the following will publish the `ui-example-hello-world-1` package to the defined npm registry and then a REST API request will be fired to register the package for the specified environment.
+Running the following command will package `ui-example-hello-world-1` in the defined npm registry and then trigger a REST API request to register the package for the specified environment.
 
 ```console
 npm run smint-io-pc:development
