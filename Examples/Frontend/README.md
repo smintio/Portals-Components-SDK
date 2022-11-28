@@ -255,7 +255,10 @@ Additional attributes such as `DynamicAllowedValuesProvider` or `IsColor` contro
 In this case, an example would be a text input field or a color picker.
 
 By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
-In addition to the minimal and default settings, custom script sections are added to make it easier to deploy components to different Smint.io environments using our [publish component](../../Tools/Portals-SDK-PublishComponent-CLI/Release/) CLI tool.
+
+In addition to the minimal and default settings, custom script sections are added to make it easier to deploy components to different Smint.io environments using our publish component CLI tool. 
+
+More information can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/)
 
 An example would be
 ```json
