@@ -172,7 +172,7 @@ Each Smint.io Portals UI component can tie itself to public API interfaces publi
 You can do this by requesting a data adapter public API interface through the configuration of the Smint.io Portals
 UI component:
 
-```
+```javascript
 import type {
     IAssetsSearch,
 } from "@smintio/portals-component-sdk";
@@ -191,7 +191,7 @@ public readonly searchBarAutoCompletion!: IAssetsSearch;
 
 Once the Smint.io Portals UI component is instanciated, you can easily call methods of that public API interface.
 
-```
+```javascript
 this.searchBarAutoCompletion.getFullTextSearchProposalsAsync({ queryString: this.searchQuery })
 	.catch((e) => {
 		...
@@ -226,9 +226,11 @@ Custom component development
 
 Good starting point is our [Hello world](ui-example-hello-world-1/) example.
 
-This [component](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
-It can only display colored static text once added to a page.
+The [component](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
+It can display colored static text once added to a page.
+
 The source follows established Vue.js structure practices by containing a template, typescript, and css sections.
+
 `PortalsUiComponent` is annotated with custom attributes which contribute to the component description in a Smint.io meaningful way.
 
 ```javascript
@@ -252,11 +254,11 @@ The `PortalsUiComponentImplementation` exports fully localized properties that a
 Additional attributes such as `DynamicAllowedValuesProvider` or `IsColor` control how the page configuration can look.
 In this case, an example would be a text input field or a color picker.
 
-By default [package.json](ui-example-hello-world-1/package.jsonx) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
-In addition to the minimal and default settings, custom script sections are added to make it easier to deploy components to different Smint.io environments using our [publish component](../../Tools/Portals-SDK-PublishComponent-CLI/) CLI tool.
+By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
+In addition to the minimal and default settings, custom script sections are added to make it easier to deploy components to different Smint.io environments using our [publish component](../../Tools/Portals-SDK-PublishComponent-CLI/Release/) CLI tool.
 
 An example would be
-```json
+```javascript
 "scripts": {
 	"smint-io-pc": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging"
 	...

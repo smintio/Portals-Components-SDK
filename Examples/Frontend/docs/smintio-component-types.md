@@ -3,8 +3,8 @@ Component types
 
 * [UI component types](#ui-component-types)
 * [UI component types for the login system](#ui-component-types-for-the-login-system)
-* [Page types](#ui-page-types)
-* [Page types for the login system](#ui-page-types-for-the-login-system)
+* [Page types](#page-types)
+* [Page types for the login system](#page-types-for-the-login-system)
 
 ## UI component types
 
