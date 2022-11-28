@@ -272,6 +272,7 @@ npm run smint-io-pc:development
 ```
 
 Please note that calling the script repeatedly will result in an error.
+
 With each code change, the version number must be increased.
 
 Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) to request publishing.
