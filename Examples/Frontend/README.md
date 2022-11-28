@@ -271,7 +271,7 @@ An example would be
 Running the following command will package `ui-example-hello-world-1` in the defined npm registry and then trigger a REST API request to register the package for the specified environment.
 
 ```console
-npm run smint-io-pc:development
+npm run smint-io-pc
 ```
 
 Please note that calling the script repeatedly will result in an error.
