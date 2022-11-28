@@ -258,10 +258,10 @@ By default, [package.json](ui-example-hello-world-1/package.json) is used by the
 In addition to the minimal and default settings, custom script sections are added to make it easier to deploy components to different Smint.io environments using our [publish component](../../Tools/Portals-SDK-PublishComponent-CLI/Release/) CLI tool.
 
 An example would be
-```javascript
+```json
 "scripts": {
-	"smint-io-pc": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging"
-	...
+    "smint-io-pc": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging"
+    ...
 }
 ```
 
