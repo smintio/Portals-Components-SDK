@@ -1,7 +1,6 @@
 Page templates
 --------------
 
-
 * [Asset details page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#asset-details-page)
 * [Collection details page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#collection-details-page)
 * [Collections overview page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#collections-overview-page)

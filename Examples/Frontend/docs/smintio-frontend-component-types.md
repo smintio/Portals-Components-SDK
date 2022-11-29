@@ -1,5 +1,3 @@
-State: 29th of November, 2022
-
 Frontend component types
 ------------------------
 
@@ -7,6 +5,8 @@ Frontend component types
 * [UI component types for the login system](#ui-component-types-for-the-login-system)
 * [Page types](#page-types)
 * [Page types for the login system](#page-types-for-the-login-system)
+
+Current version of this document is: 1.0.0 (as of 29th of November, 2022)
 
 ## UI component types
 
