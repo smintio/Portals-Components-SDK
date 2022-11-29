@@ -61,6 +61,9 @@ by you), and by the *section end* UI component (which is a generic component com
 and the *section end* UI component, users can add any number of other UI components. During rendering, the *section start*
 UI component will get a reference to all the UI components within the section, and can then render the section accordingly.
 
+The Smint.io Portals *ui-generic-section-start-table* UI component, for example, uses the section concept to implement a
+very sophisticated and responsive table construct.
+
 *Standalone*
 
 UI components must *NOT* be dependent on the presence of any other UI component on the page, or on functionality
