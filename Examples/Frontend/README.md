@@ -272,7 +272,7 @@ By default, [package.json](ui-example-hello-world-1/package.json) is used by the
 
 In addition to the minimal and default settings, custom script sections are added to make it easier to deploy components to different Smint.io environments using our publish component CLI tool. 
 
-More information can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/)
+More information about building, packaging and publishing Smint.io Portals components using the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
 
 An example would be
 ```json
