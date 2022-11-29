@@ -16,29 +16,29 @@ Current version of this document is: 1.0.0 (as of 29th of November, 2022)
 | `DisableTrimming`                  | **Disables the trimming of strings for a form item (which is done by default)**                                                |
 | `DisplayName`                      | **Specifies the display name of a form item in different languages**                                                           |
 | `DynamicAllowedValuesProvider`     | **Specifies the name of the provider of dynamic allowed value lists of a form item**                                           |
-| `FormGroup`                        | **Specifies the form group the form item belongs to**                                                                          |
+| `FormGroup`                        | **Specifies the form group a form item belongs to**                                                                            |
 | `FormGroupDeclaration`             | **Defines a new form group (displayed as separate tab or section, depending on the viewer implementation)**                    |
 | `FormGroupDescription`             | **Specifies the description of a form group in different languages**                                                           |
 | `FormGroupDisplayName`             | **Specifies the display name of a form group in different languages**                                                          |
 | `FormGroupVisibleIf`               | **Specifies the visibility condition of a form group**                                                                         |
 | `FormItemVisibility`               | **Specifies the visibility level of a form item**                                                                              |
-| `IsBoolean`                        | **Specifies for the form item to be of boolean data type (auto-detected if possible)**                                         |
-| `IsColor`                          | **Specifies for the string form item to be of color data type**                                                                |
-| `IsDataAdapter`                    | **Specifies for the form item to reference a data adapter public API interface (auto-detected if possible)**                   |
-| `IsDataAdapterArray`               | **Specifies for the form item to reference an array of  data adapter public API interfaces (auto-detected if possible)**       |
-| `IsDate`                           | **Specifies for the form item to be of date data type (auto-detected if possible)**                                            |
-| `IsDecimal`                        | **Specifies for the form item to be of decimal data type (auto-detected if possible)**                                         |
-| `IsEmailAddress`                   | **Specifies for the string form item to be an email address**                                                                  |
-| `IsInt32`                          | **Specifies for the form item to be of int data type (auto-detected if possible)**                                             |
-| `IsInt32Array`                     | **Specifies for the form item to be of int array data type (auto-detected if possible)**                                       |
-| `IsInt64`                          | **Specifies for the form item to be of long data type (auto-detected if possible)**                                            |
-| `IsInt64Array`                     | **Specifies for the form item to be of long array data type (auto-detected if possible)**                                      |
-| `IsJson`                           | **Specifies for the string form item to be a JSON string**                                                                     |
-| `IsPhoneNumber`                    | **Specifies for the string form item to be a phone number**                                                                    |
-| `IsRichText`                       | **Specifies for the string form item to be rich text**                                                                         |
-| `IsString`                         | **Specifies for the form item to be of string data type (auto-detected if possible)**                                          |
-| `IsStringArray`                    | **Specifies for the form item to be of string array data type (auto-detected if possible)**                                    |
-| `IsUri`                            | **Specifies for the string form item to be an URI**                                                                            |
+| `IsBoolean`                        | **Specifies for a form item to be of boolean data type (auto-detected if possible)**                                           |
+| `IsColor`                          | **Specifies for a string form item to be of color data type**                                                                  |
+| `IsDataAdapter`                    | **Specifies for a form item to reference a data adapter public API interface (auto-detected if possible)**                     |
+| `IsDataAdapterArray`               | **Specifies for a form item to reference an array of  data adapter public API interfaces (auto-detected if possible)**         |
+| `IsDate`                           | **Specifies for a form item to be of date data type (auto-detected if possible)**                                              |
+| `IsDecimal`                        | **Specifies for a form item to be of decimal data type (auto-detected if possible)**                                           |
+| `IsEmailAddress`                   | **Specifies for a string form item to be an email address**                                                                    |
+| `IsInt32`                          | **Specifies for a form item to be of int data type (auto-detected if possible)**                                               |
+| `IsInt32Array`                     | **Specifies for a form item to be of int array data type (auto-detected if possible)**                                         |
+| `IsInt64`                          | **Specifies for a form item to be of long data type (auto-detected if possible)**                                              |
+| `IsInt64Array`                     | **Specifies for a form item to be of long array data type (auto-detected if possible)**                                        |
+| `IsJson`                           | **Specifies for a string form item to be a JSON string**                                                                       |
+| `IsPhoneNumber`                    | **Specifies for a string form item to be a phone number**                                                                      |
+| `IsRichText`                       | **Specifies for a string form item to be rich text**                                                                           |
+| `IsString`                         | **Specifies for a form item to be of string data type (auto-detected if possible)**                                            |
+| `IsStringArray`                    | **Specifies for a form item to be of string array data type (auto-detected if possible)**                                      |
+| `IsUri`                            | **Specifies for a string form item to be an URI**                                                                              |
 | `MaxLength`                        | **Restricts the max length of a value of a form item**                                                                         |
 | `MaxValue`                         | **Restricts the upper boundary of a value of a form item**                                                                     |
 | `MinValue`                         | **Restricts the lower boundary of a value of a form item**                                                                     |
