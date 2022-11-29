@@ -18,10 +18,10 @@ Current version of this document is: 1.0.0 (as of 25th of November, 2022)
 1. [Page templates](#page-templates)
 1. [Portal templates](#portal-templates)
 1. [Data adapter public API interfaces](#data-adapter-public-api-interfaces)
-1. [Smint.io UI components list](docs/smintio-ui-components.md)
-1. [Smint.io UI pages list](docs/smintio-ui-pages.md)
-1. [Smint.io mixins list](docs/smintio-mixins.md)
-1. [Custom component development](#hello-world-component)
+1. [Overview of Smint.io UI components](docs/smintio-ui-components.md)
+1. [Overview of Smint.io page templates](docs/smintio-page-templates.md)
+1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
+1. [How to develop your own custom component](#how-to-develop-your-own-custom-component)
 
 UI components
 =============
