@@ -1,12 +1,12 @@
 Content
 =======
 
-This README.md serves to clarify the general concept of Smint.io Portals frontend components, which is page templates and user interface components.
+This README.md serves to clarify the general concept of Smint.io Portals frontend components, which is page templates and UI components.
 Also it contains an overview of a lot of currently existing default Smint.io Portals frontend componennts that are delivered and maintained directly by us.
 
 Finally, it will shed some light on how you can get started with developing your own custom Smint.io Portals frontend components.
 
-Please note that at any time you can build your own  page templates or user interface components based on our Smint.io Portals SDKs.
+Please note that at any time you can build your own  page templates or UI components based on our Smint.io Portals SDKs.
 Access to the SDKs is restricted. Get in contact with Smint.io and request access.
 Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals Enterprise plan customers.
 
@@ -51,7 +51,7 @@ additional options to your UI components and increase the flexibility of your UI
 *No nesting*
 
 Please note, that components are high level elements. So, it is not possible to nest UI components. An UI component
-may *NOT* contain another user interface component.
+may *NOT* contain another UI component.
 
 *Note*: this applies to *Smint.io Portals UI components*. Of course you can nest non-Smint.io Portals UI components (aka
 Vue.js components, see below) within your Smint.io Portals UI component as you like!
