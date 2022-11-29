@@ -21,7 +21,7 @@ Current version of this document is: 1.0.0 (as of 25th of November, 2022)
 1. [Overview of Smint.io UI components](docs/smintio-ui-components.md)
 1. [Overview of Smint.io page templates](docs/smintio-page-templates.md)
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
-1. [How to develop your own custom component](#how-to-develop-your-own-custom-component)
+1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
 
 UI components
 =============
