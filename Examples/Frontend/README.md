@@ -232,10 +232,11 @@ in your Smint.io Portals UI component.
 
 Learn more about how to do that [here](https://github.com/smintio/Portals-Components-SDK/tree/main/Examples/Backend#custom-public-api-interfaces).
 
-Custom component development
-============================
+How develop your own frontend component
+=======================================
 
-Good starting point is our [Hello world](ui-example-hello-world-1/) example.
+A good starting point is looking at our [Hello world](ui-example-hello-world-1/) example. It is an example of a Smint.io Portals UI component.
+An example for crafting your own page template will follow soon.
 
 The [component](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
 It can display colored static text once added to a page.
