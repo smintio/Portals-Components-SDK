@@ -284,11 +284,11 @@ You can then simple use that Typescript public API interface definition file in 
 
 Invoke the tool as follows:
 ```console
-SmintIo.Portals.DataAdapterSDK.CLI.exe -s [Data-Adapter-Assembly-DLL] -t [Output-Filename]
+SmintIo.Portals.DataAdapterSDK.DataAdapterExporter.CLI.exe -s [Data-Adapter-Assembly-DLL] -t [Output-Filename]
 ```
 This is an example on how to invoke the tool:
 ```console
-SmintIo.Portals.DataAdapterSDK.CLI.exe -s SmintIo.Portals.DataAdapter.Picturepark.MyCustomPictureparkInterfaces.dll -t .\IMyCustomPictureparkInterfaces.ts
+SmintIo.Portals.DataAdapterSDK.DataAdapterExporter.CLI.exe -s SmintIo.Portals.DataAdapter.Picturepark.MyCustomPictureparkInterfaces.dll -t .\IMyCustomPictureparkInterfaces.ts
 ```
 This is how the result might look like:
 ```typescript
