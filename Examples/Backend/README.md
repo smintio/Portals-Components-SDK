@@ -1,9 +1,9 @@
 Examples for Smint.io Portals backend components
 ================================================
 
-This repository contains examples for Smint.io Portals backend components (connectors, data adapters).
+This repository contains examples for Smint.io Portals backend components, which is portal templates, connectors, data adapters and task handlers.
 
-Documentation on task handlers and state machines will follow. Please get in touch if you want to leverage that functionality.
+Documentation on portal templates and task handlers will follow. Please get in touch if you want to leverage that functionality.
 
 Please note that at any time you can build your own connector or data adapter components based
 on our *Smint.io Portals SDKs*. Access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io)
@@ -12,7 +12,7 @@ Enterprise plan customers.
 
 You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
 
-Current version of this document is: 2.1.0 (as of 1st of March, 2022)
+Current version of this document is: 2.2.0 (as of 25th of November, 2022)
 
 #### Picturepark Connector
 
