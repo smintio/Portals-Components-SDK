@@ -56,6 +56,11 @@ may *NOT* contain another UI component.
 *Note*: this applies to *Smint.io Portals UI components*. Of course you can nest non-Smint.io Portals UI components (aka
 Vue.js components, see below) within your Smint.io Portals UI component as you like!
 
+*Note*: there is a concept called *sections*. A section consists of the *section start* UI component (typically written
+by you), and by the *section end* UI component (which is a generic component coming from us). Between the *section start*
+and the *section end* UI component, users can add any number of other UI components. During rendering, the *section start*
+UI component will get a reference to all the UI components within the section, and can then render the section accordingly.
+
 *Standalone*
 
 UI components must *NOT* be dependent on the presence of any other UI component on the page, or on functionality
