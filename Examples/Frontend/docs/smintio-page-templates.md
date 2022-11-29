@@ -16,7 +16,7 @@ Current version of this document is: 1.0.0 (as of 3rd of March, 2022)
 
 This asset details page template is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Asset details page](../images/pages/asset-details.png "Asset details page")
+![Asset details page](./images/page-templates/asset-details.png "Asset details page")
 
 | Key                                          | Type                      |
 |----------------------------------------------|---------------------------|
@@ -36,7 +36,7 @@ This asset details page template is best suited for media centers. It was origin
 
 ### Collection details page
 
-![Collection details page](../images/pages/collection-details.png "Collection details page")
+![Collection details page](./images/page-templates/collection-details.png "Collection details page")
 
 | Key                                          | Type                             |
 |----------------------------------------------|----------------------------------|
@@ -58,7 +58,7 @@ This asset details page template is best suited for media centers. It was origin
 
 Collections overview
 
-![Collections overview page](../images/pages/collections-overview.png "Collections overview page")
+![Collections overview page](./images/page-templates/collections-overview.png "Collections overview page")
 
 | Key                                           | Type                             |
 |-----------------------------------------------|----------------------------------|
@@ -80,7 +80,7 @@ Collections overview
 
 This cover page template is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Main Page](../images/pages/main-page.png "Main Page")
+![Main Page](./images/page-templates/main-page.png "Main Page")
 
 | Key                                  | Type                |
 |--------------------------------------|---------------------|
@@ -101,7 +101,7 @@ This cover page template is best suited for media centers. It was originally des
 
 This assets search page template is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Search page](../images/pages/search-page.png "Search page")
+![Search page](./images/page-templates/search-page.png "Search page")
 
 | Key                                          | Type                      |
 |----------------------------------------------|---------------------------|
@@ -132,7 +132,7 @@ This assets search page template is best suited for media centers. It was origin
 
 Request access
 
-![Request access page](../images/pages/request-access.png "Request access page")
+![Request access page](./images/page-templates/request-access.png "Request access page")
 
 | Key                                     | Type                       |
 |-----------------------------------------|----------------------------|
@@ -158,7 +158,7 @@ Request access
 
 ### Request download page
 
-![Request download page](../images/pages/request-download.png "Request download page")
+![Request download page](./images/page-templates/request-download.png "Request download page")
 
 | Key                                       | Type                         |
 |-------------------------------------------|------------------------------|
