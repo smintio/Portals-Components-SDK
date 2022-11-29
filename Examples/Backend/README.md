@@ -1,9 +1,9 @@
 Examples for Smint.io Portals backend components
 ================================================
 
-This repository contains examples for Smint.io Portals backend components, which is portal templates, connectors, data adapters and task handlers.
+This repository contains examples for Smint.io Portals backend components, which is connectors, data adapters, task handlers, portal templates and identity providers.
 
-Documentation on portal templates and task handlers will follow. Please get in touch if you want to leverage that functionality.
+Documentation on portal templates, task handlers and identity providers will follow. Please get in touch if you want to leverage that functionality.
 
 Please note that at any time you can build your own connector or data adapter components based
 on our *Smint.io Portals SDKs*. Access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io)
@@ -315,7 +315,9 @@ You may also publish the interface as a NPM package for further comfort.*
 TODOs
 =====
 
-- Example for task handlers and state machines
+- Documentation for portal templates
+- Documentation for task handlers
+- Documentation for identity providers
 
 Contributors
 ============
