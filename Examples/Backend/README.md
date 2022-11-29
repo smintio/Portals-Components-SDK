@@ -64,10 +64,13 @@ public string PictureparkUrl { get; set; }
 [Required]
 public string AccessToken { get; set; }
 ```
-Smint.io Portals understands the definition of custom attributes that allow to change the look and feel of the user interface.
+Smint.io Portals understands the definition of annotations that allow to change the look and feel of the user interface.
 Please note that multiple cultures are supported.
 
-The `IConnector` implementation should select authentication mechanism. Smint.io supports `OAuth2Connector` and `OAuth2AuthenticationCodeFlowWithPKCEConnector`, which should serve as a starting point in the form of a base class.
+The full list of supported Smint.io Portals annotations can be found [here](../Frontend/docs/smintio-annotations.md).
+
+The `IConnector` implementation should specify the authentication mechanism. Smint.io supports `OAuth2Connector` and `OAuth2AuthenticationCodeFlowWithPKCEConnector`, which should serve as a starting point in the form of a base class.
+However, it is also possible to implement your own authentication mechanism at any time.
 
 Several things need to be done depending on the authentication flow for instantiating a client.
 
