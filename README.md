@@ -7,8 +7,8 @@ Examples cover both [frontend](Examples/Frontend/) and [backend](Examples/Backen
 
 The tools we provide can improve the experience as you develop Smint.io Portals components.
 
-- Data Adapter Exporter SDK is used to generate TypeScript public API interface definition from backend component assemblies. Learn more about how to do that [here](Examples/Backend/#custom-public-api-interfaces)
-- Publish Component SDK is used to compile, package and deploy components. More on that [here](Tools/Portals-SDK-PublishComponent-CLI/Release/)
+- The [Data Adapter Exporter SDK](Examples/Backend/#custom-public-api-interfaces) is used to generate TypeScript public API interface definition from backend component assemblies
+- The [Publish Component SDK](Tools/Portals-SDK-PublishComponent-CLI/Release/) is used to compile, package and deploy components
 
 Please note that future tools may be added or existing ones may be updated based on user feedback.
 
