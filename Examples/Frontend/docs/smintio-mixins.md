@@ -1,13 +1,13 @@
-State: 29th of November, 2022
-
 Smint.io mixins
-=====================
+===============
 
 We have prepared several mixins that help you to perform common tasks more quickly in your components.
 
 * [Download asset(s)](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-mixins.md#download-assets)
 * [Collect asset(s)](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-mixins.md#collect-assets)
 * [Remember asset(s)](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-mixins.md#remember-assets)
+
+Current version of this document is: 1.0.0 (as of 3rd of March, 2022)
 
 ## Download asset(s)
 
