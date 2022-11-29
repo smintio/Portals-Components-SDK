@@ -260,7 +260,7 @@ The source follows established Vue.js structure practices by containing a templa
 })
 ```
 
-The full list of supported Smint.io Portals UI component types can be seen [here](docs/smintio-component-types.md).
+The full list of supported Smint.io Portals frontend component types can be seen [here](docs/smintio-frontend-component-types.md).
 
 The `PortalsUiComponentImplementation` exports fully localized properties that are interpreted by the Smint.io pages as `FormGroup`.
 Additional attributes such as `DynamicAllowedValuesProvider` or `IsColor` control how the page configuration can look.
