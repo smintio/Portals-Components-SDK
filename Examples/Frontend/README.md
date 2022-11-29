@@ -1,11 +1,12 @@
 Content
 =======
 
-This README.md contains an overview of all currently existing default Smint.io UI componets that are delivered and maintained directly by us.
-Serves to clarify the general concept of Smint.io Portals portal templates, page templates and default user interface components, together with their options.
-Finally, it will shed some light on how to get started with custom component development.
+This README.md serves to clarify the general concept of Smint.io Portals frontend components, which is page templates and user interface components.
+Also it contains an overview of a lot of currently existing default Smint.io Portals frontend componennts that are delivered and maintained directly by us.
 
-Please note that at any time you can build your own portal templates, page templates or user interface components based on our Smint.io Portals SDKs.
+Finally, it will shed some light on how you can get started with developing your own custom Smint.io Portals frontend components.
+
+Please note that at any time you can build your own  page templates or user interface components based on our Smint.io Portals SDKs.
 Access to the SDKs is restricted. Get in contact with Smint.io and request access.
 Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals Enterprise plan customers.
 
