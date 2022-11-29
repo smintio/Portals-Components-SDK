@@ -266,6 +266,8 @@ The `PortalsUiComponent` implementation exports fully localized properties that 
 Additional attributes such as `DynamicAllowedValuesProvider` or `IsColor` control how the component configuration can look.
 In this case, an example would be a text input field or a color picker.
 
+The full list of supported Smint.io Portals annotations can be found [here](docs/smintio-annotations.md).
+
 By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
 
 In addition to the minimal and default settings, custom script sections are added to make it easier to deploy components to different Smint.io environments using our publish component CLI tool. 
