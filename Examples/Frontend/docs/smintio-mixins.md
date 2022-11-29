@@ -17,6 +17,7 @@ When you want the user to be able to open the download asset(s) dialog in your t
 
 ```js
 import { SDownloadProps } from "@smintio/portals-components";
+
 export default class PortalsUiComponentImplementation extends Mixins(SDownloadProps) {
     ...
 }
