@@ -222,7 +222,7 @@ Portals component framework and runtime.
 However, for use of your custom public API interfaces in a Smint.io Portals UI component you'll need its Typescript 
 public API interface definition.
 
-Use the (Smint.io Portals Data Adapter Exporter CLI tool)[https://github.com/smintio/Portals-Components-SDK/tree/main/Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release] 
+Use the [Smint.io Portals Data Adapter Exporter CLI tool](https://github.com/smintio/Portals-Components-SDK/tree/main/Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release) 
 to generate the Typescript public API interface definition directly from your Smint.io Portals data adapter assembly. 
 
 You can then simple use that Typescript public API interface definition file
