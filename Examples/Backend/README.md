@@ -42,8 +42,7 @@ The purpose of a connector is to provide a way to communicate with an external p
 
 Each connector is system dedicated. See [Picturepark](Connectors/Connector-Picturepark/) or [Sharepoint](Connectors/Connector-SharePoint/). 
 
-One NuGet Smint.io package makes it possible to build a connector. 
-Known as `SmintIo.Portals.ConnectorSDK`.
+The `SmintIo.Portals.ConnectorSDK` NuGet Smint.io package makes it possible to build a connector.
 
 `IConnectorStartup` is the main interface to be implemented, so that at a later stage Smint.io knows how to use the newly built connector.
 
