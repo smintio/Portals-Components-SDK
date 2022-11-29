@@ -13,6 +13,9 @@ Enterprise plan customers.
 You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
 
 1. [Examples](#examples)
+1. [Connector description & flow](#user-content-connector-description--flow)
+1. [Data adapter public API interfaces](#user-content-data-adapter-public-api-interfaces)
+1. [Custom public API interfaces](#user-content-custom-public-api-interfaces)
 1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
 
 Current version of this document is: 2.2.0 (as of 25th of November, 2022)
