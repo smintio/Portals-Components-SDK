@@ -12,8 +12,6 @@ Access will be granted to either Smint.io Solution Partners or to all our Smint.
 
 You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
 
-Current version of this document is: 1.0.0 (as of 25th of November, 2022)
-
 1. [UI components](#ui-components)
 1. [Page templates](#page-templates)
 1. [Portal templates](#portal-templates)
@@ -21,7 +19,10 @@ Current version of this document is: 1.0.0 (as of 25th of November, 2022)
 1. [Overview of Smint.io UI components](docs/smintio-ui-components.md)
 1. [Overview of Smint.io page templates](docs/smintio-page-templates.md)
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
+1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
+
+Current version of this document is: 1.0.0 (as of 25th of November, 2022)
 
 UI components
 =============
