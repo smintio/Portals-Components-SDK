@@ -10,7 +10,7 @@ Page templates
 * [Request access page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#request-access-page)
 * [Request download page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#request-download-page)
 
-
+Current version of this document is: 1.0.0 (as of 3rd of March, 2022)
 
 ### Asset details page
 

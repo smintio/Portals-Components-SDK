@@ -12,6 +12,8 @@ The tools we provide can improve the experience as you develop Smint.io Portals 
 
 Please note that future tools may be added or existing ones may be updated based on user feedback.
 
+Current version of this document is: 1.0.0 (as of 25th of November, 2022)
+
 Contributors
 ============
 

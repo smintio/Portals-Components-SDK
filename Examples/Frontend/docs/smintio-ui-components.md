@@ -32,6 +32,7 @@ Components
    * [Facet based search form](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#facet-based-search-form)  
    * [Search result](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#search-result)  
 
+Current version of this document is: 1.0.0 (as of 3rd of March, 2022)
 
 ## Generic components  
 
