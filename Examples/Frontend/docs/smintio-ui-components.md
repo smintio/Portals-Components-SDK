@@ -39,7 +39,7 @@ Current version of this document is: 1.0.0 (as of 3rd of March, 2022)
 ### Assets preview
 This component shows multiple assets in a neat preview. The user can then easily download or collect assets directly from the preview.
 
-![Assets preview](../images/components/assets-preview-with-action-bar.gif "Assets preview")
+![Assets preview](./images/ui-components/assets-preview-with-action-bar.gif "Assets preview")
 
 | Key                                              | Type                         |
 |--------------------------------------------------|------------------------------|
@@ -59,7 +59,7 @@ This component shows multiple assets in a neat preview. The user can then easily
 
 This component displays a banner with an optional title and a search bar.
 
-![Banner with search bar](../images/components/banner-with-search-bar-video-fading-small.gif "Banner with search bar")
+![Banner with search bar](./images/ui-components/banner-with-search-bar-video-fading-small.gif "Banner with search bar")
 
 | Key                                      | Type             |
 |------------------------------------------|------------------|
@@ -95,7 +95,7 @@ This component displays a banner with an optional title and a search bar.
 
 This component displays a column-based category chooser for one or more categories.
 
-![Category chooser](../images/components/category-chooser.png "Category chooser")
+![Category chooser](./images/ui-components/category-chooser.png "Category chooser")
 
 | Key                                      | Type                        |
 |------------------------------------------|-----------------------------|
@@ -119,7 +119,7 @@ The component has margin on it's X axis intentionally because the components are
 
 This component displays a category carousel for one or more categories.
 
-![Category carousel](../images/components/category-slider.png "Category carousel")
+![Category carousel](./images/ui-components/category-slider.png "Category carousel")
 
 | Key                                     | Type                      |
 |-----------------------------------------|---------------------------|
@@ -146,7 +146,7 @@ The component has margin on it's X axis intentionally because the slide arrows a
 
 This component displays the details and the content of a collection.
 
-![Collection details](../images/components/collection-details.png "Collection details")
+![Collection details](./images/ui-components/collection-details.png "Collection details")
 
 | Key                                          | Type                           |
 |----------------------------------------------|--------------------------------|
@@ -164,7 +164,7 @@ This component displays the details and the content of a collection.
 
 This component displays an overview of all collections of the user.
 
-![Collections overview](../images/components/collections-overview.png "Collections overview")
+![Collections overview](./images/ui-components/collections-overview.png "Collections overview")
 
 | Key                                          | Type                            |
 |----------------------------------------------|---------------------------------|
@@ -182,7 +182,7 @@ This component displays an overview of all collections of the user.
 
 This component displays a color indicator with text to the left or to the right.
 
-![Color](../images/components/color.png "Color indicator with text")
+![Color](./images/ui-components/color.png "Color indicator with text")
 
 | Key                            | Type                       |
 |--------------------------------|----------------------------|
@@ -207,7 +207,7 @@ This component displays a color indicator with text to the left or to the right.
 
 This component displays a page footer.
 
-![Footer](../images/components/footer.png "Footer")
+![Footer](./images/ui-components/footer.png "Footer")
 
 | Key                            | Type              |
 |--------------------------------|-------------------|
@@ -232,7 +232,7 @@ This component displays a page footer.
 
 This component displays a page header.
 
-![Header](../images/components/header.png "Header")
+![Header](./images/ui-components/header.png "Header")
 
 | Key                            | Type              |
 |--------------------------------|-------------------|
@@ -263,7 +263,7 @@ This component displays a page header.
 
 This component displays an image.
 
-![Image](../images/components/image.png "Image")
+![Image](./images/ui-components/image.png "Image")
 
 | Key                             | Type            |
 |---------------------------------|-----------------|
@@ -287,7 +287,7 @@ This component displays an image.
 
 This component displays an image with text to the left or to the right.
 
-![Image with text](../images/components/image-with-text.png "Image with text")
+![Image with text](./images/ui-components/image-with-text.png "Image with text")
 
 | Key                                     | Type                       |
 |-----------------------------------------|----------------------------|
@@ -320,7 +320,7 @@ This component displays an image with text to the left or to the right.
 
 This component displays a location.
 
-![Location](../images/components/location.png "Location")
+![Location](./images/ui-components/location.png "Location")
 
 | Key                                | Type                |
 |------------------------------------|---------------------|
@@ -354,7 +354,7 @@ This component displays a location.
 
 This component displays a column-based menu item chooser for one or more menu items and sub menu items.
 
-![Menu item chooser](../images/components/menu-item-chooser.png "Menu item chooser")
+![Menu item chooser](./images/ui-components/menu-item-chooser.png "Menu item chooser")
 
 | Key                                      | Type                       |
 |------------------------------------------|----------------------------|
@@ -378,7 +378,7 @@ This component displays a column-based menu item chooser for one or more menu it
 
 This component displays a page title and subtitle.
 
-![Page title](../images/components/page-title.png "Page title")
+![Page title](./images/ui-components/page-title.png "Page title")
 
 | Key                                      | Type                   |
 |------------------------------------------|------------------------|
@@ -399,7 +399,7 @@ This component displays a page title and subtitle.
 
 This component displays a search bar for assets.
 
-![Search bar](../images/components/search-bar.png "Search bar")
+![Search bar](./images/ui-components/search-bar.png "Search bar")
 
 | Key                                | Type                  |
 |------------------------------------|-----------------------|
@@ -419,7 +419,7 @@ This component displays a search bar for assets.
 
 This component displays a multi level side menu.
 
-![Side menu](../images/components/side-menu.png "Side menu")
+![Side menu](./images/ui-components/side-menu.png "Side menu")
 
 | Key                              | Type                 |
 |----------------------------------|----------------------|
@@ -438,7 +438,7 @@ This component displays a multi level side menu.
 
 This component displays a text block with header, sub header and continuous text.
 
-![Text block](../images/components/text-block.png "Text block")
+![Text block](./images/ui-components/text-block.png "Text block")
 
 | Key                         | Type           |
 |-----------------------------|----------------|
@@ -461,7 +461,7 @@ This component displays a text block with header, sub header and continuous text
 
 This component displays a text block with up to 3 columns.
 
-![Text block with up to 3 columns](../images/components/text-columns.png "Text block with up to 3 columns")
+![Text block with up to 3 columns](./images/ui-components/text-columns.png "Text block with up to 3 columns")
 
 | Key                                 | Type           |
 |-------------------------------------|----------------|
@@ -495,7 +495,7 @@ This component displays a text block with up to 3 columns.
 
 This component displays a video.
 
-![Video](../images/components/video.png "Video")
+![Video](./images/ui-components/video.png "Video")
 
 | Key                          | Type            |
 |------------------------------|-----------------|
@@ -519,7 +519,7 @@ This component displays a video.
 
 This asset details action bar component is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Action bar](../images/components/asset-actions-bar.png "Action bar")
+![Action bar](./images/ui-components/asset-actions-bar.png "Action bar")
 
 | Key                                                   | Type                               |
 |-------------------------------------------------------|------------------------------------|
@@ -531,7 +531,7 @@ This asset details action bar component is best suited for media centers. It was
 
 This asset preview component for the asset details view is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Asset preview](../images/components/asset-preview.png "Asset preview")
+![Asset preview](./images/ui-components/asset-preview.png "Asset preview")
 
 | Key                                                | Type                            |
 |----------------------------------------------------|---------------------------------|
@@ -543,7 +543,7 @@ This asset preview component for the asset details view is best suited for media
 
 This details text component for the asset details view is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Details text](../images/components/asset-text.png "Details text")
+![Details text](./images/ui-components/asset-text.png "Details text")
 
 | Key                                             | Type                         |
 |-------------------------------------------------|------------------------------|
@@ -563,7 +563,7 @@ This details text component for the asset details view is best suited for media 
 
 This metadata viewer component for the asset details view is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Metadata viewer](../images/components/asset-metadata-viewer.png "Metadata viewer")
+![Metadata viewer](./images/ui-components/asset-metadata-viewer.png "Metadata viewer")
 
 | Key                                                        | Type                                    |
 |------------------------------------------------------------|-----------------------------------------|
@@ -583,7 +583,7 @@ This metadata viewer component for the asset details view is best suited for med
 
 This tag viewer component for the asset details view is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Tag viewer](../images/components/asset-tags.png "Tag viewer")
+![Tag viewer](./images/ui-components/asset-tags.png "Tag viewer")
 
 | Key                                                   | Type                               |
 |-------------------------------------------------------|------------------------------------|
@@ -604,7 +604,7 @@ This tag viewer component for the asset details view is best suited for media ce
 
 This collections quickview component is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Collections quickview](../images/components/collections-quickview.png "Collections quickview")
+![Collections quickview](./images/ui-components/collections-quickview.png "Collections quickview")
 
 | Key                                                | Type                            |
 |----------------------------------------------------|---------------------------------|
@@ -622,7 +622,7 @@ This collections quickview component is best suited for media centers. It was or
 
 This facet based search form is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Facet based search form](../images/components/search-facet-form.png "Facet based search form")
+![Facet based search form](./images/ui-components/search-facet-form.png "Facet based search form")
 
 | Key                                            | Type                  |
 |------------------------------------------------|-----------------------|
@@ -645,7 +645,7 @@ This facet based search form is best suited for media centers. It was originally
 
 This search result display component is best suited for media centers. It was originally designed for the Imagination media center.
 
-![Search result](../images/components/search-result.png "Search result")
+![Search result](./images/ui-components/search-result.png "Search result")
 
 | Key                                        | Type                    |
 |--------------------------------------------|-------------------------|
