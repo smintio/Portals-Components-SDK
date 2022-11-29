@@ -111,4 +111,4 @@ Current version of this document is: 1.0.0 (as of 29th of November, 2022)
 | `Error`                            | `page-type-error`                                    |   **Error**                                               |
 ---
 
-Please note that if a new type is required, you can contact us at [support@smint.io](mailto:support@smint.io)
+Please note that if a new type is required, you can contact us at [support@smint.io](mailto:support@smint.io).
