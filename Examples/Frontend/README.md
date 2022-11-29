@@ -238,7 +238,7 @@ How develop your own frontend component
 A good starting point is looking at our [Hello world](ui-example-hello-world-1/) example. It is an example of a Smint.io Portals UI component.
 An example for crafting your own page template will follow soon.
 
-The [component](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
+The [Vue.js component itself](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
 It can display colored static text once added to a page.
 
 The source follows established Vue.js structure practices by containing a template, typescript, and css sections.
