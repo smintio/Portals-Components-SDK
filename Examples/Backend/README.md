@@ -104,7 +104,7 @@ Confirms whether we can communicate successfully with the third party.
 ```C#
 public override async Task PerformPostAuthorizationChecksAsync(FormFieldValuesModel formFieldValuesModel)
 {
-	var channelFormFieldValueModel = formFieldValuesModel.Values.FirstOrDefault(FormFieldValueModel => string.Equals(FormFieldValueModel.Id, nameof(PictureparkConnectorConfiguration.Channel)));
+    var channelFormFieldValueModel = formFieldValuesModel.Values.FirstOrDefault(FormFieldValueModel => string.Equals(FormFieldValueModel.Id, nameof(PictureparkConnectorConfiguration.Channel)));
 
     string configuredChannelId = null;
 
