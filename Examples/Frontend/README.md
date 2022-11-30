@@ -247,27 +247,54 @@ The source follows established Vue.js structure practices by containing a templa
 `PortalsUiComponent` is annotated with custom attributes which contribute to the component description in way meaningful to Smint.io.
 
 ```javascript
-@PortalsUiComponent({
-    type: "ui-type-text",
-    key: "smintio-ui-example-hello-world-1",
-    displayName: {
-        [DefaultCulture]: "Hello world",
-        de: "Hallo Welt",
-    },
-    description: {
-        [DefaultCulture]: "This component displays a message with an optional color.",
-        de: "Diese Komponente dient zur Darstellung eines Banners mit optionalem Titel und einer Suchleiste.",
-    },
-})
+    @PortalsUiComponent({
+        type: "ui-type-text",
+        key: "smintio-ui-example-hello-world-1",
+        displayName: {
+            [DefaultCulture]: "Hello world",
+            de: "Hallo Welt",
+        },
+        description: {
+            [DefaultCulture]: "This component displays a message with an optional color.",
+            de: "Diese Komponente dient zur Darstellung eines Banners mit optionalem Titel und einer Suchleiste.",
+        },
+    })
 ```
 
 The full list of supported Smint.io Portals frontend component types can be seen [here](docs/smintio-frontend-component-types.md).
 
 The `PortalsUiComponent` implementation exports fully localized properties that are interpreted by the Smint.io pages as `FormGroup`.
+
+```javascript
+    @DisplayName("en", "Component text", true)
+    @DisplayName("de", "Komponententext")
+    @Description("en", "The component text.", true)
+    @Description("de", "Der Komponententext.")
+    @Implements("ILocalizedStringsModel")
+    @ComponentProperty({ name: "componentText" })
+    @DynamicAllowedValuesProvider(
+        PortalsGlobalServices.PortalsContext.toString(),
+        "StringResourceAllowedValuesProvider"
+    )
+    @FormGroup("hw-text")
+    public readonly componentText!: ILocalizedStringsModel;
+
+    @DisplayName("en", "Color", true)
+    @DisplayName("de", "Farbe")
+    @Description("en", "The component text color.", true)
+    @Description("de", "Die Textfarbe der Komponente.")
+    @ComponentProperty({ name: "componentColor" })
+    @IsColor()
+    @FormGroup("hw-color")
+    public readonly componentColor!: string;
+```
+
 Additional attributes such as `DynamicAllowedValuesProvider` or `IsColor` control how the component configuration can look.
 In this case, an example would be a text input field or a color picker.
 
 The full list of supported Smint.io Portals annotations can be found [here](docs/smintio-annotations.md).
+
+`ILocalizedStringsModel` is a custom object type defined by Smint.io that can return the correct text value of a component according to the selected language by the user.
 
 By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
 
