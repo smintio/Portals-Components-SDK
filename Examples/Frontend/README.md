@@ -279,7 +279,10 @@ Step to follow
     - Please note that newer versions of npm packages may exist.
 1. Enjoy while developing your first `PortalsUiComponent.vue` custom component
 
-A good starting point is looking at our [Hello world](ui-example-hello-world-1/) example. It is an example of a Smint.io Portals UI component.
+A good starting point is looking at our [Hello world](ui-example-hello-world-1/) example. 
+
+It is an example of a Smint.io Portals UI component.
+
 An example for crafting your own page template will follow soon.
 
 The [Vue.js component itself](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
