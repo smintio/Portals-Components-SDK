@@ -21,7 +21,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
 1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
-1. [Workflow for publishing custom components](#workflow-for-publishing-custom-components)
+1. [Workflow for publishing custom component](#workflow-for-publishing-custom-component)
 
 Current version of this document is: 1.0.0 (as of 25th of November, 2022)
 
@@ -345,8 +345,8 @@ In addition to the minimal and default settings, custom script sections are adde
 
 More information about building, packaging and publishing Smint.io Portals components using the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
 
-Workflow for publishing custom components
-=========================================
+Workflow for publishing custom component
+========================================
 
 Once the custom component code is ready to publish
 
