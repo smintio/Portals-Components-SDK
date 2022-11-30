@@ -21,6 +21,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
 1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
+1. [Step to publish your own custom component](#step-to-publish-your-own-custom-component)
 
 Current version of this document is: 1.0.0 (as of 25th of November, 2022)
 
@@ -319,6 +320,9 @@ npm run smint-io-pc
 Please note that calling the script repeatedly will result in an error.
 
 With each code change, the version number must be increased.
+
+Step to publish your own custom component
+=========================================
 
 Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) to request publishing.
 
