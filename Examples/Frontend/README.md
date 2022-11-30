@@ -356,8 +356,7 @@ Do this:
 1. Run `npm run build` to ensure the latest version will be published
 1. Run `npm run smint-io-pc` to publish to `Staging` environment or `npm run smint-io-pc:development` to publish to `Development`
     - `Staging` should be the preferred environment without access to the Smint.io codebase
-    - If the component already exists in the npm registry the component can deployed by running `npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging` 
-    - Running command will package the component in the defined npm registry and then trigger a REST API request to register the package for the specified environment
+    - If the component already exists in the npm registry the component can be deployed by running `npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging` 
 1. A browser window will open for you to authenticate to allow the component to be published
     - The window will close after a few seconds on success
 1. Go back to the command prompt or terminal window and validate that component is published using the correct version
@@ -365,6 +364,8 @@ Do this:
 1. Repeat the process for each code change
 
 Please note that calling `npm run smint-io-pc` repeatedly will result in an error.
+
+Running the command will package the component in the defined npm registry and then trigger a REST API request to register the package for the specified environment
 
 With each code change, the version number must be increased in the `package.json` file.
 
