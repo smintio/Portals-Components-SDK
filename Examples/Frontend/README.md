@@ -358,7 +358,8 @@ Do this:
     - `Staging` should be the preferred environment without access to the Smint.io codebase
     - If the component already exists in the npm registry the component can be deployed by running `npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging` 
 1. A browser window will open for you to authenticate to allow the component to be published
-    - The window will close after a few seconds on success
+    - If successful, the window will close after a few seconds
+    - *You can now return to the application.* will also indicate success
 1. Go back to the command prompt or terminal window and validate that component is published using the correct version
 1. `Done` will indicate that the publication is succsesful
 1. Repeat the process for each code change
