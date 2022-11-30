@@ -363,9 +363,9 @@ Do this:
 1. `Done` will indicate that the publication is succsesful
 1. Repeat the process for each code change
 
-Please note that calling `npm run smint-io-pc` repeatedly will result in an error.
+Running `npm run smint-io-pc` will package the component in the defined npm registry and then trigger a REST API request to register the package for the specified environment.
 
-Running the command will package the component in the defined npm registry and then trigger a REST API request to register the package for the specified environment
+Please note that calling the command repeatedly will result in an error.
 
 With each code change, the version number must be increased in the `package.json` file.
 
