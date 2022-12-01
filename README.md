@@ -10,7 +10,7 @@ Please find guides about frontend or backend component development here:
 	- Page templates
 	- UI components
 	
-- [Developint backend components](Examples/Backend/)
+- [Developing backend components](Examples/Backend/)
 
 	- Connectors
 	- Data adapters
