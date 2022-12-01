@@ -60,11 +60,9 @@ Usage
 
 The DevServer tool can be started by executing the binary for the target operating system.
 
-During initialization the server with list all known configuration mappings.
+During initialization the server with list all known frontend component configuration mappings.
 
-If the component is not listed in the mappings, the server will display a message indicating that the component is not recognized.
-
-Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) for any questions regarding Portals-DevServer.
+Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) for any questions regarding the dev server.
 
 Contributors
 ============
