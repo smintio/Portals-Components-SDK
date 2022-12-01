@@ -237,53 +237,33 @@ Learn more about how to do that [here](https://github.com/smintio/Portals-Compon
 How develop your own frontend component
 =======================================
 
-Step to follow
+## Get started
 
-1. Navigate to a folder where the components should be physically present. We will call it the root folder.
-1. Open a command prompt or terminal window in the root folder
-1. Install the `Vue.js` CLI tool by running `npm install -g @vue/cli`
-1. Once finished initialize a new `Vue.js` component by running `vue create custom-component-name --bare`
-    - Replace `custom-component-name` with the desired component name
-    - Usually the component name ends with its major version number e.g. `ui-example-hello-world-1`
-1. The Vue CLI will execute and take the wizard
-    - Navigate to `Manually select features` using the arrows
-    - Click enter
-    - Navigate to `TypeScript`
-    - Click space to select it
-    - Optionally navigate and select other features
-    - Click enter to proceed
-    - Navigate to version `2.x` and click enter
-    - Click `enter` a few more times or adjust the configuration to your preference
-    - `Where do you prefer placing config for Babel, ESLint, etc.?` Please select in package.json
-    - Wait for the bootstrap process to finish
-1. Go to the newly created custom component folder
-    - Delete `public` folder
-    - Go to `src`
-    - Rename `App.vue` to `PortalsUiComponent.vue`
-    - Delete the rest of the files
-    - Go back to parent folder
-1. Edit the newly created `package.json` file.
-    - Prefix the component name with your company name or something recognizable by you e.g. `@smintio/ui-example-hello-world-1`
-    - Please add a `author` property
-    - Add custom command under the `scripts` property
-        - `"smint-io-pc:development": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development"`
-        - `"smint-io-pc": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging"`
-    - Include Smint.io npm packages to `dependencies` with optional `vuetify`
-        - `"@smintio/helpers": 1.4.7"`
-        - `"@smintio/mpa-page-helpers": "0.6.1"`
-        - `"@smintio/portals-component-sdk": "1.3.7"`
-        - `"@smintio/portals-components": "5.1.2"`
-        - `"vuetify": "2.5.9"`
-    - Include Smint.io npm dev packages to `devDependencies`
-        - `"@smintio/portals-resource-builder-cli": "1.1.2"`
-    - Please note that newer versions of npm packages may exist.
-1. Enjoy while developing your first `PortalsUiComponent.vue` custom component
+Steps to follow:
 
-A good starting point is looking at our [Hello world](ui-example-hello-world-1/) example. It is an example of a Smint.io Portals UI component.
+1. Navigate to a folder where the components should be physically present. We will call it the root folder
+1. Copy the `ui-example-hello-world-1` directory to that root folder as a starting point
+1. Rename the `ui-example-hello-world-1` directory to your desired frontend component name
+
+Suggestions:
+
+- Start the directory name with `ui-` for UI components, and `page-` for page templates)
+- End the directory name with `-1` so that later on, if desired, you can potentially create different variations of the frontend component
+
+1. Edit the `package.json` file in the new directory, and change `name`, `description`, `version` and `author` of your new frontend component
+
+Suggestions:
+
+- Prefix the package `name` with your domain e.g. `@smint-io/` or `@smintio/`
+- Then simply add the directory name from the previous step as the package name
+
+1. Please adjust `src/PortalsUiComponent.vue` accordingly
 
 An example for crafting your own page template will follow soon.
 
-The [Vue.js component itself](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
+## The example frontend component
+
+The [example Vue.js component itself](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
 It can display colored static text once added to a page.
 
 The source follows established Vue.js structure practices by containing a template, typescript, and css sections.
@@ -346,8 +326,7 @@ In addition to the minimal and default settings, custom script sections are adde
 
 More information about building, packaging and publishing Smint.io Portals components using the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
 
-Workflow for publishing custom component
-========================================
+## The workflow for publishing your custom frontend component
 
 Once the custom component code is ready to publish
 
