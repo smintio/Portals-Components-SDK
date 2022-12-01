@@ -1,5 +1,5 @@
-Content
-=======
+Developing Smint.io Portals frontend components
+===============================================
 
 This README.md serves to clarify the general concept of Smint.io Portals frontend components, which is page templates and UI components.
 Also it contains an overview of a lot of currently existing default Smint.io Portals frontend componennts that are delivered and maintained directly by us.
@@ -24,8 +24,8 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 
 Current version of this document is: 1.0.0 (as of 25th of November, 2022)
 
-UI components
-=============
+# UI components
+
 The most atomic part of a Smint.io Portal is the *Smint.io Portals UI component*. A UI component could, for example, be:
 
 - A header bar
@@ -107,8 +107,7 @@ The UI components can then be published to any NPM repository from where our sys
 components. You can locally develop Smint.io Portals UI components while having them run in our production system by
 running our very simple *Smint.io Portals DevServer*.
 
-Page templates
-==============
+# Page templates
 
 The second level of structure on top of UI components is introduced by *Smint.io Page Templates*. A page template
 defines the structure of a Smint.io Portals page by defining and rendering so-called *slots* (do NOT confuse with Vue.js
@@ -153,8 +152,7 @@ annotations*. The page templates can then be published to any NPM repository fro
 templates. You can locally develop Smint.io Portals page templates while having them run in our production system by
 running our very simple *Smint.io Portals DevServer*.
 
-Portal templates
-================
+# Portal templates
 
 To wrap the story up, the topmost level of the structure of a Smint.io Portals portal is introduced by *Smint.io portal
 templates*. A portal template combines and configures page templates for a complete portal experience. The portal
@@ -174,8 +172,7 @@ Smint.io portal templates can be developed using the *SmintIo-PortalTemplate-SDK
 Template properties can be made available for editing by the user through *annotations*. Portal templates need to be
 submitted to Smint.io for approval and inclusion to our portal template library.
 
-Data adapter public API interfaces
-==================================
+# Data adapter public API interfaces
 
 Each Smint.io Portals UI component can tie itself to public API interfaces published by Smint.io Portals data adapters.
 
@@ -233,10 +230,9 @@ in your Smint.io Portals UI component.
 
 Learn more about how to do that [here](https://github.com/smintio/Portals-Components-SDK/tree/main/Examples/Backend#custom-public-api-interfaces).
 
-How develop your own frontend component
-=======================================
+# How develop your own frontend component
 
-### Getting started
+## Getting started
 
 Steps to follow:
 
@@ -256,7 +252,7 @@ Steps to follow:
 
 An example for crafting your own page template will follow soon.
 
-### The example frontend component
+## The example frontend component
 
 The [example Vue.js component itself](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
 It can display colored static text once added to a page.
@@ -317,12 +313,12 @@ The full list of supported Smint.io Portals annotations can be found [here](docs
 
 By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
 
-### Build your custom frontend component
+## Build your custom frontend component
 
 1. In the component folder open a command prompt or terminal window
 1. Run `npm run build` or `npm run watch` to build your frontend component
 
-### Publish your custom frontend component
+## Publish your custom frontend component
 
 1. In the component folder open a command prompt or terminal window
 1. Run `npm run build` to ensure the latest version will be published
@@ -344,7 +340,7 @@ With each code change, the version number must be increased in the `package.json
 
 More information about the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
 
-### Local development
+## Local development
 
 1. Get in touch with [support@smint.io](mailto:support@smint.io) so that we can set up a development portal for you
 1. Set up the [Portals Dev-Server](../../Tools/Portals-DevServer/Release/) to point to the root folder, and map your new frontend component
@@ -354,7 +350,7 @@ More information about the *Portals-SDK-PublishComponent-CLI tool* can be found 
 1. Navigate to your development portal, add your frontend component to a page
 1. Change some code in your frontend component, and refresh the browser page. Enjoy! :)
 
-### Problems
+## Problems
 
 Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) if you run into any issues.
 
