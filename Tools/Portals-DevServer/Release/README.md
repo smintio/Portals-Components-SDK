@@ -13,7 +13,7 @@ Description
 
 By default, Smint.io distributes frontend components through a CDN. This means, that you cannot change a frontend component easily
 and quickly update them in your browser without building, packaging and publishing the frontend component to the Smint.io servers
-using the [Portals-SDK-PublishComponent-CLI tool](../Portals-SDK-PublishComponent-CLI/Release/).
+using the [Portals-SDK-PublishComponent-CLI tool](../../Portals-SDK-PublishComponent-CLI/Release/).
 
 The Portals-DevServer fixes that problem. Once you point the dev server to your local component build directory, it is able to
 serve the JavaScript of the frontend component to your browser directly, without going through the CDN.
