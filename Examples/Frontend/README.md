@@ -317,7 +317,7 @@ The full list of supported Smint.io Portals annotations can be found [here](docs
 
 By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
 
-### Building your custom frontend component
+### Build your custom frontend component
 
 1. In the component folder open a command prompt or terminal window
 1. Run `npm run build` or `npm run watch` to build your frontend component
