@@ -1,7 +1,7 @@
-Smint.io mixins
-===============
+Smint.io Portals frontend component mixins
+==========================================
 
-We have prepared several mixins that help you to perform common tasks more quickly in your components.
+We have prepared several Vue.js mixins that help you to perform common tasks more quickly in your Smint.io Portals frontend components.
 
 * [Download asset(s)](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-mixins.md#download-assets)
 * [Collect asset(s)](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-mixins.md#collect-assets)
@@ -13,7 +13,7 @@ Current version of this document is: 1.0.0 (as of 3rd of March, 2022)
 
 When you want the user to be able to open the download asset(s) dialog in your top level Smint.io component you need to make sure that the following steps are implemented:
 
-### 1. Use the mixin in the Smint.io component
+### 1. Use the mixin in the Smint.io frontend component
 
 ```js
 import { SDownloadProps } from "@smintio/portals-components";
