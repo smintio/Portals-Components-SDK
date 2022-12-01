@@ -22,7 +22,7 @@ This means that you can use e.g. `npm run watch` to quickly build your frontend 
 to refresh the browser (*do not forget to turn off the browser cache!*) for the changes to take effect.
 
 For this to work, *the portal you are using to test your frontend components needs to be configured* to look up frontend components
-from localhost before loading them from our CDN. We can do that for you. Please get in touch with [support@smint.io](mailto:support@smint.io)
+from the dev server before loading them from our CDN. We can do that for you. Please get in touch with [support@smint.io](mailto:support@smint.io)
 to start the process.
 
 *Please note, that this only works for frontend component JavaScript changes!* If you want to change the *configuration options* of
