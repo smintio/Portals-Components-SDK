@@ -4,7 +4,6 @@ The Portals-DevServer
 1. [Description](#description)
 1. [Download](#download)
 1. [App settings](#app-settings)
-1. [Publish and deploy](#publish-and-deploy)
 1. [Usage](#usage)
 
 Current version of this document is: 1.0.0 (as of 30th of November, 2022)
