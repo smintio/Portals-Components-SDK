@@ -237,7 +237,7 @@ Learn more about how to do that [here](https://github.com/smintio/Portals-Compon
 How develop your own frontend component
 =======================================
 
-### Get started
+### Getting started
 
 Steps to follow:
 
@@ -245,19 +245,15 @@ Steps to follow:
 1. Copy the `ui-example-hello-world-1` directory to that root folder as a starting point
 1. Rename the `ui-example-hello-world-1` directory to your desired frontend component name
 
-Suggestions:
-
 - Start the directory name with `ui-` for UI components, and `page-` for page templates)
 - End the directory name with `-1` so that later on, if desired, you can potentially create different variations of the frontend component
 
-1. Edit the `package.json` file in the new directory, and change `name`, `description`, `version` and `author` of your new frontend component
-
-Suggestions:
+4. Edit the `package.json` file in the new directory, and change `name`, `description`, `version` and `author` of your new frontend component
 
 - Prefix the package `name` with your domain e.g. `@smint-io/` or `@smintio/`
 - Then simply add the directory name from the previous step as the package name
 
-1. Please adjust `src/PortalsUiComponent.vue` accordingly
+5. Please adjust `src/PortalsUiComponent.vue` accordingly
 
 An example for crafting your own page template will follow soon.
 
