@@ -242,7 +242,7 @@ How develop your own frontend component
 Steps to follow:
 
 1. Navigate to a folder where the components should be physically present. We will call it the root folder
-1. Copy the `ui-example-hello-world-1` directory [from this repository](./ui-example-hello-world-1) to that root folder as a starting point
+1. Copy the `ui-example-hello-world-1` directory from this repository to the root folder as a starting point
 1. Rename the `ui-example-hello-world-1` directory to your desired frontend component name
 
 	- Start the directory name with `ui-` for UI components, and `page-` for page templates
