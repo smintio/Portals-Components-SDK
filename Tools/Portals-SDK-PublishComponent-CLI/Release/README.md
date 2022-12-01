@@ -1,5 +1,6 @@
-Content
-=======
+The Portals-SDK-PublishComponent-CLI tool
+=========================================
+
 1. [Description](#description)
 1. [Download](#download)
 1. [Environment Variable](#environment-variable)
@@ -7,8 +8,7 @@ Content
 1. [Parameters](#parameters)
 1. [Publish and deploy](#publish-and-deploy)
 
-Description
-===========
+## Description
 
 The purpose of the Portals-SDK-PublishComponent-CLI tool is to enable developers with a short cycle to publish and deploy frontend and backend components to Smint.io.
 
@@ -21,23 +21,20 @@ Enterprise plan customers.
 
 Current version of this document is: 1.0.0 (as of 24th of November, 2022)
 
-Download
-========
+## Download
 
 Download the ZIP archive suitable for your operating system to a convenient location.
 
 Extract the archive.
 
-Environment variable
-====================
+## Environment variable
 
 Create an environment variable named `SMINT_IO_SDK_HOME` pointing to the location from the previous step.
 Doing so will allow the publishing tool to be invoked from different locations.
 - For Windows `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe`
 - For Linux `$SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI`
 
-App settings
-============
+## App settings
 
 You can manage three different environments for your component development efforts (`Development`, `Staging` and `Production`).
 For each of those environments, you can specify different connection data:
@@ -73,8 +70,7 @@ available on your machine, you can override the `RedirectUrl` setting inherited 
 also note that in this case you will also need to contact us at [support@smint.io](mailto:support@smint.io) and tell us the new redirect
 URL, because we need to whitelist the new redirect URL on our side before you can use it.*
 
-Parameters
-==========
+## Parameters
 
 The CLI tool has parameters that can be listed by executing the binary with one of the arguments `/?`, `/help` or `--help`
 
@@ -90,8 +86,7 @@ Example: `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe /?`
     - Intended for use by Smint.io staff only.
 - Lastly, `--version` shows the tool version
 
-Publish and deploy
-==================
+## Publish and deploy
 
 ### Frontend components 
 
