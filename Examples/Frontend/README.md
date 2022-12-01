@@ -352,7 +352,8 @@ More information about the *Portals-SDK-PublishComponent-CLI tool* can be found 
 1. Run the dev server
 1. Run `npm run watch` for continuous building of your frontend component
 1. Turn off your browser's cache
-1. Navigate to your development portal, add your frontend component to a page, and enjoy! :)
+1. Navigate to your development portal, add your frontend component to a page
+1. Change some code in your frontend component, and refresh the browser page. Enjoy! :)
 
 ### Problems
 
