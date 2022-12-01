@@ -21,6 +21,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
 1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
+1. [Workflow for publishing custom component](#workflow-for-publishing-custom-component)
 
 Current version of this document is: 1.0.0 (as of 25th of November, 2022)
 
@@ -236,7 +237,50 @@ Learn more about how to do that [here](https://github.com/smintio/Portals-Compon
 How develop your own frontend component
 =======================================
 
+Step to follow
+
+1. Navigate to a folder where the components should be physically present. We will call it the root folder.
+1. Open a command prompt or terminal window in the root folder
+1. Install the `Vue.js` CLI tool by running `npm install -g @vue/cli`
+1. Once finished initialize a new `Vue.js` component by running `vue create custom-component-name --bare`
+    - Replace `custom-component-name` with the desired component name
+    - Usually the component name ends with its major version number e.g. `ui-example-hello-world-1`
+1. The Vue CLI will execute and take the wizard
+    - Navigate to `Manually select features` using the arrows
+    - Click enter
+    - Navigate to `TypeScript`
+    - Click space to select it
+    - Optionally navigate and select other features
+    - Click enter to proceed
+    - Navigate to version `2.x` and click enter
+    - Click `enter` a few more times or adjust the configuration to your preference
+    - `Where do you prefer placing config for Babel, ESLint, etc.?` Please select in package.json
+    - Wait for the bootstrap process to finish
+1. Go to the newly created custom component folder
+    - Delete `public` folder
+    - Go to `src`
+    - Rename `App.vue` to `PortalsUiComponent.vue`
+    - Delete the rest of the files
+    - Go back to parent folder
+1. Edit the newly created `package.json` file.
+    - Prefix the component name with your company name or something recognizable by you e.g. `@smintio/ui-example-hello-world-1`
+    - Please add a `author` property
+    - Add custom command under the `scripts` property
+        - `"smint-io-pc:development": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development"`
+        - `"smint-io-pc": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging"`
+    - Include Smint.io npm packages to `dependencies` with optional `vuetify`
+        - `"@smintio/helpers": 1.4.7"`
+        - `"@smintio/mpa-page-helpers": "0.6.1"`
+        - `"@smintio/portals-component-sdk": "1.3.7"`
+        - `"@smintio/portals-components": "5.1.2"`
+        - `"vuetify": "2.5.9"`
+    - Include Smint.io npm dev packages to `devDependencies`
+        - `"@smintio/portals-resource-builder-cli": "1.1.2"`
+    - Please note that newer versions of npm packages may exist.
+1. Enjoy while developing your first `PortalsUiComponent.vue` custom component
+
 A good starting point is looking at our [Hello world](ui-example-hello-world-1/) example. It is an example of a Smint.io Portals UI component.
+
 An example for crafting your own page template will follow soon.
 
 The [Vue.js component itself](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
@@ -247,27 +291,54 @@ The source follows established Vue.js structure practices by containing a templa
 `PortalsUiComponent` is annotated with custom attributes which contribute to the component description in way meaningful to Smint.io.
 
 ```javascript
-@PortalsUiComponent({
-    type: "ui-type-text",
-    key: "smintio-ui-example-hello-world-1",
-    displayName: {
-        [DefaultCulture]: "Hello world",
-        de: "Hallo Welt",
-    },
-    description: {
-        [DefaultCulture]: "This component displays a message with an optional color.",
-        de: "Diese Komponente dient zur Darstellung eines Banners mit optionalem Titel und einer Suchleiste.",
-    },
-})
+    @PortalsUiComponent({
+        type: "ui-type-text",
+        key: "smintio-ui-example-hello-world-1",
+        displayName: {
+            [DefaultCulture]: "Hello world",
+            de: "Hallo Welt",
+        },
+        description: {
+            [DefaultCulture]: "This component displays a message with an optional color.",
+            de: "Diese Komponente dient zur Darstellung eines Banners mit optionalem Titel und einer Suchleiste.",
+        },
+    })
 ```
 
 The full list of supported Smint.io Portals frontend component types can be seen [here](docs/smintio-frontend-component-types.md).
 
 The `PortalsUiComponent` implementation exports fully localized properties that are interpreted by the Smint.io pages as `FormGroup`.
+
+```javascript
+    @DisplayName("en", "Component text", true)
+    @DisplayName("de", "Komponententext")
+    @Description("en", "The component text.", true)
+    @Description("de", "Der Komponententext.")
+    @Implements("ILocalizedStringsModel")
+    @ComponentProperty({ name: "componentText" })
+    @DynamicAllowedValuesProvider(
+        PortalsGlobalServices.PortalsContext.toString(),
+        "StringResourceAllowedValuesProvider"
+    )
+    @FormGroup("hw-text")
+    public readonly componentText!: ILocalizedStringsModel;
+
+    @DisplayName("en", "Color", true)
+    @DisplayName("de", "Farbe")
+    @Description("en", "The component text color.", true)
+    @Description("de", "Die Textfarbe der Komponente.")
+    @ComponentProperty({ name: "componentColor" })
+    @IsColor()
+    @FormGroup("hw-color")
+    public readonly componentColor!: string;
+```
+
 Additional attributes such as `DynamicAllowedValuesProvider` or `IsColor` control how the component configuration can look.
 In this case, an example would be a text input field or a color picker.
 
 The full list of supported Smint.io Portals annotations can be found [here](docs/smintio-annotations.md).
+
+`ILocalizedStringsModel` is a custom object type defined by Smint.io that can return the correct text value of a component according to the selected language by the user.
 
 By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
 
@@ -275,23 +346,30 @@ In addition to the minimal and default settings, custom script sections are adde
 
 More information about building, packaging and publishing Smint.io Portals components using the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
 
-An example would be
-```json
-"scripts": {
-    "smint-io-pc": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging"
-    ...
-}
-```
+Workflow for publishing custom component
+========================================
 
-Running the following command will package `ui-example-hello-world-1` in the defined npm registry and then trigger a REST API request to register the package for the specified environment.
+Once the custom component code is ready to publish
 
-```console
-npm run smint-io-pc
-```
+Do this:
 
-Please note that calling the script repeatedly will result in an error.
+1. In the component folder open command prompt or terminal window
+1. Run `npm run build` to ensure the latest version will be published
+1. Run `npm run smint-io-pc` to publish to `Staging` environment or `npm run smint-io-pc:development` to publish to `Development`
+    - `Staging` should be the preferred environment without access to the Smint.io codebase
+    - If the component already exists in the npm registry the component can be deployed by running `npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging` 
+1. A browser window will open for you to authenticate to allow the component to be published
+    - If successful, the window will close after a few seconds
+    - *You can now return to the application.* will also indicate success
+1. Go back to the command prompt or terminal window and validate that component is published using the correct version
+1. `Done` will indicate that the publication is succsesful
+1. Repeat the process for each code change
 
-With each code change, the version number must be increased.
+Running `npm run smint-io-pc` will package the component in the defined npm registry and then trigger a REST API request to register the package for the specified environment.
+
+Please note that calling the command repeatedly will result in an error.
+
+With each code change, the version number must be increased in the `package.json` file.
 
 Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) to request publishing.
 
