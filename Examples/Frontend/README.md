@@ -245,7 +245,7 @@ Steps to follow:
 1. Copy the `ui-example-hello-world-1` directory to that root folder as a starting point
 1. Rename the `ui-example-hello-world-1` directory to your desired frontend component name
 
-- Start the directory name with `ui-` for UI components, and `page-` for page templates)
+- Start the directory name with `ui-` for UI components, and `page-` for page templates
 - End the directory name with `-1` so that later on, if desired, you can potentially create different variations of the frontend component
 
 4. Edit the `package.json` file in the new directory, and change `name`, `description`, `version` and `author` of your new frontend component
