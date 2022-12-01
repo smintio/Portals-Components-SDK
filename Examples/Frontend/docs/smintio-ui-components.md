@@ -1,36 +1,5 @@
-Components
---------------
-
-* [Generic components](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#generic-componentns)  
-   * [Assets overview](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#assets-preview)  
-   * [Banner with search bar](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#banner-with-search-bar)
-   * [Category chooser](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#category-chooser)  
-   * [Category carousel](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#category-carousel)  
-   * [Collection details](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#collection-details)  
-   * [Collections overview](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#collections-overview)  
-   * [Color indicator with text](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#color-indicator-with-text)  
-   * [Footer](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#footer)  
-   * [Header](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#header)  
-   * [Image](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#image)  
-   * [Image with text](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#image-with-text)  
-   * [Location](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#location)  
-   * [Menu item chooser](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#menu-item-chooser)  
-   * [Page title](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#page-title)  
-   * [Search bar](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#search-bar)  
-   * [Side menu](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#side-menu)  
-   * [Text block](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#text-block)  
-   * [Text block with up to 3 columns](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#text-block-with-up-to-3-columns)  
-   * [Video](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#video)
-* [Asset details components](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#asset-details-components)
-  * [Action bar](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#action-bar)
-  * [Asset preview](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#asset-preview)
-  * [Details text](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#details-text)
-  * [Metadata viewer](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#metadata-viewer)
-  * [Tag viewer](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#tag-viewer)
-* [Media center components](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#media-center-components)
-   * [Collections quickview](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#collections-quickview)    
-   * [Facet based search form](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#facet-based-search-form)  
-   * [Search result](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-components.md#search-result)  
+Smint.io Portals frontend components
+====================================
 
 Current version of this document is: 1.0.0 (as of 3rd of March, 2022)
 
