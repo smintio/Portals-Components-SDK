@@ -29,6 +29,8 @@ to start the process.
 your frontend component, you need to build, package and publish the frontend component to the Smint.io servers for the change to take
 effect!
 
+Please note, that you need to build, package and publish the frontend component *at least once* before the dev server can work!
+
 Download
 ========
 

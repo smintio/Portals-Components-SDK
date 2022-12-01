@@ -245,15 +245,15 @@ Steps to follow:
 1. Copy the `ui-example-hello-world-1` directory [from this repository](./ui-example-hello-world-1) to that root folder as a starting point
 1. Rename the `ui-example-hello-world-1` directory to your desired frontend component name
 
-- Start the directory name with `ui-` for UI components, and `page-` for page templates
-- End the directory name with `-1` so that later on, if desired, you can potentially create different variations of the frontend component
+	- Start the directory name with `ui-` for UI components, and `page-` for page templates
+	- End the directory name with `-1` so that later on, if desired, you can potentially create different variations of the frontend component
 
-4. Edit the `package.json` file in the new directory, and change `name`, `description`, `version` and `author` of your new frontend component
+1. Edit the `package.json` file in the new directory, and change `name`, `description`, `version` and `author` of your new frontend component
 
-- Prefix the package `name` with your domain e.g. `@smint-io/` or `@smintio/`
-- Then simply add the directory name from the previous step as the package name
+	- Prefix the package `name` with your domain e.g. `@smint-io/` or `@smintio/`
+	- Then simply add the directory name from the previous step as the package name
 
-5. Please adjust `src/PortalsUiComponent.vue` accordingly
+1. Please adjust `src/PortalsUiComponent.vue` accordingly
 
 An example for crafting your own page template will follow soon.
 
@@ -322,31 +322,43 @@ In addition to the minimal and default settings, custom script sections are adde
 
 More information about building, packaging and publishing Smint.io Portals components using the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
 
-### Workflow for publishing your custom frontend component
+### Building your custom frontend component
 
-Once the custom component code is ready to publish
+1. In the component folder open a command prompt or terminal window
+1. Run `npm run build` or `npm run watch` to build your frontend component
 
-Do this:
+### Publish your custom frontend component
 
-1. In the component folder open command prompt or terminal window
+1. In the component folder open a command prompt or terminal window
 1. Run `npm run build` to ensure the latest version will be published
-1. Run `npm run smint-io-pc` to publish to `Staging` environment or `npm run smint-io-pc:development` to publish to `Development`
-    - `Staging` should be the preferred environment without access to the Smint.io codebase
-    - If the component already exists in the npm registry the component can be deployed by running `npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging` 
+1. Run `npm run smint-io-pc` to publish to the Smint.io `Staging` environment
+
+	- If the component already exists in the npm registry the component can be deployed by running `npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging` 
+
 1. A browser window will open for you to authenticate to allow the component to be published
     - If successful, the window will close after a few seconds
-    - *You can now return to the application.* will also indicate success
+    - The message *You can now return to the application.* will also indicate success
 1. Go back to the command prompt or terminal window and validate that component is published using the correct version
-1. `Done` will indicate that the publication is succsesful
-1. Repeat the process for each code change
+1. `Done` will indicate that the publication was successful
 
-Running `npm run smint-io-pc` will package the component in the defined npm registry and then trigger a REST API request to register the package for the specified environment.
+Running `npm run smint-io-pc` will package the component in the defined npm registry and then trigger a REST API request to register the package with Smint.io.
 
-Please note that calling the command repeatedly will result in an error.
+Please note that calling the command repeatedly with the same package version will result in an error.
 
 With each code change, the version number must be increased in the `package.json` file.
 
-Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) to request publishing.
+### Local development
+
+1. Get in touch with [support@smint.io](mailto:support@smint.io) so that we can set up a development portal for you
+1. Set up the [Portals Dev-Server](../../Tools/Portals-DevServer/Release/) to point to the root folder, and map your new frontend component
+1. Run the dev server
+1. Run `npm run watch` for continuous building of your frontend component
+1. Turn off your browser's cache
+1. Navigate to your development portal, add your frontend component to a page, and enjoy! :)
+
+### Problems
+
+Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) if you run into any issues.
 
 Contributors
 ============
