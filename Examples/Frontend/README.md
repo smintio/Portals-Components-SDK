@@ -237,7 +237,7 @@ Learn more about how to do that [here](https://github.com/smintio/Portals-Compon
 How develop your own frontend component
 =======================================
 
-## Get started
+### Get started
 
 Steps to follow:
 
@@ -261,7 +261,7 @@ Suggestions:
 
 An example for crafting your own page template will follow soon.
 
-## The example frontend component
+### The example frontend component
 
 The [example Vue.js component itself](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
 It can display colored static text once added to a page.
@@ -326,7 +326,7 @@ In addition to the minimal and default settings, custom script sections are adde
 
 More information about building, packaging and publishing Smint.io Portals components using the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
 
-## The workflow for publishing your custom frontend component
+### Workflow for publishing your custom frontend component
 
 Once the custom component code is ready to publish
 
