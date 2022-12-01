@@ -3,9 +3,22 @@ Description
 
 This repository contains examples and tools for rapid developing of custom components targeting the Smint.io Portals solution.
 
-Examples cover both [frontend](Examples/Frontend/) and [backend](Examples/Backend/) components.
+Please find guides about frontend or backend component development here:
 
-The tools we provide can improve the experience as you develop Smint.io Portals components.
+- [Develop frontend components](Examples/Frontend/)
+
+	- Page templates
+	- UI components
+	
+- [Develop backend components](Examples/Backend/)
+
+	- Connectors
+	- Data adapters
+	- Task handlers
+	- Portal templates
+	- Identity providers
+	
+This is the tools you need for developing Smint.io Portals components:
 
 - The [Data Adapter Exporter SDK](https://github.com/smintio/Portals-Components-SDK/tree/main/Examples/Backend/#user-content-data-adapter-public-api-interfaces) is used to generate TypeScript public API interface definition from backend component assemblies
 - The [Portals-SDK-PublishComponent-CLI tool](Tools/Portals-SDK-PublishComponent-CLI/Release/) is used to compile, package and deploy components
