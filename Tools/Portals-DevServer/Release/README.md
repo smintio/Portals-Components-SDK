@@ -15,7 +15,7 @@ By default, Smint.io distributes frontend components through a CDN. This means, 
 and quickly update them in your browser without building, packaging and publishing the frontend component to the Smint.io servers
 using the [Portals-SDK-PublishComponent-CLI tool](../../Portals-SDK-PublishComponent-CLI/Release/).
 
-The Portals-DevServer fixes that problem. Once you point the dev server to your local component build directory, it is able to
+The Portals-DevServer fixes that problem. Once you point the dev server to your local frontend component build directory, it is able to
 serve the JavaScript of the frontend component to your browser directly, without going through the CDN.
 
 This means that you can use e.g. `npm run watch` to quickly build your frontend component whenever you change it. Then you just need
@@ -44,11 +44,11 @@ A few things needs to be configured for Portals-DevServer to work properly.
 Inside the `appsettings.json` file, please configure the following
 
 - AllowedHosts - By default the value is `*`
-- RootDirectory - This is the base path of the build location of your components
+- RootDirectory - This is the base path of the build location of your frontend components
 - ComponentMappings - A key pair mapping the frontend component to its location relative to the `RootDirectory`
 
 Each ComponentMapping key should be considered like a `*[KEY]*` filter on the name of your frontend component's npm package.
-This means that if your component's npm package name is `ui-generic-account-accept-terms-form-1-6.3.0.tgz`, it is sufficient
+This means that if your frontend component's npm package name is `ui-generic-account-accept-terms-form-1-6.3.0.tgz`, it is sufficient
 to e.g. type `ui-generic-account-accept-terms-form` to map this frontend component.
 
 Please note that the `RootDirectory` is optional, but then `ComponentMappings` must contain the full path.
