@@ -1,5 +1,6 @@
-Content
-=======
+The Portals-DevServer
+=====================
+
 1. [Description](#description)
 1. [Download](#download)
 1. [App settings](#app-settings)
@@ -8,8 +9,7 @@ Content
 
 Current version of this document is: 1.0.0 (as of 30th of November, 2022)
 
-Description
-===========
+## Description
 
 By default, Smint.io distributes frontend components through a CDN. This means, that you cannot change a frontend component easily
 and quickly update them in your browser without building, packaging and publishing the frontend component to the Smint.io servers
@@ -31,15 +31,13 @@ effect!
 
 Please note, that you need to build, package and publish the frontend component *at least once* before the dev server can work!
 
-Download
-========
+## Download
 
 Download the ZIP archive suitable for your operating system to a convenient location.
 
 Extract the archive.
 
-App settings
-============
+## App settings
 
 A few things needs to be configured for Portals-DevServer to work properly.
 
@@ -57,8 +55,7 @@ Please note that the `RootDirectory` is optional, but then `ComponentMappings` m
 
 When a change is made to the `appsettings.json` file and the dev server is running, the dev must be restarted for the changes to take effect.
 
-Usage
-=====
+## Usage
 
 The DevServer tool can be started by executing the binary for the target operating system.
 
