@@ -44,14 +44,16 @@ A few things needs to be configured for Portals-DevServer to work properly.
 Inside the `appsettings.json` file, please configure the following
 
 - AllowedHosts - By default the value is `*`
-- RootDirectory - This is the base path of the components location. This is optional
-- ComponentMappings - A key pair of the component name and its location relative to the `RootDirectory`
+- RootDirectory - This is the base path of the build location of your components
+- ComponentMappings - A key pair mapping the frontend component to its location relative to the `RootDirectory`
+
+Each ComponentMapping key should be considered like a `*[KEY]*` filter on the name of your frontend component's npm package.
+This means that if your component's npm package name is `ui-generic-account-accept-terms-form-1-6.3.0.tgz`, it is sufficient
+to e.g. type `ui-generic-account-accept-terms-form` to map this frontend component.
 
 Please note that the `RootDirectory` is optional, but then `ComponentMappings` must contain the full path.
 
-By default all Smint.io frontend components are added to the `appsettings.json` file.
-
-When a change is made to the `appsettings.json` file and the server is running, Portals-DevServer must be restarted.
+When a change is made to the `appsettings.json` file and the dev server is running, the dev must be restarted for the changes to take effect.
 
 Usage
 =====
