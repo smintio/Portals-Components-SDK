@@ -1,5 +1,5 @@
-Annotations
------------
+Smint.io Portals component annotations
+======================================
 
 Current version of this document is: 1.0.0 (as of 29th of November, 2022)
 
