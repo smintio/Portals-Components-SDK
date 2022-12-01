@@ -350,7 +350,7 @@ More information about the *Portals-SDK-PublishComponent-CLI tool* can be found 
 1. Navigate to your development portal, add your frontend component to a page
 1. Change some code in your frontend component, and refresh the browser page. Enjoy! :)
 
-## Problems
+### Problems
 
 Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) if you run into any issues.
 
