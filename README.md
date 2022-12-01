@@ -5,12 +5,12 @@ This repository contains examples and tools for rapid developing of custom compo
 
 Please find guides about frontend or backend component development here:
 
-- [Develop frontend components](Examples/Frontend/)
+- [Developing frontend components](Examples/Frontend/)
 
 	- Page templates
 	- UI components
 	
-- [Develop backend components](Examples/Backend/)
+- [Developint backend components](Examples/Backend/)
 
 	- Connectors
 	- Data adapters
