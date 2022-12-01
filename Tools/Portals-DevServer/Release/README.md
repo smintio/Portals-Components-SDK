@@ -18,7 +18,7 @@ using the [Portals-SDK-PublishComponent-CLI tool](../../Portals-SDK-PublishCompo
 The Portals-DevServer fixes that problem. Once you point the dev server to your local component build directory, it is able to
 serve the JavaScript of the frontend component to your browser directly, without going through the CDN.
 
-This means that you can use e.g. *npm watch* to quickly build your frontend component whenever you change it. Then you just need
+This means that you can use e.g. `npm run watch` to quickly build your frontend component whenever you change it. Then you just need
 to refresh the browser (*do not forget to turn off the browser cache!*) for the changes to take effect.
 
 For this to work, *the portal you are using to test your frontend components needs to be configured* to look up frontend components
