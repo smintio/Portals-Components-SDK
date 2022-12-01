@@ -320,8 +320,6 @@ By default, [package.json](ui-example-hello-world-1/package.json) is used by the
 
 In addition to the minimal and default settings, custom script sections are added to make it easier to deploy components to different Smint.io environments using our publish component CLI tool. 
 
-More information about building, packaging and publishing Smint.io Portals components using the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
-
 ### Building your custom frontend component
 
 1. In the component folder open a command prompt or terminal window
@@ -346,6 +344,8 @@ Running `npm run smint-io-pc` will package the component in the defined npm regi
 Please note that calling the command repeatedly with the same package version will result in an error.
 
 With each code change, the version number must be increased in the `package.json` file.
+
+More information about the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
 
 ### Local development
 
