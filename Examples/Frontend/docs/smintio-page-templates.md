@@ -1,13 +1,5 @@
-Page templates
---------------
-
-* [Asset details page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#asset-details-page)
-* [Collection details page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#collection-details-page)
-* [Collections overview page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#collections-overview-page)
-* [Main Page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#main-page)
-* [Search page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#search-page)
-* [Request access page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#request-access-page)
-* [Request download page](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-ui-pages.md#request-download-page)
+Smint.io Portals page templates
+===============================
 
 Current version of this document is: 1.0.0 (as of 3rd of March, 2022)
 

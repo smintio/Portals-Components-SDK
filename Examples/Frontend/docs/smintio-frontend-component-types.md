@@ -1,5 +1,5 @@
-Frontend component types
-------------------------
+Smint.io Portals frontend component types
+=========================================
 
 * [UI component types](#ui-component-types)
 * [UI component types for the login system](#ui-component-types-for-the-login-system)

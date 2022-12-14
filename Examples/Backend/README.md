@@ -1,5 +1,5 @@
-Examples for Smint.io Portals backend components
-================================================
+Developing Smint.io Portals backend components
+==============================================
 
 This repository contains examples for Smint.io Portals backend components, which is connectors, data adapters, task handlers, portal templates and identity providers.
 
