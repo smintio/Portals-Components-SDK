@@ -5,7 +5,7 @@
     <AssemblyName>SmintIo.Portals.DataAdapter.SharePoint</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="4.5.6" />
+    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="4.5.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Connectors\Connector-SharePoint\Connector-SharePoint.csproj" />
