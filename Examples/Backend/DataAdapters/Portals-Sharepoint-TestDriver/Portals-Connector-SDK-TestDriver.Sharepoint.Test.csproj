@@ -5,8 +5,8 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SmintIo.Portals.ConnectorSDK.TestDriver" Version="4.8.1" />
-    <PackageReference Include="SmintIo.Portals.DataAdapterSDK.TestDriver" Version="4.8.1" />
+    <PackageReference Include="SmintIo.Portals.ConnectorSDK.TestDriver" Version="4.8.2" />
+    <PackageReference Include="SmintIo.Portals.DataAdapterSDK.TestDriver" Version="4.8.2" />
     <PackageReference Include="FluentAssertions" Version="6.7.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
