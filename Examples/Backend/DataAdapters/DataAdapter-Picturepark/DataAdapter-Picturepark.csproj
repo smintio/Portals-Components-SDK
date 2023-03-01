@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="DotLiquid" Version="2.2.656" />
     <PackageReference Include="Picturepark.SDK.V1" Version="11.4.42" />
-    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="5.1.15" />
+    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="5.1.16" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Connectors\Connector-Picturepark\Connector-Picturepark.csproj" />
