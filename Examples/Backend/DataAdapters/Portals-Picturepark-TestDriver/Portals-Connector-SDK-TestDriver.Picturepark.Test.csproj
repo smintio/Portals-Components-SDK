@@ -6,12 +6,12 @@
     <AssemblyName>SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="5.1.14" />
+    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="5.1.15" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
     <PackageReference Include="Moq" Version="4.18.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SmintIo.Portals.DataAdapterSDK.TestDriver" Version="5.1.14" />
+    <PackageReference Include="SmintIo.Portals.DataAdapterSDK.TestDriver" Version="5.1.15" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <PrivateAssets>all</PrivateAssets>
