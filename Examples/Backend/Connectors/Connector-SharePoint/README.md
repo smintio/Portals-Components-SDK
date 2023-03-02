@@ -1,4 +1,7 @@
-# How-to implement the `Connector`
+How-to implement the `Connector`
+================================
+
+Current version of this document is: 1.0.0 (as of 2nd of March, 2023)
 
 ## `Connector` Basics
 
@@ -191,3 +194,9 @@ that have attributes like `MaxLength`, `AllowMultiline` etc. which we cannot mod
 validation is required. Please get in touch if you need more capabilities here.
 
 Sharepoint only knows one "root entity model", but other more complex systems may distinguish between images, video files, thus have an `EntityModel` for each one of them.
+
+Contributors
+============
+
+- Reinhard Holzner, Smint.io GmbH
+- Yosif Velev, Smint.io GmbH

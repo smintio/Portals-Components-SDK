@@ -1,4 +1,7 @@
-# How-to implement the `DataAdapter`
+How-to implement the `DataAdapter`
+==================================
+ 
+Current version of this document is: 1.0.0 (as of 2nd of March, 2023)
 
 ## `DataAdapter` basics
 
@@ -22,3 +25,8 @@ for every interface and separate the implementation concerns accordingly.
 Note: some of the interfaces have overlapping signatures, for example both the `IAssetsRead` and `IAssetsInternalProvider` both define the `GetAssetsDownloadItemMappingsAsync` method, 
 and of course it only needs to be implemented once. It is, however, still advisable to declare all interfaces in the `DataAdapter`'s signature due to Reflection reasons.
 
+Contributors
+============
+
+- Reinhard Holzner, Smint.io GmbH
+- Yosif Velev, Smint.io GmbH

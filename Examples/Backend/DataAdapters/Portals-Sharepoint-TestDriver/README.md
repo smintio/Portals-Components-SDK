@@ -1,4 +1,7 @@
-# `DataAdapter` Unit Tests
+DataAdapter Unit Tests
+======================
+
+Current version of this document is: 1.0.0 (as of 2nd of March, 2023)
 
 ## Basics
 
@@ -6,8 +9,8 @@ The `DataAdapter` can be understood as a _facade_ for the external system. It is
 
 It uses the `Connector` to establish a connection to the external system such as Sharepoint. 
 
-In order to ensure that both the DataAdapter and Connector function correctly, `Smint.io` created a set of unit tests.
-This documentation briefly explains how does the `Smint.io` test framework works.
+In order to ensure that both the DataAdapter and Connector function correctly, Smint.io created a set of unit tests.
+This documentation briefly explains how does the Smint.io test framework works.
 
 ## Folder Structure
 
@@ -25,7 +28,7 @@ Please note that we use the term "fixture" to describe the configuration of a Da
 
 ### Integration
 
-The integration folder contains all the unit tests for SharePoint. Since `Smint.io` has a set of generic unit tests, we can leverage them by inheriting some of the base classes. 
+The integration folder contains all the unit tests for SharePoint. Since Smint.io has a set of generic unit tests, we can leverage them by inheriting some of the base classes. 
 
 * ConnectorMetamodelTests - will test connector's metamodel
 * ConnectorTests - will test the connector itself
@@ -42,6 +45,16 @@ protected override AssetsDataAdapterBaseImpl GetDataAdapter(Type componentImplem
 ```
 
 Another override would be the definition of a different sample assets so that the connector can test with existing data.
+
+```c#
+        protected override AssetItemOption SampleImageAsset => _fixture.AssetOptions.ImageAsset;
+
+        protected override AssetItemOption SampleVideoAsset => _fixture.AssetOptions.VideoAsset;
+
+        protected override AssetItemOption SampleAudioAsset => _fixture.AssetOptions.AudioAsset;
+
+        protected override AssetItemOption SampleDocumentAsset => _fixture.AssetOptions.DocumentAsset;
+```
 
 The behavior of the unit tests can be altered by overriding methods that check the integrity of the data.
 
@@ -66,4 +79,10 @@ protected override void AssertContentMetadata(AssetDataObject assetDataObject)
 
 This way each individual metadata can be asserted based on what we expect from SharePoint.
 
-Please note that `Smint.io` tests are constantly being updated and new tests added, so everything is subject to future change.
+Please note that Smint.io tests are constantly being updated and new tests added, so everything is subject to future change.
+
+Contributors
+============
+
+- Reinhard Holzner, Smint.io GmbH
+- Yosif Velev, Smint.io GmbH

@@ -18,18 +18,9 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Custom public API interfaces](#user-content-custom-public-api-interfaces)
 1. [Overview of Smint.io annotations](../Frontend/docs/smintio-annotations.md)
 
-Current version of this document is: 2.2.0 (as of 25th of November, 2022)
+Current version of this document is: 2.2.1 (as of 2nd of March, 2023)
 
 ## Examples
-
-#### Picturepark Connector
-
-- [Root directory](Connectors/Connector-Picturepark/)
-
-#### Picturepark Data Adapter
-
-- [Root directory](DataAdapters/DataAdapter-Picturepark/)
-- [Test driver](DataAdapters/Portals-Picturepark-TestDriver/)
 
 #### Microsoft SharePoint Connector
 
@@ -42,13 +33,22 @@ This data adapter implements the *IAssets* data adapter interface.
 
 - [Root directory](DataAdapters/DataAdapter-SharePoint/)
 - [Data adapter README.md](DataAdapters/DataAdapter-SharePoint/README.md)
-- [Test driver](DataAdapters/Portals-Sharepoint-TestDriver/)
+- [Test driver README.md](DataAdapters/Portals-Sharepoint-TestDriver/README.md)
+
+#### Picturepark Connector
+
+- [Root directory](Connectors/Connector-Picturepark/)
+
+#### Picturepark Data Adapter
+
+- [Root directory](DataAdapters/DataAdapter-Picturepark/)
+- [Test driver](DataAdapters/Portals-Picturepark-TestDriver/)
 
 ## Connector description & flow
 
 The purpose of a connector is to provide a way to communicate with an external provider via a client, expose user interface configurations, authentication processing, verify settings and build a translatable meta-model.
 
-Each connector is system dedicated. See [Picturepark](Connectors/Connector-Picturepark/) or [Sharepoint](Connectors/Connector-SharePoint/). 
+Each connector is system dedicated. See [Sharepoint](Connectors/Connector-SharePoint/) or [Picturepark](Connectors/Connector-Picturepark/). 
 
 The `SmintIo.Portals.ConnectorSDK` NuGet Smint.io package makes it possible to build a connector.
 
