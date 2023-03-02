@@ -523,7 +523,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                    requiresHiResDownloadPermission;
         }
 
-        public override async Task<AssetDownloadStreamModel> GetAssetThumbnailDownloadStreamAsync(AssetIdentifier assetId, ContentTypeEnumDataObject contentType, AssetThumbnailSize size, string thumbnailSpec)
+        public override async Task<AssetDownloadStreamModel> GetAssetThumbnailDownloadStreamAsync(AssetIdentifier assetId, ContentTypeEnumDataObject contentType, AssetThumbnailSize size, string thumbnailSpec, long? maxFileSizeBytes)
         {
             var unscopedId = assetId?.UnscopedId;
 
@@ -532,31 +532,31 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             if (contentType == ContentTypeEnumDataObject.Video &&
                 size == AssetThumbnailSize.PlaybackLarge)
             {
-                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "VideoLarge").ConfigureAwait(false);
+                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "VideoLarge", maxFileSizeBytes).ConfigureAwait(false);
             }
             else if (contentType == ContentTypeEnumDataObject.Video &&
                 size == AssetThumbnailSize.PlaybackSmall)
             {
-                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "VideoSmall").ConfigureAwait(false);
+                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "VideoSmall", maxFileSizeBytes).ConfigureAwait(false);
             }
             else if (contentType == ContentTypeEnumDataObject.Audio &&
                 size == AssetThumbnailSize.PlaybackSmall)
             {
-                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "AudioSmall").ConfigureAwait(false);
+                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "AudioSmall", maxFileSizeBytes).ConfigureAwait(false);
             }
             else if (size == AssetThumbnailSize.PdfPreview)
             {
-                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "Pdf").ConfigureAwait(false);
+                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "Pdf", maxFileSizeBytes).ConfigureAwait(false);
             }
             else
             {
-                streamResponse = await _client.GetImageDownloadStreamAsync(unscopedId, ToPictureparkThumbnailSize(size)).ConfigureAwait(false);
+                streamResponse = await _client.GetImageDownloadStreamAsync(unscopedId, ToPictureparkThumbnailSize(size), maxFileSizeBytes).ConfigureAwait(false);
             }
 
             return GetAssetDownloadStreamModel(streamResponse);
         }
 
-        public override async Task<AssetDownloadStreamModel> GetAssetDownloadStreamAsync(AssetIdentifier assetId, AssetDownloadItemMappingModel downloadItemMapping)
+        public override async Task<AssetDownloadStreamModel> GetAssetDownloadStreamAsync(AssetIdentifier assetId, AssetDownloadItemMappingModel downloadItemMapping, long? maxFileSizeBytes)
         {
             if (assetId == null)
             {
@@ -568,7 +568,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                 throw new ArgumentNullException(nameof(downloadItemMapping));
             }
 
-            var streamResponse = await _client.GetDownloadStreamForOutputFormatIdAsync(assetId.UnscopedId, downloadItemMapping.ItemId).ConfigureAwait(false);
+            var streamResponse = await _client.GetDownloadStreamForOutputFormatIdAsync(assetId.UnscopedId, downloadItemMapping.ItemId, maxFileSizeBytes).ConfigureAwait(false);
 
             return GetAssetDownloadStreamModel(streamResponse);
         }
