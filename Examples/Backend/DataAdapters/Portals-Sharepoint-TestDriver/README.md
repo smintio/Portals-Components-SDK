@@ -6,8 +6,8 @@ The `DataAdapter` can be understood as a _facade_ for the external system. It is
 
 It uses the `Connector` to establish a connection to the external system such as Sharepoint. 
 
-In order to ensure that both the DataAdapter and Connector function correctly, `Smint.io` created a set of unit tests.
-This documentation briefly explains how does the `Smint.io` test framework works.
+In order to ensure that both the DataAdapter and Connector function correctly, Smint.io created a set of unit tests.
+This documentation briefly explains how does the Smint.io test framework works.
 
 ## Folder Structure
 
@@ -25,7 +25,7 @@ Please note that we use the term "fixture" to describe the configuration of a Da
 
 ### Integration
 
-The integration folder contains all the unit tests for SharePoint. Since `Smint.io` has a set of generic unit tests, we can leverage them by inheriting some of the base classes. 
+The integration folder contains all the unit tests for SharePoint. Since Smint.io has a set of generic unit tests, we can leverage them by inheriting some of the base classes. 
 
 * ConnectorMetamodelTests - will test connector's metamodel
 * ConnectorTests - will test the connector itself
@@ -66,4 +66,4 @@ protected override void AssertContentMetadata(AssetDataObject assetDataObject)
 
 This way each individual metadata can be asserted based on what we expect from SharePoint.
 
-Please note that `Smint.io` tests are constantly being updated and new tests added, so everything is subject to future change.
+Please note that Smint.io tests are constantly being updated and new tests added, so everything is subject to future change.
