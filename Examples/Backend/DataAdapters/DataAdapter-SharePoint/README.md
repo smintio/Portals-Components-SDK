@@ -1,7 +1,7 @@
 How-to implement the `DataAdapter`
 ==================================
  
-Current version of this document is: 1.0.0 (as of 2th of March, 2023)
+Current version of this document is: 1.0.0 (as of 2nd of March, 2023)
 
 ## `DataAdapter` basics
 
