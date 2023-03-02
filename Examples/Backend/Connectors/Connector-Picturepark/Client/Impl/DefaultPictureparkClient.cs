@@ -671,7 +671,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
            ).ConfigureAwait(false);
         }
 
-        public async Task<StreamResponse> GetImageDownloadStreamAsync(string id, ThumbnailSize size)
+        public async Task<StreamResponse> GetImageDownloadStreamAsync(string id, ThumbnailSize size, long? maxFileSizeBytes)
         {
             string downloadUri;
 
@@ -701,12 +701,12 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 new KeyValuePair<string, string>("Picturepark-CustomerAlias", _customerAlias)
             };
 
-            var streamResponse = await GetHttpClientStreamResponseWithBackoffAsync(downloadUri, requestFailedHandler: DefaultRequestFailedHandler, accessToken, hint: $"Get image download stream ({id}, {size})", requestHeaders: requestHeaders, cancelRequestDelay: TimeSpan.FromSeconds(5));
+            var streamResponse = await GetHttpClientStreamResponseWithBackoffAsync(downloadUri, requestFailedHandler: DefaultRequestFailedHandler, accessToken, hint: $"Get image download stream ({id}, {size})", requestHeaders: requestHeaders, cancelRequestDelay: TimeSpan.FromSeconds(5), maxFileSizeBytes);
 
             return streamResponse;
         }
 
-        public async Task<StreamResponse> GetPlaybackDownloadStreamAsync(string id, string size)
+        public async Task<StreamResponse> GetPlaybackDownloadStreamAsync(string id, string size, long? maxFileSizeBytes)
         {
             var downloadUri = $"{_apiUrl}v1/Contents/downloads/{Uri.EscapeDataString(id)}/{Uri.EscapeDataString(size)}";
 
@@ -717,12 +717,12 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 new KeyValuePair<string, string>("Picturepark-CustomerAlias", _customerAlias)
             };
 
-            var streamResponse = await GetHttpClientStreamResponseWithBackoffAsync(downloadUri, requestFailedHandler: DefaultRequestFailedHandler, accessToken, hint: $"Get playback download stream ({id}, {size})", requestHeaders: requestHeaders, cancelRequestDelay: TimeSpan.FromSeconds(5));
+            var streamResponse = await GetHttpClientStreamResponseWithBackoffAsync(downloadUri, requestFailedHandler: DefaultRequestFailedHandler, accessToken, hint: $"Get playback download stream ({id}, {size})", requestHeaders: requestHeaders, cancelRequestDelay: TimeSpan.FromSeconds(5), maxFileSizeBytes);
 
             return streamResponse;
         }
 
-        public async Task<StreamResponse> GetDownloadStreamForOutputFormatIdAsync(string id, string outputFormatId)
+        public async Task<StreamResponse> GetDownloadStreamForOutputFormatIdAsync(string id, string outputFormatId, long? maxFileSizeBytes)
         {
             id = await GetThumbnailReferenceIdAsync(id).ConfigureAwait(false);
 
@@ -735,7 +735,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 new KeyValuePair<string, string>("Picturepark-CustomerAlias", _customerAlias)
             };
 
-            var streamResponse = await GetHttpClientStreamResponseWithBackoffAsync(downloadUri, requestFailedHandler: DefaultRequestFailedHandler, accessToken, hint: $"Get download stream for output format ({id}, {outputFormatId})", requestHeaders: requestHeaders);
+            var streamResponse = await GetHttpClientStreamResponseWithBackoffAsync(downloadUri, requestFailedHandler: DefaultRequestFailedHandler, accessToken, hint: $"Get download stream for output format ({id}, {outputFormatId})", requestHeaders: requestHeaders, maxFileSizeBytes: maxFileSizeBytes);
 
             return streamResponse;
         }

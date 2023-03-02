@@ -53,11 +53,11 @@ namespace SmintIo.Portals.Connector.Picturepark.Client
 
         Task UpdateContentsAsync(ICollection<ContentMetadataUpdateItem> contents);
 
-        Task<StreamResponse> GetImageDownloadStreamAsync(string id, ThumbnailSize size);
+        Task<StreamResponse> GetImageDownloadStreamAsync(string id, ThumbnailSize size, long? maxFileSizeBytes);
 
-        Task<StreamResponse> GetPlaybackDownloadStreamAsync(string id, string size);
+        Task<StreamResponse> GetPlaybackDownloadStreamAsync(string id, string size, long? maxFileSizeBytes);
 
-        Task<StreamResponse> GetDownloadStreamForOutputFormatIdAsync(string id, string outputFormatId);
+        Task<StreamResponse> GetDownloadStreamForOutputFormatIdAsync(string id, string outputFormatId, long? maxFileSizeBytes);
 
         Task<ICollection<string>> GetProfileUserRoleIdsAsync();
     }
