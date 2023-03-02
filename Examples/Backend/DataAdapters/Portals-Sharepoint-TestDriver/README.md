@@ -1,4 +1,7 @@
-# `DataAdapter` Unit Tests
+DataAdapter Unit Tests
+======================
+
+Current version of this document is: 1.0.0 (as of 2th of March, 2023)
 
 ## Basics
 
@@ -43,6 +46,16 @@ protected override AssetsDataAdapterBaseImpl GetDataAdapter(Type componentImplem
 
 Another override would be the definition of a different sample assets so that the connector can test with existing data.
 
+```c#
+        protected override AssetItemOption SampleImageAsset => _fixture.AssetOptions.ImageAsset;
+
+        protected override AssetItemOption SampleVideoAsset => _fixture.AssetOptions.VideoAsset;
+
+        protected override AssetItemOption SampleAudioAsset => _fixture.AssetOptions.AudioAsset;
+
+        protected override AssetItemOption SampleDocumentAsset => _fixture.AssetOptions.DocumentAsset;
+```
+
 The behavior of the unit tests can be altered by overriding methods that check the integrity of the data.
 
 ```c#
@@ -67,3 +80,9 @@ protected override void AssertContentMetadata(AssetDataObject assetDataObject)
 This way each individual metadata can be asserted based on what we expect from SharePoint.
 
 Please note that Smint.io tests are constantly being updated and new tests added, so everything is subject to future change.
+
+Contributors
+============
+
+- Reinhard Holzner, Smint.io GmbH
+- Yosif Velev, Smint.io GmbH
