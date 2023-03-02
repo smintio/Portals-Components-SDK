@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Graph;
 using SmintIo.Portals.Connector.SharePoint.Models;
+using SmintIo.Portals.ConnectorSDK.Clients.Prefab;
+using SmintIo.Portals.SDK.Core.Http.Prefab.Extensions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 
 namespace SmintIo.Portals.Connector.SharePoint.Client
@@ -10,8 +12,10 @@ namespace SmintIo.Portals.Connector.SharePoint.Client
     /// <summary>
     /// A facade for the Microsoft GraphAPI client.  
     /// </summary>
-    public interface ISharepointClient : ConnectorSDK.Clients.Prefab.IBaseClient
+    public interface ISharepointClient : IClient
     {
+        IRequestFailedHandler DefaultRequestFailedHandler { get; }
+
         /// <summary>
         /// The identifier of sharepoint site.
         /// </summary>
@@ -38,6 +42,19 @@ namespace SmintIo.Portals.Connector.SharePoint.Client
         /// <param name="siteId">The ID for the site. Normally this looks like "{host}.sharepoint.com,{guid},{guid}</param>
         /// <returns>The list of <see cref="ColumnDefinitionResponse"/> objects representing the metadata fields.</returns>
         public Task<ICollection<ColumnDefinitionResponse>> GetSiteMetadataAsync(string siteId);
+
+        /// <summary>
+        /// Gets the site's drives.
+        /// </summary>
+        /// <returns></returns>
+        public Task<ICollection<Drive>> GetSiteDrivesAsync();
+
+        /// <summary>
+        /// Gets the site's drive.
+        /// </summary>
+        /// <param name="driveId"></param>
+        /// <returns></returns>
+        public Task<Drive> GetSiteDriveAsync(string driveId);
 
         /// <summary>
         /// Gets folder <see cref="DriveItem"/>'s by identifier from Sharepoint
@@ -95,32 +112,25 @@ namespace SmintIo.Portals.Connector.SharePoint.Client
         /// </summary>
         /// <returns>The thumbnail stream response.</returns>
         /// <exception cref="ArgumentException">if the <paramref name="size"/> is invalid</exception>
-        Task<StreamResponse> GetDriveItemThumbnailContentAsync(string assetId, string thumbnailSetId, string size);
+        Task<StreamResponse> GetDriveItemThumbnailContentAsync(string assetId, string thumbnailSetId, string size, long? maxFileSizeBytes);
 
         /// <summary>
         /// Gets the file as PDF format.
         /// </summary>
         /// <param name="assetId"></param>
         /// <returns>The stream response</returns>
-        Task<StreamResponse> GetDriveItemPdfContentAsync(string assetId);
+        Task<StreamResponse> GetDriveItemPdfContentAsync(string assetId, long? maxFileSizeBytes);
 
         /// <summary>
         /// Downloads a file from Sharepoint.
         /// </summary>
         /// <returns>A stream containing the file raw data.</returns>
-        Task<StreamResponse> GetDriveItemContentAsync(string assetId);
+        Task<StreamResponse> GetDriveItemContentAsync(string assetId, long? maxFileSizeBytes);
 
         /// <summary>
         /// Gets the drive item changes based on a token.
         /// </summary>
         /// <returns>A list of <see cref="DriveItemChangesListModel"/> items.</returns>
         Task<DriveItemChangesListModel> GetDriveItemChangesListAsync(string deltaLink);
-
-        /// <summary>
-        /// Gets the HTTP stream response, with Sharepoint error handling.
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        Task<StreamResponse> GetHttpStreamResponseWithSharepointErrorHandlingAsync(string url);
     }
 }

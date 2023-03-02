@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using Picturepark.SDK.V1.Contract;
 using SmintIo.Portals.Connector.Picturepark.Metamodel.Aggregations;
+using SmintIo.Portals.ConnectorSDK.Clients.Prefab;
+using SmintIo.Portals.SDK.Core.Http.Prefab.Extensions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 
 namespace SmintIo.Portals.Connector.Picturepark.Client
@@ -13,8 +15,10 @@ namespace SmintIo.Portals.Connector.Picturepark.Client
         Advanced
     };
 
-    public interface IPictureparkClient
+    public interface IPictureparkClient : IClient
     {
+        IRequestFailedHandler DefaultRequestFailedHandler { get; }
+
         Task InitializeChannelAggregatorsAsync();
 
         Task<AggregatorManager> GetAggregatorManagerAsync();
@@ -34,8 +38,8 @@ namespace SmintIo.Portals.Connector.Picturepark.Client
         Task<(ContentSearchResult, ICollection<ContentDetail>)> SearchContentAsync(string searchString, ICollection<AggregatorBase> aggregators,
             FilterBase filter, ICollection<AggregationFilter> aggregationFilters, string pageToken, int? pageSize, ICollection<SortInfo> sortInfos,
             SearchType? searchType = null, bool includeFulltext = false, bool resolveMetadata = false);
-        
-        Task<ContentDetail> GetContentAsync(string id);
+
+        Task<(ContentDetail ContentDetail, ContentType? OriginalContentType)> GetContentAsync(string id);
 
         Task<ICollection<ContentDetail>> GetContentsAsync(ICollection<string> ids, bool skipNonAccessibleContents = false);
 
@@ -49,11 +53,11 @@ namespace SmintIo.Portals.Connector.Picturepark.Client
 
         Task UpdateContentsAsync(ICollection<ContentMetadataUpdateItem> contents);
 
-        Task<StreamResponse> GetImageDownloadStreamAsync(string id, ThumbnailSize size);
+        Task<StreamResponse> GetImageDownloadStreamAsync(string id, ThumbnailSize size, long? maxFileSizeBytes);
 
-        Task<StreamResponse> GetPlaybackDownloadStreamAsync(string id, string size);
+        Task<StreamResponse> GetPlaybackDownloadStreamAsync(string id, string size, long? maxFileSizeBytes);
 
-        Task<StreamResponse> GetDownloadStreamForOutputFormatIdAsync(string id, string outputFormatId);
+        Task<StreamResponse> GetDownloadStreamForOutputFormatIdAsync(string id, string outputFormatId, long? maxFileSizeBytes);
 
         Task<ICollection<string>> GetProfileUserRoleIdsAsync();
     }

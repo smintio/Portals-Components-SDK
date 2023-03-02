@@ -10,6 +10,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Progress;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
+using SmintIo.Portals.SDK.Core.Models.Metamodel;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
@@ -21,74 +22,87 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
     {
         public override async Task<GetAssetResult> GetAssetAsync(GetAssetParameters parameters)
         {
-            var unscopedId = parameters?.AssetId?.UnscopedId;
-
-            try
+            if (parameters == null)
             {
-                ContentDetail content = await _client.GetContentAsync(unscopedId);
+                throw new ArgumentNullException(nameof(parameters));
+            }
 
-                var converter = new PictureparkContentConverter(
-                    _logger,
-                    Context,
-                    _entityModelProvider,
-                    _configuration.ListNameAttribute,
-                    _configuration.ListNameAttribute2,
-                    _configuration.ResolveListDataAttributes,
-                    new PictureparkPostProcessObjectConverter(_entityModelProvider));
+            if (parameters.AssetId == null)
+            {
+                throw new ArgumentException(nameof(parameters.AssetId));
+            }
 
-                var assetDataObject = converter.Convert(content, titleDisplayPattern: null);
+            var unscopedId = parameters.AssetId.UnscopedId;
 
-                return new GetAssetResult()
+            var (content, originalContentType) = await _client.GetContentAsync(unscopedId);
+
+            var converter = new PictureparkContentConverter(
+                _logger,
+                Context,
+                _entityModelProvider,
+                _configuration.ListNameAttribute,
+                _configuration.ListNameAttribute2,
+                _configuration.ResolveListDataAttributes,
+                new PictureparkPostProcessObjectConverter(_entityModelProvider));
+
+            var assetDataObject = converter.Convert(content, titleDisplayPattern: null);
+
+            if (originalContentType != null)
+            {
+                if (assetDataObject.InternalMetadata == null)
                 {
-                    AssetDataObject = assetDataObject
-                };
+                    assetDataObject.InternalMetadata = new DataObjectInternalMetadata();
+                }
+
+                assetDataObject.InternalMetadata.ThumbnailContentType = PictureparkContentConverter.Convert(originalContentType);
             }
-            catch (PictureparkNotFoundException)
+
+            return new GetAssetResult()
             {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetNotFound, "The asset was not found", unscopedId);
-            }
-            catch (ContentPermissionException)
-            {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AccessDenied, "Access to the asset has been denied", unscopedId);
-            }
+                AssetDataObject = assetDataObject
+            };
         }
 
         public override async Task<GetAssetsResult> GetAssetsAsync(GetAssetsParameters parameters, IProgressMonitor progressMonitor)
         {
-            try
+            if (parameters == null)
             {
-                ICollection<ContentDetail> contents = await _client.GetContentsAsync(parameters?.AssetIds?.Select(i => i.UnscopedId).ToList());
-
-                var converter = new PictureparkContentConverter(
-                    _logger,
-                    Context,
-                    _entityModelProvider,
-                    _configuration.ListNameAttribute,
-                    _configuration.ListNameAttribute2,
-                    _configuration.ResolveListDataAttributes,
-                    new PictureparkPostProcessObjectConverter(_entityModelProvider));
-
-                var assetDataObjects = contents
-                    .Select(c => converter.Convert(c, _configuration.GalleryTitleDisplayPattern))
-                    .ToArray();
-
-                return new GetAssetsResult()
-                {
-                    AssetDataObjects = assetDataObjects
-                };
+                throw new ArgumentNullException(nameof(parameters));
             }
-            catch (PictureparkNotFoundException)
+
+            if (parameters.AssetIds == null)
             {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetsNotFound, "One of the assets was not found");
+                throw new ArgumentException(nameof(parameters.AssetIds));
             }
-            catch (ContentPermissionException)
+
+            ICollection<ContentDetail> contents = await _client.GetContentsAsync(parameters?.AssetIds?.Select(i => i.UnscopedId).ToList());
+
+            var converter = new PictureparkContentConverter(
+                _logger,
+                Context,
+                _entityModelProvider,
+                _configuration.ListNameAttribute,
+                _configuration.ListNameAttribute2,
+                _configuration.ResolveListDataAttributes,
+                new PictureparkPostProcessObjectConverter(_entityModelProvider));
+
+            var assetDataObjects = contents
+                .Select(c => converter.Convert(c, _configuration.GalleryTitleDisplayPattern))
+                .ToArray();
+
+            return new GetAssetsResult()
             {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AccessDenied, "Access to one or more assets has been denied");
-            }
+                AssetDataObjects = assetDataObjects
+            };
         }
 
         public override async Task<GetAssetsPermissionsResult> GetAssetsPermissionsAsync(GetAssetsPermissionsParameters parameters)
         {
+            if (parameters == null || parameters.AssetIds == null)
+            {
+                return null;
+            }
+
             ICollection<ContentDetail> contents = await _client.GetContentPermissionsAsync(parameters?.AssetIds?.Select(i => i.UnscopedId).ToList());
 
             var converter = new PictureparkContentConverter(
@@ -111,6 +125,16 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 
         public override async Task<GetAssetsDownloadItemMappingsResult> GetAssetsDownloadItemMappingsAsync(GetAssetsDownloadItemMappingsParameters parameters, IProgressMonitor progressMonitor)
         {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            if (parameters.AssetIds == null)
+            {
+                throw new ArgumentException(nameof(parameters.AssetIds));
+            }
+
             ICollection<ContentDetail> contents = await _client.GetContentOutputsAsync(parameters?.AssetIds?.Select(i => i.UnscopedId).ToList());
 
             if (contents == null || contents.Count == 0)
@@ -119,6 +143,11 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                 {
                     AssetDownloadItemMappings = new List<AssetDownloadItemMappingsModel>()
                 };
+            }
+
+            if (contents.Count != parameters.AssetIds.Length)
+            {
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetsNotFound, "One of the assets was not found");
             }
 
             HashSet<string> outputFormatIds = new HashSet<string>();
@@ -222,7 +251,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 
                     var assetDownloadItemMappingModel = new AssetDownloadItemMappingModel()
                     {
-                        GroupId = $"{(int)content.ContentType}",
+                        GroupId = assetDataObject.ContentType.Id,
                         ItemId = outputFormatId,
                         Version = assetDataObject.Version,
                         Description = new LocalizedStringsModel(outputOutputFormatDetails.Names),
@@ -494,72 +523,63 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                    requiresHiResDownloadPermission;
         }
 
-        public override async Task<AssetDownloadStreamModel> GetAssetThumbnailDownloadStreamAsync(AssetIdentifier assetId, ContentTypeEnumDataObject contentType, AssetThumbnailSize size, string thumbnailSpec)
+        public override async Task<AssetDownloadStreamModel> GetAssetThumbnailDownloadStreamAsync(AssetIdentifier assetId, ContentTypeEnumDataObject contentType, AssetThumbnailSize size, string thumbnailSpec, long? maxFileSizeBytes)
         {
             var unscopedId = assetId?.UnscopedId;
 
-            try
-            {
-                StreamResponse streamResponse;
+            StreamResponse streamResponse;
 
-                if (contentType == ContentTypeEnumDataObject.Video &&
-                    size == AssetThumbnailSize.PlaybackLarge)
-                {
-                    streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "VideoLarge").ConfigureAwait(false);
-                }
-                else if (contentType == ContentTypeEnumDataObject.Video &&
-                  size == AssetThumbnailSize.PlaybackSmall)
-                {
-                    streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "VideoSmall").ConfigureAwait(false);
-                }
-                else if (contentType == ContentTypeEnumDataObject.Audio &&
-                    size == AssetThumbnailSize.PlaybackSmall)
-                {
-                    streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "AudioSmall").ConfigureAwait(false);
-                }
-                else if (size == AssetThumbnailSize.PdfPreview)
-                {
-                    streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "Pdf").ConfigureAwait(false);
-                }
-                else
-                {
-                    streamResponse = await _client.GetImageDownloadStreamAsync(unscopedId, ToPictureparkThumbnailSize(size)).ConfigureAwait(false);
-                }
+            if (contentType == ContentTypeEnumDataObject.Video &&
+                size == AssetThumbnailSize.PlaybackLarge)
+            {
+                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "VideoLarge", maxFileSizeBytes).ConfigureAwait(false);
+            }
+            else if (contentType == ContentTypeEnumDataObject.Video &&
+                size == AssetThumbnailSize.PlaybackSmall)
+            {
+                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "VideoSmall", maxFileSizeBytes).ConfigureAwait(false);
+            }
+            else if (contentType == ContentTypeEnumDataObject.Audio &&
+                size == AssetThumbnailSize.PlaybackSmall)
+            {
+                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "AudioSmall", maxFileSizeBytes).ConfigureAwait(false);
+            }
+            else if (size == AssetThumbnailSize.PdfPreview)
+            {
+                streamResponse = await _client.GetPlaybackDownloadStreamAsync(unscopedId, "Pdf", maxFileSizeBytes).ConfigureAwait(false);
+            }
+            else
+            {
+                streamResponse = await _client.GetImageDownloadStreamAsync(unscopedId, ToPictureparkThumbnailSize(size), maxFileSizeBytes).ConfigureAwait(false);
+            }
 
-                return GetAssetDownloadStreamModel(streamResponse);
-            }
-            catch (PictureparkNotFoundException)
-            {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetNotFound, "The asset was not found", unscopedId);
-            }
-            catch (ContentPermissionException)
-            {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AccessDenied, "Access to the asset has been denied", unscopedId);
-            }
+            return GetAssetDownloadStreamModel(streamResponse);
         }
 
-        public override async Task<AssetDownloadStreamModel> GetAssetDownloadStreamAsync(AssetIdentifier assetId, AssetDownloadItemMappingModel downloadItemMapping)
+        public override async Task<AssetDownloadStreamModel> GetAssetDownloadStreamAsync(AssetIdentifier assetId, AssetDownloadItemMappingModel downloadItemMapping, long? maxFileSizeBytes)
         {
-            var unscopedId = assetId?.UnscopedId;
+            if (assetId == null)
+            {
+                throw new ArgumentNullException(nameof(assetId));
+            }
 
-            try
+            if (downloadItemMapping == null)
             {
-                var streamResponse = await _client.GetDownloadStreamForOutputFormatIdAsync(assetId.UnscopedId, downloadItemMapping.ItemId).ConfigureAwait(false);
+                throw new ArgumentNullException(nameof(downloadItemMapping));
+            }
 
-                return GetAssetDownloadStreamModel(streamResponse);
-            }
-            catch (PictureparkNotFoundException)
-            {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetNotFound, "The asset was not found", unscopedId);
-            }
-            catch (ContentPermissionException)
-            {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AccessDenied, "Access to the asset has been denied", unscopedId);
-            }
+            var streamResponse = await _client.GetDownloadStreamForOutputFormatIdAsync(assetId.UnscopedId, downloadItemMapping.ItemId, maxFileSizeBytes).ConfigureAwait(false);
+
+            return GetAssetDownloadStreamModel(streamResponse);
         }
 
         private static AssetDownloadStreamModel GetAssetDownloadStreamModel(StreamResponse streamResponse)
         {
+            if (streamResponse == null)
+            {
+                return null;
+            }
+
             return new AssetDownloadStreamModel(
                 streamResponse.FileName,
                 streamResponse.FileSizeInBytes,

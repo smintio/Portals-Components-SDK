@@ -17,7 +17,7 @@ using EntityType = SmintIo.Portals.SDK.Core.Models.Metamodel.Model.EntityType;
 
 namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 {
-    public class SharepointMetamodelBuilder
+    public class SharepointMetamodelBuilder : IMetamodelBuilder
     {
         public const string RootEntityKey = "SharepointFile";
 
@@ -45,7 +45,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
         private readonly ConnectorMetamodel _metamodel;
 
-        public SharepointMetamodelBuilder(ILogger logger, ISharepointClient sharepointClient, string siteId, IEnumerable<string> siteFolderIds)
+        public SharepointMetamodelBuilder(ILogger logger, ISharepointClient sharepointClient, string siteId, string siteListId, IEnumerable<string> siteFolderIds)
         {
             _logger = logger;
             _sharepointClient = sharepointClient;
@@ -56,7 +56,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
             var foldersHash = GetMD5EncodeHash(folderIds);
 
             _metamodel = new ConnectorMetamodel(
-                $"{SharepointConnectorStartup.SharepointConnector}-{siteId}-{foldersHash}",
+                $"{SharepointConnectorStartup.SharepointConnector}-{siteId}-{siteListId}-{foldersHash}",
                 isRandomAccessSupported: true,
                 isFullTextSearchProposalsSupported: false,
                 isFolderNavigationSupported: false);
@@ -318,7 +318,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
                 var addressEntity = _metamodel.AddEntity(addressEntityModel);
 
-                locationEntityModel.AddProperty(AddressModel.Key, DataType.DataObject, addressEntity.Key);
+                locationEntityModel.AddProperty(AddressModel.Key, DataType.DataObject, addressEntity.Key, AddressModel.Key.Localize());
             }
         }
 

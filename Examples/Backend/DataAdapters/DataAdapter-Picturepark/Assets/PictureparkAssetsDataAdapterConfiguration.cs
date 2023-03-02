@@ -1,10 +1,8 @@
 ﻿using System;
 using SmintIo.Portals.DataAdapter.Picturepark.Assets.AllowedValues;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Configurations;
-using SmintIo.Portals.SDK.Core.Components;
 using SmintIo.Portals.SDK.Core.Configuration.Annotations;
 using SmintIo.Portals.SDK.Core.Models.MetadataAttributes;
-using SmintIo.Portals.SDK.Core.Models.Strings;
 
 namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 {
@@ -12,7 +10,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
     [FormGroupDeclaration("data_mapping")]
     [FormGroupDisplayName("data_mapping", "en", "Data mapping", IsDefault = true)]
     [FormGroupDisplayName("data_mapping", "de", "Daten-Mapping")]
-    public class PictureparkAssetsDataAdapterConfiguration : IModifyThumbnailsDataAdapterConfiguration, IIndicatorDataAdapterConfiguration, IOutputFormatDataAdapterConfiguration, IOverrideNameDataAdapterConfiguration
+    public class PictureparkAssetsDataAdapterConfiguration : IOutputFormatDataAdapterConfiguration, IPreserveMetadataDataAdapterConfiguration
     {
         /// <summary>
         /// Returns the default page size.
@@ -89,22 +87,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
         [FormGroup("data_mapping")]
         public string[] ResolveListDataAttributes { get; set; }
 
-        public MetadataAttributeModel SmintIoOverrideThumbnailAttribute { get; set; }
-
-        public MetadataAttributeModel SmintIoThumbnailAlignmentAttribute { get; set; }
-
-        public MetadataAttributeModel SmintIoIndicatorActivatorAttribute { get; set; }
-
-        public MetadataAttributeModel SmintIoOverrideNameAttribute { get; set; }
-
-        public string SmintIoIndicatorActivatorValue { get; set; }
-
-        public string SmintIoIndicatorIcon { get; set; }
-
-        public string SmintIoIndicatorBackgroundColor { get; set; }
-
-        public LocalizedStringsModel SmintIoIndicatorText { get; set; }
-
         [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProvider))]
         public string[] OutputFormatIdAllowList { get; set; }
 
@@ -125,5 +107,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 
         [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProvider))]
         public string[] HiResOutputFormatIdList { get; set; }
+
+        public MetadataAttributeModel[] SmintIoPreserveMetadataAttributes { get; set; }
     }
 }

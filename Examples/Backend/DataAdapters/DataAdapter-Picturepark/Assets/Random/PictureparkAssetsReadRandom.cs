@@ -7,6 +7,7 @@ using SmintIo.Portals.DataAdapter.Picturepark.Assets.Common;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Impl;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
+using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 
 namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 {
@@ -26,6 +27,11 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 
         public override async Task<GetRandomAssetsResult> GetRandomAssetsAsync(GetRandomAssetsParameters parameters)
         {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
             int limit = parameters?.Max ?? 1;
             if (limit <= 0)
                 limit = 1;
@@ -73,6 +79,14 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                 sortInfos: null).ConfigureAwait(false);
 
             var random = new Random();
+
+            if (contentDetails == null)
+            {
+                return new GetRandomAssetsResult
+                {
+                    AssetDataObjects = new AssetDataObject[0]
+                };
+            }
 
             var assetDataObjects =
                 contentDetails

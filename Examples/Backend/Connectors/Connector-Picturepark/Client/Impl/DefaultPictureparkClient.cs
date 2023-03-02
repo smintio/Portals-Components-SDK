@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Picturepark.SDK.V1.Contract;
-using Polly;
-using Polly.Retry;
 using SmintIo.Portals.Connector.Picturepark.Metamodel.Aggregations;
+using SmintIo.Portals.ConnectorSDK.Clients.Prefab;
 using SmintIo.Portals.SDK.Core.Cache;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Extensions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
@@ -18,12 +16,9 @@ using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 
 namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 {
-    public class DefaultPictureparkClient : IPictureparkClient
+    public class DefaultPictureparkClient : BaseHttpClientApiClient, IPictureparkClient
     {
-        protected const int MaxRetryAttempts = 3;
-
         protected HttpClient HttpClient { get; private set; }
-        protected AsyncRetryPolicy RetryPolicy { get; private set; }
 
         private string _debugAccessTokenCache;
         private IPictureparkService _service;
@@ -41,7 +36,9 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
         private readonly PictureparkConnector _pictureparkConnector;
 
-        private readonly IPortalsContextModel _portalsContext;
+        private readonly IPortalsContextModel _portalsContextModel;
+
+        public IRequestFailedHandler DefaultRequestFailedHandler { get; private set; }
 
         /// <summary>
         /// Constructor.
@@ -49,11 +46,25 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
         /// <param name="service"></param>
         /// <param name="channelId"></param>
         /// <param name="logger"></param>
-        public DefaultPictureparkClient(PictureparkConnector pictureparkConnector, IPortalsContextModel portalsContext, string accessToken, IPictureparkService service, string channelId, ICache cache, HttpClient httpClient, string apiUrl, string customerAlias, bool thumbnailPortalPresent, bool thumbnailExtraLargePresent, ILogger logger)
+        public DefaultPictureparkClient(
+            PictureparkConnector pictureparkConnector, 
+            IPortalsContextModel portalsContextModel, 
+            string accessToken, 
+            IPictureparkService service, 
+            string channelId, 
+            ICache cache, 
+            IHttpClientFactory httpClientFactory,
+            HttpClient httpClient, 
+            string apiUrl, 
+            string customerAlias, 
+            bool thumbnailPortalPresent, 
+            bool thumbnailExtraLargePresent, 
+            ILogger logger)
+            : base(PictureparkConnectorStartup.PictureparkConnector, portalsContextModel, httpClientFactory, logger)
         {
             _pictureparkConnector = pictureparkConnector;
 
-            _portalsContext = portalsContext;
+            _portalsContextModel = portalsContextModel;
 
             _debugAccessTokenCache = accessToken;
             _service = service;
@@ -70,86 +81,49 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             _cache = cache;
 
             HttpClient = httpClient;
-            RetryPolicy = GetRetryStrategy();
+
+            DefaultRequestFailedHandler = new PictureparkDefaultRequestFailedHandler(this);
         }
 
-        private AsyncRetryPolicy GetRetryStrategy()
+        internal async Task<RequestFailedHandlerResult?> HandleUnauthorizedAsync()
         {
-            return Policy
-                .Handle<ApiException>()
-                .Or<Exception>()
-                .WaitAndRetryAsync(
-                    MaxRetryAttempts,
-                    retryAttempt => TimeSpan.FromMilliseconds(Math.Pow(2, retryAttempt) * 100),
-                    async (ex, timespan, context) =>
-                    {
-                        if (ex is ContentPermissionException)
-                        {
-                            // fail, because there is some low level permission error
+            // try to refresh the auth token, then backoff again
 
-                            throw ex;
-                        }
-                        if (ex is UserNotFoundException userNotFoundException)
-                        {
-                            // fail, because user was not found
+            if (_pictureparkConnector.PassThroughAuthenticationTokenProvider != null)
+            {
+                try
+                {
+                    var (newAccessToken, newService) = await _pictureparkConnector.RefreshPassThroughAuthorizationValuesAsync(log: true).ConfigureAwait(false);
 
-                            throw new ExternalDependencyException(ExternalDependencyStatusEnum.GetNotFound, "The Picturepark user was not found", userNotFoundException.MissingUserId);
-                        }
-                        else if (ex is ApiException apiEx)
-                        {
-                            if (apiEx.StatusCode == (int)HttpStatusCode.TooManyRequests)
-                            {
-                                // too many requests, backoff and try again
+                    _logger.LogInformation($"Authorization values refreshed successfully ({newAccessToken}, {newService}, {_portalsContextModel})");
 
-                                return;
-                            }
-                            else if (apiEx.StatusCode == (int)HttpStatusCode.Unauthorized)
-                            {
-                                // try to refresh the auth token, then backoff again
+                    _debugAccessTokenCache = newAccessToken;
+                    _service = newService;
 
-                                if (_pictureparkConnector.PassThroughAuthenticationTokenProvider != null)
-                                {
-                                    try
-                                    {
-                                        var (newAccessToken, newService) = await _pictureparkConnector.RefreshPassThroughAuthorizationValuesAsync(log: true).ConfigureAwait(false);
+                    // if we succeed, backoff and try again
 
-                                        _logger.LogInformation($"Authorization values refreshed successfully ({newAccessToken}, {newService}, {_portalsContext})");
+                    return RequestFailedHandlerResult.Retry;
+                }
+                catch (ExternalDependencyException e)
+                when (e.ErrorCode == ExternalDependencyStatusEnum.AuthorizationValuesExpired)
+                {
+                    // if we fail because of expired grant, fail and report
 
-                                        _debugAccessTokenCache = newAccessToken;
+                    _logger.LogError($"Picturepark pass through auth refresh failed because authorization values expired, failing and reporting: {e} ({_portalsContextModel})", PictureparkConnectorStartup.PictureparkConnector);
 
-                                        _service = newService;
+                    throw new ExternalDependencyException(ExternalDependencyStatusEnum.PassThroughAuthorizationValuesExpired, e.Message, e.Identifier);
+                }
+                catch (Exception e)
+                {
+                    // if we fail because of something else, backoff and try again
 
-                                        // if we succeed, backoff and try again
+                    _logger.LogError($"Picturepark auth failed with exception, backing off and trying again: {e} ({_portalsContextModel})", PictureparkConnectorStartup.PictureparkConnector);
 
-                                        return;
-                                    }
-                                    catch (ExternalDependencyException e)
-                                    when (e.ErrorCode == ExternalDependencyStatusEnum.AuthorizationValuesExpired)
-                                    {
-                                        // if we fail because of expired grant, fail and report
+                    return null;
+                }
+            }
 
-                                        _logger.LogError($"PT auth refresh failed because authorization values expired, failing and reporting: {e} ({_portalsContext})");
-
-                                        throw new ExternalDependencyException(ExternalDependencyStatusEnum.PassThroughAuthorizationValuesExpired, e.Message, e.Identifier);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        // if we fail because of something else, backoff and try again
-
-                                        _logger.LogError($"PT auth failed with exception, backing off and trying again: {e} ({_portalsContext})");
-
-                                        return;
-                                    }
-                                }
-                            }
-
-                            // expected error happened server side, most likely our problem, cancel
-
-                            ExternalDependencyException.HandleStatusCode(apiEx.StatusCode, apiEx, "Picturepark request", PictureparkConnectorStartup.PictureparkConnector, targetGetUuid: null, _logger);
-                        }
-
-                        // some server side or communication issue, backoff and try again
-                    });
+            return null;
         }
 
         public async Task InitializeChannelAggregatorsAsync()
@@ -158,18 +132,22 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             if (channelAggregatorsInitializedMarker != null)
                 return;
 
-            Channel channel = null;
+            var channel = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                    {
+                        return _service.Channel.GetAsync(_channelId);
+                    },
+                requestFailedHandler: DefaultRequestFailedHandler,
+                hint: "Initialize channel aggregators",
+                isGet: false
+            ).ConfigureAwait(false);
 
-            await RetryPolicy.ExecuteAsync(async () =>
+            if (channel != null)
             {
-                _logger.LogInformation($"Calling Channel.GetAsync with {_debugAccessTokenCache} ({_portalsContext})");
+                AggregatorManager aggregatorManager = new AggregatorManager(channel.Aggregations, channel.Sort, channel.SortFields);
 
-                channel = await _service.Channel.GetAsync(_channelId).ConfigureAwait(false);
-            }).ConfigureAwait(false);
-
-            AggregatorManager aggregatorManager = new AggregatorManager(channel.Aggregations, channel.Sort, channel.SortFields);
-
-            await aggregatorManager.CacheAggregatorsAsync(_cache).ConfigureAwait(false);
+                await aggregatorManager.CacheAggregatorsAsync(_cache).ConfigureAwait(false);
+            }
 
             await _cache.StoreAsync("ChannelAggregatorsInitialized", new ChannelAggregatorsInitializedMarker()).ConfigureAwait(false);
         }
@@ -200,17 +178,27 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                     Limit = 5000
                 };
 
-                SchemaSearchResult response = null;
+                var schemaSearchResult = await ExecuteWithBackoffAsync(
+                    apiFunc: (_) =>
+                        {
+                            return _service.Schema.SearchAsync(request);
+                        },
+                    requestFailedHandler: DefaultRequestFailedHandler,
+                    hint: "Get schemas",
+                    isGet: false
+                ).ConfigureAwait(false);
 
-                await RetryPolicy.ExecuteAsync(async () =>
+                if (schemaSearchResult == null)
                 {
-                    _logger.LogInformation($"Calling Schema.SearchAsync with {_debugAccessTokenCache} ({_portalsContext})");
+                    break;
+                }
 
-                    response = await _service.Schema.SearchAsync(request).ConfigureAwait(false);
-                }).ConfigureAwait(false);
+                if (schemaSearchResult.Results != null)
+                {
+                    schemas.AddRange(schemaSearchResult.Results);
+                }
 
-                schemas.AddRange(response.Results);
-                pageToken = response.PageToken;
+                pageToken = schemaSearchResult.PageToken;
             } while (pageToken != null);
             //
             // The IDs are usually human-readable names, so we sort them alphabetically,
@@ -226,16 +214,17 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
         /// <returns></returns>
         public async Task<ICollection<OutputFormatInfo>> GetOutputFormatsAsync()
         {
-            CustomerInfo response = null;
+            var customerInfo = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                    {
+                        return _service.Info.GetInfoAsync();
+                    },
+                requestFailedHandler: DefaultRequestFailedHandler,
+                hint: "Get output formats",
+                isGet: false
+            ).ConfigureAwait(false);
 
-            await RetryPolicy.ExecuteAsync(async () =>
-            {
-                _logger.LogInformation($"Calling Info.GetInfoAsync() with {_debugAccessTokenCache} ({_portalsContext})");
-
-                response = await _service.Info.GetInfoAsync().ConfigureAwait(false);
-            }).ConfigureAwait(false);
-
-            return response.OutputFormats;
+            return customerInfo?.OutputFormats;
         }
 
         /// <summary>
@@ -254,16 +243,20 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 int count = Math.Min(to - i, MaxLimit);
                 IEnumerable<string> schemaIds = schemas.Skip(i).Take(count).Select(s => s.Id);
 
-                ICollection<SchemaDetail> schemaDetails = null;
+                var schemaDetails = await ExecuteWithBackoffAsync(
+                    apiFunc: (_) =>
+                        {
+                            return _service.Schema.GetManyAsync(schemaIds);
+                        },
+                    requestFailedHandler: DefaultRequestFailedHandler,
+                    hint: "Get schema details",
+                    isGet: false
+                ).ConfigureAwait(false);
 
-                await RetryPolicy.ExecuteAsync(async () =>
+                if (schemaDetails != null)
                 {
-                    _logger.LogInformation($"Calling Schema.GetManyAsync with {_debugAccessTokenCache} ({_portalsContext})");
-
-                    schemaDetails = await _service.Schema.GetManyAsync(schemaIds).ConfigureAwait(false);
-                }).ConfigureAwait(false);
-
-                result.AddRange(schemaDetails);
+                    result.AddRange(schemaDetails);
+                }
             }
 
             return result;
@@ -283,7 +276,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
             do
             {
-                ListItemSearchRequest request = new ListItemSearchRequest()
+                ListItemSearchRequest listItemSearchRequest = new ListItemSearchRequest()
                 {
                     SchemaIds = schemaIds,
                     ResolveBehaviors = new[] {
@@ -294,17 +287,27 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                     PageToken = pageToken
                 };
 
-                ListItemSearchResult response = null;
+                var listItemSearchResult = await ExecuteWithBackoffAsync(
+                    apiFunc: (_) =>
+                        {
+                            return _service.ListItem.SearchAsync(listItemSearchRequest);
+                        },
+                    requestFailedHandler: DefaultRequestFailedHandler,
+                    hint: "Get list items",
+                    isGet: false
+                ).ConfigureAwait(false);
 
-                await RetryPolicy.ExecuteAsync(async () =>
+                if (listItemSearchResult == null)
                 {
-                    _logger.LogInformation($"Calling ListItem.SearchAsync with {_debugAccessTokenCache} ({_portalsContext})");
+                    break;
+                }
 
-                    response = await _service.ListItem.SearchAsync(request).ConfigureAwait(false);
-                }).ConfigureAwait(false);
+                if (listItemSearchResult.Results != null)
+                {
+                    listItems.AddRange(listItemSearchResult.Results);
+                }
 
-                listItems.AddRange(response.Results);
-                pageToken = response.PageToken;
+                pageToken = listItemSearchResult.PageToken;
 
             } while (pageToken != null);
 
@@ -313,30 +316,32 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
         public async Task<Channel> GetChannelAsync(string channelId)
         {
-            Channel result = null;
+            var channel = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                    {
+                        return _service.Channel.GetAsync(channelId);
+                    },
+                requestFailedHandler: DefaultRequestFailedHandler,
+                hint: $"Get channel ({channelId})",
+                isGet: true
+            ).ConfigureAwait(false);
 
-            await RetryPolicy.ExecuteAsync(async () =>
-            {
-                _logger.LogInformation($"Calling Channel.GetAsync with {_debugAccessTokenCache} ({_portalsContext})");
-
-                result = await _service.Channel.GetAsync(channelId).ConfigureAwait(false);
-            }).ConfigureAwait(false);
-
-            return result;
+            return channel;
         }
 
         public async Task<ICollection<Channel>> GetAllChannelsAsync()
         {
-            ICollection<Channel> result = null;
+            var channels = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                    {
+                        return _service.Channel.GetAllAsync();
+                    },
+                requestFailedHandler: DefaultRequestFailedHandler,
+                hint: "Get all channels",
+                isGet: false
+            ).ConfigureAwait(false);
 
-            await RetryPolicy.ExecuteAsync(async () =>
-            {
-                _logger.LogInformation($"Calling Channel.GetAllAsync with {_debugAccessTokenCache} ({_portalsContext})");
-
-                result = await _service.Channel.GetAllAsync().ConfigureAwait(false);
-            }).ConfigureAwait(false);
-
-            return result;
+            return channels;
         }
 
         public async Task<(ContentSearchResult, ICollection<ContentDetail>)> SearchContentAsync(string searchString, ICollection<AggregatorBase> aggregators,
@@ -393,20 +398,21 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 Sort = sortInfos
             };
 
-            ContentSearchResult contentSearchResult = null;
-
-            await RetryPolicy.ExecuteAsync(async () =>
-            {
-                _logger.LogInformation($"Calling Service.Content with {_debugAccessTokenCache} ({_portalsContext})");
-
-                contentSearchResult = await _service.Content.SearchAsync(request).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            var contentSearchResult = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                {
+                    return _service.Content.SearchAsync(request);
+                },
+                requestFailedHandler: DefaultRequestFailedHandler,
+                hint: "Search content",
+                isGet: false
+            ).ConfigureAwait(false);
 
             ICollection<ContentDetail> contentDetails;
 
             if (resolveMetadata)
             {
-                contentDetails = await GetManyAsync(contentSearchResult.Results?.Select(result => result.Id), new ContentResolveBehavior[] {
+                contentDetails = await GetManyAsync(contentSearchResult?.Results?.Select(result => result.Id), new ContentResolveBehavior[] {
                     ContentResolveBehavior.OuterDisplayValueThumbnail,
                     ContentResolveBehavior.OuterDisplayValueList,
                     ContentResolveBehavior.OuterDisplayValueName,
@@ -418,7 +424,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             }
             else
             {
-                contentDetails = await GetManyAsync(contentSearchResult.Results?.Select(result => result.Id), new ContentResolveBehavior[] {
+                contentDetails = await GetManyAsync(contentSearchResult?.Results?.Select(result => result.Id), new ContentResolveBehavior[] {
                     ContentResolveBehavior.OuterDisplayValueThumbnail,
                     ContentResolveBehavior.OuterDisplayValueList,
                     ContentResolveBehavior.OuterDisplayValueName,
@@ -428,38 +434,42 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 }).ConfigureAwait(false);
             }
 
-            DEBUG($"SearchAsync() took {contentSearchResult.ElapsedMilliseconds} ms");
-
             return (contentSearchResult, contentDetails);
         }
 
-        public async Task<ContentDetail> GetContentAsync(string id)
+        public async Task<(ContentDetail ContentDetail, ContentType? OriginalContentType)> GetContentAsync(string id)
         {
             await CheckContentChannelAccessAsync(id).ConfigureAwait(false);
 
-            ContentDetail contentDetail = null;
+            var contentDetail = await ExecuteWithBackoffAsync(
+               apiFunc: (_) =>
+               {
+                    return _service.Content.GetAsync(id, new ContentResolveBehavior[] {
+                        ContentResolveBehavior.Metadata,
+                        ContentResolveBehavior.Content,
+                        ContentResolveBehavior.OuterDisplayValueThumbnail,
+                        ContentResolveBehavior.OuterDisplayValueList,
+                        ContentResolveBehavior.OuterDisplayValueName,
+                        // ContentResolveBehavior.OuterDisplayValueDetail,
+                        ContentResolveBehavior.LinkedListItems,
+                        ContentResolveBehavior.Outputs,
+                        ContentResolveBehavior.Permissions,
+                        ContentResolveBehavior.DynamicViewFields
+                    });
+               },
+               requestFailedHandler: DefaultRequestFailedHandler,
+               hint: "Search content",
+               isGet: false
+           ).ConfigureAwait(false);
 
-            await RetryPolicy.ExecuteAsync(async () =>
+            if (contentDetail == null)
             {
-                _logger.LogInformation($"Calling Content.GetAsync with {_debugAccessTokenCache} ({_portalsContext})");
+                return (null, null);
+            }
 
-                contentDetail = await _service.Content.GetAsync(id, new ContentResolveBehavior[] {
-                    ContentResolveBehavior.Metadata,
-                    ContentResolveBehavior.Content,
-                    ContentResolveBehavior.OuterDisplayValueThumbnail,
-                    ContentResolveBehavior.OuterDisplayValueList,
-                    ContentResolveBehavior.OuterDisplayValueName,
-                    // ContentResolveBehavior.OuterDisplayValueDetail,
-                    ContentResolveBehavior.LinkedListItems,
-                    ContentResolveBehavior.Outputs,
-                    ContentResolveBehavior.Permissions,
-                    ContentResolveBehavior.DynamicViewFields
-                }).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            var originalContentType = await HandleThumbnailReferenceFileTypeAsync(contentDetail).ConfigureAwait(false);
 
-            await HandleThumbnailReferenceFileTypeAsync(contentDetail).ConfigureAwait(false);
-
-            return contentDetail;
+            return (contentDetail, originalContentType);
         }
 
         public async Task<ICollection<ContentDetail>> GetContentsAsync(ICollection<string> ids, bool skipNonAccessibleContents = false)
@@ -485,16 +495,17 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
         public async Task<ICollection<OutputFormatDetail>> GetOutputFormatsAsync(ICollection<string> outputFormatIds)
         {
-            ICollection<OutputFormatDetail> result = null;
+            var outputFormats = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                {
+                    return _service.OutputFormat.GetManyAsync(outputFormatIds);
+                },
+                requestFailedHandler: DefaultRequestFailedHandler,
+                hint: "Get output formats",
+                isGet: false
+            ).ConfigureAwait(false);
 
-            await RetryPolicy.ExecuteAsync(async () =>
-            {
-                _logger.LogInformation($"OutputFormat.GetManyAsync with {_debugAccessTokenCache} ({_portalsContext})");
-
-                result = await _service.OutputFormat.GetManyAsync(outputFormatIds).ConfigureAwait(false);
-            }).ConfigureAwait(false);
-
-            return result;
+            return outputFormats;
         }
 
         public async Task<ICollection<ContentDetail>> GetContentPermissionsAsync(ICollection<string> ids)
@@ -504,8 +515,6 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             var contentDetails = await GetManyAsync(contentSearchResult.Results?.Select(result => result.Id), new ContentResolveBehavior[] {
                 ContentResolveBehavior.Permissions
             }).ConfigureAwait(false);
-
-            DEBUG($"GetContentPermissionsAsync() took {contentSearchResult.ElapsedMilliseconds} ms");
 
             return contentDetails;
         }
@@ -528,8 +537,6 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             }).ConfigureAwait(false);
 
             contentDetails = await HandleThumbnailReferenceAsync(contentDetails).ConfigureAwait(false);
-
-            DEBUG($"GetContentOutputsAsync() took {contentSearchResult.ElapsedMilliseconds} ms");
 
             return contentDetails;
         }
@@ -557,14 +564,15 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 Sort = null
             };
 
-            ContentSearchResult contentSearchResult = null;
-
-            await RetryPolicy.ExecuteAsync(async () =>
-            {
-                _logger.LogInformation($"Calling Content.SearchAsync with {_debugAccessTokenCache} ({_portalsContext})");
-
-                contentSearchResult = await _service.Content.SearchAsync(request).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            var contentSearchResult = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                {
+                    return _service.Content.SearchAsync(request);
+                },
+                requestFailedHandler: DefaultRequestFailedHandler,
+                hint: "Get content channel access IDs",
+                isGet: false
+            ).ConfigureAwait(false);
 
             return contentSearchResult;
         }
@@ -589,7 +597,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
                 if (contentSearchResult.TotalResults < ids.Count)
                 {
-                    throw new PictureparkNotFoundException();
+                    throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetNotFound, "The asset was not found", ids.First());
                 }
 
                 return ids;
@@ -612,19 +620,26 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             if (contents == null || contents.Count == 0)
                 return;
 
-            await RetryPolicy.ExecuteAsync(async () =>
+            var contentsCreateRequest = new ContentCreateManyRequest()
             {
-                _logger.LogInformation($"Creating Content.CreateAsync with {_debugAccessTokenCache} ({_portalsContext})");
+                Items = contents
+            };
 
-                var contentsCreateRequest = new ContentCreateManyRequest()
-                {
-                    Items = contents
-                };
+            await ExecuteWithBackoffAsync(
+               apiFunc: async (_) =>
+               {
+                   var result = await _service.Content.CreateManyAsync(contentsCreateRequest).ConfigureAwait(false);
 
-                var result = await _service.Content.CreateManyAsync(contentsCreateRequest).ConfigureAwait(false);
+                   await _service.BusinessProcess.WaitForCompletionAsync(result.BusinessProcessId);
 
-                await _service.BusinessProcess.WaitForCompletionAsync(result.BusinessProcessId);
-            }).ConfigureAwait(false);
+                   // something
+
+                   return true;
+               },
+               requestFailedHandler: DefaultRequestFailedHandler,
+               hint: "Create contents",
+               isGet: false
+           ).ConfigureAwait(false);
         }
 
         public async Task UpdateContentsAsync(ICollection<ContentMetadataUpdateItem> contents)
@@ -634,22 +649,29 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
             await CheckContentChannelAccessAsync(contents.Select(content => content.Id).ToList(), skipNonAccessibleContents: false).ConfigureAwait(false);
 
-            await RetryPolicy.ExecuteAsync(async () =>
+            var contentsUpdateRequest = new ContentMetadataUpdateManyRequest()
             {
-                _logger.LogInformation($"Creating Content.UpdateAsync with {_debugAccessTokenCache} ({_portalsContext})");
+                Items = contents
+            };
 
-                var contentsUpdateRequest = new ContentMetadataUpdateManyRequest()
-                {
-                    Items = contents
-                };
+            await ExecuteWithBackoffAsync(
+               apiFunc: async (_) =>
+               {
+                   var result = await _service.Content.UpdateMetadataManyAsync(contentsUpdateRequest).ConfigureAwait(false);
 
-                var result = await _service.Content.UpdateMetadataManyAsync(contentsUpdateRequest).ConfigureAwait(false);
+                   await _service.BusinessProcess.WaitForCompletionAsync(result.BusinessProcessId);
 
-                await _service.BusinessProcess.WaitForCompletionAsync(result.BusinessProcessId);
-            }).ConfigureAwait(false);
+                   // something
+
+                   return true;
+               },
+               requestFailedHandler: DefaultRequestFailedHandler,
+               hint: "Update contents",
+               isGet: false
+           ).ConfigureAwait(false);
         }
 
-        public async Task<StreamResponse> GetImageDownloadStreamAsync(string id, ThumbnailSize size)
+        public async Task<StreamResponse> GetImageDownloadStreamAsync(string id, ThumbnailSize size, long? maxFileSizeBytes)
         {
             string downloadUri;
 
@@ -672,27 +694,48 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 downloadUri = $"{_apiUrl}v1/Contents/thumbnails/{Uri.EscapeDataString(id)}/{Uri.EscapeDataString(sizeString)}";
             }
 
-            var streamResponse = await GetStreamResponseAsync(downloadUri, cancelRequestDelay: TimeSpan.FromSeconds(5));
+            var accessToken = _pictureparkConnector.GetAccessToken();
+
+            var requestHeaders = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("Picturepark-CustomerAlias", _customerAlias)
+            };
+
+            var streamResponse = await GetHttpClientStreamResponseWithBackoffAsync(downloadUri, requestFailedHandler: DefaultRequestFailedHandler, accessToken, hint: $"Get image download stream ({id}, {size})", requestHeaders: requestHeaders, cancelRequestDelay: TimeSpan.FromSeconds(5), maxFileSizeBytes);
 
             return streamResponse;
         }
 
-        public async Task<StreamResponse> GetPlaybackDownloadStreamAsync(string id, string size)
+        public async Task<StreamResponse> GetPlaybackDownloadStreamAsync(string id, string size, long? maxFileSizeBytes)
         {
             var downloadUri = $"{_apiUrl}v1/Contents/downloads/{Uri.EscapeDataString(id)}/{Uri.EscapeDataString(size)}";
 
-            var streamResponse = await GetStreamResponseAsync(downloadUri, cancelRequestDelay: TimeSpan.FromSeconds(5));
+            var accessToken = _pictureparkConnector.GetAccessToken();
+
+            var requestHeaders = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("Picturepark-CustomerAlias", _customerAlias)
+            };
+
+            var streamResponse = await GetHttpClientStreamResponseWithBackoffAsync(downloadUri, requestFailedHandler: DefaultRequestFailedHandler, accessToken, hint: $"Get playback download stream ({id}, {size})", requestHeaders: requestHeaders, cancelRequestDelay: TimeSpan.FromSeconds(5), maxFileSizeBytes);
 
             return streamResponse;
         }
 
-        public async Task<StreamResponse> GetDownloadStreamForOutputFormatIdAsync(string id, string outputFormatId)
+        public async Task<StreamResponse> GetDownloadStreamForOutputFormatIdAsync(string id, string outputFormatId, long? maxFileSizeBytes)
         {
             id = await GetThumbnailReferenceIdAsync(id).ConfigureAwait(false);
 
             var downloadUri = $"{_apiUrl}v1/Contents/downloads/{Uri.EscapeDataString(id)}/{Uri.EscapeDataString(outputFormatId)}";
 
-            var streamResponse = await GetStreamResponseAsync(downloadUri);
+            var accessToken = _pictureparkConnector.GetAccessToken();
+
+            var requestHeaders = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("Picturepark-CustomerAlias", _customerAlias)
+            };
+
+            var streamResponse = await GetHttpClientStreamResponseWithBackoffAsync(downloadUri, requestFailedHandler: DefaultRequestFailedHandler, accessToken, hint: $"Get download stream for output format ({id}, {outputFormatId})", requestHeaders: requestHeaders, maxFileSizeBytes: maxFileSizeBytes);
 
             return streamResponse;
         }
@@ -704,21 +747,24 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 return null;
             }
 
-            var profile = await RetryPolicy.ExecuteAsync(async () =>
-            {
-                _logger.LogInformation($"Getting Profile.GetAsync with {_debugAccessTokenCache} ({_portalsContext})");
+            var profile = await ExecuteWithBackoffAsync(
+               apiFunc: (_) =>
+               {
+                   try
+                   {
+                       return _service.Profile.GetAsync();
+                   }
+                   catch (PictureparkForbiddenException)
+                   {
+                       // lets immediately cancel
 
-                try
-                {
-                    return await _service.Profile.GetAsync().ConfigureAwait(false);
-                }
-                catch (PictureparkForbiddenException)
-                {
-                    // happens... let's "transform" it :)
-
-                    throw new UserNotFoundException();
-                }
-            });
+                       throw new ExternalDependencyException(ExternalDependencyStatusEnum.GetNotFound, "The Picturepark user was not found", PictureparkConnectorStartup.PictureparkConnector);
+                   }
+               },
+               requestFailedHandler: DefaultRequestFailedHandler,
+               hint: "Get profile user role IDs",
+               isGet: false
+           ).ConfigureAwait(false);
 
             if (profile == null)
             {
@@ -735,22 +781,6 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             return userRoles;
         }
 
-        private async Task<StreamResponse> GetStreamResponseAsync(string downloadUri, TimeSpan cancelRequestDelay = default)
-        {
-            var accessToken = _pictureparkConnector.GetAccessToken();
-
-            var requestHeaders = new List<KeyValuePair<string, string>>()
-            {
-                new KeyValuePair<string, string>("Picturepark-CustomerAlias", _customerAlias)
-            };
-
-            var downloadStreamRequest = new DownloadStreamRequest(downloadUri, accessToken, requestHeaders, cancelRequestDelay);
-
-            var streamResponse = await HttpClient.GetDownloadStreamAsync(_logger, _portalsContext, downloadStreamRequest);
-
-            return streamResponse;
-        }
-
         private async Task<ICollection<ContentDetail>> GetManyAsync(IEnumerable<string> contentIds, ContentResolveBehavior[] contentResolveBehaviors)
         {
             List<ContentDetail> contentDetails = new List<ContentDetail>();
@@ -764,14 +794,20 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                     int count = Math.Min(to - i, MaxLimit);
                     IEnumerable<string> partialContentIds = contentIds.Skip(i).Take(count);
 
-                    ICollection<ContentDetail> partialContentDetails = null;
+                    var partialContentDetails = await ExecuteWithBackoffAsync(
+                       apiFunc: (_) =>
+                       {
+                           return _service.Content.GetManyAsync(partialContentIds, contentResolveBehaviors);
+                       },
+                       requestFailedHandler: DefaultRequestFailedHandler,
+                       hint: "Get many",
+                       isGet: false
+                   ).ConfigureAwait(false);
 
-                    await RetryPolicy.ExecuteAsync(async () =>
+                    if (partialContentDetails == null)
                     {
-                        _logger.LogInformation($"Calling GetManyAsync with {_debugAccessTokenCache} ({_portalsContext})");
-
-                        partialContentDetails = await _service.Content.GetManyAsync(partialContentIds, contentResolveBehaviors).ConfigureAwait(false);
-                    }).ConfigureAwait(false);
+                        continue;
+                    }
 
                     contentDetails.AddRange(partialContentDetails);
                 }
@@ -805,7 +841,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                     continue;
                 }
 
-                var targetContentDetail = await GetContentAsync(targetContentId).ConfigureAwait(false);
+                var (targetContentDetail, _) = await GetContentAsync(targetContentId).ConfigureAwait(false);
 
                 result.Add(targetContentDetail);
             }
@@ -813,9 +849,18 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             return result;
         }
 
-        private async Task HandleThumbnailReferenceFileTypeAsync(ContentDetail contentDetail)
+        private async Task<ContentType?> HandleThumbnailReferenceFileTypeAsync(ContentDetail contentDetail)
         {
+            var originalContentType = contentDetail.ContentType;
+
             await HandleThumbnailReferenceFileTypeAsync(new[] { contentDetail }).ConfigureAwait(false);
+
+            if (contentDetail.ContentType != originalContentType)
+            {
+                return originalContentType;
+            }
+
+            return null;
         }
 
         private async Task HandleThumbnailReferenceFileTypeAsync(ICollection<ContentDetail> contentDetails)
@@ -839,7 +884,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                     continue;
                 }
 
-                var targetContentDetail = await GetContentAsync(targetContentId).ConfigureAwait(false);
+                var (targetContentDetail, _) = await GetContentAsync(targetContentId).ConfigureAwait(false);
 
                 contentDetail.ContentType = targetContentDetail.ContentType;
             }
@@ -852,7 +897,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 return id;
             }
 
-            var contentDetail = await GetContentAsync(id).ConfigureAwait(false);
+            var (contentDetail, _) = await GetContentAsync(id).ConfigureAwait(false);
 
             var targetContentId = GetThumbnailReferenceTargetContentId(contentDetail);
 
@@ -934,14 +979,6 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             }
 
             return targetId;
-        }
-
-        protected void DEBUG(string message, params object[] args)
-        {
-            if (!(_logger is null))
-            {
-                _logger.LogDebug(message, args);
-            }
         }
     }
 }

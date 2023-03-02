@@ -4,28 +4,13 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Configurations;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Prefab;
 using SmintIo.Portals.SDK.Core.Configuration.Annotations;
 using SmintIo.Portals.SDK.Core.Models.MetadataAttributes;
-using SmintIo.Portals.SDK.Core.Models.Strings;
 using static SmintIo.Portals.DataAdapterSDK.DataAdapters.Prefab.IAlwaysOnIntegrationLayerDataAdapterConfiguration;
 
 namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 {
     [Serializable]
-    public class SharepointAssetsDataAdapterConfiguration : IAlwaysOnIntegrationLayerDataAdapterConfiguration, IModifyThumbnailsDataAdapterConfiguration, IIndicatorDataAdapterConfiguration, IOutputFormatDataAdapterConfiguration
+    public class SharepointAssetsDataAdapterConfiguration : IAlwaysOnIntegrationLayerDataAdapterConfiguration, IOutputFormatDataAdapterConfiguration, IPreserveMetadataDataAdapterConfiguration
     {
-        public MetadataAttributeModel SmintIoOverrideThumbnailAttribute { get; set; }
-
-        public MetadataAttributeModel SmintIoThumbnailAlignmentAttribute { get; set; }
-
-        public MetadataAttributeModel SmintIoIndicatorActivatorAttribute { get; set; }
-
-        public string SmintIoIndicatorActivatorValue { get; set; }
-
-        public string SmintIoIndicatorIcon { get; set; }
-
-        public string SmintIoIndicatorBackgroundColor { get; set; }
-
-        public LocalizedStringsModel SmintIoIndicatorText { get; set; }
-
         public MetadataAttributeModel[] SmintIoIntegrationLayerSearchIndexMetadataAttributeList { get; set; }
 
         public MetadataAttributeModel[] SmintIoIntegrationLayerSearchIndexSortMetadataAttributeList { get; set; }
@@ -37,6 +22,10 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
         public SmintIoDataSearchIndexFileType[] SmintIoSearchIndexFileTypeDenyList { get; set; }
 
         public string[] SmintIoSearchIndexIndexedLanguages { get; set; }
+
+        public MetadataAttributeModel[] SmintIoSearchIndexOnlyIndexAssetsWithAttributes { get; set; }
+
+        public string SmintIoSearchIndexOnlyIndexAssetsWithAttributeValue { get; set; }
 
         [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProviderBaseImpl))]
         public string[] OutputFormatIdAllowList { get; set; }
@@ -58,5 +47,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProviderBaseImpl))]
         public string[] HiResOutputFormatIdList { get; set; }
+
+        public MetadataAttributeModel[] SmintIoPreserveMetadataAttributes { get; set; }
     }
 }

@@ -113,6 +113,8 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
                     if (propertyModel.LinkedTranslationProperties == null || !propertyModel.LinkedTranslationProperties.Any())
                     {
+                        propertyModel.LinkedTranslationProperties = null;
+
                         continue;
                     }
 
@@ -165,7 +167,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                     continue;
                 }
 
-                existingPropertyModel.LinkedTranslationProperties ??= new LinkedTranslationPropertyModel[0];
+                existingPropertyModel.LinkedTranslationProperties ??= Array.Empty<LinkedTranslationPropertyModel>();
 
                 var translatableFields = GetTranslatableFields(existingPropertyModel, translatablePropertyModel);
 
@@ -173,11 +175,16 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
                 SetLabels(existingPropertyModel.Labels, localizedData);
 
-                var linkedTranslationPropertyModels = existingPropertyModel.LinkedTranslationProperties
+                existingPropertyModel.LinkedTranslationProperties = existingPropertyModel.LinkedTranslationProperties
                     .Union(localizedData.LinkedTranslationPropertyModels)
                     .ToArray();
 
-                existingPropertyModel.LinkedTranslationProperties = linkedTranslationPropertyModels;
+                if (existingPropertyModel.LinkedTranslationProperties.Length == 0)
+                {
+                    existingPropertyModel.LinkedTranslationProperties = null;
+
+                    return;
+                }
 
                 if (existingPropertyModel.DataType != DataType.String)
                 {

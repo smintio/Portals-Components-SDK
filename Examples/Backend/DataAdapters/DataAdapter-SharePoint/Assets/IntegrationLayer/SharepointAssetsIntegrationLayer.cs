@@ -11,6 +11,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
+using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 using ChangeType = SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models.ChangeType;
 
 namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
@@ -82,7 +83,32 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            var driveItemsChangesList = await _sharepointClient.GetDriveItemChangesListAsync(deltaLink: parameters.LastContinuationId).ConfigureAwait(false);
+            DriveItemChangesListModel driveItemsChangesList;
+
+            try
+            {
+                driveItemsChangesList = await _sharepointClient.GetDriveItemChangesListAsync(deltaLink: parameters.LastContinuationId).ConfigureAwait(false);
+            }
+            catch (UriFormatException ex)
+            {
+                if (!string.Equals(ex.Message, "Invalid URI: The format of the URI could not be determined.", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw;
+                }
+
+                driveItemsChangesList = new DriveItemChangesListModel
+                {
+                    ContinuationTooOld = true
+                };
+            }
+            catch (ExternalDependencyException ex)
+            when (ex.ErrorCode == ExternalDependencyStatusEnum.CompatiblityIssue)
+            {
+                driveItemsChangesList = new DriveItemChangesListModel
+                {
+                    ContinuationTooOld = true
+                };
+            }
 
             var changes = await GetChangesModelsAsync(driveItemsChangesList).ConfigureAwait(false);
 
@@ -144,7 +170,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
         {
             if (driveItemsChangesList == null || (!driveItemsChangesList.DriveItems.Any() && !driveItemsChangesList.FolderDriveItemsToDelete.Any()))
             {
-                return new ChangeModel[0];
+                return Array.Empty<ChangeModel>();
             }
 
             var converter = new SharepointContentConverter(_logger, Context, _sharepointClient, _entityModelProvider);

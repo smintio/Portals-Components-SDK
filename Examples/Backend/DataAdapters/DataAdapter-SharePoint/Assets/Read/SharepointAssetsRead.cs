@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -14,9 +13,9 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Progress;
-using SmintIo.Portals.SDK.Core.Http.Prefab.Exceptions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
+using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 
 namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 {
@@ -25,7 +24,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
         private static readonly Regex _downloadUrlRegex = new Regex("downloadUrl\":\"(.*?)\"", RegexOptions.IgnoreCase);
         private static readonly Regex _spItemUrlRegex = new Regex("g_fileInfo =(.*?); var g_webApplicationUrls", RegexOptions.IgnoreCase);
 
-        protected override bool HasPlaybackPreviewOutputFormat(AssetDataObject assetDataObject)
+        public override bool HasPlaybackPreviewOutputFormat(AssetDataObject assetDataObject)
         {
             return false;
         }
@@ -34,7 +33,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
             AssetIdentifier assetId,
             ContentTypeEnumDataObject contentType,
             AssetThumbnailSize assetThumbnailSize,
-            string thumbnailSpec)
+            string thumbnailSpec,
+            long? maxFileSizeBytes)
         {
             if (assetId == null)
             {
@@ -58,19 +58,14 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
                 if (assetDownloadUrlModel == null || string.IsNullOrEmpty(assetDownloadUrlModel.Url))
                 {
-                    throw new Exception("Asset download URL is empty");
+                    return null;
                 }
 
-                var streamResponse = await _sharepointClient.GetHttpStreamResponseWithoutBackoffAsync(assetDownloadUrlModel.Url, cancelRequestDelay: TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+                var streamResponse = await _sharepointClient.GetHttpClientStreamResponseWithoutBackoffAsync(assetDownloadUrlModel.Url, _sharepointClient.DefaultRequestFailedHandler, accessToken: null, hint: $"Get asset thumbnail download stream ({assetId}, {contentType}, {assetThumbnailSize}, {thumbnailSpec})", cancelRequestDelay: TimeSpan.FromSeconds(5), maxFileSizeBytes: maxFileSizeBytes).ConfigureAwait(false);
 
                 if (streamResponse == null)
                 {
                     return null;
-                }
-
-                if (streamResponse.Stream == null)
-                {
-                    throw new Exception("Stream is null");
                 }
 
                 return new AssetDownloadStreamModel(
@@ -82,18 +77,13 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
             if (string.Equals(thumbnailSpec, SharepointContentConverter.ConvertThumbnailSpec))
             {
-                var streamResponse = await _sharepointClient.GetDriveItemPdfContentAsync(assetId.UnscopedId).ConfigureAwait(false);
+                var streamResponse = await _sharepointClient.GetDriveItemPdfContentAsync(assetId.UnscopedId, maxFileSizeBytes).ConfigureAwait(false);
 
                 if (streamResponse == null)
                 {
                     // not supported
 
                     return null;
-                }
-
-                if (streamResponse.Stream == null)
-                {
-                    throw new Exception("Stream is null");
                 }
 
                 var fileName = streamResponse.FileName;
@@ -114,16 +104,11 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 assetThumbnailSize == AssetThumbnailSize.PlaybackLarge ||
                 assetThumbnailSize == AssetThumbnailSize.PlaybackSmall)
             {
-                var streamResponse = await GetPreviewContentAsync(assetId, contentType, isStreaming).ConfigureAwait(false);
+                var streamResponse = await GetPreviewContentAsync(assetId, contentType, isStreaming, maxFileSizeBytes).ConfigureAwait(false);
 
                 if (streamResponse == null)
                 {
                     return null;
-                }
-
-                if (streamResponse.Stream == null)
-                {
-                    throw new Exception("Stream is null");
                 }
 
                 var fileName = streamResponse.FileName;
@@ -144,16 +129,11 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
             if (isPdfPreview)
             {
-                var streamResponse = await _sharepointClient.GetDriveItemContentAsync(assetId.UnscopedId).ConfigureAwait(false);
+                var streamResponse = await _sharepointClient.GetDriveItemContentAsync(assetId.UnscopedId, maxFileSizeBytes).ConfigureAwait(false);
 
                 if (streamResponse == null)
                 {
                     return null;
-                }
-
-                if (streamResponse.Stream == null)
-                {
-                    throw new Exception("Stream is null");
                 }
 
                 return new AssetDownloadStreamModel(
@@ -168,14 +148,14 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
                 if (driveItem == null)
                 {
-                    return null;
+                    throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetNotFound, "The asset was not found", assetId.UnscopedId);
                 }
 
                 var thumbnailSet = driveItem.Thumbnails.FirstOrDefault();
 
                 if (thumbnailSet == null)
                 {
-                    _logger.LogWarning($"Thumbnail set is null for asset ID {assetId.UnscopedId}, drive item {driveItem.Id} - no thumbnails present, ignoring and returning null");
+                    _logger.LogWarning($"Thumbnail set NULL for asset ID {assetId.UnscopedId}, drive item {driveItem.Id} - no thumbnails present, ignoring and returning NULL");
 
                     // no thumbnails available
 
@@ -204,34 +184,32 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                         break;
                 }
 
+                if (string.IsNullOrEmpty(thumbnailUrl))
+                {
+                    return null;
+                }
+
                 StreamResponse streamResponse;
 
                 if (computePreview)
                 {
-                    streamResponse = await _sharepointClient.GetDriveItemThumbnailContentAsync(assetId.UnscopedId, thumbnailSet.Id, size: "c1600x1600").ConfigureAwait(false);
+                    streamResponse = await _sharepointClient.GetDriveItemThumbnailContentAsync(assetId.UnscopedId, thumbnailSet.Id, size: "c1600x1600", maxFileSizeBytes).ConfigureAwait(false);
                 }
                 else
                 {
                     if (string.IsNullOrEmpty(thumbnailUrl))
                     {
-                        throw new Exception("Thumbnail is not present");
+                        _logger.LogWarning($"Thumbnail is not present for asset {assetId.UnscopedId}");
+
+                        return null;
                     }
 
-                    streamResponse = await _sharepointClient.GetHttpStreamResponseWithSharepointErrorHandlingAsync(thumbnailUrl).ConfigureAwait(false);
+                    streamResponse = await _sharepointClient.GetHttpClientStreamResponseWithBackoffAsync(thumbnailUrl, _sharepointClient.DefaultRequestFailedHandler, accessToken: null, hint: $"Get asset thumbnail download stream ({assetId}, {contentType}, {assetThumbnailSize}, {thumbnailSpec})", maxFileSizeBytes: maxFileSizeBytes).ConfigureAwait(false);
                 }
 
                 if (streamResponse == null)
                 {
-                    _logger.LogWarning($"Stream response is null for asset ID {assetId.UnscopedId}, drive item {driveItem.Id} - no thumbnails present, ignoring and returning null");
-
-                    // no thumbnails available
-
                     return null;
-                }
-
-                if (streamResponse.Stream == null)
-                {
-                    throw new Exception("Stream response stream is null");
                 }
 
                 var fileName = streamResponse.FileName;
@@ -249,13 +227,18 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
             }
         }
 
-        private async Task<StreamResponse> GetPreviewContentAsync(AssetIdentifier assetId, ContentTypeEnumDataObject contentType, bool isStreaming)
+        private async Task<StreamResponse> GetPreviewContentAsync(AssetIdentifier assetId, ContentTypeEnumDataObject contentType, bool isStreaming, long? maxFileSizeBytes)
         {
             var useMediaPresentation = isStreaming && contentType.Id == ContentTypeEnumDataObject.Video.Id;
 
             var url = await GetAssetItemPreviewUrlAsync(assetId.UnscopedId, useMediaPresentation).ConfigureAwait(false);
 
-            return await _sharepointClient.GetHttpStreamResponseWithSharepointErrorHandlingAsync(url).ConfigureAwait(false);
+            if (string.IsNullOrEmpty(url))
+            {
+                return null;
+            }
+
+            return await _sharepointClient.GetHttpClientStreamResponseWithBackoffAsync(url, _sharepointClient.DefaultRequestFailedHandler, accessToken: null, hint: $"Get preview content ({assetId}, {contentType})", maxFileSizeBytes: maxFileSizeBytes).ConfigureAwait(false);
         }
 
         private async Task<string> GetAssetItemPreviewUrlAsync(string assetId, bool useMediaPresentation)
@@ -274,7 +257,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 { "user-agent", "Smint.io/1.0.0" }
             };
 
-            var urlContent = await _sharepointClient.GetHttpStreamResponseAsStringAsync(itemPreviewInfo.GetUrl, accessToken: null, requestHeaders).ConfigureAwait(false);
+            var urlContent = await _sharepointClient.GetHttpClientStreamResponseAsStringWithBackoffAsync(itemPreviewInfo.GetUrl, _sharepointClient.DefaultRequestFailedHandler, accessToken: null, hint: $"Get asset item preview URL ({assetId}, {useMediaPresentation})", isGet: true, requestHeaders).ConfigureAwait(false);
 
             if (string.IsNullOrEmpty(urlContent))
             {
@@ -296,10 +279,15 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
             if (string.IsNullOrEmpty(downloadUrlMatch.Value) || downloadUrlMatch.Groups.Count < 2)
             {
                 throw new InvalidOperationException(
-                    $"Could not determine item preview url for asset '{assetId}'. Revisit what Microsoft has changed.");
+                    $"Could not determine item preview url for asset {assetId}. Revisit what Microsoft has changed");
             }
 
             var url = downloadUrlMatch.Groups[1].Value;
+
+            if (string.IsNullOrEmpty(url))
+            {
+                return null;
+            }
 
             return url;
         }
@@ -314,14 +302,14 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 {
                     return null;
                 }
-                    
+
                 var sharepointItemPreview = JsonConvert.DeserializeObject<SharepointItemPreview>(sharepointItemPreviewText);
 
                 if (string.IsNullOrEmpty(sharepointItemPreview.MediaServiceFastMetadata))
                 {
                     return null;
                 }
-                
+
                 var mediaServiceFastMetadata = JsonConvert.DeserializeObject<MediaServiceFastMetadata>(sharepointItemPreview.MediaServiceFastMetadata);
 
                 if (mediaServiceFastMetadata == null)
@@ -337,13 +325,13 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
             {
                 // We will fall back to piped file stream.
 
-                _logger.LogError(ex, $"SharePoint item preview manifest parsing failed. Revisit what Microsoft has changed.");
+                _logger.LogError(ex, $"SharePoint item preview manifest parsing failed. Revisit what Microsoft has changed");
 
                 return null;
             }
         }
 
-        public async override Task<AssetDownloadStreamModel> GetAssetDownloadStreamAsync(AssetIdentifier assetId, AssetDownloadItemMappingModel downloadItemMapping)
+        public async override Task<AssetDownloadStreamModel> GetAssetDownloadStreamAsync(AssetIdentifier assetId, AssetDownloadItemMappingModel downloadItemMapping, long? maxFileSizeBytes)
         {
             if (assetId == null)
             {
@@ -363,24 +351,21 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
                 if (assetDownloadUrlModel == null || string.IsNullOrEmpty(assetDownloadUrlModel.Url))
                 {
-                    throw new Exception("Asset download URL is empty");
+                    _logger.LogWarning($"Asset download URL is empty for asset {assetId.UnscopedId}");
+
+                    return null;
                 }
 
-                streamResponse = await _sharepointClient.GetHttpStreamResponseAsync(assetDownloadUrlModel.Url).ConfigureAwait(false);
+                streamResponse = await _sharepointClient.GetHttpClientStreamResponseWithBackoffAsync(assetDownloadUrlModel.Url, _sharepointClient.DefaultRequestFailedHandler, accessToken: null, hint: $"Get asset download stream ({assetId})", maxFileSizeBytes: maxFileSizeBytes).ConfigureAwait(false);
             }
             else
             {
-                streamResponse = await _sharepointClient.GetDriveItemContentAsync(assetId.UnscopedId).ConfigureAwait(false);
+                streamResponse = await _sharepointClient.GetDriveItemContentAsync(assetId.UnscopedId, maxFileSizeBytes).ConfigureAwait(false);
             }
 
             if (streamResponse == null)
             {
                 return null;
-            }
-
-            if (streamResponse.Stream == null)
-            {
-                throw new Exception("Stream is null");
             }
 
             return new AssetDownloadStreamModel(
@@ -417,13 +402,13 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 throw new NotImplementedException();
             }
 
-            var unscopedIds = parameters
-                .AssetIds?
-                .Select(i => i.UnscopedId)
-                .ToList();
-
             if (progressMonitor != null)
             {
+                var unscopedIds = parameters
+                    .AssetIds?
+                    .Select(i => i.UnscopedId)
+                    .ToList();
+
                 progressMonitor.Maximum = unscopedIds.Count * 2;
 
                 await progressMonitor.ReportProgressAsync(unscopedIds.Count, null).ConfigureAwait(false);
@@ -433,7 +418,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
             if (progressMonitor != null)
             {
-                await progressMonitor.ReportProgressAsync(unscopedIds.Count, null).ConfigureAwait(false);
+                await progressMonitor.ReportProgressAsync(assets.AssetDataObjects.Length, null).ConfigureAwait(false);
                 await progressMonitor.FinishedAsync(null).ConfigureAwait(false);
             }
 

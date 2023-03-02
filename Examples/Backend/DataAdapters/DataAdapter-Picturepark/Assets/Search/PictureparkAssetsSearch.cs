@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Picturepark.SDK.V1.Contract;
 using SmintIo.Portals.Connector.Picturepark.Client;
@@ -20,6 +21,8 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 {
     public partial class PictureparkAssetsDataAdapter : AssetsDataAdapterBaseImpl
     {
+        private const string AllowedCharactersPattern = @"[^a-zA-Z0-9 ]";
+
         public override Task<GetAssetsSearchFeatureSupportResult> GetFeatureSupportAsync(GetAssetsSearchFeatureSupportParameters parameters)
         {
             return Task.FromResult(new GetAssetsSearchFeatureSupportResult()
@@ -52,6 +55,11 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 
         public override async Task<GetFormItemDefinitionAllowedValuesResult> GetFormItemDefinitionAllowedValuesAsync(GetFormItemDefinitionAllowedValuesParameters parameters)
         {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
             await _client.InitializeChannelAggregatorsAsync().ConfigureAwait(false);
 
             FilterBase filter = null;
@@ -155,7 +163,8 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             {
                 return new GetFormItemDefinitionAllowedValuesResult()
                 {
-                    AllowedValues = new List<ValueForJsonUiDetailsModel>()
+                    AllowedValues = new List<ValueForJsonUiDetailsModel>(),
+                    AllowedValuesTotalCount = 0
                 };
             }
 
@@ -221,6 +230,11 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
         /// <returns></returns>
         public override async Task<SearchAssetsResult> SearchAssetsAsync(SearchAssetsParameters parameters)
         {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
             await _client.InitializeChannelAggregatorsAsync().ConfigureAwait(false);
 
             var aggregatorManager = await _client.GetAggregatorManagerAsync().ConfigureAwait(false);
@@ -406,20 +420,10 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             if (pageSize > 500)
                 pageSize = 500;
 
-            var resolveMetadata = false;
-
-            if (_configuration.SmintIoOverrideThumbnailAttribute != null ||
-                _configuration.SmintIoThumbnailAlignmentAttribute != null ||
-                _configuration.SmintIoIndicatorActivatorAttribute != null ||
-                _configuration.SmintIoOverrideNameAttribute != null)
-            {
-                // in this case we need metadata on the search
-
-                resolveMetadata = true;
-            }
+            var sanitizedQuery = Regex.Replace(parameters?.QueryString ?? string.Empty, AllowedCharactersPattern, " ");
 
             var (response, contentDetails) = await _client.SearchContentAsync(
-                parameters?.QueryString,
+                sanitizedQuery,
                 aggregators,
                 filter,
                 aggregationFilters,
@@ -428,7 +432,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                 new SortInfo[] { sortInfo },
                 currentSearchType,
                 includeFulltext: true,
-                resolveMetadata: resolveMetadata).ConfigureAwait(false);
+                resolveMetadata: true).ConfigureAwait(false);
 
             FormGroupsModelBuilder builder = new FormGroupsModelBuilder(aggregatorManager);
             IFormGroupsDefinitionModel formGroupsModel = builder.Build(aggregatorManager.Aggregators, response.AggregationResults, _configuration.MultiSelectItemCount);
@@ -618,7 +622,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             AssetSearchDetailsModel details = new AssetSearchDetailsModel()
             {
                 MaxPages = (int)Math.Ceiling((double)response.TotalResults / (parameters?.PageSize ?? _configuration.DefaultPageSize)),
-                CurrentItemsPerPage = parameters?.PageSize ?? _configuration.DefaultPageSize,
+                CurrentItemsPerPage = contentDetails.Count,
                 CurrentPage = parameters?.Page ?? -1,
                 HasMoreResults = response.PageToken != null,
                 SearchResultSetId = response.PageToken,
@@ -627,22 +631,14 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 
             // let's not resolve EVERYTHING - we are in search
 
-            var resolveListDataAttributes = resolveMetadata
-                ? _configuration.ResolveListDataAttributes
-                : null;
-
-            var postProcessObjectConverter = resolveMetadata
-                ? new PictureparkPostProcessObjectConverter(_entityModelProvider)
-                : null;
-
             var converter = new PictureparkContentConverter(
                 _logger,
                 Context,
                 _entityModelProvider,
                 _configuration.ListNameAttribute,
                 _configuration.ListNameAttribute2,
-                resolveListDataAttributes,
-                postProcessObjectConverter);
+                _configuration.ResolveListDataAttributes,
+                new PictureparkPostProcessObjectConverter(_entityModelProvider));
 
             var results = contentDetails
                 .Select(cd => converter.Convert(cd, _configuration.GalleryTitleDisplayPattern))

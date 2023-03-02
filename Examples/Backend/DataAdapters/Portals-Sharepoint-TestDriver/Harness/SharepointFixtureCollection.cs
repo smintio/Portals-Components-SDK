@@ -2,7 +2,7 @@
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Harness
 {
-    [CollectionDefinition("SharepointCollection")]
+    [CollectionDefinition(nameof(SharepointFixtureCollection))]
     public class SharepointFixtureCollection : ICollectionFixture<SharepointFixture>
     {
     }
