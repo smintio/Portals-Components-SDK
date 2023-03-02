@@ -18,7 +18,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Custom public API interfaces](#user-content-custom-public-api-interfaces)
 1. [Overview of Smint.io annotations](../Frontend/docs/smintio-annotations.md)
 
-Current version of this document is: 2.2.1 (as of 2th of March, 2023)
+Current version of this document is: 2.2.1 (as of 2nd of March, 2023)
 
 ## Examples
 
