@@ -28,7 +28,7 @@ namespace SmintIo.Portals.Connector.SharePoint
 
         [DisplayName("en", "SharePoint site", IsDefault = true)]
         [DisplayName("de", "SharePoint Site")]
-        [Description("en", "Please select the SharePoint site whose documents structure should be processed by this connector",
+        [Description("en", "Please select the SharePoint site whose documents structure should be processed by this connector.",
             IsDefault = true)]
         [Description("de",
             "Bitte wählen Sie die SharePoint Site, deren Dokumentenstruktur von diesem Connector verarbeitet werden soll.")]
@@ -37,12 +37,36 @@ namespace SmintIo.Portals.Connector.SharePoint
         [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, false)]
         public string SiteId { get; set; }
 
-        [DisplayName("en", "SharePoint site folders to sync", IsDefault = true)]
-        [DisplayName("de", "Zu synchronisierende SharePoint-Site-Ordner")]
-        [Description("en", "Please select the SharePoint site folders whose documents structure should be processed by this connector",
+        [DisplayName("en", "SharePoint drive", IsDefault = true)]
+        [DisplayName("de", "SharePoint-Laufwerk")]
+        [Description("en", "Please select the SharePoint drive whose documents structure should be processed by this connector.",
             IsDefault = true)]
         [Description("de",
-            "Bitte wählen Sie die SharePoint-Site-Ordner aus, deren Dokumentenstruktur von diesem Connector verarbeitet werden soll.")]
+            "Bitte wählen Sie das SharePoint-Laufwerk aus, deren Dokumentenstruktur von diesem Connector verarbeitet werden soll.")]
+        [DynamicAllowedValuesProvider(typeof(SharepointDriveIdProvider))]
+        [FormItemVisibility(Visibility = FormItemVisibilityEnum.Advanced)]
+        [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, false)]
+        [VisibleIf(nameof(SiteId), VisibleIfOperators.NotEqual, (string)null)]
+        public string SiteDriveId { get; set; }
+
+        [DisplayName("en", "SharePoint list", IsDefault = true)]
+        [DisplayName("de", "SharePoint-Liste")]
+        [Description("en", "Please select the SharePoint list whose metadata definitions should be processed by this connector.",
+            IsDefault = true)]
+        [Description("de",
+            "Bitte wählen Sie die SharePoint-Liste aus, deren Metadaten-Definitionen von diesem Connector verarbeitet werden sollen.")]
+        [DynamicAllowedValuesProvider(typeof(SharepointListIdProvider))]
+        [FormItemVisibility(Visibility = FormItemVisibilityEnum.Advanced)]
+        [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, false)]
+        [VisibleIf(nameof(SiteId), VisibleIfOperators.NotEqual, (string)null)]
+        public string SiteListId { get; set; }
+
+        [DisplayName("en", "SharePoint folders to sync", IsDefault = true)]
+        [DisplayName("de", "Zu synchronisierende SharePoint-Ordner")]
+        [Description("en", "Please select the SharePoint folders whose documents structure should be processed by this connector.",
+            IsDefault = true)]
+        [Description("de",
+            "Bitte wählen Sie die SharePoint-Ordner aus, deren Dokumentenstruktur von diesem Connector verarbeitet werden soll.")]
         [DynamicAllowedValuesProvider(typeof(SharepointFolderIdProvider))]
         [FormItemVisibility(Visibility = FormItemVisibilityEnum.Advanced)]
         [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, false)]
@@ -73,7 +97,7 @@ namespace SmintIo.Portals.Connector.SharePoint
 
         [DisplayName("en", "SharePoint site ID", IsDefault = true)]
         [DisplayName("de", "SharePoint Site ID")]
-        [Description("en", "Please enter the SharePoint site ID of the SharePoint site whose documents structure should be processed by this connector",
+        [Description("en", "Please enter the SharePoint site ID of the SharePoint site whose documents structure should be processed by this connector.",
             IsDefault = true)]
         [Description("de",
             "Bitte geben Sie die SharePoint Site ID der SharePoint Site ein, deren Dokumentenstruktur von diesem Connector verarbeitet werden soll.")]
@@ -81,9 +105,33 @@ namespace SmintIo.Portals.Connector.SharePoint
         [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, true)]
         public string SiteIdString { get; set; }
 
+        [DisplayName("en", "SharePoint drive", IsDefault = true)]
+        [DisplayName("de", "SharePoint-Laufwerk")]
+        [Description("en", "Please select the SharePoint drive whose documents structure should be processed by this connector.",
+            IsDefault = true)]
+        [Description("de",
+            "Bitte wählen Sie das SharePoint-Laufwerk aus, deren Dokumentenstruktur von diesem Connector verarbeitet werden soll.")]
+        [DynamicAllowedValuesProvider(typeof(SharepointDriveIdProvider))]
+        [FormItemVisibility(Visibility = FormItemVisibilityEnum.Advanced)]
+        [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, true)]
+        [VisibleIf(nameof(SiteIdString), VisibleIfOperators.NotEqual, (string)null)]
+        public string SiteDriveIdString { get; set; }
+
+        [DisplayName("en", "SharePoint list", IsDefault = true)]
+        [DisplayName("de", "SharePoint-Liste")]
+        [Description("en", "Please select the SharePoint list whose metadata definitions should be processed by this connector.",
+            IsDefault = true)]
+        [Description("de",
+            "Bitte wählen Sie die SharePoint-Liste aus, deren Metadaten-Definitionen von diesem Connector verarbeitet werden sollen.")]
+        [DynamicAllowedValuesProvider(typeof(SharepointListIdProvider))]
+        [FormItemVisibility(Visibility = FormItemVisibilityEnum.Advanced)]
+        [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, true)]
+        [VisibleIf(nameof(SiteIdString), VisibleIfOperators.NotEqual, (string)null)]
+        public string SiteListIdString { get; set; }
+
         [DisplayName("en", "SharePoint site folders to sync", IsDefault = true)]
         [DisplayName("de", "Zu synchronisierende SharePoint-Site-Ordner")]
-        [Description("en", "Please select the SharePoint site folders whose documents structure should be processed by this connector",
+        [Description("en", "Please select the SharePoint site folders whose documents structure should be processed by this connector.",
             IsDefault = true)]
         [Description("de",
             "Bitte wählen Sie die SharePoint-Site-Ordner aus, deren Dokumentenstruktur von diesem Connector verarbeitet werden soll.")]

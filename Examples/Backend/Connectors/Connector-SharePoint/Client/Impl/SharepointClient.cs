@@ -4,34 +4,31 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Newtonsoft.Json.Linq;
-using Polly;
-using Polly.Retry;
 using RestSharp;
 using SmintIo.Portals.Connector.SharePoint.Client.Authenticators;
 using SmintIo.Portals.Connector.SharePoint.Extensions;
-using SmintIo.Portals.Connector.SharePoint.MicrosoftGraph;
 using SmintIo.Portals.Connector.SharePoint.Models;
+using SmintIo.Portals.ConnectorSDK.Clients.Prefab;
+using SmintIo.Portals.SDK.Core.Http.Prefab.RequestFailedHandlers;
 using SmintIo.Portals.ConnectorSDK.Models;
 using SmintIo.Portals.SDK.Core.Cache;
-using SmintIo.Portals.SDK.Core.Extensions;
-using SmintIo.Portals.SDK.Core.Http.Prefab.Exceptions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Extensions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 using SmintIo.Portals.SDK.Core.Models.Context;
 using SmintIo.Portals.SDK.Core.Rest;
 using SmintIo.Portals.SDK.Core.Rest.Prefab;
 using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 {
-    public class SharepointClient : ConnectorSDK.Clients.Prefab.BaseClient, ISharepointClient, IResponseFailedHandler
+    public class SharepointClient : BaseHttpClientApiClient, ISharepointClient
     {
+        public static readonly DefaultRequestFailedHandler PrivateDefaultRequestFailedHandler = new SharepointDefaultRequestFailedHandler();
+
         private const string RootFolderId = "0";
 
         private static readonly string[] _driveItemFields = new[]
@@ -67,13 +64,17 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
         private readonly ILogger _logger;
         private readonly ICache _cache;
-        private readonly IPortalsContextModel _portalsContext;
+        private readonly IPortalsContextModel _portalsContextModel;
         private readonly Func<AuthorizationValuesModel> _getAuthorizationValuesFunc;
         private readonly string _sharepointUrl;
+        private readonly string _siteDriveId;
+        private readonly string _siteListId;
         private readonly IEnumerable<string> _siteFolderIds;
 
         private GraphServiceClient _graphServiceClient;
         private IRestSharpClient _restSharpClient;
+
+        public IRequestFailedHandler DefaultRequestFailedHandler => PrivateDefaultRequestFailedHandler;
 
         /// <summary>
         /// Constructs a new SharepointClient with a function to renew the OAuth2 Access Token.
@@ -81,29 +82,33 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
         /// </summary>
         /// <param name="logger">Used to perform general logging <see cref="ILogger"/></param>
         /// <param name="cache"><see cref="ICache"/></param>
-        /// <param name="portalsContext">Used to perform general logging <see cref="IPortalsContextModel"/></param>
+        /// <param name="portalsContextModel">Used to perform general logging <see cref="IPortalsContextModel"/></param>
         /// <param name="getAuthorizationValuesFunc">A <see cref="Func{T}"/>that performs the refresh</param>
         /// <param name="sharepointUrl">the Url for the sharepoint site</param>
         /// <param name="siteId">the Site ID for the sharepoint site</param>
         public SharepointClient(
             ILogger logger,
             ICache cache,
-            IPortalsContextModel portalsContext,
+            IPortalsContextModel portalsContextModel,
             IHttpClientFactory httpClientFactory,
             Func<AuthorizationValuesModel> getAuthorizationValuesFunc,
             string sharepointUrl,
             string siteId,
+            string siteDriveId,
+            string siteListId,
             IEnumerable<string> siteFolderIds)
-            : base(SharepointConnectorStartup.SharepointConnector, portalsContext, httpClientFactory, logger)
+            : base(SharepointConnectorStartup.SharepointConnector, portalsContextModel, httpClientFactory, logger)
         {
             _logger = logger;
             _cache = cache;
-            _portalsContext = portalsContext;
+            _portalsContextModel = portalsContextModel;
             _getAuthorizationValuesFunc = getAuthorizationValuesFunc;
             _sharepointUrl = sharepointUrl;
-            _siteFolderIds = siteFolderIds;
 
             SiteId = siteId;
+            _siteDriveId = siteDriveId;
+            _siteListId = siteListId;
+            _siteFolderIds = siteFolderIds;
 
             CreateGraphApiClient();
             CreateRestApiClient();
@@ -128,51 +133,6 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             _graphServiceClient = new GraphServiceClient(authenticationProvider);
         }
 
-        protected override async Task HandleDefaultRetryPolicyExceptionAsync(Exception ex, TimeSpan timespan, Context context, string requestId)
-        {
-            if (ex is ServiceException serviceException)
-            {
-                if (serviceException.StatusCode == HttpStatusCode.TooManyRequests)
-                {
-                    // too many requests, backoff and try again
-
-                    return;
-                }
-
-                if (serviceException.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    // Retry with a new client
-
-                    CreateGraphApiClient();
-
-                    return;
-                }
-
-                if (serviceException.StatusCode == HttpStatusCode.Gone)
-                {
-                    context[nameof(serviceException.StatusCode)] = serviceException.StatusCode;
-
-                    return;
-                }
-
-                if (serviceException.StatusCode == HttpStatusCode.NotAcceptable)
-                {
-                    throw serviceException;
-                }
-            }
-            else if (ex is HttpResponseException httpResponseException)
-            {
-                if (httpResponseException.StatusCode == (int)HttpStatusCode.NotAcceptable)
-                {
-                    // happens in some edge cases
-
-                    throw httpResponseException;
-                }
-            }
-
-            await base.HandleDefaultRetryPolicyExceptionAsync(ex, timespan, context, requestId).ConfigureAwait(false);
-        }
-
         /// <summary>
         /// Creates Rest Api client with delayed bearer authentication via <see cref="_getAuthorizationValuesFunc"/>.
         /// </summary>
@@ -182,76 +142,33 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             {
                 throw new ExternalDependencyException(
                     ExternalDependencyStatusEnum.NotSetup,
-                    "The SharePoint Url is not setup yet");
+                    "The SharePoint URL is not yet set up");
             }
 
             _restSharpClient = new RestSharpClient(new Uri($"{_sharepointUrl}"));
             _restSharpClient.Client.Authenticator = new SharepointBearerAuthenticator(_getAuthorizationValuesFunc);
         }
 
-        private AsyncRetryPolicy<IRestResponse> RestSharpRetryPolicy =>
-            Policy
-                .HandleResult<IRestResponse>((response) => response.StatusCode != HttpStatusCode.OK)
-                .WaitAndRetryAsync(
-                    DefaultMaxRetryAttempts,
-                    retryCount => GetSleepDurationDuringRetry(retryCount),
-                    (response, timespan, context) =>
-                    {
-                        if (response.Result.StatusCode == HttpStatusCode.TooManyRequests)
-                        {
-                            // too many requests, backoff and try again
-
-                            return;
-                        }
-
-                        if (response.Result.StatusCode == HttpStatusCode.Forbidden)
-                        {
-                            // retry with a new client
-
-                            CreateRestApiClient();
-
-                            return;
-                        }
-
-                        if (response.Result.ErrorException is HttpResponseException httpResponseException)
-                        {
-                            ExternalDependencyException.HandleStatusCode(
-                                statusCode: httpResponseException.StatusCode,
-                                httpResponseException,
-                                "SharePoint REST request",
-                                SharepointConnectorStartup.SharepointConnector,
-                                targetGetUuid: null,
-                                _logger);
-
-                            return;
-                        }
-                    });
-
-        private Task<IRestResponse> ExecuteRestSharpRequestAsync(Func<Context, Task<IRestResponse>> apiFunc, string requestId = "", [CallerMemberName] string callerName = "")
-        {
-            return RestSharpRetryPolicy.ExecuteAsync(
-               (context) =>
-               {
-                   if (_logger.IsEnabled(LogLevel.Information))
-                   {
-                       _logger.LogInformation($"Calling {callerName} with {_portalsContext} (with backoff)");
-                   }
-
-                   return apiFunc(context);
-               },
-               contextData: new Dictionary<string, object>() { { RequestIdKey, requestId } });
-        }
-
         public async Task<ICollection<SiteResponse>> GetSitesAsync(string query = null)
         {
-            var response = await ExecuteRestSharpRequestAsync(async (context) =>
+            var response = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                    {
+                        var request = new RestRequest("_api/search/query?querytext='contentclass:sts_site'", Method.GET);
+
+                        SetResponseHeaderType(request);
+
+                        return _restSharpClient.ExecuteTaskAsync<string>(request);
+                    },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: "Get sites",
+                isGet: false
+            ).ConfigureAwait(false);
+
+            if (response == null || string.IsNullOrEmpty(response.Content))
             {
-                var request = new RestRequest("_api/search/query?querytext='contentclass:sts_site'", Method.GET);
-
-                SetResponseHeaderType(request);
-
-                return await _restSharpClient.ExecuteTaskAsync<string>(request);
-            }).ConfigureAwait(false);
+                return null;
+            }
 
             var host = new Uri(_sharepointUrl).Host;
 
@@ -277,16 +194,21 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
         public async Task<Site> GetSiteAsync(string siteId)
         {
-            var sitesResult = await ExecuteAsync((context) =>
-            {
-                return _graphServiceClient
-                    .Sites[siteId]
-                    .Request()
-                    .Expand(s => s.Lists)
-                    .GetAsync();
-            }).ConfigureAwait(false);
+            var siteResult = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                    {
+                        return _graphServiceClient
+                            .Sites[siteId]
+                            .Request()
+                            .Expand(s => s.Lists)
+                            .GetAsync();
+                    },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: $"Get site ({siteId})",
+                isGet: true
+            ).ConfigureAwait(false);
 
-            return sitesResult;
+            return siteResult;
         }
 
         public async Task<ICollection<ColumnDefinitionResponse>> GetSiteMetadataAsync(string siteId)
@@ -305,42 +227,69 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
             if (site == null)
             {
-                throw new SharepointConnectorException($"The requested site was not found! SiteId: {siteId}");
+                _logger.LogWarning($"The requested site with ID {siteId} was not found");
+
+                return null;
             }
 
-            var documentList = site.Lists.FirstOrDefault(l => _possibleDefaultShareDocumentLists.Contains(l.Name));
+            Microsoft.Graph.List documentList;
+
+            if (!string.IsNullOrEmpty(_siteListId))
+            {
+                documentList = site.Lists.FirstOrDefault(l => l.Id == _siteListId);
+            }
+            else
+            {
+                documentList = site.Lists.FirstOrDefault(l => _possibleDefaultShareDocumentLists.Contains(l.Name));
+            }
 
             if (documentList == null)
             {
-                throw new SharepointConnectorException($"The requested site does match any of the default shared document lists! SiteId: {SiteId}");
+                _logger.LogWarning($"The requested site with ID {siteId} does match any of the default shared document lists");
+
+                return null;
             }
 
-            var response = await ExecuteRestSharpRequestAsync(async (context) =>
+            var response = await ExecuteWithBackoffAsync(
+               apiFunc: (_) =>
+               {
+                   var resource = $"/sites/{site.Name}/_api/lists(guid'{documentList.Id}')/fields";
+                   var request = new RestRequest(resource, Method.GET);
+
+                   SetResponseHeaderType(request);
+
+                   return _restSharpClient.ExecuteTaskAsync<string>(request);
+               },
+               requestFailedHandler: PrivateDefaultRequestFailedHandler,
+               hint: $"Get site metadata ({siteId})",
+               isGet: true
+           ).ConfigureAwait(false);
+
+            ColumnDefinitionResponse[] columnDefinitionResponses;
+
+            if (response != null && response.Content != null)
             {
-                var resource = $"/sites/{site.Name}/_api/lists(guid'{documentList.Id}')/fields";
-                var request = new RestRequest(resource, Method.GET);
+                columnDefinitionResponses = JObject
+                    .Parse(response.Content)
+                    .SelectTokens("$.d.results..[*]") // $.d.results..[?(@.Hidden == 'false')] -- not working.
+                    .Select(jToken => new ColumnDefinitionResponse
+                    {
+                        Id = GetTokenValue<string>(jToken, "Id"),
+                        Name = GetTokenValue<string>(jToken, "EntityPropertyName"),
+                        DisplayName = GetTokenValue<string>(jToken, "Title"),
+                        IsHidden = GetTokenValue<bool>(jToken, "Hidden"),
+                        FieldTypeKind = GetTokenValue<int>(jToken, "FieldTypeKind"),
+                        TypeAsString = GetTokenValue<string>(jToken, "TypeAsString")
+                    })
+                    .Where(cd => !cd.IsHidden && !cd.Name.StartsWith("OData", StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+            }
+            else
+            {
+                columnDefinitionResponses = Array.Empty<ColumnDefinitionResponse>();
+            }
 
-                SetResponseHeaderType(request);
-
-                return await _restSharpClient.ExecuteTaskAsync<string>(request).ConfigureAwait(false);
-            }).ConfigureAwait(false);
-
-            var columnDefinitionResponses = JObject
-                .Parse(response.Content)
-                .SelectTokens("$.d.results..[*]") // $.d.results..[?(@.Hidden == 'false')] -- not working.
-                .Select(jToken => new ColumnDefinitionResponse
-                {
-                    Id = GetTokenValue<string>(jToken, "Id"),
-                    Name = GetTokenValue<string>(jToken, "EntityPropertyName"),
-                    DisplayName = GetTokenValue<string>(jToken, "Title"),
-                    IsHidden = GetTokenValue<bool>(jToken, "Hidden"),
-                    FieldTypeKind = GetTokenValue<int>(jToken, "FieldTypeKind"),
-                    TypeAsString = GetTokenValue<string>(jToken, "TypeAsString")
-                })
-                .Where(cd => !cd.IsHidden && !cd.Name.StartsWith("OData", StringComparison.OrdinalIgnoreCase))
-                .ToArray();
-
-            var columnDefinitionNamesCacheKey = GetColumnDefinitionNamesCacheKey(siteId);
+            var columnDefinitionNamesCacheKey = GetColumnDefinitionNamesCacheKey(siteId, _siteListId);
             var columnDefinitionNames = GetColumnDefinitionNames(columnDefinitionResponses);
 
             await _cache.StoreAsync(columnDefinitionNamesCacheKey, columnDefinitionNames, TimeSpan.FromDays(7)).ConfigureAwait(false);
@@ -374,15 +323,20 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
         private async Task<ColumnDefinition> GetColumnDefinitionAsync(string siteId, string documentListId, string columnId)
         {
-            var columnDefinition = await ExecuteAsync((context) =>
-            {
-                return _graphServiceClient
-                    .Sites[siteId]
-                    .Lists[documentListId]
-                    .Columns[columnId]
-                    .Request()
-                    .GetAsync();
-            }).ConfigureAwait(false);
+            var columnDefinition = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                {
+                    return _graphServiceClient
+                       .Sites[siteId]
+                       .Lists[documentListId]
+                       .Columns[columnId]
+                       .Request()
+                       .GetAsync();
+                },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: $"Get column definition ({siteId}, {documentListId}, {columnId})",
+                isGet: true
+            ).ConfigureAwait(false);
 
             return columnDefinition;
         }
@@ -535,7 +489,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
             if (!driveItem.IsFolder())
             {
-                throw new Exception($"DriveItem is not a Folder!");
+                _logger.LogWarning($"DriveItem wit ID {assetId} is not a folder");
+
+                return null;
             }
 
             var driveItemListModel = await GetChildrenDriveItemsInternallyAsync(driveItem, skipToken, pageSize).ConfigureAwait(false);
@@ -545,9 +501,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
         private async Task<DriveItemListModel> GetChildrenDriveItemsInternallyAsync(DriveItem driveItem, string skipToken, int? pageSize)
         {
-            try
-            {
-                var childrenDriveItems = await ExecuteAsync((context) =>
+            var childrenDriveItems = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
                 {
                     var driveItemChildrenCollectionRequest = _graphServiceClient
                         .Sites[SiteId]
@@ -562,22 +517,19 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                     driveItemChildrenCollectionRequest.QueryOptions.SetPageSize(pageSize);
 
                     return driveItemChildrenCollectionRequest.GetAsync();
-                }).ConfigureAwait(false);
+                },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: $"Get children drive items internally ({driveItem.Id})",
+                isGet: true
+            ).ConfigureAwait(false);
 
-                var nextSkipToken = childrenDriveItems.NextPageRequest?.QueryOptions.GetNextSkipToken();
+            var nextSkipToken = childrenDriveItems.NextPageRequest?.QueryOptions.GetNextSkipToken();
 
-                return new DriveItemListModel
-                {
-                    DriveItems = childrenDriveItems,
-                    ContinuationUuid = nextSkipToken
-                };
-            }
-            catch (Exception)
+            return new DriveItemListModel
             {
-                _logger.LogError($"Error occured with drive ID {driveItem.ParentReference.DriveId} and item ID {driveItem.Id} and skip token {skipToken}");
-
-                throw;
-            }
+                DriveItems = childrenDriveItems,
+                ContinuationUuid = nextSkipToken
+            };
         }
 
         public async Task<ICollection<DriveItem>> GetFoldersListAsync()
@@ -617,55 +569,98 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             return folderDriveItems;
         }
 
-        private async Task<ICollection<Drive>> GetDrivesAsync()
+        public async Task<ICollection<Drive>> GetSiteDrivesAsync()
         {
             if (string.IsNullOrEmpty(SiteId))
             {
                 return null;
             }
 
-            var drives = await ExecuteAsync((context) =>
-            {
-                return _graphServiceClient
-                    .Sites[SiteId]
-                    .Drives
-                    .Request()
-                    .GetAsync();
-            }).ConfigureAwait(false);
+            var drives = await ExecuteWithBackoffAsync(
+               apiFunc: (_) =>
+               {
+                    return _graphServiceClient
+                        .Sites[SiteId]
+                        .Drives
+                        .Request()
+                        .GetAsync();
+               },
+               requestFailedHandler: PrivateDefaultRequestFailedHandler,
+               hint: "Get site drives",
+               isGet: false
+           ).ConfigureAwait(false);
 
             return drives;
         }
 
+        public async Task<Drive> GetSiteDriveAsync(string driveId)
+        {
+            if (string.IsNullOrEmpty(SiteId))
+            {
+                return null;
+            }
+
+            var drive = await ExecuteWithBackoffAsync(
+               apiFunc: (_) =>
+               {
+                    return _graphServiceClient
+                        .Sites[SiteId]
+                        .Drives[driveId]
+                        .Request()
+                        .GetAsync();
+               },
+               requestFailedHandler: PrivateDefaultRequestFailedHandler,
+               hint: $"Get site drive ({driveId})",
+               isGet: true
+           ).ConfigureAwait(false);
+
+            return drive;
+        }
+
         private async Task<DriveItemListModel> GetRootDriveItemListAsync(string skipToken, int? pageSize)
         {
-            var drives = await GetDrivesAsync().ConfigureAwait(false);
+            Drive drive;
 
-            var drive = drives.FirstOrDefault();
+            if (string.IsNullOrEmpty(_siteDriveId))
+            {
+                var drives = await GetSiteDrivesAsync().ConfigureAwait(false);
 
-            // One drive per site
+                drive = drives.FirstOrDefault();
+            }
+            else
+            {
+                drive = await GetSiteDriveAsync(_siteDriveId).ConfigureAwait(false);
+            }
 
             if (drive == null)
             {
-                throw new InvalidOperationException();
+                _logger.LogWarning($"Drive with ID {_siteDriveId} was not found");
+
+                return null;
             }
 
-            var driveItems = await ExecuteAsync((context) =>
-            {
-                var driveItemChildrenCollectionRequest = _graphServiceClient
-                    .Drives[drive.Id]
-                    .Root
-                    .Children
-                    .Request()
-                    .Expand(i => i.Thumbnails)
-                    .Select(string.Join(",", _driveItemFields));
+            var driveItems = await ExecuteWithBackoffAsync(
+               apiFunc: (_) =>
+               {
+                    var driveItemChildrenCollectionRequest = _graphServiceClient
+                        .Drives[drive.Id]
+                        .Root
+                        .Children
+                        .Request()
+                        .Expand(i => i.Thumbnails)
+                        .Select(string.Join(",", _driveItemFields));
 
-                driveItemChildrenCollectionRequest.QueryOptions.SetSkipToken(skipToken);
-                driveItemChildrenCollectionRequest.QueryOptions.SetPageSize(pageSize);
+                    driveItemChildrenCollectionRequest.QueryOptions.SetSkipToken(skipToken);
+                    driveItemChildrenCollectionRequest.QueryOptions.SetPageSize(pageSize);
 
-                return driveItemChildrenCollectionRequest.GetAsync();
-            }).ConfigureAwait(false);
+                    return driveItemChildrenCollectionRequest.GetAsync();
+               },
+               requestFailedHandler: PrivateDefaultRequestFailedHandler,
+               hint: "Get root drive item list",
+               isGet: false
+           ).ConfigureAwait(false);
 
-            var nextSkipToken = driveItems.NextPageRequest?.QueryOptions.GetNextSkipToken();
+            var nextSkipToken = driveItems?.NextPageRequest?.QueryOptions.GetNextSkipToken();
 
             return new DriveItemListModel
             {
@@ -715,7 +710,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
             if (!driveItem.IsFolder())
             {
-                throw new Exception($"DriveItem is not a Folder!");
+                _logger.LogWarning($"DriveItem wit ID {assetId} is not a folder");
+
+                return null;
             }
 
             return driveItem;
@@ -761,25 +758,17 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
         {
             (string driveId, string itemId) = assetId.Parse();
 
-            try
-            {
-                var driveItem = await ExecuteAsync((context) =>
-                {
-                    return GetDriveItemRequest(assetId).GetAsync();
-                }).ConfigureAwait(false);
+            var driveItem = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                    {
+                        return GetDriveItemRequest(assetId).GetAsync();
+                    },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: $"Get drive item internally ({assetId})",
+                isGet: true
+           ).ConfigureAwait(false);
 
-                return driveItem;
-            }
-            catch (ServiceException ex)
-            {
-                if (ex.StatusCode == HttpStatusCode.NotFound)
-                {
-                    // We will handle it gracefully because of the integration layer
-                    return null;
-                }
-
-                throw ex;
-            }
+            return driveItem;
         }
 
         private IDriveItemRequest GetDriveItemRequest(string assetId)
@@ -812,19 +801,24 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
             var selectValues = string.Join(", ", columnDefinitionNames);
 
-            var listItemWithFields = await ExecuteAsync((context) =>
-            {
-                return _graphServiceClient
-                    .Drives[driveItem.ParentReference.DriveId]
-                    .Items[driveItem.Id]
-                    .ListItem
-                    .Fields
-                    .Request()
-                    .Select(selectValues)
-                    .GetAsync();
-            }).ConfigureAwait(false);
+            var listItemWithFields = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                    {
+                        return _graphServiceClient
+                            .Drives[driveItem.ParentReference.DriveId]
+                            .Items[driveItem.Id]
+                            .ListItem
+                            .Fields
+                            .Request()
+                            .Select(selectValues)
+                            .GetAsync();
+                    },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: $"Get drive item additional data by field names ({driveItem.Id})",
+                isGet: true
+           ).ConfigureAwait(false);
 
-            return listItemWithFields.AdditionalData
+            return listItemWithFields?.AdditionalData?
                 .ToDictionary(
                     kvp1 => kvp1.Key,
                     kvp1 => kvp1.Value);
@@ -832,7 +826,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
         private async Task<ICollection<string>> GetCachedColumnDefinitionNamesAsync()
         {
-            var columnDefinitionNamesCacheKey = GetColumnDefinitionNamesCacheKey(SiteId);
+            var columnDefinitionNamesCacheKey = GetColumnDefinitionNamesCacheKey(SiteId, _siteListId);
 
             var columnDefinitionNames = await _cache.GetAsync<List<string>>(columnDefinitionNamesCacheKey).ConfigureAwait(false);
 
@@ -853,9 +847,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 .ToList();
         }
 
-        private static string GetColumnDefinitionNamesCacheKey(string value)
+        private static string GetColumnDefinitionNamesCacheKey(string siteId, string listId)
         {
-            return $"columnDefinitions_{value}";
+            return $"columnDefinitions_{siteId}_{listId}";
         }
 
         public async Task<ItemPreviewInfo> GetDriveItemPreviewInfoAsync(string assetId)
@@ -872,21 +866,25 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            var itemPreviewInfo = await ExecuteAsync((context) =>
-            {
-                var driveItemSearchRequest = _graphServiceClient
-                    .Drives[driveItem.ParentReference.DriveId]
-                    .Items[driveItem.Id]
-                    .Preview()
-                    .Request();
-
-                return driveItemSearchRequest.PostAsync();
-            }).ConfigureAwait(false);
+            var itemPreviewInfo = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                    {
+                        return _graphServiceClient
+                            .Drives[driveItem.ParentReference.DriveId]
+                            .Items[driveItem.Id]
+                            .Preview()
+                            .Request()
+                            .PostAsync();
+                    },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: $"Get drive item preview info ({assetId})",
+                isGet: true
+           ).ConfigureAwait(false);
 
             return itemPreviewInfo;
         }
 
-        public async Task<StreamResponse> GetDriveItemContentAsync(string assetId)
+        public async Task<StreamResponse> GetDriveItemContentAsync(string assetId, long? maxFileSizeBytes)
         {
             if (string.IsNullOrEmpty(SiteId) || !_siteFolderIds.Any())
             {
@@ -900,43 +898,50 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            var size = driveItem.Size;
-
-            if (size != null && size > int.MaxValue)
+            if (maxFileSizeBytes != null)
             {
-                // this exceeds the max stream size
+                if (driveItem.Size == null)
+                {
+                    _logger.LogWarning($"Found drive item with NULL size ({assetId})");
+                }
+				else if (driveItem.Size > maxFileSizeBytes)
+                {
+                    throw new ExternalDependencyException(ExternalDependencyStatusEnum.FileTooLarge, "The file is too large", SharepointConnectorStartup.SharepointConnector);
+                }
+            }
 
-                _logger.LogWarning($"Found file with a file size larger than {int.MaxValue} bytes ({assetId}), skipping altogether (for now)");
+            var response = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
+                {
+                    return _graphServiceClient
+                        .Drives[driveItem.ParentReference.DriveId]
+                        .Items[driveItem.Id]
+                        .Content
+                        .Request()
+                        .GetResponseAsync(completionOption: HttpCompletionOption.ResponseHeadersRead);
+                },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: $"Get drive item content ({assetId})",
+                isGet: true
+            ).ConfigureAwait(false);
 
+            if (response == null || response.Content == null)
+            {
                 return null;
             }
-            else if (size == null)
-            {
-                _logger.LogWarning($"Found drive item with NULL size ({assetId})");
-            }
-
-            var stream = await ExecuteAsync((context) =>
-            {
-                return _graphServiceClient
-                   .Drives[driveItem.ParentReference.DriveId]
-                   .Items[driveItem.Id]
-                   .Content
-                   .Request()
-                   .GetAsync();
-            }).ConfigureAwait(false);
 
             var streamResponse = new StreamResponse
             {
                 FileName = driveItem.Name,
-                FileSizeInBytes = stream.Length,
+                FileSizeInBytes = response.Content.Headers?.ContentLength,
                 MediaType = driveItem.File?.MimeType,
-                Stream = stream
+                Stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)
             };
 
             return streamResponse;
         }
 
-        public async Task<StreamResponse> GetDriveItemThumbnailContentAsync(string assetId, string thumbnailSetId, string size)
+        public async Task<StreamResponse> GetDriveItemThumbnailContentAsync(string assetId, string thumbnailSetId, string size, long? maxFileSize)
         {
             if (string.IsNullOrEmpty(SiteId) || !_siteFolderIds.Any())
             {
@@ -955,47 +960,41 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            GraphResponse responseMessage;
+            // TODO: max file size bytes not yet supported
 
-            try
-            {
-                responseMessage = await ExecuteAsync((context) =>
+            var response = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
                 {
                     return _graphServiceClient
-                        .Drives[driveItem.ParentReference.DriveId]
-                        .Items[driveItem.Id]
-                        .Thumbnails[thumbnailSetId][size]
-                        .Content
-                        .Request()
-                        .GetResponseAsync();
-                }).ConfigureAwait(false);
-            }
-            catch (ServiceException se)
-            {
-                if (se.StatusCode == HttpStatusCode.NotAcceptable)
-                {
-                    // happens in edge cases
+                       .Drives[driveItem.ParentReference.DriveId]
+                       .Items[driveItem.Id]
+                       .Thumbnails[thumbnailSetId][size]
+                       .Content
+                       .Request()
+                       .GetResponseAsync(completionOption: HttpCompletionOption.ResponseHeadersRead);
+                },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: $"Get drive item thumbnail content ({assetId}, {thumbnailSetId}, {size})",
+                isGet: true
+            ).ConfigureAwait(false);
 
-                    return null;
-                }
-                else
-                {
-                    throw;
-                }
+            if (response == null || response.Content == null)
+            {
+                return null;
             }
 
             var streamResponse = new StreamResponse
             {
-                FileName = responseMessage.Content?.Headers?.ContentDisposition?.FileName,
-                FileSizeInBytes = responseMessage.Content?.Headers?.ContentLength,
-                MediaType = responseMessage.Content?.Headers?.ContentType?.MediaType,
-                Stream = await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false)
+                FileName = response.Content.Headers?.ContentDisposition?.FileName,
+                FileSizeInBytes = response.Content.Headers?.ContentLength,
+                MediaType = response.Content.Headers?.ContentType?.MediaType,
+                Stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)
             };
 
             return streamResponse;
         }
 
-        public async Task<StreamResponse> GetDriveItemPdfContentAsync(string assetId)
+        public async Task<StreamResponse> GetDriveItemPdfContentAsync(string assetId, long? maxFileSizeBytes)
         {
             if (string.IsNullOrEmpty(SiteId) || !_siteFolderIds.Any())
             {
@@ -1016,94 +1015,37 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 new QueryOption("format", "pdf")
             };
 
-            try
-            {
-                var responseMessage = await ExecuteAsync((context) =>
+            // TODO: max file size bytes not yet supported
+
+            var response = await ExecuteWithBackoffAsync(
+                apiFunc: (_) =>
                 {
                     return _graphServiceClient
                         .Drives[driveItem.ParentReference.DriveId]
                         .Items[driveItem.Id]
                         .Content
                         .Request(queryOptions)
-                        .GetResponseAsync();
-                }).ConfigureAwait(false);
+                        .GetResponseAsync(completionOption: HttpCompletionOption.ResponseHeadersRead);
+                },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: $"Get drive item PDF content ({assetId})",
+                isGet: true
+            ).ConfigureAwait(false);
 
-                var streamResponse = new StreamResponse
-                {
-                    FileName = responseMessage.Content?.Headers?.ContentDisposition?.FileName,
-                    FileSizeInBytes = responseMessage.Content?.Headers?.ContentLength,
-                    MediaType = responseMessage.Content?.Headers?.ContentType?.MediaType,
-                    Stream = await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false)
-                };
-
-                return streamResponse;
-            }
-            catch (ServiceException se)
-            {
-                if (se.Error != null)
-                {
-                    if (string.Equals(se.Error.Code, "notSupported"))
-                        return null;
-
-                    if (string.Equals(se.Error.Code, "itemNotFound"))
-                        return null;
-                }
-
-                throw;
-            }
-        }
-
-        public async Task<StreamResponse> GetHttpStreamResponseWithSharepointErrorHandlingAsync(string url)
-        {
-            if (string.IsNullOrEmpty(url))
+            if (response == null || response.Content == null)
             {
                 return null;
             }
 
-            var downloadStreamRequest = new DownloadStreamRequest(url, accessToken: null, requestHeaders: null, cancelRequestDelay: default);
-
-            var streamResponse = await ExecuteHttpRequestAsync((context, httpClient) => httpClient.GetDownloadStreamAsync(Logger, PortalsContextModel, downloadStreamRequest, this), requestId: null);
+            var streamResponse = new StreamResponse
+            {
+                FileName = response.Content.Headers?.ContentDisposition?.FileName,
+                FileSizeInBytes = response.Content.Headers?.ContentLength,
+                MediaType = response.Content.Headers?.ContentType?.MediaType,
+                Stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)
+            };
 
             return streamResponse;
-        }
-
-        public Task<RequestFailedHandlerResult> HandleRequestFailedAsync(HttpResponseMessage responseMessage)
-        {
-            if (responseMessage == null ||
-                responseMessage.Headers == null ||
-                !responseMessage.Headers.TryGetValues("x-errorcode", out var values) ||
-                values == null ||
-                !values.Any())
-            {
-                return Task.FromResult(RequestFailedHandlerResult.Throw);
-            }
-
-            var errorCode = values.First();
-
-            if (string.IsNullOrEmpty(errorCode))
-            {
-                return Task.FromResult(RequestFailedHandlerResult.Throw);
-            }
-
-            if (string.Equals(errorCode, "VideoProcessing_ByteStreamTypeNotSupported") ||
-                string.Equals(errorCode, "SubStreamCached_GeneralFailure"))
-            {
-                // permanent error
-
-                return Task.FromResult(RequestFailedHandlerResult.Ignore);
-            }
-
-            return Task.FromResult(RequestFailedHandlerResult.Throw);
-        }
-
-        public Task<RequestFailedHandlerResult> HandleMaxFileSizeExceededAsync(long? actualFileSize)
-        {
-            return Task.FromResult(RequestFailedHandlerResult.Throw);
-        }
-
-        public RequestFailedHandlerResult HandleJsonResponse(string content)
-        {
-            return RequestFailedHandlerResult.Throw;
         }
 
         public async Task<DriveItemChangesListModel> GetDriveItemChangesListAsync(string deltaLink)
@@ -1113,87 +1055,104 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            var driveItemsChangesList = await ExecuteAsync(
-                async (context) =>
-                {
-                    var driveItemChangesListModel = new DriveItemChangesListModel();
-
-                    if (context.TryGetValue(nameof(ServiceException.StatusCode), out var statusCode) && (int)statusCode == (int)HttpStatusCode.Gone)
+            var driveItemDeltaRequest = GetDriveItemDeltaRequest(deltaLink);
+            
+            var driveItemsChangesList = await ExecuteWithBackoffAsync(
+                async (_) =>
                     {
-                        // If a deltaLink is no longer valid, the service will respond with 410 Gone.
-                        driveItemChangesListModel.ContinuationTooOld = true;
+                        var driveItemChangesListModel = new DriveItemChangesListModel();
+
+                        IDriveItemDeltaCollectionPage driveItemDeltaCollectionPage;
+
+                        try
+                        {
+                            driveItemDeltaCollectionPage = await driveItemDeltaRequest.GetAsync().ConfigureAwait(false);
+                        }
+                        catch (ServiceException e)
+                        {
+                            if (e.StatusCode == HttpStatusCode.Gone)
+                            {
+                                // If a deltaLink is no longer valid, the service will respond with 410 Gone
+
+                                driveItemChangesListModel.ContinuationTooOld = true;
+
+                                return driveItemChangesListModel;
+                            }
+
+                            throw;
+                        }
+
+                        // We don't track the root folder.
+
+                        var driveItems = driveItemDeltaCollectionPage
+                            .Where(driveItem => !string.Equals(driveItem.Name, "root"))
+                            .ToList();
+
+                        driveItemChangesListModel.DriveItems = driveItems;
+
+                        // as MS does: https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/blob/6ec55dcc43b884cec3d61aeb3ceb69fe27852157/src/Microsoft.Graph.Core/Tasks/PageIterator.cs
+
+                        if (driveItemDeltaCollectionPage.NextPageRequest != null)
+                        {
+                            driveItemChangesListModel.ContinuationUuid = driveItemDeltaCollectionPage.NextPageRequest.GetHttpRequestMessage().RequestUri.AbsoluteUri;
+                        }
+                        else if (driveItemDeltaCollectionPage.AdditionalData != null)
+                        {
+                            if (driveItemDeltaCollectionPage.AdditionalData.TryGetValue(Constants.OdataInstanceAnnotations.NextLink, out object nextLink))
+                            {
+                                driveItemChangesListModel.ContinuationUuid = nextLink?.ToString();
+                            }
+                            else if (driveItemDeltaCollectionPage.AdditionalData.TryGetValue(Constants.OdataInstanceAnnotations.DeltaLink, out object deltaLink))
+                            {
+                                driveItemChangesListModel.ContinuationUuid = deltaLink?.ToString();
+                            }
+                        }
 
                         return driveItemChangesListModel;
-                    }
+                    },
+                requestFailedHandler: PrivateDefaultRequestFailedHandler,
+                hint: "Get drive item changed",
+                isGet: false
+            ).ConfigureAwait(false);
 
-                    var driveItemDeltaRequest = GetDriveItemDeltaRequest(deltaLink);
-
-                    var driveItemDeltaCollectionPage = await driveItemDeltaRequest.GetAsync().ConfigureAwait(false);
-
-                    // We don't track the root folder.
-
-                    var driveItems = driveItemDeltaCollectionPage
-                        .Where(driveItem => !string.Equals(driveItem.Name, "root"))
-                        .ToList();
-
-                    driveItemChangesListModel.DriveItems = driveItems;
-
-                    // as MS does: https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/blob/6ec55dcc43b884cec3d61aeb3ceb69fe27852157/src/Microsoft.Graph.Core/Tasks/PageIterator.cs
-
-                    if (driveItemDeltaCollectionPage.NextPageRequest != null)
+                if (driveItemsChangesList != null && driveItemsChangesList.DriveItems != null)
+                {
+                    for (var i = driveItemsChangesList.DriveItems.Count - 1; i >= 0; i--)
                     {
-                        driveItemChangesListModel.ContinuationUuid = driveItemDeltaCollectionPage.NextPageRequest.GetHttpRequestMessage().RequestUri.AbsoluteUri;
-                    }
-                    else if (driveItemDeltaCollectionPage.AdditionalData != null)
-                    {
-                        if (driveItemDeltaCollectionPage.AdditionalData.TryGetValue(Constants.OdataInstanceAnnotations.NextLink, out object nextLink))
+                        var driveItem = driveItemsChangesList.DriveItems.ElementAt(i);
+
+                        if (driveItem.Deleted != null)
                         {
-                            driveItemChangesListModel.ContinuationUuid = nextLink?.ToString();
+                            continue;
                         }
-                        else if (driveItemDeltaCollectionPage.AdditionalData.TryGetValue(Constants.OdataInstanceAnnotations.DeltaLink, out object deltaLink))
+
+                        var canAccess = await CanAccessDriveItemAsync(driveItem).ConfigureAwait(false);
+
+                        if (canAccess)
                         {
-                            driveItemChangesListModel.ContinuationUuid = deltaLink?.ToString();
+                            continue;
+                        }
+
+                        // We are deleting assets that we no longer have can access to
+
+                        if (driveItem.IsFolder())
+                        {
+                            // We will not receive notifications for the individual assets, so we will delete them recursively
+
+                            driveItemsChangesList.DriveItems.Remove(driveItem);
+                            driveItemsChangesList.FolderDriveItemsToDelete.Add(driveItem);
+                        }
+                        else
+                        {
+                            // Single asset being moved and we cannot access it
+
+                            driveItem.Deleted = new Deleted();
                         }
                     }
-
-                    return driveItemChangesListModel;
-                }).ConfigureAwait(false);
-
-            for (var i = driveItemsChangesList.DriveItems.Count - 1; i >= 0; i--)
-            {
-                var driveItem = driveItemsChangesList.DriveItems.ElementAt(i);
-
-                if (driveItem.Deleted != null)
-                {
-                    continue;
                 }
 
-                var canAccess = await CanAccessDriveItemAsync(driveItem).ConfigureAwait(false);
-
-                if (canAccess)
-                {
-                    continue;
-                }
-
-                // We are deleting assets that we no longer have can access to
-
-                if (driveItem.IsFolder())
-                {
-                    // We will not receive notifications for the individual assets, so we will delete them recursively
-
-                    driveItemsChangesList.DriveItems.Remove(driveItem);
-                    driveItemsChangesList.FolderDriveItemsToDelete.Add(driveItem);
-                }
-                else
-                {
-                    // Single asset being moved and we cannot access it
-
-                    driveItem.Deleted = new Deleted();
-                }
+                return driveItemsChangesList;
             }
-
-            return driveItemsChangesList;
-        }
 
         private IDriveItemDeltaRequest GetDriveItemDeltaRequest(string deltaLink)
         {
@@ -1244,18 +1203,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
             var driveItems = new List<DriveItem>();
 
-            var batchResponsesByAsset = await GetDriveItemsBatchResponsesAsync(assetIds).ConfigureAwait(false);
-
             foreach (var assetId in assetIds)
             {
-                if (!batchResponsesByAsset.TryGetValue(assetId, out var message))
-                {
-                    continue;
-                }
-
-                var responseContent = await message.Content.ReadAsStreamAsync().ConfigureAwait(false);
-
-                var driveItem = JsonSerializer.Deserialize<DriveItem>(responseContent);
+                var driveItem = await GetDriveItemAsync(assetId).ConfigureAwait(false);
 
                 if (driveItem == null)
                 {
@@ -1268,60 +1218,6 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             await EnsureDriveItemsAccessAsync(driveItems).ConfigureAwait(false);
 
             return driveItems;
-        }
-
-        private async Task<IDictionary<string, HttpResponseMessage>> GetDriveItemsBatchResponsesAsync(List<string> assetIds)
-        {
-            var batchResponsesTasks = assetIds
-                .Chunk(size: 20)
-                .Select(assetIdsChunk =>
-                {
-                    var batchRequestSteps = assetIdsChunk
-                        .Select(assetId =>
-                        {
-                            var driveItemRequest = GetDriveItemRequest(assetId);
-
-                            return new BatchRequestStep(assetId, driveItemRequest.GetHttpRequestMessage());
-                        })
-                        .ToArray();
-
-                    var batchRequestContent = new BatchRequestContent(batchRequestSteps);
-                    var batchResponseContent = BatchAsync(batchRequestContent);
-
-                    return batchResponseContent;
-                })
-                .ToList();
-
-            var batchResponses = await Task.WhenAll(batchResponsesTasks).ConfigureAwait(false);
-
-            var responses = await Task.WhenAll(batchResponses.Select(br => br.GetResponsesAsync()).ToArray()).ConfigureAwait(false);
-
-            return responses
-                .SelectMany(r => r)
-                .ToDictionary(pair => pair.Key, pair => pair.Value);
-        }
-
-        public async Task<BatchResponseContent> BatchAsync(BatchRequestContent batchRequestContent)
-        {
-            if (string.IsNullOrEmpty(SiteId) || !_siteFolderIds.Any())
-            {
-                return null;
-            }
-
-            if (batchRequestContent == null)
-            {
-                return null;
-            }
-
-            var batchResponseContent = await ExecuteAsync((context) =>
-            {
-                return _graphServiceClient
-                    .Batch
-                    .Request()
-                    .PostAsync(batchRequestContent);
-            }).ConfigureAwait(false);
-
-            return batchResponseContent;
         }
 
         private static void SetResponseHeaderType(RestRequest request)

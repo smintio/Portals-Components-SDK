@@ -457,7 +457,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
 
             var enumObject = new Dictionary<string, object>
             {
-                {  EntityModel.PropName_ListDisplayName, value }
+                {  EntityModel.PropName_ListDisplayName, enumValue }
             };
 
             return enumObject;

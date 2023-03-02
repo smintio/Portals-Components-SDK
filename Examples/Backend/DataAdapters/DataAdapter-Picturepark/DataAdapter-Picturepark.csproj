@@ -3,13 +3,17 @@
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>SmintIo.Portals.DataAdapter.Picturepark</RootNamespace>
     <AssemblyName>SmintIo.Portals.DataAdapter.Picturepark</AssemblyName>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Version>1.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DotLiquid" Version="2.2.656" />
-    <PackageReference Include="Picturepark.SDK.V1" Version="11.4.42" />
     <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="5.2.7" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Connectors\Connector-Picturepark\Connector-Picturepark.csproj" />
+    <ProjectReference Include="..\..\Connectors\Connector-Picturepark\Connector-Picturepark.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
   </ItemGroup>
 </Project>

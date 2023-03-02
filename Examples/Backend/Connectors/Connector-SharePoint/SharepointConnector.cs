@@ -11,6 +11,7 @@ using RestSharp;
 using SmintIo.Portals.Connector.SharePoint.Client;
 using SmintIo.Portals.Connector.SharePoint.Client.Impl;
 using SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel;
+using SmintIo.Portals.SDK.Core.Http.Prefab.RetryPolicies;
 using SmintIo.Portals.ConnectorSDK.Connectors.Prefab;
 using SmintIo.Portals.ConnectorSDK.Metamodel;
 using SmintIo.Portals.ConnectorSDK.Models;
@@ -158,9 +159,13 @@ namespace SmintIo.Portals.Connector.SharePoint
                 ? _configuration.SiteIdString
                 : _configuration.SiteId;
 
+            var siteListId = _configuration.HighSecurityMode
+                ? _configuration.SiteListIdString
+                : _configuration.SiteListId;
+
             var siteFolderIds = GetSiteFolderIds();
 
-            var sharepointMetamodelBuilder = new SharepointMetamodelBuilder(_logger, sharepointClient, siteId, siteFolderIds);
+            var sharepointMetamodelBuilder = new SharepointMetamodelBuilder(_logger, sharepointClient, siteId, siteListId, siteFolderIds);
 
             return sharepointMetamodelBuilder.BuildAsync();
         }
@@ -230,16 +235,11 @@ namespace SmintIo.Portals.Connector.SharePoint
 
             request.AcceptApplicationJson();
 
-            var postResponse = await restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenResponse>(request)
-                .ConfigureAwait(false);
-
-            request.HandleStatusCode(
-                restSharpClient,
-                postResponse,
-                "Get access token by authorization code",
-                Key,
-                targetGetUuid: null,
-                _logger);
+            var postResponse = await new RestSharpRetryPolicy(Key, "Get access token by authorization code", isGet: false, requestFailedHandler: null, portalsContextModel: null, _logger, maxRequestRetryCount: 0)
+                .ExecuteAsync((_) =>
+                {
+                    return restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenResponse>(request);
+                }).ConfigureAwait(false);
 
             var data = postResponse.Data;
 
@@ -384,22 +384,21 @@ namespace SmintIo.Portals.Connector.SharePoint
 
             request.AcceptApplicationJson();
 
-            var postResponse = await restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenResponse>(request).ConfigureAwait(false);
+            IRestResponse<OAuth2GetAccessTokenResponse> postResponse = null;
 
             try
             {
-                request.HandleStatusCode(
-                    restSharpClient,
-                    postResponse,
-                    "Refresh access token with refresh token",
-                    Key,
-                    targetGetUuid: null,
-                    _logger);
+                postResponse = await new RestSharpRetryPolicy(Key, "Refresh access token with refresh token", isGet: false, requestFailedHandler: null, portalsContextModel: null, _logger, maxRequestRetryCount: 0)
+                    .ExecuteAsync((_) =>
+                    {
+                        return restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenResponse>(request);
+                    }).ConfigureAwait(false);
             }
             catch (ExternalDependencyException e)
-                when (e.ErrorCode == ExternalDependencyStatusEnum.CompatiblityIssue)
+            when (e.ErrorCode == ExternalDependencyStatusEnum.CompatiblityIssue)
             {
-                if (!string.IsNullOrEmpty(postResponse.Content) &&
+                if (postResponse != null &&
+                    !string.IsNullOrEmpty(postResponse.Content) &&
                     postResponse.Content.IndexOf("invalid_grant", StringComparison.Ordinal) > -1)
                 {
                     // this is delivered by OAuth clients when grants are expired
@@ -409,6 +408,8 @@ namespace SmintIo.Portals.Connector.SharePoint
                         "The authorization expired. Please re-authorize",
                         Key);
                 }
+
+                throw;
             }
 
             if (string.IsNullOrEmpty(postResponse.Data.AccessToken))
@@ -432,6 +433,14 @@ namespace SmintIo.Portals.Connector.SharePoint
                 ? _configuration.SiteIdString
                 : _configuration.SiteId;
 
+            var siteDriveId = _configuration.HighSecurityMode
+                ? _configuration.SiteDriveIdString
+                : _configuration.SiteDriveId;
+
+            var siteListId = _configuration.HighSecurityMode
+                ? _configuration.SiteListIdString
+                : _configuration.SiteListId;
+
             var siteFolderIds = GetSiteFolderIds();
 
             return _sharepointClient ??= new SharepointClient(
@@ -442,6 +451,8 @@ namespace SmintIo.Portals.Connector.SharePoint
                 () => AuthorizationValuesModel,
                 _configuration.SharepointUrl,
                 siteId,
+                siteDriveId,
+                siteListId,
                 siteFolderIds);
         }
 

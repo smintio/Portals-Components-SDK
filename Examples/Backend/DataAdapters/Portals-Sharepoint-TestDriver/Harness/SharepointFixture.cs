@@ -1,68 +1,29 @@
 using System;
-using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmintIo.Portals.Connector.SharePoint;
 using SmintIo.Portals.Connector.SharePoint.Client;
-using SmintIo.Portals.ConnectorSDK.Metamodel;
 using SmintIo.Portals.DataAdapter.SharePoint.Assets;
 using SmintIo.Portals.DataAdapterSDK.TestDriver;
-using Xunit;
+using SmintIo.Portals.DataAdapterSDK.TestDriver.Harness;
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Harness
 {
-    public class SharepointFixture : IAsyncLifetime
+    public class SharepointFixture : BaseDataAdapterFixture<OAuthOptions, SharepointConnector>
     {
-        private const string RefreshTokenFilename = "refreshtoken.txt";
-
-        private string _refreshToken;
-
-        public SharepointFixture()
+        protected override void BindSections(IConfiguration configuration)
         {
-            if (File.Exists(RefreshTokenFilename))
-            {
-                _refreshToken = File.ReadAllText(RefreshTokenFilename);
+            base.BindSections(configuration);
 
-                if (string.IsNullOrWhiteSpace(_refreshToken))
-                {
-                    _refreshToken = null;
-                }
-            }
-            else
-            {
-                File.Create(RefreshTokenFilename);
-            }
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false)
-                .AddJsonFile("appsettings.local.json", true)
-                .AddEnvironmentVariables()
-                .Build();
-
-            OauthConfig = new OauthOptions();
-            configuration.GetSection(OauthOptions.Name).Bind(OauthConfig);
-
-            SharepointOptions = new SharepointOptions();
-            configuration.GetSection(SharepointOptions.Name).Bind(SharepointOptions);
+            configuration.GetSection(OAuthOptions.Name).Bind(ConfigurationOptions);
         }
 
-        public OauthOptions OauthConfig { get; }
-
-        public SharepointOptions SharepointOptions { get; }
-
-        public SharepointConnector Connector { get; set; }
-
-        public ConnectorMetamodel Metamodel { get; set; }
-
-        public SharepointAssetsDataAdapter DataAdapter { get; private set; }
-
-        public IServiceProvider ServiceProvider { get; private set; }
-
-        public async Task InitializeAsync()
+        public async override Task InitializeAsync()
         {
-            var (metamodel, connector) = await CreateConnectorAsync().ConfigureAwait(false);
+            await CreateConnectorAsync().ConfigureAwait(false);
 
             var services = new ServiceCollection();
 
@@ -79,22 +40,19 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Harness
 
             ServiceProvider = services.BuildServiceProvider();
 
-            DataAdapter = await CreateDataAdapterAsync(metamodel, connector).ConfigureAwait(false);
+            DataAdapter = await CreateDataAdapterAsync().ConfigureAwait(false);
         }
 
-        public async Task DisposeAsync()
+        private async Task<SharepointAssetsDataAdapter> CreateDataAdapterAsync()
         {
-            await File.WriteAllTextAsync(RefreshTokenFilename, _refreshToken);
-        }
-
-        private async Task<SharepointAssetsDataAdapter> CreateDataAdapterAsync(ConnectorMetamodel metamodel, SharepointConnector connector)
-        {
-            Metamodel = metamodel;
-            Connector = connector;
+            if (Connector == null)
+            {
+                throw new ArgumentNullException(nameof(Connector));
+            }
 
             var config = new SharepointAssetsDataAdapterConfiguration();
 
-            var dataAdapterTestDriver = new DataAdapterTestDriver(connector, metamodel);
+            var dataAdapterTestDriver = new DataAdapterTestDriver(Connector, Metamodel);
 
             await dataAdapterTestDriver.InstantiateDataAdapterAsync(typeof(SharepointAssetsDataAdapterStartup), config);
 
@@ -103,24 +61,27 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Harness
             return (SharepointAssetsDataAdapter)dataAdapter;
         }
 
-        private async Task<(ConnectorMetamodel, SharepointConnector)> CreateConnectorAsync()
+        protected override async Task CreateConnectorAsync()
         {
             var sharepointSettings = new SharepointConnectorConfiguration
             {
-                SiteId = SharepointOptions.SiteId,
-                SharepointUrl = OauthConfig.SharepointUrl
+                SiteId = ConfigurationOptions.SiteId,
+                SharepointUrl = ConfigurationOptions.SharepointUrl,
+                SiteFolderIds = AssetOptions.Folders.Select(f => f.Id).ToArray()
             };
 
-            var connectorTestDriver = new OAuth2AuthenticationCodeFlowWithPKCETestDriver("http://localhost:7587", _refreshToken);
+            var connectorTestDriver = new OAuth2AuthenticationCodeFlowWithPKCETestDriver("http://localhost:7587", RefreshToken);
 
             await connectorTestDriver.InstantiateConnectorAsync(typeof(SharepointConnectorStartup), sharepointSettings)
                 .ConfigureAwait(false);
 
-            var connector = (SharepointConnector)connectorTestDriver.Connector;
-            
-            _refreshToken = connector.GetAuthorizationValues().RefreshToken;
+            Metamodel = connectorTestDriver.ConnectorMetamodel;
 
-            return (connectorTestDriver.ConnectorMetamodel, connector);
+            var connector = (SharepointConnector)connectorTestDriver.Connector;
+
+            RefreshToken = connector.GetAuthorizationValues().RefreshToken;
+
+            Connector = connector;
         }
     }
 }

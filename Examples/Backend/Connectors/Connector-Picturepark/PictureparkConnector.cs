@@ -9,6 +9,7 @@ using SmintIo.Portals.Connector.Picturepark.Client;
 using SmintIo.Portals.Connector.Picturepark.Client.Impl;
 using SmintIo.Portals.Connector.Picturepark.Metamodel;
 using SmintIo.Portals.Connector.Picturepark.Model;
+using SmintIo.Portals.SDK.Core.Http.Prefab.RetryPolicies;
 using SmintIo.Portals.ConnectorSDK.Connectors.Prefab;
 using SmintIo.Portals.ConnectorSDK.Metamodel;
 using SmintIo.Portals.ConnectorSDK.Models;
@@ -112,38 +113,42 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             request.AcceptApplicationJson();
 
-            var getResponse = await restSharpClient.ExecuteTaskAsync<CustomerServiceInfoResponse>(request).ConfigureAwait(false);
+            IRestResponse<CustomerServiceInfoResponse> getResponse = null;
 
             try
             {
-                request.HandleStatusCode(restSharpClient, getResponse, "Get customer service info", PictureparkConnectorStartup.PictureparkConnector, targetGetUuid: null, _logger);
+                getResponse = await new RestSharpRetryPolicy(Key, "Get customer service info", isGet: false, requestFailedHandler: null, portalsContextModel: null, _logger, maxRequestRetryCount: 0)
+                    .ExecuteAsync((_) =>
+                    {
+                        return restSharpClient.ExecuteTaskAsync<CustomerServiceInfoResponse>(request);
+                    }).ConfigureAwait(false);
             }
             catch (Exception)
             {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointUrlInvalid, "The Picturepark URL did not deliver valid customer service info", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointUrlInvalid, "The Picturepark URL did not deliver valid customer service info", Key);
             }
 
             var data = getResponse.Data;
 
             var baseUrl = data.BaseUrl;
             if (string.IsNullOrEmpty(baseUrl))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark response base URL is missing", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark response base URL is missing", Key);
 
             var customerId = data.CustomerId;
             if (string.IsNullOrEmpty(customerId))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark response customer ID is missing", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark response customer ID is missing", Key);
 
             var customerAlias = data.CustomerAlias;
             if (string.IsNullOrEmpty(customerAlias))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark response customer alias is missing", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark response customer alias is missing", Key);
 
             var identityServerUrl = data.IdentityServerUrl;
             if (string.IsNullOrEmpty(identityServerUrl))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark response identity server URL is missing", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark response identity server URL is missing", Key);
 
             var apiUrl = data.ApiUrl;
             if (string.IsNullOrEmpty(apiUrl))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark API URL is missing", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark API URL is missing", Key);
 
             if (!apiUrl.EndsWith("/"))
             {
@@ -254,14 +259,14 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             if (firstChannel == null)
             {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.CannotReadMetamodel, "No channel is available", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.CannotReadMetamodel, "No channel is available", Key);
             }
 
             var firstChannelId = firstChannel.Id;
 
             if (string.IsNullOrEmpty(firstChannelId))
             {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.CannotReadMetamodel, "Channel ID is empty", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.CannotReadMetamodel, "Channel ID is empty", Key);
             }
 
             return firstChannelId;
@@ -336,22 +341,26 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             request.AcceptApplicationJson();
 
-            var getResponse = await restSharpClient.ExecuteTaskAsync<CustomerServiceInfoResponse>(request).ConfigureAwait(false);
+            IRestResponse<CustomerServiceInfoResponse> getResponse = null;
 
             try
             {
-                request.HandleStatusCode(restSharpClient, getResponse, "Get customer service info", PictureparkConnectorStartup.PictureparkConnector, targetGetUuid: null, _logger);
+                getResponse = await new RestSharpRetryPolicy(Key, "Get customer service info", isGet: false, requestFailedHandler: null, portalsContextModel: null, _logger, maxRequestRetryCount: 0)
+                    .ExecuteAsync((_) =>
+                    {
+                        return restSharpClient.ExecuteTaskAsync<CustomerServiceInfoResponse>(request);
+                    }).ConfigureAwait(false);
             }
             catch (Exception)
             {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointUrlInvalid, "The Picturepark URL did not deliver valid customer service info", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointUrlInvalid, "The Picturepark URL did not deliver valid customer service info", Key);
             }
 
             var data = getResponse.Data;
 
             var newApiUrl = data.ApiUrl;
             if (string.IsNullOrEmpty(newApiUrl))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark API URL is missing", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.EndpointDataInvalid, "Picturepark API URL is missing", Key);
 
             if (!newApiUrl.EndsWith("/"))
             {
@@ -436,7 +445,7 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             var pictureparkService = new PictureparkService(settings, httpClient);
 
-            _pictureparkClient = new DefaultPictureparkClient(this, _portalsContext, accessToken, pictureparkService, _configuration.Channel, _cache, httpClient, apiUrl, customerAlias, thumbnailPortalPresent, thumbnailExtraLargePresent, _logger);
+            _pictureparkClient = new DefaultPictureparkClient(this, _portalsContext, accessToken, pictureparkService, _configuration.Channel, _cache, _httpClientFactory, httpClient, apiUrl, customerAlias, thumbnailPortalPresent, thumbnailExtraLargePresent, _logger);
 
             return _pictureparkClient;
         }
@@ -447,12 +456,12 @@ namespace SmintIo.Portals.Connector.Picturepark
                 throw new ArgumentNullException(nameof(AuthorizationValuesModel));
 
             if (!AuthorizationValuesModel.KeyValueStore.ContainsKey(ApiUrlKey))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The API URL is missing", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The API URL is missing", Key);
 
             var apiUrl = AuthorizationValuesModel.KeyValueStore[ApiUrlKey];
 
             if (string.IsNullOrEmpty(apiUrl))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The API URL is empty", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The API URL is empty", Key);
 
             return apiUrl;
         }
@@ -463,12 +472,12 @@ namespace SmintIo.Portals.Connector.Picturepark
                 throw new ArgumentNullException(nameof(AuthorizationValuesModel));
 
             if (!AuthorizationValuesModel.KeyValueStore.ContainsKey(CustomerIdKey))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The customer ID is missing", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The customer ID is missing", Key);
 
             var customerId = AuthorizationValuesModel.KeyValueStore[CustomerIdKey];
 
             if (string.IsNullOrEmpty(customerId))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The customer ID is empty", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The customer ID is empty", Key);
 
             return customerId;
         }
@@ -479,12 +488,12 @@ namespace SmintIo.Portals.Connector.Picturepark
                 throw new ArgumentNullException(nameof(AuthorizationValuesModel));
 
             if (!AuthorizationValuesModel.KeyValueStore.ContainsKey(CustomerAliasKey))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The customer alias is missing", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The customer alias is missing", Key);
 
             var customerAlias = AuthorizationValuesModel.KeyValueStore[CustomerAliasKey];
 
             if (string.IsNullOrEmpty(customerAlias))
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The customer alias is empty", PictureparkConnectorStartup.PictureparkConnector);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The customer alias is empty", Key);
 
             return customerAlias;
         }

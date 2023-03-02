@@ -7,12 +7,13 @@ using Xunit.Abstractions;
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Integration
 {
-    public class SharepointSiteIdProviderTest : SharepointConnectorTest
+    [Collection(nameof(SharepointFixtureCollection))]
+    public class SharepointSiteIdProviderTest
     {
         private readonly SharepointFixture _fixture;
         private SharepointSiteIdProvider _provider;
 
-        public SharepointSiteIdProviderTest(ITestOutputHelper helper, SharepointFixture fixture) : base(helper, fixture)
+        public SharepointSiteIdProviderTest(ITestOutputHelper helper, SharepointFixture fixture)
         {
             _fixture = fixture;
 
@@ -22,9 +23,9 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Integration
         [Fact]
         public async Task GetDynamicValueAsync_ShouldReturnAllSitesAsync()
         {
-            var siteDetails = await _provider.GetDynamicValueAsync(_fixture.SharepointOptions.SiteId);
+            var siteDetails = await _provider.GetDynamicValueAsync(_fixture.ConfigurationOptions.SiteId);
             siteDetails.Should().NotBeNull();
-            siteDetails.Value.Should().BeEquivalentTo(_fixture.SharepointOptions.SiteId);
+            siteDetails.Value.Should().BeEquivalentTo(_fixture.ConfigurationOptions.SiteId);
             siteDetails.Name.Should().NotBeNull();
             siteDetails.Description.Should().NotBeNull();
         }
@@ -34,9 +35,9 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Integration
         {
             _provider = new SharepointSiteIdProvider(null);
 
-            var siteDetails = await _provider.GetDynamicValueAsync(_fixture.SharepointOptions.SiteId);
+            var siteDetails = await _provider.GetDynamicValueAsync(_fixture.ConfigurationOptions.SiteId);
             siteDetails.Should().NotBeNull();
-            siteDetails.Value.Should().BeEquivalentTo(_fixture.SharepointOptions.SiteId);
+            siteDetails.Value.Should().BeEquivalentTo(_fixture.ConfigurationOptions.SiteId);
             siteDetails.Name.Should().BeNull();
             siteDetails.Description.Should().BeNull();
         }

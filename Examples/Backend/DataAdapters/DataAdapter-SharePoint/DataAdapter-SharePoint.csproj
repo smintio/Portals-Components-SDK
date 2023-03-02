@@ -3,11 +3,16 @@
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>SmintIo.Portals.DataAdapter.SharePoint</RootNamespace>
     <AssemblyName>SmintIo.Portals.DataAdapter.SharePoint</AssemblyName>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Version>1.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="5.2.7" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Connectors\Connector-SharePoint\Connector-SharePoint.csproj" />
+    <ProjectReference Include="..\..\Connectors\Connector-SharePoint\Connector-SharePoint.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
   </ItemGroup>
 </Project>
