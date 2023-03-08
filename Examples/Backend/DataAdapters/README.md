@@ -1,7 +1,7 @@
 How-to implement the `DataAdapter`
 ==================================
  
-Current version of this document is: 1.0.0 (as of 2nd of March, 2023)
+Current version of this document is: 1.0.1 (as of 8th of March, 2023)
 
 ## `DataAdapter` basics
 
@@ -24,6 +24,18 @@ for every interface and separate the implementation concerns accordingly.
 
 Note: some of the interfaces have overlapping signatures, for example both the `IAssetsRead` and `IAssetsInternalProvider` both define the `GetAssetsDownloadItemMappingsAsync` method, 
 and of course it only needs to be implemented once. It is, however, still advisable to declare all interfaces in the `DataAdapter`'s signature due to Reflection reasons.
+
+Smint.io offers two different integration modes. Based on the functionality supported by the external system.
+
+- Live connection
+
+The data is fetched on demand. This will mean that the external system must support feature-rich functionality (e.g. fully translatable metamodel, faceted search and etc)
+
+- Internal index
+
+Selected data is analyzed and metadata is captured. Thumbnails, video, audio and document renditions are generated and stored by Smint.io  for offline usage.
+Further data synchronization is required via tokens, webhooks or time based intervals.
+Please note that Smint.io does not store original assets.
 
 Contributors
 ============

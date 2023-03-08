@@ -18,9 +18,20 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Custom public API interfaces](#user-content-custom-public-api-interfaces)
 1. [Overview of Smint.io annotations](../Frontend/docs/smintio-annotations.md)
 
-Current version of this document is: 2.2.1 (as of 2nd of March, 2023)
+Current version of this document is: 2.2.2 (as of 8th of March, 2023)
 
 ## Examples
+
+#### Hello World Connector
+
+- [Root directory](Connectors/Connector-HelloWorld/)
+
+#### Hello World Data Adapter
+
+This data adapter implements the *IAssets* data adapter interface.
+
+- [Root directory](DataAdapters/DataAdapter-HelloWorld/)
+- [Test driver README.md](DataAdapters/Portals-HelloWorld-TestDriver)
 
 #### Microsoft SharePoint Connector
 
@@ -48,7 +59,13 @@ This data adapter implements the *IAssets* data adapter interface.
 
 The purpose of a connector is to provide a way to communicate with an external provider via a client, expose user interface configurations, authentication processing, verify settings and build a translatable meta-model.
 
-Each connector is system dedicated. See [Sharepoint](Connectors/Connector-SharePoint/) or [Picturepark](Connectors/Connector-Picturepark/). 
+Each connector is system dedicated. See [SharePoint](Connectors/Connector-SharePoint/) or [Picturepark](Connectors/Connector-Picturepark/). 
+
+Please note that in the case of `Picturepark`, the connector uses a live connection (data is requested on the fly).
+
+For `SharePoint` this is done using our own index. We call it the integration layer.
+
+When developing a new connector, [HelloWorld](Connectors/Connector-HelloWorld/) serves as a good starting point.
 
 The `SmintIo.Portals.ConnectorSDK` NuGet Smint.io package makes it possible to build a connector.
 
@@ -189,7 +206,7 @@ Acts as a facade in front of provider's concrete SDK as a means of communication
 
 Smint.io has a set of retry strategy helpers that live under SmintIo.Portals.ConnectorSDK.Clients.Prefab
 
-A client can inherit from `BaseClient`, `BaseDynamicApiClient<TDynamicApiClient>` or `BaseRestSharpApiClient`
+A client can inherit from `BaseHttpClientApiClient`, `BaseDynamicApiClient<TDynamicApiClient>` or `BaseRestSharpApiClient`
 
 See `SharepointClient.cs` for reference.
 
