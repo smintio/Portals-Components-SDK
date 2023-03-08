@@ -22,6 +22,10 @@ namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
         {
             Id = CustomStringFieldKey,
             Label = "Custom string",
+            LabelTranslationByCulture = new Dictionary<string, string>
+            {
+                ["de"] = "Benutzerdefinierte Zeichenfolge"
+            },
             CustomFieldType = HelloWorldCustomFieldType.String
         };
 
@@ -29,6 +33,10 @@ namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
         {
             Id = CustomDateFieldKey,
             Label = "Custom date",
+            LabelTranslationByCulture = new Dictionary<string, string>
+            {
+                ["de"] = "Benutzerdefiniertes Datum"
+            },
             CustomFieldType = HelloWorldCustomFieldType.Date
         };
 
@@ -36,6 +44,10 @@ namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
         {
             Id = CustomNumberFieldKey,
             Label = "Custom number",
+            LabelTranslationByCulture = new Dictionary<string, string>
+            {
+                ["de"] = "Benutzerdefinierte Nummer"
+            },
             CustomFieldType = HelloWorldCustomFieldType.Number
         };
 
@@ -43,6 +55,10 @@ namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
         {
             Id = CustomSingleSelectFieldKey,
             Label = "Custom single select list",
+            LabelTranslationByCulture = new Dictionary<string, string>
+            {
+                ["de"] = "Benutzerdefinierte Einzelauswahlliste"
+            },
             CustomFieldType = HelloWorldCustomFieldType.SingleSelect,
             MultiOptions = false
         };
@@ -51,6 +67,10 @@ namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
         {
             Id = CustomMultiSelectFieldKey,
             Label = "Custom multi select list",
+            LabelTranslationByCulture = new Dictionary<string, string>
+            {
+                ["de"] = "Benutzerdefinierte Mehrfachauswahlliste"
+            },
             CustomFieldType = HelloWorldCustomFieldType.MultiSelect,
             MultiOptions = true
         };
@@ -69,8 +89,38 @@ namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
                 new HelloWorldCustomFieldValueResponse
                 {
                     CustomFieldId = CustomSingleSelectFieldKey,
-                    Label = "Value 1",
-                    Value = CustomSingleSelectValueOneKey
+                    Value = new HelloWorldSingleSelectFieldValueResponse
+                    {
+                        Id =  CustomSingleSelectValueOneKey,
+                        Label = "Value 1",
+                        LabelTranslationByCulture  = new Dictionary<string, string>
+                        {
+                            ["de"] = "Wert 1"
+                        }
+                    }
+                },
+                new HelloWorldCustomFieldValueResponse
+                {
+                    CustomFieldId = CustomStringFieldKey,
+                    Value = new HelloWorldStringFieldValueResponse
+                    {
+                        Label = "Custom string value",
+                        LabelTranslationByCulture  = new Dictionary<string, string>
+                        {
+                            ["de"] = "Benutzerdefinierter Zeichenfolgenwert"
+                        }
+                    }
+                }
+            },
+            Tags = new List<HelloWorldTagResponse>
+            {
+                new HelloWorldTagResponse
+                {
+                    Labels = new[] { "Tag 1", "Tag 2" },
+                    LabelsTranslationByCulture = new Dictionary<string, string[]>
+                    {
+                        ["de"] = new[] { "Etikett 1", "Etikett 2" }
+                    }
                 }
             },
             DownloadUrl = $"{_helloWorldDownloadUrl}/1",

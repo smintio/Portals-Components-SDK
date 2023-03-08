@@ -52,12 +52,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
 
             var localizedTags = GetLocalizedTags(helloWorldAssetResponse.Tags);
 
-            var eTag = helloWorldAssetResponse.ETag;
-
-            if (string.IsNullOrEmpty(eTag))
-            {
-                eTag = $"{helloWorldAssetResponse.FileName}-{helloWorldAssetResponse.FileExtension}-{helloWorldAssetResponse.FileSize}";
-            }
+            var eTag = $"{helloWorldAssetResponse.FileName}-{helloWorldAssetResponse.FileExtension}-{helloWorldAssetResponse.FileSize}";
 
             var assetDataObject = new AssetDataObject(_dataAdapterContext)
             {
@@ -87,17 +82,31 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             return assetDataObject;
         }
 
-        private static LocalizedStringsArrayModel GetLocalizedTags(string[] tags)
+        private static LocalizedStringsArrayModel GetLocalizedTags(ICollection<HelloWorldTagResponse> tags)
         {
             if (tags == null)
             {
                 return null;
             }
 
-            var localizedStringsArrayByCulture = new List<KeyValuePair<string, string[]>>
+            var localizedStringsArrayByCulture = new List<KeyValuePair<string, string[]>>();
+
+            foreach (var tag in tags)
             {
-                new KeyValuePair<string, string[]>(LocalizedStringsArrayModel.DefaultCulture, tags)
-            };
+                var defaultTagPair = new KeyValuePair<string, string[]>(LocalizedStringsArrayModel.DefaultCulture, tag.Labels);
+
+                if (tag.LabelsTranslationByCulture != null && tag.LabelsTranslationByCulture.Any())
+                {
+                    foreach (var labelsTranslationPair in tag.LabelsTranslationByCulture)
+                    {
+                        var translationPair = new KeyValuePair<string, string[]>(labelsTranslationPair.Key, labelsTranslationPair.Value);
+
+                        localizedStringsArrayByCulture.Add(translationPair);
+                    }
+                }
+
+                localizedStringsArrayByCulture.Add(defaultTagPair);
+            }
 
             return new LocalizedStringsArrayModel(localizedStringsArrayByCulture);
         }
@@ -175,7 +184,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 return;
             }
 
-            var objectsByKey = helloWorldAssetResponse.CustomFieldValues.ToDictionary(i => $"p_cf_{i.CustomFieldId}", i => i.Value);
+            var objectsByKey = helloWorldAssetResponse.CustomFieldValues.ToDictionary(cfv => $"p_cf_{cfv.CustomFieldId}", cfv => cfv as object);
 
             objectsByKey[HelloWorldMetamodelBuilder.ContentTypeId] = helloWorldAssetResponse.ContentType;
 

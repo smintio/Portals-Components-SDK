@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SmintIo.Portals.Connector.HelloWorld.Models.Common
+namespace SmintIo.Portals.Connector.HelloWorld.Models.Requests
 {
     public class HelloWorldFacetFilterRequest
     {

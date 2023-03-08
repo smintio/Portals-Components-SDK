@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using SmintIo.Portals.Connector.HelloWorld.Extensions;
 using SmintIo.Portals.Connector.HelloWorld.Models.Responses;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Converters;
 using SmintIo.Portals.SDK.Core.Extensions;
@@ -28,7 +29,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
 
             if (customFieldValue != null)
             {
-                var stringValue = GetTypedValue<string>(customFieldValue.Value, logWarning: false);
+                var stringValue = GetTypedValue<string>(customFieldValue.Value, logWarning: true);
 
                 return stringValue;
             }
@@ -42,7 +43,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
 
             if (customFieldValue != null)
             {
-                var stringArrayValue = GetTypedValue<string[]>(customFieldValue.Value, logWarning: false);
+                var stringArrayValue = GetTypedValue<string[]>(customFieldValue.Value, logWarning: true);
 
                 return stringArrayValue;
             }
@@ -50,55 +51,23 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             return base.GetStringArrayDataType(value, semanticHint);
         }
 
-        protected override DateTimeOffset? GetDateTimeDataType(object value, string semanticHint)
+        protected override LocalizedStringsModel GetLocalizedStringsModelDataType(object value, string semanticHint)
         {
-            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: true);
 
             if (customFieldValue != null)
             {
-                var dateTimeValue = GetTypedValue<DateTimeOffset?>(customFieldValue.Value, logWarning: false);
+                var stringFieldValue = GetTypedValue<HelloWorldStringFieldValueResponse>(customFieldValue.Value, logWarning: true);
 
-                return dateTimeValue;
-            }
-
-            return base.GetDateTimeDataType(value, semanticHint);
-        }
-
-        protected override decimal? GetDecimalDataType(object value, string semanticHint)
-        {
-            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
-
-            if (customFieldValue != null)
-            {
-                var decimalValue = GetTypedValue<decimal?>(customFieldValue.Value, logWarning: false);
-
-                return decimalValue;
-            }
-
-            return base.GetDecimalDataType(value, semanticHint);
-        }
-
-        protected override IDictionary<string, object> GetEnumObject(object value, string semanticHint)
-        {
-            var stringValue = GetStringDataType(value, semanticHint);
-
-            if (stringValue != null && CustomFieldById.TryGetValue(semanticHint, out var customField))
-            {
-                var displayName = stringValue.Localize();
-
-                var enumObject = new Dictionary<string, object>
+                if (stringFieldValue != null)
                 {
-                    { EntityModel.PropName_Id, customField.Id },
-                    { EntityModel.PropName_ListDisplayName, displayName },
-                    { EntityModel.PropName_DetailDisplayName, displayName }
-                };
+                    var localizedStringsModel = stringFieldValue.Label.Localize().AddTranslations(stringFieldValue.LabelTranslationByCulture);
 
-                return enumObject;
+                    return localizedStringsModel;
+                }
             }
 
-            var baseEnumObject = base.GetEnumObject(value, semanticHint);
-
-            return baseEnumObject;
+            return base.GetLocalizedStringsModelDataType(value, semanticHint);
         }
 
         protected override LocalizedStringsArrayModel GetLocalizedStringsArrayModelDataType(object value, string semanticHint)
@@ -116,6 +85,62 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             }
 
             return base.GetLocalizedStringsArrayModelDataType(value, semanticHint);
+        }
+
+        protected override DateTimeOffset? GetDateTimeDataType(object value, string semanticHint)
+        {
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
+
+            if (customFieldValue != null)
+            {
+                var dateTimeValue = GetTypedValue<DateTimeOffset?>(customFieldValue.Value, logWarning: true);
+
+                return dateTimeValue;
+            }
+
+            return base.GetDateTimeDataType(value, semanticHint);
+        }
+
+        protected override decimal? GetDecimalDataType(object value, string semanticHint)
+        {
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
+
+            if (customFieldValue != null)
+            {
+                var decimalValue = GetTypedValue<decimal?>(customFieldValue.Value, logWarning: true);
+
+                return decimalValue;
+            }
+
+            return base.GetDecimalDataType(value, semanticHint);
+        }
+
+        protected override IDictionary<string, object> GetEnumObject(object value, string semanticHint)
+        {
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
+
+            if (customFieldValue != null)
+            {
+                var singleSelectFieldValue = GetTypedValue<HelloWorldSingleSelectFieldValueResponse>(customFieldValue.Value, logWarning: true);
+
+                if (singleSelectFieldValue != null)
+                {
+                    var displayName = singleSelectFieldValue.Label.Localize().AddTranslations(singleSelectFieldValue.LabelTranslationByCulture);
+
+                    var enumObject = new Dictionary<string, object>
+                    {
+                        { EntityModel.PropName_Id, singleSelectFieldValue.Id },
+                        { EntityModel.PropName_ListDisplayName, displayName },
+                        { EntityModel.PropName_DetailDisplayName, displayName }
+                    };
+
+                    return enumObject;
+                }
+            }
+
+            var baseEnumObject = base.GetEnumObject(value, semanticHint);
+
+            return baseEnumObject;
         }
 
         protected override IDictionary<string, object> GetObject(object value, string semanticHint)

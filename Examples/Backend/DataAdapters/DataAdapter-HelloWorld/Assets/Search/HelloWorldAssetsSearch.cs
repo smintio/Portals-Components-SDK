@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using SmintIo.Portals.Connector.HelloWorld.Models.Common;
 using SmintIo.Portals.Connector.HelloWorld.Models.Requests;
 using SmintIo.Portals.Connector.HelloWorld.Models.Responses;
 using SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common;

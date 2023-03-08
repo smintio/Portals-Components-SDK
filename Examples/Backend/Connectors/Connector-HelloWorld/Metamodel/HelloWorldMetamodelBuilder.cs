@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SmintIo.Portals.Connector.HelloWorld.Client;
+using SmintIo.Portals.Connector.HelloWorld.Extensions;
 using SmintIo.Portals.Connector.HelloWorld.Models.Responses;
 using SmintIo.Portals.ConnectorSDK.Metamodel;
 using SmintIo.Portals.SDK.Core.Extensions;
@@ -99,7 +100,7 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
         {
             string targetMetamodelEntityKey = null;
 
-            var labels = customField.Label.Localize();
+            var labels = customField.Label.Localize().AddTranslations(customField.LabelTranslationByCulture);
 
             var isEnum = customField.CustomFieldType == HelloWorldCustomFieldType.SingleSelect;
 
@@ -110,16 +111,11 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
 
             var dataType = GetDataType(customField);
 
-            var propertyModel = entityModel.AddProperty(
+            entityModel.AddProperty(
                 $"p_cf_{customField.Id}",
                 dataType,
                 targetMetamodelEntityKey,
                 labels);
-
-            if (isEnum)
-            {
-                propertyModel.SemanticHint = customField.Id;
-            }
         }
 
         private EntityModel GetEnumEntityModel(HelloWorldCustomFieldResponse customField, LocalizedStringsModel labels)
@@ -154,7 +150,7 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
         {
             return customField.CustomFieldType switch
             {
-                HelloWorldCustomFieldType.String => DataType.String,
+                HelloWorldCustomFieldType.String => DataType.LocalizedStringsModel,
                 HelloWorldCustomFieldType.Date => DataType.DateTime,
                 HelloWorldCustomFieldType.Number => DataType.Decimal,
                 HelloWorldCustomFieldType.SingleSelect => DataType.Enum,

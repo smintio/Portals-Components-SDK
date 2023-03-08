@@ -46,7 +46,7 @@ namespace SmintIo.Portals.Connector.HelloWorld
         }
 
         public string Key => HelloWorldConnectorStartup.HelloWorldConnector;
-        
+
         public AuthorizationValuesModel AuthorizationValuesModel { get; private set; }
 
         public Task PerformPostConfigurationChecksAsync(AuthorizationValuesModel authorizationValuesModel)

@@ -30,11 +30,9 @@ namespace SmintIo.Portals.Connector.HelloWorld.Models.Responses
 
         public string[] ParantFolders { get; set; } = Array.Empty<string>();
 
-        public string[] Tags { get; set; }
+        public ICollection<HelloWorldTagResponse> Tags { get; set; }
 
         public string Version { get; set; }
-
-        public string ETag { get; set; }
 
         public HelloWorldImagePreviewResponse ImagePreview { get; set; }
 

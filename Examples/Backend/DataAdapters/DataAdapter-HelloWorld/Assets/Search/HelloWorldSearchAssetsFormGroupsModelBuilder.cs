@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using SmintIo.Portals.Connector.HelloWorld.Extensions;
 using SmintIo.Portals.Connector.HelloWorld.Metamodel;
 using SmintIo.Portals.Connector.HelloWorld.Models.Responses;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Constants;
@@ -253,7 +254,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Search
 
                     var valueForJsonUiDetailsModel = new ValueForJsonUiDetailsModel()
                     {
-                        Name = searchFacetValue.Label.Localize(),
+                        Name = searchFacetValue.Label.Localize().AddTranslations(searchFacetValue.LabelTranslationByCulture),
                         Value = new ValueForJson()
                         {
                             StringValue = searchFacetValue.Value

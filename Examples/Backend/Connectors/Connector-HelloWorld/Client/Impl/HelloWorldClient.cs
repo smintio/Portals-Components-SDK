@@ -89,8 +89,8 @@ namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
                     }
 
                     assets = assets.Where(a => a.CustomFieldValues
-                        .Where(cfv => cfv.Value is string)
-                        .Any(cfv => cfv.CustomFieldId == facetFilter.Id && (string)cfv.Value == facetFilter.StringValue));
+                        .Where(cfv => cfv.Value is HelloWorldSingleSelectFieldValueResponse)
+                        .Any(cfv => cfv.CustomFieldId == facetFilter.Id && cfv.Value is HelloWorldSingleSelectFieldValueResponse singleSelectFieldValue && singleSelectFieldValue.Id == facetFilter.StringValue));
                 }
             }
 
@@ -147,14 +147,29 @@ namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
                             Id = customFieldResponse.Id,
                             Label = customFieldResponse.Label,
                             SearchFacetValues = customFieldValueGroup
-                                .Select(cfv => new HelloWorldSearchFacetValueResponse
+                                .Select(cfv =>
                                 {
-                                    Label = cfv.Label,
-                                    Value = cfv.Value as string,
-                                    Count = groupCount
+                                    if (cfv.Value is HelloWorldSingleSelectFieldValueResponse singleSelectFieldValue)
+                                    {
+                                        return new HelloWorldSearchFacetValueResponse
+                                        {
+                                            Label = singleSelectFieldValue.Label,
+                                            LabelTranslationByCulture = singleSelectFieldValue.LabelTranslationByCulture,
+                                            Value = singleSelectFieldValue.Id,
+                                            Count = groupCount
+                                        };
+                                    }
+
+                                    return null;
                                 })
+                                .Where(sfv => sfv != null)
                                 .ToList()
                         };
+
+                        if (searchFacetResponse.SearchFacetValues.Count == 0)
+                        {
+                            continue;
+                        }
 
                         searchFacetResponses.Add(searchFacetResponse);
                     }
