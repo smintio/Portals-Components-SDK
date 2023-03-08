@@ -72,16 +72,18 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
 
         protected override LocalizedStringsArrayModel GetLocalizedStringsArrayModelDataType(object value, string semanticHint)
         {
-            var stringArrayValue = GetStringArrayDataType(value, semanticHint);
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
 
-            if (stringArrayValue != null)
+            if (customFieldValue != null)
             {
-                var localizedStringsArrayByCulture = new List<KeyValuePair<string, string[]>>
-                {
-                    new KeyValuePair<string, string[]>(LocalizedStringsArrayModel.DefaultCulture, stringArrayValue)
-                };
+                var stringArrayFieldValue = GetTypedValue<HelloWorldStringArrayFieldValueResponse>(customFieldValue.Value, logWarning: true);
 
-                return new LocalizedStringsArrayModel(localizedStringsArrayByCulture);
+                if (stringArrayFieldValue != null)
+                {
+                    var localizedStringsArrayModel = stringArrayFieldValue.Labels.Localize().AddTranslations(stringArrayFieldValue.LabelsTranslationByCulture);
+
+                    return localizedStringsArrayModel;
+                }
             }
 
             return base.GetLocalizedStringsArrayModelDataType(value, semanticHint);
