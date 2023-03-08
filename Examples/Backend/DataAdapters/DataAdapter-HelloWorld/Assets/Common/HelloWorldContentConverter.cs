@@ -186,9 +186,16 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
 
             var objectsByKey = helloWorldAssetResponse.CustomFieldValues.ToDictionary(cfv => $"p_cf_{cfv.CustomFieldId}", cfv => cfv as object);
 
-            objectsByKey[HelloWorldMetamodelBuilder.ContentTypeId] = helloWorldAssetResponse.ContentType;
+            objectsByKey[HelloWorldMetamodelBuilder.ContentTypeId] = helloWorldAssetResponse.ContentType switch
+            {
+                HelloWorldContentType.Image => ContentTypeEnumDataObject.Image.ListDisplayName,
+                HelloWorldContentType.Video => ContentTypeEnumDataObject.Image.ListDisplayName,
+                HelloWorldContentType.Audio => ContentTypeEnumDataObject.Image.ListDisplayName,
+                HelloWorldContentType.Document => ContentTypeEnumDataObject.Image.ListDisplayName,
+                _ => ContentTypeEnumDataObject.Other.ListDisplayName
+            };
 
-            var dataObject = GetDataObject(HelloWorldMetamodelBuilder.RootEntityKey, objectsByKey);
+            var dataObject = GetDataObject(HelloWorldMetamodelBuilder.RootEntityKey, objectsByKey);            
 
             assetDataObject.RawData = new[] { dataObject };
         }

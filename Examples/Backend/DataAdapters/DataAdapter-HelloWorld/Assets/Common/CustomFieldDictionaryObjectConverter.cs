@@ -132,8 +132,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                     var enumObject = new Dictionary<string, object>
                     {
                         { EntityModel.PropName_Id, singleSelectFieldValue.Id },
-                        { EntityModel.PropName_ListDisplayName, displayName },
-                        { EntityModel.PropName_DetailDisplayName, displayName }
+                        { EntityModel.PropName_ListDisplayName, displayName }
                     };
 
                     return enumObject;

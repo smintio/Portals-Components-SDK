@@ -58,7 +58,7 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
 
             rootEntityModel.AddProperty(
                 ContentTypeId,
-                DataType.String,
+                DataType.LocalizedStringsModel,
                 targetMetamodelEntityKey: null,
                 labels: ContentTypeLabels);
 
