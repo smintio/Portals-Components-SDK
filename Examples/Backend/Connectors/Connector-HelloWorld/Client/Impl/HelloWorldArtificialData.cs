@@ -136,7 +136,19 @@ namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
             MimeType = "video/mp4",
             Version = "1",
             ContentType = HelloWorldContentType.Video,
-            CustomFieldValues = Array.Empty<HelloWorldCustomFieldValueResponse>(),
+            CustomFieldValues = new List<HelloWorldCustomFieldValueResponse>
+            {
+                new HelloWorldCustomFieldValueResponse
+                {
+                    CustomFieldId = CustomDateFieldKey,
+                    Value = DateTimeOffset.Now
+                },
+                new HelloWorldCustomFieldValueResponse
+                {
+                    CustomFieldId = CustomNumberFieldKey,
+                    Value = 24.3m
+                }
+            },
             DownloadUrl = $"{_helloWorldDownloadUrl}/2",
             PreviewUrl = $"{_helloWorldPreviewUrl}/2"
         };
