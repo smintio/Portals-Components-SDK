@@ -33,6 +33,7 @@ Current version of this document is: 1.0.0 (as of 29th of November, 2022)
 | `IsInt32Array`                     | **Specifies for a form item to be of int array data type (auto-detected if possible)**                                         |
 | `IsInt64`                          | **Specifies for a form item to be of long data type (auto-detected if possible)**                                              |
 | `IsInt64Array`                     | **Specifies for a form item to be of long array data type (auto-detected if possible)**                                        |
+| `IsJavascript`                     | **Specifies for a string form item to be a Javascript program**                                                                |
 | `IsJson`                           | **Specifies for a string form item to be a JSON string**                                                                       |
 | `IsPhoneNumber`                    | **Specifies for a string form item to be a phone number**                                                                      |
 | `IsRichText`                       | **Specifies for a string form item to be rich text**                                                                           |
