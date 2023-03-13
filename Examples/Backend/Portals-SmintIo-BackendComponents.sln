@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Connector-SharePoint", "Connectors\Connector-SharePoint\Connector-SharePoint.csproj", "{E4D9A904-9D9C-40CE-889E-CE792723E4BE}"
 EndProject
@@ -14,6 +14,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAdapter-Picturepark", "DataAdapters\DataAdapter-Picturepark\DataAdapter-Picturepark.csproj", "{3D0F904D-81DD-44D6-B861-295FADFEFB5B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portals-Connector-SDK-TestDriver.Picturepark.Test", "DataAdapters\Portals-Picturepark-TestDriver\Portals-Connector-SDK-TestDriver.Picturepark.Test.csproj", "{B11A5FFB-E708-4FEC-AE21-F2DB4A279F96}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Connector-HelloWorld", "Connectors\Connector-HelloWorld\Connector-HelloWorld.csproj", "{1F8EB325-BE6B-4399-9C8B-AC7735FCE883}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portals-Connector-SDK-TestDriver.HelloWorld.Test", "DataAdapters\Portals-HelloWorld-TestDriver\Portals-Connector-SDK-TestDriver.HelloWorld.Test.csproj", "{15346CDF-A130-4C19-ADF7-17E97A497BE6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAdapter-HelloWorld", "DataAdapters\DataAdapter-HelloWorld\DataAdapter-HelloWorld.csproj", "{A2BF50AC-5666-4FBA-81CA-DAB4B28020E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +51,18 @@ Global
 		{B11A5FFB-E708-4FEC-AE21-F2DB4A279F96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B11A5FFB-E708-4FEC-AE21-F2DB4A279F96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B11A5FFB-E708-4FEC-AE21-F2DB4A279F96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F8EB325-BE6B-4399-9C8B-AC7735FCE883}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F8EB325-BE6B-4399-9C8B-AC7735FCE883}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F8EB325-BE6B-4399-9C8B-AC7735FCE883}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F8EB325-BE6B-4399-9C8B-AC7735FCE883}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15346CDF-A130-4C19-ADF7-17E97A497BE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15346CDF-A130-4C19-ADF7-17E97A497BE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15346CDF-A130-4C19-ADF7-17E97A497BE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15346CDF-A130-4C19-ADF7-17E97A497BE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2BF50AC-5666-4FBA-81CA-DAB4B28020E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2BF50AC-5666-4FBA-81CA-DAB4B28020E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2BF50AC-5666-4FBA-81CA-DAB4B28020E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2BF50AC-5666-4FBA-81CA-DAB4B28020E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

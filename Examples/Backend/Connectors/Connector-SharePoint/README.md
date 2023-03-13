@@ -3,32 +3,16 @@ How-to implement the `Connector`
 
 Current version of this document is: 1.0.0 (as of 2nd of March, 2023)
 
-## `Connector` Basics
+## SharePoint `Connector` Basics
 
-A `Connector` in the context of Smint.io Portals is an object that contains information about the external
-system's metamodel and handles authorization.
-
-For example, Sharepoint (or rather: the Microsoft Graph API) offers OAuth2 authorization with several flows. In order to 
+For Sharepoint (or rather: the Microsoft Graph API) offers OAuth2 authorization with several flows. In order to 
 leverage user-specific access rules and to provide a fine-grained security context, we opted for the OAuth2 Authorization 
 Code Flow.
-
-So, one of the `Connector's` main tasks is to establish and maintain a trust context to the external system, e.g. by
-obtaining access and refresh tokens. It should not keep any network connections alive. The connector also should provide a
-means to refresh the access token, if OAuth2 is used.
 
 The `OAuth2AuthenticationCodeFlowWithPKCEConnector` can be used for a scaffolding a OAuth2 flow. Note, that you can implement
 any authentication flow, but this class gives you a prefab implementation of this specific flow. All the steps required
 to finalize the authentication flow will be driven by Smint.io Portals (e.g. redirects), so you do not need to care about
 that low level details at all.
-
-Also, the `Connector` is tasked with establishing a meta-model of whatever is stored in the external system. The meta-model
-should describe the data structure that is being delivered by the external system. This meta-model is then used throughout 
-Smint.io Portals to interpret the external metadata delivered by the external system (e.g. also custom metadata).
-
-For example, if the external System is a simple file storage, as is the case with Sharepoint, the meta-model will likely
-consist of all properties that a file can have. You can think of it in a similar way to file properties in a local file
-system. While a text document has a `ModifiedDate`, a `Creator` and so on, an image might have a `Width` and a
-`Height` property etc.
 
 ## Authentication process
 
