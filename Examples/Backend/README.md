@@ -31,7 +31,7 @@ Current version of this document is: 2.2.2 (as of 8th of March, 2023)
 This data adapter implements the *IAssets* data adapter interface.
 
 - [Root directory](DataAdapters/DataAdapter-HelloWorld/)
-- [Test driver README.md](DataAdapters/Portals-HelloWorld-TestDriver)
+- [Test driver](DataAdapters/Portals-HelloWorld-TestDriver)
 
 #### Microsoft SharePoint Connector
 
