@@ -21,6 +21,7 @@ Current version of this document is: 1.0.0 (as of 29th of November, 2022)
 | `FormGroupDescription`             | **Specifies the description of a form group in different languages**                                                           |
 | `FormGroupDisplayName`             | **Specifies the display name of a form group in different languages**                                                          |
 | `FormGroupVisibleIf`               | **Specifies the visibility condition of a form group**                                                                         |
+| `FormItemLayout`                   | **Specifies responsive layout options for a form item**                                                                        |
 | `FormItemVisibility`               | **Specifies the visibility level of a form item**                                                                              |
 | `IsBoolean`                        | **Specifies for a form item to be of boolean data type (auto-detected if possible)**                                           |
 | `IsColor`                          | **Specifies for a string form item to be of color data type**                                                                  |
