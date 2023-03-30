@@ -6,7 +6,7 @@ using SmintIo.Portals.Connector.HelloWorld.Extensions;
 using SmintIo.Portals.Connector.HelloWorld.Metamodel;
 using SmintIo.Portals.Connector.HelloWorld.Models.Responses;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Constants;
-using SmintIo.Portals.DataAdapterSDK.DataAdapters.Fields;
+using SmintIo.Portals.DataAdapterSDK.DataAdapters.FormGroupDefinitions;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Specs;
 using SmintIo.Portals.SDK.Core.Configuration;
 using SmintIo.Portals.SDK.Core.Configuration.Model;

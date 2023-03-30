@@ -5,6 +5,9 @@ using SmintIo.Portals.Connector.HelloWorld.Models.Responses;
 
 namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
 {
+    /// <summary>
+    /// Fake data on imaginary external client system
+    /// </summary>
     internal static class HelloWorldArtificialData
     {
         public const string CustomStringFieldKey = "100";

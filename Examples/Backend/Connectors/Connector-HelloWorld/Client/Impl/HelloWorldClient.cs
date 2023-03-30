@@ -15,6 +15,10 @@ using SmintIo.Portals.SDK.Core.Models.Context;
 
 namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
 {
+    /// <summary>
+    /// Implementation of the client interface of external systems
+    /// Please note that other possible base classes are `BaseHttpClientApiClient` and `BaseDynamicApiClient`
+    /// </summary>
     public class HelloWorldClient : BaseRestSharpApiClient, IHelloWorldClient
     {
         private readonly ICache _cache;

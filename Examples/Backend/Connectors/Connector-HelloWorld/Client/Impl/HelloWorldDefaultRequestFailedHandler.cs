@@ -7,6 +7,10 @@ using SmintIo.Portals.SDK.Core.Http.Prefab.RequestFailedHandlers;
 
 namespace SmintIo.Portals.Connector.HelloWorld.Client.Impl
 {
+    /// <summary>
+    /// Given a status code, custom error, header or external system specific flag
+    /// This request failed handler decides how to handle the response
+    /// </summary>
     public class HelloWorldDefaultRequestFailedHandler : DefaultRequestFailedHandler
     {
         public override Task<RequestFailedHandlerResult> HandleHttpStatusExceptionAsync(HttpStatusException httpStatusException)

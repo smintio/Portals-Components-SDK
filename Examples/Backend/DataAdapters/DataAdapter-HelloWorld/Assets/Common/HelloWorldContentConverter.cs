@@ -16,6 +16,9 @@ using SmintIo.Portals.SDK.Core.Models.Strings;
 
 namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
 {
+    /// <summary>
+    /// The content converter is responsible for representing asset data of external systems in a standardized Smint.Io <see cref="AssetDataObject"/>
+    /// </summary>
     public class HelloWorldContentConverter : CustomFieldDictionaryObjectConverter
     {
         public static readonly ICollection<string> _convertibleDocumentExtensions = new HashSet<string>()
@@ -41,6 +44,10 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             _entityModelProvider = entityModelProvider;
         }
 
+        /// <summary>
+        /// Extracts and converts single external system asset data into <see cref="AssetDataObject"/>
+        /// This includes mapping the content type to the correct Smint.Io type, parsing available thumbnails with the appropriate aspect ratio, extracting file metadata, raw metadata, and more
+        /// </summary>
         public AssetDataObject GetAssetDataObject(HelloWorldAssetResponse helloWorldAssetResponse)
         {
             if (helloWorldAssetResponse == null)
@@ -111,6 +118,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             return new LocalizedStringsArrayModel(localizedStringsArrayByCulture);
         }
 
+        /// <summary>
+        /// A content-type mapper between the external system and a Smint.Io content-type enumeration
+        /// </summary>
         private static ContentTypeEnumDataObject GetContentType(HelloWorldContentType contentType)
         {
             return contentType switch
@@ -123,6 +133,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             };
         }
 
+        /// <summary>
+        /// Sets the content type metadata based on the enumeration and what the external system exposes
+        /// </summary>
         private static void SetContentTypeMetadata(AssetDataObject assetDataObject, HelloWorldAssetResponse helloWorldAssetResponse)
         {
             if (assetDataObject.ContentType.Id == ContentTypeEnumDataObject.Image.Id)
@@ -159,6 +172,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             // Nothing for Audio or Documents
         }
 
+        /// <summary>
+        /// Sets general file metadata information for the asset
+        /// </summary>
         private static void SetFileMetaData(AssetDataObject assetDataObject, HelloWorldAssetResponse helloWorldAssetResponse)
         {
             assetDataObject.FileMetadata = new FileMetadataDataObject
@@ -172,6 +188,11 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             };
         }
 
+        /// <summary>
+        /// Sets the raw data of an asset represented as an Smint.Io <see cref="DataObject"/>
+        /// Here, based on the <see cref="HelloWorldMetamodelBuilder"/> schema of the predefined connector metamodel, the `GetDataObject` method processes the raw `objectsByKey` and creates the compatible `dataObject` to be used by the Smint.Io infrastructure
+        /// The logic for this is moved to the <see cref="CustomFieldDictionaryObjectConverter"/> class
+        /// </summary>
         private void SetRawData(AssetDataObject assetDataObject, HelloWorldAssetResponse helloWorldAssetResponse)
         {
             if (_entityModelProvider == null)
@@ -184,7 +205,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 return;
             }
 
-            var objectsByKey = helloWorldAssetResponse.CustomFieldValues.ToDictionary(cfv => $"p_cf_{cfv.CustomFieldId}", cfv => cfv as object);
+            var objectsByKey = helloWorldAssetResponse.CustomFieldValues.ToDictionary(cfv => cfv.CustomFieldId, cfv => cfv as object);
 
             objectsByKey[HelloWorldMetamodelBuilder.ContentTypeId] = helloWorldAssetResponse.ContentType switch
             {
@@ -195,11 +216,14 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 _ => ContentTypeEnumDataObject.Other.ListDisplayName
             };
 
-            var dataObject = GetDataObject(HelloWorldMetamodelBuilder.RootEntityKey, objectsByKey);            
+            var dataObject = GetDataObject(HelloWorldMetamodelBuilder.RootEntityKey, objectsByKey);
 
             assetDataObject.RawData = new[] { dataObject };
         }
 
+        /// <summary>
+        /// Sets thumbnail information given what the external system has
+        /// </summary>
         private static void SetThumbnails(AssetDataObject assetDataObject)
         {
             assetDataObject.IsThumbnailPreviewAvailable = true;
@@ -265,6 +289,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             }
         }
 
+        /// <summary>
+        /// Calculates the aspect ratio based on the width and height dimensions
+        /// </summary>
         private static decimal? ComputeAspectRatio(int? width, int? height)
         {
             if (width == null || height == null || height == 0)
@@ -275,6 +302,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             return (decimal)width / (decimal)height;
         }
 
+        /// <summary>
+        /// Sets the permissions for an asset data object
+        /// </summary>
         private static void SetPermissionUuids(AssetDataObject assetDataObject)
         {
             // Since we are not using pass through, it is safe to consider that we have read, search and download permissions.

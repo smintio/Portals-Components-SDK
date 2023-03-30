@@ -4,6 +4,9 @@ using SmintIo.Portals.SDK.Core.Models.Strings;
 
 namespace SmintIo.Portals.Connector.HelloWorld.Extensions
 {
+    /// <summary>
+    /// Useful extension methods
+    /// </summary>
     public static class LabelExtensions
     {
         public static LocalizedStringsModel AddTranslations(this LocalizedStringsModel localizedStringsModel, IDictionary<string, string> translationByCulture)

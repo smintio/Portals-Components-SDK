@@ -8,6 +8,13 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
 {
     internal class HelloWorldFormGroupsModelBuilder
     {
+        /// <summary>
+        /// Here we build the <see cref="FormGroupsDefinitionModel"/>
+        /// The means that the custom fields that are eliggible for filtering will be added as `FormItemDefinitions`
+        /// The UI will know what to expect in terms of raw metadata (coming from the assets) and what the rendered filter pattern should be
+        /// E.g. `Custom multi select list` can be represented as multi select checkbox list by using <see cref="StringArrayFormFieldItemModel"/> 
+        /// `Custom single select list` will be represented as single select radio button list by using <see cref="StringFormFieldItemModel"/> 
+        /// </summary>
         internal static IFormGroupsDefinitionModel Build(ICollection<HelloWorldCustomFieldResponse> customFields)
         {
             var formGroupsDefinitionModel = new FormGroupsDefinitionModel
