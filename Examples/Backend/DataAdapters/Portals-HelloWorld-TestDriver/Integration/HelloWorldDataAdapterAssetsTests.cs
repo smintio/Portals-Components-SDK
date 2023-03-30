@@ -12,6 +12,9 @@ using Xunit;
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.HelloWorld.Test.Integration
 {
+    /// <summary>
+    /// Common Smint.Io tests that cover the core functionality of the data adapter assets
+    /// </summary>
     [Collection(nameof(HelloWorldFixtureCollection))]
     public class HelloWorldDataAdapterAssetsTests : DataAdapterAssetsTests
     {

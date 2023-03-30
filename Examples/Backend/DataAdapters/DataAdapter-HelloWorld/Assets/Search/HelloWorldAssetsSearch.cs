@@ -20,8 +20,14 @@ using SmintIo.Portals.SDK.Core.Models.Strings;
 
 namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
 {
+    /// <summary>
+    /// Searches the external systems using the <see cref="IHelloWorldClient"/> by values coming from the user interface
+    /// </summary>
     public partial class HelloWorldAssetsDataAdapter : AssetsDataAdapterBaseImpl
     {
+        /// <summary>
+        /// Smint.Io typeahead functionality hook
+        /// </summary>
         public override async Task<GetFullTextSearchProposalsResult> GetFullTextSearchProposalsAsync(GetFullTextSearchProposalsParameters parameters)
         {
             var assets = await SearchAssetsAsync(new SearchAssetsParameters()
@@ -40,6 +46,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
             };
         }
 
+        /// <summary>
+        /// This Smint.Io infrastructure hook is called when we have a search facet and want to search for a specific value in it, or the values have been clipped due to the value of `MultiSelectItemCount`
+        /// </summary>
         public override async Task<GetFormItemDefinitionAllowedValuesResult> GetFormItemDefinitionAllowedValuesAsync(GetFormItemDefinitionAllowedValuesParameters parameters)
         {
             if (parameters == null)
@@ -107,6 +116,14 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
             };
         }
 
+        /// <summary>
+        /// Smint.Io search assets functionality to be implemented by the data adapter
+        /// Ideally the flow would be
+        /// 1) Parse the incoming values (CurrentFields) from the UI
+        /// 2) Perform search
+        /// 3) Convert the data
+        /// 4) Return the asset data objects and possible filters
+        /// </summary>
         public override async Task<SearchAssetsResult> SearchAssetsAsync(SearchAssetsParameters parameters)
         {
             if (parameters == null)
@@ -130,22 +147,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
 
             if (searchResponse == null || searchResponse.Assets.Count == 0)
             {
-                return new SearchAssetsResult
-                {
-                    Details = new AssetSearchDetailsModel()
-                    {
-                        CurrentItemsPerPage = 0,
-                        CurrentPage = 0,
-                        HasMoreResults = false,
-                        MaxPages = 0,
-                        TotalResults = 0
-                    },
-                    AssetDataObjects = Array.Empty<AssetDataObject>(),
-                    FilterModel = new FormGroupsDefinitionModel()
-                    {
-                        FormGroupDefinitions = new List<FormGroupDefinitionModel>()
-                    }
-                };
+                return GetEmptySearchAssetsResult();
             }
 
             var details = new AssetSearchDetailsModel
@@ -201,6 +203,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
             };
         }
 
+        /// <summary>
+        /// Parses the values coming from the user interface represented as `formFieldValueModelById` into the appropriate format (facetFilters) and triggers the external system search
+        /// </summary>
         private async Task<HelloWorldSearchAssetsResponse> GetSearchAssetsResultAsync(
             Dictionary<string, FormFieldValueModel> formFieldValueModelById,
             string queryString,

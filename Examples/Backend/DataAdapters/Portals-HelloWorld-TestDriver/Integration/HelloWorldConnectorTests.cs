@@ -9,6 +9,9 @@ using Xunit.Abstractions;
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.HelloWorld.Test.Integration
 {
+    /// <summary>
+    /// Common Smint.Io tests that cover the core functionality of the connector
+    /// </summary>
     [Collection(nameof(HelloWorldFixtureCollection))]
     public class HelloWorldConnectorTests : ConnectorTests<HelloWorldConnector>
     {

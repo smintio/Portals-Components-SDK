@@ -10,6 +10,15 @@ using SmintIo.Portals.SDK.Core.Models.Strings;
 
 namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
 {
+    /// <summary>
+    /// Inherits <see cref="DictionaryObjectConverter"/> and respectivelly the base <see cref="DataObjectConverter<TObject, TValue>"/> class
+    /// The purpose of the dictionary object converter is to convert external system custom data type values to the corresponding Smint.Io data types
+    /// In the case of `GetStringDataType`, we would expect the value to be of a specific type, so this instance tries to convert it to a `String`
+    /// Other overrides are available for the remaining Smint.Io supported data types
+    /// Please see <see cref="DictionaryObjectConverter"/> 
+    /// Smint.Io supports various json type converters by default if you inherit from <see cref="JObjectDictionaryObjectConverter"/>, <see cref="JsonElementDictionaryObjectConverter"/> or <see cref="JsonObjectConverter"/>
+    /// For more information, feel free to contact one of the Smint.Io dev representatives
+    /// </summary>
     public class CustomFieldDictionaryObjectConverter : DictionaryObjectConverter
     {
         public CustomFieldDictionaryObjectConverter(

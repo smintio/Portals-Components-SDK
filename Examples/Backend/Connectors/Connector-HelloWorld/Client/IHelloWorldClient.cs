@@ -8,6 +8,9 @@ using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 
 namespace SmintIo.Portals.Connector.HelloWorld.Client
 {
+    /// <summary>
+    /// Client interface of external systems with relevant functionality definitions
+    /// </summary>
     public interface IHelloWorldClient : IClient
     {
         IRequestFailedHandler DefaultRequestFailedHandler { get; }

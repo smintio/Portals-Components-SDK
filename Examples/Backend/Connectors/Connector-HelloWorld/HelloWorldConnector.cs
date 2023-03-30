@@ -18,6 +18,9 @@ using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 
 namespace SmintIo.Portals.Connector.HelloWorld
 {
+    /// <summary>
+    /// The Hello world connector itself
+    /// </summary>
     public class HelloWorldConnector : IConnector
     {
         private readonly ILogger _logger;
@@ -49,6 +52,9 @@ namespace SmintIo.Portals.Connector.HelloWorld
 
         public AuthorizationValuesModel AuthorizationValuesModel { get; private set; }
 
+        /// <summary>
+        /// Validates user input from the connector's UI page
+        /// </summary>
         public Task PerformPostConfigurationChecksAsync(AuthorizationValuesModel authorizationValuesModel)
         {
             authorizationValuesModel.IdentityServerUrl = _connectorConfiguration.SiteUrl;
@@ -59,6 +65,9 @@ namespace SmintIo.Portals.Connector.HelloWorld
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Initializes an authorization flow with the external system
+        /// </summary>
         public async Task<AuthorizationValuesModel> InitializeAuthorizationValuesAsync(string originalSecret, string secret, AuthorizationValuesModel bootstrapAuthorizationValuesModel)
         {
             var oAuth2GetAccessTokenResponse = await GetAccessTokenAsync(bootstrapAuthorizationValuesModel).ConfigureAwait(false);
@@ -82,6 +91,9 @@ namespace SmintIo.Portals.Connector.HelloWorld
             });
         }
 
+        /// <summary>
+        /// Ensures that after post-authorization the external system is accessible
+        /// </summary>
         public async Task PerformPostAuthorizationChecksAsync(FormFieldValuesModel formFieldValuesModel)
         {
             var helloWorldClient = EnsureHelloWorldClient();
@@ -96,11 +108,29 @@ namespace SmintIo.Portals.Connector.HelloWorld
             }
         }
 
+        /// <summary>
+        /// This method is called periodically by the Smint.Io infrastructure to obtain new tokens when an external system requires it
+        /// </summary>
         public Task<AuthorizationValuesModel> RefreshAuthorizationValuesAsync(AuthorizationValuesModel authorizationValuesModel)
         {
-            throw new NotSupportedException();
+            if (string.IsNullOrEmpty(authorizationValuesModel.AccessToken) || string.IsNullOrEmpty(authorizationValuesModel.RefreshToken))
+            {
+                return InitializeAuthorizationValuesAsync(originalSecret: null, secret: null, authorizationValuesModel);
+            }
+
+            // Implement get access token request
+
+            return Task.FromResult(new AuthorizationValuesModel
+            {
+                AccessToken = Guid.NewGuid().ToString(),
+                RefreshToken = Guid.NewGuid().ToString(),
+                ExpiresAt = DateTime.UtcNow.AddHours(1),
+            });
         }
 
+        /// <summary>
+        /// Final modification of authorization values before storing them in the Smint.Io database
+        /// </summary>
         public void SetAuthorizationValuesModel(AuthorizationValuesModel authorizationValuesModel)
         {
             if (authorizationValuesModel is null)
@@ -111,11 +141,17 @@ namespace SmintIo.Portals.Connector.HelloWorld
             AuthorizationValuesModel = authorizationValuesModel;
         }
 
+        /// <summary>
+        /// <see cref="IServiceCollection"/> injection hook used by the data adapter
+        /// </summary>
         public void ConfigureServicesForDataAdapter(ServiceCollection services)
         {
             services.AddTransient(_ => EnsureHelloWorldClient());
         }
 
+        /// <summary>
+        /// Representation of the external system's metadata into Smint.Io as <see cref="ConnectorMetamodel"/>
+        /// </summary>
         public Task<ConnectorMetamodel> GetConnectorMetamodelAsync()
         {
             var helloWorldClient = EnsureHelloWorldClient();
@@ -125,11 +161,18 @@ namespace SmintIo.Portals.Connector.HelloWorld
             return helloWorldMetamodelBuilder.BuildAsync();
         }
 
+        /// <summary>
+        /// Call back url called when the `ConnectorSetupMethod` is set to `Redirect`
+        /// Usually used by `OAuth2Connector` connectors 
+        /// </summary>
         public Task<string> GetRedirectUrlAsync(string targetRedirectUri, string secret, AuthorizationValuesModel authorizationValuesModel, CultureInfo currentCulture)
         {
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Ensure that `IHelloWorldClient` has a valid instance when requested
+        /// </summary>
         private IHelloWorldClient EnsureHelloWorldClient()
         {
             return _helloWorldClient ??= new HelloWorldClient(
@@ -142,6 +185,10 @@ namespace SmintIo.Portals.Connector.HelloWorld
                 () => AuthorizationValuesModel?.AccessToken);
         }
 
+        /// <summary>
+        /// A connector hook used for caching purposes
+        /// Please feel free to ask any of the Smint.Io team members for more information
+        /// </summary>
         public Task WarmCachesAsync(bool forceWarming = false)
         {
             return Task.CompletedTask;

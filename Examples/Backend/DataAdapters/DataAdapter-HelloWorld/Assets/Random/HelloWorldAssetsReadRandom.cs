@@ -14,6 +14,10 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
 {
     public partial class HelloWorldAssetsDataAdapter : AssetsDataAdapterBaseImpl
     {
+        /// <summary>
+        /// Searches the external systems using the <see cref="IHelloWorldClient"/> for random assets by type
+        /// A valid use case would be on the landing page, we would like to display a random image
+        /// </summary>
         public override async Task<GetRandomAssetsResult> GetRandomAssetsAsync(GetRandomAssetsParameters parameters)
         {
             if (parameters == null)

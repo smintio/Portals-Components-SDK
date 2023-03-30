@@ -13,6 +13,9 @@ using SmintIo.Portals.SDK.Core.Models.Strings;
 
 namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
 {
+    /// <summary>
+    /// Maps the external system's metadata
+    /// </summary>
     public class HelloWorldMetamodelBuilder : IMetamodelBuilder
     {
         public const string RootEntityKey = "HelloWorldAsset";
@@ -41,6 +44,9 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
                 isFolderNavigationSupported: false);
         }
 
+        /// <summary>
+        /// Builds the <see cref="ConnectorMetamodel"/>
+        /// </summary>
         public async Task<ConnectorMetamodel> BuildAsync()
         {
             var customFieldById = await _helloWorldClient.GetCustomFieldByIdAsync(getFreshData: true).ConfigureAwait(false);
@@ -52,6 +58,9 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
             return _metamodel;
         }
 
+        /// <summary>
+        /// Represents each custom field as a Smint.Io property
+        /// </summary>
         private void AddEntities(ICollection<HelloWorldCustomFieldResponse> customFields)
         {
             var rootEntityModel = CreateRootEntityModel();
@@ -68,6 +77,11 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
             }
         }
 
+        /// <summary>
+        /// Form groups drives how the search facets should look like
+        /// E.g. would be if we want to have a `Custom single select list` filtering functionality while searching for assets
+        /// or if we want to have a list of radio buttons with possible sorting by criteria
+        /// </summary>
         private void AddFormGroups(ICollection<HelloWorldCustomFieldResponse> customFields)
         {
             var formGroupsDefinitionModel = HelloWorldFormGroupsModelBuilder.Build(customFields);
@@ -83,6 +97,11 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
                 });
         }
 
+        /// <summary>
+        /// The top level entity object
+        /// Used by Smint.Io for UI selection mapping and raw metadata visizualization
+        /// In case the external system is enabled with multiple templates, then it is recommended to use it <see cref="EntityType.MetadataLayer"/>
+        /// </summary>
         private EntityModel CreateRootEntityModel()
         {
             var rootEntityLabels = "HelloWorld Asset".LocalizeByCulture();
@@ -96,6 +115,11 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
             return rootEntityModel;
         }
 
+        /// <summary>
+        /// Maps each individual external system field to the corresponding Smint.Io property type
+        /// </summary>
+        /// <param name="entityModel"></param>
+        /// <param name="customField"></param>
         private void AddProperty(EntityModel entityModel, HelloWorldCustomFieldResponse customField)
         {
             string targetMetamodelEntityKey = null;
@@ -112,12 +136,15 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
             var dataType = GetDataType(customField);
 
             entityModel.AddProperty(
-                $"p_cf_{customField.Id}",
+                customField.Id,
                 dataType,
                 targetMetamodelEntityKey,
                 labels);
         }
 
+        /// <summary>
+        /// External system's enumeration object representation
+        /// </summary>
         private EntityModel GetEnumEntityModel(HelloWorldCustomFieldResponse customField, LocalizedStringsModel labels)
         {
             var enumEntityModel = _metamodel.GetEntity(customField.Id);
@@ -130,10 +157,13 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
             return enumEntityModel;
         }
 
+        /// <summary>
+        /// External system's complex objects are reprenseted as <see cref="EntityModel"/>
+        /// </summary>
         private EntityModel CreateEntityModel(string entityModelKey, LocalizedStringsModel localizedStringsModel = null, bool isEnum = false)
         {
             var entityModel = isEnum
-                ? EnumEntityModel.CreateEntity($"e_cf_{entityModelKey}", parentEntityModelKey: null, localizedStringsModel)
+                ? EnumEntityModel.CreateEntity(entityModelKey, parentEntityModelKey: null, localizedStringsModel)
                 : new EntityModel(entityModelKey, localizedStringsModel)
                 {
                     Type = EntityType.Fieldset
@@ -146,6 +176,12 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
             return entityModel;
         }
 
+        /// <summary>
+        /// Each of the external custom field types is represented as Smint.Io <see cref="DataType"/>
+        /// By default strings are represented as `LocalizedStringsModel` if the field is localized, otherwise as `String`
+        /// Static defined list are mapped as `Enum`. This means that a value in the list has an identifier
+        /// Statically defined multi-select lists can be represented as `EnumArray` as long as we have a way to map their values, otherwise they are usually represented as a sequence of strings `LocalizedStringsArrayModel`
+        /// </summary>
         private static DataType GetDataType(HelloWorldCustomFieldResponse customField)
         {
             return customField.CustomFieldType switch

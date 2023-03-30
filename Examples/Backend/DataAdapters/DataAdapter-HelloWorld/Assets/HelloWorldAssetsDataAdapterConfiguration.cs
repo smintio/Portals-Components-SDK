@@ -7,6 +7,10 @@ using SmintIo.Portals.SDK.Core.Models.MetadataAttributes;
 namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
 {
     [Serializable]
+    /// <summary>
+    /// Standartized Smint.Io data adapter configuration
+    /// Used by the Smint.Io infrastructure to configure which output formats should be available for download, what the maximum number of search fragments elements should be displayed, and more
+    /// </summary>
     public class HelloWorldAssetsDataAdapterConfiguration : IOutputFormatDataAdapterConfiguration, IPreserveMetadataDataAdapterConfiguration
     {
         /// <summary>

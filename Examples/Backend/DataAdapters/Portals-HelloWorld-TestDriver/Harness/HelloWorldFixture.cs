@@ -11,6 +11,9 @@ using SmintIo.Portals.DataAdapterSDK.TestDriver.Harness;
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.HelloWorld.Test.Harness
 {
+    /// <summary>
+    /// Setup of the HelloWorld fixture harness
+    /// </summary>
     public class HelloWorldFixture : BaseDataAdapterFixture<OAuthOptions, HelloWorldConnector>
     {
         protected override void BindSections(IConfiguration configuration)
@@ -20,6 +23,9 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.HelloWorld.Test.Harness
             configuration.GetSection(OAuthOptions.Name).Bind(ConfigurationOptions);
         }
 
+        /// <summary>
+        /// Initialization of the fixture
+        /// </summary>
         public async override Task InitializeAsync()
         {
             await CreateConnectorAsync().ConfigureAwait(false);
@@ -42,6 +48,9 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.HelloWorld.Test.Harness
             DataAdapter = await CreateDataAdapterAsync().ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Create an in-memory data adapter
+        /// </summary>
         private async Task<HelloWorldAssetsDataAdapter> CreateDataAdapterAsync()
         {
             if (Connector == null)
@@ -63,6 +72,9 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.HelloWorld.Test.Harness
             return (HelloWorldAssetsDataAdapter)dataAdapter;
         }
 
+        /// <summary>
+        /// Create an in-memory connector
+        /// </summary>
         protected override async Task CreateConnectorAsync()
         {
             var connectorConfiguration = new HelloWorldConnectorConfiguration

@@ -12,36 +12,70 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
     {
         public const string HelloWorldAssetsDataAdapter = "assets";
 
-        public void ConfigureServices(IServiceCollection services)
-        {
-        }
-
+        /// <summary>
+        /// The data adapter unique key
+        /// </summary>
         public string Key => HelloWorldAssetsDataAdapter;
 
+        /// <summary>
+        /// The localized strings
+        /// </summary>
         public LocalizedStringsModel Name => new()
         {
             { LocalizedStringsModel.DefaultCulture, "Asset access" },
             { "de", "Zugriff auf Assets" },
         };
 
+        /// <summary>
+        /// The localized strings
+        /// </summary>
         public LocalizedStringsModel Description => new()
         {
             { LocalizedStringsModel.DefaultCulture, "Provides services to read, search and download assets from HelloWorld." },
             { "de", "Stellt Dienste zum Lesen, Suchen und Herunterladen von HelloWorld-Assets zur Verfügung." }
         };
 
+        /// <summary>
+        /// Optional data adapter logo link
+        /// </summary>
         public string LogoUrl => null;
 
+        /// <summary>
+        /// Optional link for the data adapter icon
+        /// </summary>
         public string IconUrl => null;
 
+        /// <summary>
+        /// The type of data adapter configuration
+        /// </summary>
         public Type ConfigurationImplementation => typeof(HelloWorldAssetsDataAdapterConfiguration);
 
+        /// <summary>
+        /// The type of data adapter implementation
+        /// </summary>
         public Type ComponentImplementation => typeof(HelloWorldAssetsDataAdapter);
 
+        /// <summary>
+        /// <see cref="IServiceCollection"/> injection hook for this data adapter
+        /// </summary>
+        public void ConfigureServices(IServiceCollection services)
+        {
+        }
+
+        /// <summary>
+        /// Returns which connector should be used by the data adapter
+        /// </summary>
         public string ConnectorKey => HelloWorldConnectorStartup.HelloWorldConnector;
 
+        /// <summary>
+        /// Describes the permissions that the data adapter requires
+        /// </summary>
         public DataAdapterPermission[] Permissions => null;
 
+        /// <summary>
+        /// Defines which interfaces should be implemented by the current data adapter so that the Smint.Io infrastructure knows how to include them
+        /// For additional interfaces, feel free to contact Smint.Io
+        /// </summary>
         public Type[] PublicApiInterfaces => new[] { typeof(IAssets) };
     }
 }

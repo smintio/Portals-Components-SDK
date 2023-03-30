@@ -15,8 +15,14 @@ using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 
 namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
 {
+    /// <summary>
+    /// Implements various hooking methods to Smint.Io infrastructure responsible for delivering data related to assets
+    /// </summary>
     public partial class HelloWorldAssetsDataAdapter : AssetsDataAdapterBaseImpl
     {
+        /// <summary>
+        /// Gets <see cref="AssetDownloadStreamModel"/> for a thumbnail size that was previously described in the <see cref="HelloWorldContentConverter.SetThumbnails"/> for a particular asset identifier
+        /// </summary>
         public async override Task<AssetDownloadStreamModel> GetAssetThumbnailDownloadStreamAsync(
             AssetIdentifier assetId,
             ContentTypeEnumDataObject contentType,
@@ -133,6 +139,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
                 streamResponse.Stream);
         }
 
+        /// <summary>
+        /// Helper method to calculate the external systems dynamic thumbnail URL based on a thumbnail specification defined by <see cref="HelloWorldContentConverter.SetThumbnails"/>
+        /// </summary>
         private static string GetDynamicAssetThumbnailUrl(HelloWorldAssetResponse helloWorldAssetRespons, string thumbnailSpec)
         {
             string thumbnailUrl;
@@ -153,6 +162,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
             return thumbnailUrl;
         }
 
+        /// <summary>
+        /// A Smint.Io hook that returns original asset stream or any other allow list output format in the form of <see cref="AssetDownloadStreamModel"/>
+        /// </summary>
         public async override Task<AssetDownloadStreamModel> GetAssetDownloadStreamAsync(AssetIdentifier assetId, AssetDownloadItemMappingModel assetDownloadItemMappingModel, long? maxFileSizeBytes)
         {
             if (assetId == null)
@@ -205,6 +217,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
                 streamResponse.Stream);
         }
 
+        /// <summary>
+        /// A Smint.Io hook that queries an external system for asset-related data by identifier
+        /// </summary>
         public override async Task<GetAssetResult> GetAssetAsync(GetAssetParameters parameters)
         {
             if (parameters == null)
@@ -236,6 +251,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
             };
         }
 
+        /// <summary>
+        /// A Smint.Io hook that queries an external system for asset-related data by multiple identifiers
+        /// </summary>
         public async override Task<GetAssetsResult> GetAssetsAsync(GetAssetsParameters parameters, IProgressMonitor progressMonitor)
         {
             if (parameters == null)
@@ -312,6 +330,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
             };
         }
 
+        /// <summary>
+        /// A Smint.Io hook that queries an external system for asset-related permissions
+        /// </summary>
         public override Task<GetAssetsPermissionsResult> GetAssetsPermissionsAsync(GetAssetsPermissionsParameters parameters)
         {
             return Task.FromResult<GetAssetsPermissionsResult>(null);

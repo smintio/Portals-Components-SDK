@@ -10,6 +10,10 @@ using SmintIo.Portals.SDK.Core.Models.Metamodel.Model;
 
 namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
 {
+    /// <summary>
+    /// The data adapter broken down into multiple partial classes
+    /// The other parts are usually located in the `Search`, `Reading`, and `Random` folders.
+    /// </summary>
     public partial class HelloWorldAssetsDataAdapter : AssetsDataAdapterBaseImpl
     {
         private readonly ILogger _logger;
@@ -34,6 +38,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Defines what features the data adapter supports
+        /// </summary>
         public override Task<GetAssetsSearchFeatureSupportResult> GetFeatureSupportAsync(GetAssetsSearchFeatureSupportParameters parameters)
         {
             var featureSupport = new GetAssetsSearchFeatureSupportResult
