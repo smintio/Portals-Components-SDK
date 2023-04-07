@@ -1,7 +1,7 @@
 {
     "name": "@smintio/ui-example-hello-world-1",
     "description": "Smint.io Portals UI example component hello world",
-    "version": "0.0.3",
+    "version": "1.0.0",
     "author": "Smint.io GmbH",
     "private": false,
     "type-check": "tsc",
