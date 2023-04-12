@@ -399,6 +399,7 @@ always-auth=true
 
 	- You did not properly provide the SMINT_IO_SDK_HOME environment variable
 	- You did not adjust the package.json scripts to handle Mac or Linux - note the default scripts are tuned for Windows users
+	- You did not use the proper tool builds for your operating system
 	- There is authorization issues with your NPM setup (see previous chapter for more instructions)
 	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
 	
