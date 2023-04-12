@@ -258,7 +258,7 @@ An example for crafting your own page template will follow soon.
 
 The `package.json` scripts you find in the example component are tuned at Windows users.
 
-For Mac or Linux users, you have to change your `package.json`. Please change the `smint-io-pc` script parts as follows:
+For Mac or Linux users, you have to change your `package.json`. Please change the `smint-io-pc` script parts as follows (remove .exe extension of the executable file, and fix the environment variable reference from `%SMINT_IO_SDK_HOME%` to `$SMINT_IO_SDK_HOME`):
 
 ```
 "smint-io-pc:development": "npm publish && npm info --json | $SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI -env development",
