@@ -262,7 +262,7 @@ Steps to follow:
 always-auth=true
 ```
 
-7. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
+7. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our NPM SDK  repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
 8. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
 
 ```
@@ -367,7 +367,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 always-auth=true
 ```
 
-4. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and by then clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
+4. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our NPM SDK repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and by then clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
 5. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
 
 ```
