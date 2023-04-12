@@ -258,7 +258,7 @@ An example for crafting your own page template will follow soon.
 
 The `package.json` scripts you find in the example component are tuned at Windows users.
 
-For Mac or Linux users, you have to change your `package.json`. Please change the `smint-io-pc` script parts as follows (remove .exe extension of the executable file, and fix the environment variable reference from `%SMINT_IO_SDK_HOME%` to `$SMINT_IO_SDK_HOME`):
+For Mac or Linux users, you have to change your `package.json`. Please change the `smint-io-pc` script parts as follows (remove .exe extension of the executable file, fix the environment variable reference from `%SMINT_IO_SDK_HOME%` to `$SMINT_IO_SDK_HOME`, and fix the path separator):
 
 ```
 "smint-io-pc:development": "npm publish && npm info --json | $SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI -env development",
@@ -341,7 +341,7 @@ By default, [package.json](ui-example-hello-world-1/package.json) is used by the
 1. Run `npm run build` to ensure the latest version will be published
 1. Run `npm run smint-io-pc` to publish to the Smint.io `Staging` environment
 
-	- If the component already exists in the npm registry the component can be deployed by running `npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging` 
+	- If the component already exists in the npm registry the component can be deployed by running `npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging` (for Windows users) or `npm info --json | $SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI -env staging` (for Mac or Linux users)
 
 1. A browser window will open for you to authenticate to allow the component to be published
     - If successful, the window will close after a few seconds
