@@ -274,7 +274,7 @@ always-auth=true
 
 10. Run `npm i` at the first time, or when you update dependencies
 
-	- If there is any authorization issues you are running into, you will have done something wrong in step 3-6. Please revisit your settings
+	- If there is any authorization issues you are running into, you will have done something wrong in step 6-9. Please revisit your settings
 	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
 	
 11. Please adjust `src/PortalsUiComponent.vue` accordingly
