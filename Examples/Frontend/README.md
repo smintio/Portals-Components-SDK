@@ -236,6 +236,7 @@ Learn more about how to do that [here](https://github.com/smintio/Portals-Compon
 
 Steps to follow:
 
+1. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
 1. Navigate to a folder where the components should be physically present. We will call it the root folder
 1. Copy the `ui-example-hello-world-1` directory from this repository to the root folder as a starting point
 1. Rename the `ui-example-hello-world-1` directory to your desired frontend component name
