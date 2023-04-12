@@ -395,6 +395,13 @@ always-auth=true
 
 	- If the component already exists in the npm registry the component can be deployed by running `npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging` (for Windows users) or `npm info --json | $SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI -env staging` (for Mac or Linux users)
 
+1. If you run into any issues in running the command, it is likely one of the following causes:
+
+	- You did not properly provide the SMINT_IO_SDK_HOME environment variable
+	- You did not adjust the package.json scripts to handle Mac or Linux - note the default scripts are tuned for Windows users
+	- There is authorization issues with your NPM setup (see previous chapter for more instructions)
+	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
+	
 1. A browser window will open for you to authenticate to allow the component to be published
     - If successful, the window will close after a few seconds
     - The message *You can now return to the application.* will also indicate success
