@@ -318,6 +318,8 @@ By default, [package.json](ui-example-hello-world-1/package.json) is used by the
 ### Build your custom frontend component
 
 1. In the component folder open a command prompt or terminal window
+1. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
+1. Run `npm i` at the first time, or when you update dependencies
 1. Run `npm run build` or `npm run watch` to build your frontend component
 
 ### Publish your custom frontend component
