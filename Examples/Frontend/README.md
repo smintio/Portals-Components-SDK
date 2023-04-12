@@ -21,8 +21,8 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
 1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
-1. [Extras for Smint.io Certified partners]()
-1. [Problems]()
+1. [Extras for Smint.io Certified partners](#user-content-extras-for-smintio-certified-partners)
+1. [Problems](#user-content-problems)
 
 Current version of this document is: 1.0.1 (as of 12th of April, 2023)
 
