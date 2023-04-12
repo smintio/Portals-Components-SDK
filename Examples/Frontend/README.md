@@ -21,6 +21,8 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
 1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
+1. [Extras for Smint.io Certified partners]()
+1. [Problems]()
 
 Current version of this document is: 1.0.1 (as of 12th of April, 2023)
 
@@ -293,24 +295,6 @@ For Mac or Linux users, you have to change your `package.json`. Please change th
 "smint-io-pc:production": "npm publish && npm info --json | $SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI -env production"
 ```
 
-### Extras for Smint.io Certified partners
-
-If you are one of our `Smint.io Certified` partners, you will also get access to the source code of our own Smint.io Portals components. You can then check how we did things, and you can use our code
-as a reference for you to solve your requirements. In this case, we recommend you to check out that source code from [here](https://smintio.visualstudio.com/SmintIo-UIComponents/_git/SmintIo-UIComponents).
-
-1. Check out the `page-templates` directory to find the implementations of our page templates
-
-	- Here you can find a list of our page template components (not up-to-date, but helpful): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-page-templates.md
-	
-2. Check out the `ui-components` directory to find the implementations of our UI components
-
-	- Here you can find a list of our UI components (not up-to-date, but helpful): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-ui-components.md
-	
-3. Check out the `portals-components` directory to find the implementation of our shared component library
-4. Please do not forget to pull this repository regularily, as we constantly update our codebase
-
-If you have any questions about the code, on how to build those components, or whatever else, please do not hesitate to get in touch at [support@smint.io](mailto:support@smint.io)!
-
 ### The example frontend component
 
 The [example Vue.js component itself](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
@@ -445,7 +429,25 @@ More information about the *Portals-SDK-PublishComponent-CLI tool* can be found 
 1. Navigate to your development portal, add your frontend component to a page
 1. Change some code in your frontend component, and refresh the browser page. Enjoy! :)
 
-### Problems
+## Extras for Smint.io Certified partners
+
+If you are one of our `Smint.io Certified` partners, you will also get access to the source code of our own Smint.io Portals components. You can then check how we did things, and you can use our code
+as a reference for you to solve your requirements. In this case, we recommend you to check out that source code from [here](https://smintio.visualstudio.com/SmintIo-UIComponents/_git/SmintIo-UIComponents).
+
+1. Check out the `page-templates` directory to find the implementations of our page templates
+
+	- Here you can find a list of our page template components (not up-to-date, but helpful): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-page-templates.md
+	
+2. Check out the `ui-components` directory to find the implementations of our UI components
+
+	- Here you can find a list of our UI components (not up-to-date, but helpful): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-ui-components.md
+	
+3. Check out the `portals-components` directory to find the implementation of our shared component library
+4. Please do not forget to pull this repository regularily, as we constantly update our codebase
+
+If you have any questions about the code, on how to build those components, or whatever else, please do not hesitate to get in touch at [support@smint.io](mailto:support@smint.io)!
+
+## Problems
 
 Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) if you run into any issues.
 
