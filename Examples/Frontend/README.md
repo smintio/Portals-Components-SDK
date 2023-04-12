@@ -387,6 +387,23 @@ always-auth=true
 	
 8. Run `npm run build` or `npm run watch` to build your frontend component
 
+### Extras for Smint.io Certified partners
+
+If you are one of our `Smint.io Certified` partners, you will also get access to the source code of our own Smint.io Portals components. You can then check how we did things, and you can use our code
+as a reference for you to solve your requirements. In this case, we recommend you to check out that source code from [here](https://smintio.visualstudio.com/SmintIo-UIComponents/_git/SmintIo-UIComponents).
+
+1. Check out the `page-templates` directory to find the implementations of our page templates
+
+	- Here you can find a list of our page template components (not up-to-date, but helpful): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-page-templates.md
+	
+2. Check out the `ui-components` directory to find the implementations of our UI components
+
+	- Here you can find a list of our UI components (not up-to-date, but helpful): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-ui-components.md
+	
+3. Check out the `portals-components` directory to find the implementation of our shared component library
+
+If you have any questions about the code, on how to build those components, or whatever else, please do not hesitate get in touch at [support@smint.io](mailto:support@smint.io)!
+
 ### Publish your custom frontend component
 
 1. In the component folder open a command prompt or terminal window
