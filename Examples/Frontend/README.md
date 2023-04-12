@@ -309,7 +309,7 @@ as a reference for you to solve your requirements. In this case, we recommend yo
 3. Check out the `portals-components` directory to find the implementation of our shared component library
 4. Please do not forget to pull this repository regularily, as we constantly update our codebase
 
-If you have any questions about the code, on how to build those components, or whatever else, please do not hesitate get in touch at [support@smint.io](mailto:support@smint.io)!
+If you have any questions about the code, on how to build those components, or whatever else, please do not hesitate to get in touch at [support@smint.io](mailto:support@smint.io)!
 
 ### The example frontend component
 
