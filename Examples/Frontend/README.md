@@ -89,7 +89,7 @@ nightmare because of not following this rule).
 *UI component ID and UI component type*
 
 Each Smint.io Portals UI component has an ID that is being defined by the developer of the UI component. Please prefix
-your UI component IDs by your domain (e.g. *smintio-* or *smint-io-*) to avoid ID clashes. On top of that it is assigned
+your UI component IDs by your partner ID (e.g. `smintio-`) to avoid ID clashes. On top of that it is assigned
 to an UI component type. There is a predefined list of UI component types (see below) which is maintained by Smint.io.
 If you need an additional UI component type, please get in touch.
 
@@ -135,7 +135,7 @@ padding and margins between all of their UI components.
 *Page template ID and page type*
 
 Each Smint.io Portals page template has an ID that is being defined by the developer of the page template. Please prefix
-your page template IDs by your domain (e.g. *smintio-* or *smint-io-*) to avoid ID clashes. On top of that it is
+your page template IDs by your partner ID (e.g. `smintio-`) to avoid ID clashes. On top of that it is
 assigned to a page type. There is a predefined list of page types (see below) which is maintained by Smint.io. If you
 need an additional page type, please get in touch.
 
@@ -162,7 +162,7 @@ Smint.io Portal from the portal template.
 *Portal template ID and portal type*
 
 Each Smint.io Portals portal template has an ID that is being defined by the developer of the portal template. Please
-prefix your portal template IDs by your domain (e.g. *smintio-* or *smint-io-*) to avoid ID clashes. On top of that it
+prefix your portal template IDs by your partner ID (e.g. `smintio-`) to avoid ID clashes. On top of that it
 is assigned to a portal type. There is a predefined list of portal types (see below) which is maintained by Smint.io. If
 you need an additional portal type, please get in touch.
 
@@ -251,7 +251,7 @@ Steps to follow:
 
 4. Edit the `package.json` file in the new directory, and change `name`, `description`, `version` and `author` of your new frontend component
 
-	- Prefix the package `name` with your domain e.g. `@smint-io/` or `@smintio/`
+	- Prefix the package `name` with your partner ID e.g. `@smintio/`
 	- Then simply add the directory name from the previous step as the package name
 
 5. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
