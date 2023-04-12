@@ -234,6 +234,12 @@ Learn more about how to do that [here](https://github.com/smintio/Portals-Compon
 
 ### Getting started
 
+Please note that access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io)
+and request access. Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals
+Enterprise plan customers.
+
+You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
+
 Steps to follow:
 
 1. Navigate to a folder where the components should be physically present. We will call it the root folder
@@ -249,6 +255,7 @@ Steps to follow:
 	- Then simply add the directory name from the previous step as the package name
 
 1. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
+1. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo
 1. Run `npm i` at the first time, or when you update dependencies
 1. Please adjust `src/PortalsUiComponent.vue` accordingly
 
@@ -330,8 +337,15 @@ By default, [package.json](ui-example-hello-world-1/package.json) is used by the
 
 ### Build your custom frontend component
 
+Please note that access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io)
+and request access. Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals
+Enterprise plan customers.
+
+You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
+
 1. In the component folder open a command prompt or terminal window
 1. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
+1. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo
 1. Run `npm i` at the first time, or when you update dependencies
 1. Run `npm run build` or `npm run watch` to build your frontend component
 
