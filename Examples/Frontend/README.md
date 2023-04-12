@@ -263,7 +263,7 @@ always-auth=true
 ```
 
 1. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and clicking `Connect to feed` -> npm -> select `Windows` or `Other` for instructions)
-1. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo:
+1. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
 
 ```
 @[partner-id]:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Partners-[partner-id]/npm/registry/ 
@@ -288,7 +288,6 @@ For Mac or Linux users, you have to change your `package.json`. Please change th
 "smint-io-pc": "npm publish && npm info --json | $SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI -env staging",
 "smint-io-pc:production": "npm publish && npm info --json | $SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI -env production"
 ```
-
 
 ### The example frontend component
 
@@ -369,7 +368,7 @@ always-auth=true
 ```
 
 1. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and by then clicking `Connect to feed` -> npm -> select `Windows` or `Other` for instructions)
-1. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo:
+1. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
 
 ```
 @[partner-id]:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Partners-[partner-id]/npm/registry/ 
