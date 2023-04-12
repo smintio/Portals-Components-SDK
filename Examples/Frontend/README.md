@@ -22,7 +22,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
 
-Current version of this document is: 1.0.0 (as of 25th of November, 2022)
+Current version of this document is: 1.0.1 (as of 12th of April, 2023)
 
 ## UI components
 
