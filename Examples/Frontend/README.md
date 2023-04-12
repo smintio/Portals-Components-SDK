@@ -254,6 +254,18 @@ Steps to follow:
 
 An example for crafting your own page template will follow soon.
 
+### Things to do for Mac or Linux users
+
+The `package.json` scripts you find in the example component are tuned at Windows users.
+
+For Mac or Linux users, you have to change your `package.json`. Please change the `smint-io-pc` script parts as follows:
+
+```"smint-io-pc:development": "npm publish && npm info --json | $SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI -env development",
+    "smint-io-pc": "npm publish && npm info --json | $SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI -env staging",
+    "smint-io-pc:production": "npm publish && npm info --json | $SMINT_IO_SDK_HOME/SmintIo.Portals.SDK.PublishComponent.CLI -env production"
+```
+
+
 ### The example frontend component
 
 The [example Vue.js component itself](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
