@@ -273,6 +273,10 @@ always-auth=true
 9. If applicable, authorize your NPM for use of your partner NPM repo. You will find more info by accessing the Azure DevOps location of your partner repo (https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Partners-[partner-id]) and by then clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
 
 10. Run `npm i` at the first time, or when you update dependencies
+
+	- If there is any authorization issues you are running into, you will have done something wrong in step 3-6. Please revisit your settings
+	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
+	
 11. Please adjust `src/PortalsUiComponent.vue` accordingly
 
 An example for crafting your own page template will follow soon.
@@ -377,6 +381,10 @@ always-auth=true
 
 6. If applicable, authorize your NPM for use of your partner NPM repo. You will find more info by accessing the Azure DevOps location of your partner repo (https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Partners-[partner-id]) and by then clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
 7. Run `npm i` at the first time, or when you update dependencies
+
+	- If there is any authorization issues you are running into, you will have done something wrong in step 3-6. Please revisit your settings
+	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
+	
 8. Run `npm run build` or `npm run watch` to build your frontend component
 
 ### Publish your custom frontend component
