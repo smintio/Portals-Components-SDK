@@ -243,37 +243,37 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 Steps to follow:
 
 1. Navigate to a folder where the components should be physically present. We will call it the root folder
-1. Copy the `ui-example-hello-world-1` directory from this repository to the root folder as a starting point
-1. Rename the `ui-example-hello-world-1` directory to your desired frontend component name
+2. Copy the `ui-example-hello-world-1` directory from this repository to the root folder as a starting point
+3. Rename the `ui-example-hello-world-1` directory to your desired frontend component name
 
 	- Start the directory name with `ui-` for UI components, and `page-` for page templates
 	- End the directory name with `-1` so that later on, if desired, you can potentially create different variations of the frontend component
 
-1. Edit the `package.json` file in the new directory, and change `name`, `description`, `version` and `author` of your new frontend component
+4. Edit the `package.json` file in the new directory, and change `name`, `description`, `version` and `author` of your new frontend component
 
 	- Prefix the package `name` with your domain e.g. `@smint-io/` or `@smintio/`
 	- Then simply add the directory name from the previous step as the package name
 
-1. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
-1. Make sure that your component .npmrc file contains the proper reference to our NPM SDK repo:
+5. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
+6. Make sure that your component .npmrc file contains the proper reference to our NPM SDK repo:
 
 ```
 @smintio:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Public/npm/registry/
 always-auth=true
 ```
 
-1. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and clicking `Connect to feed` -> npm -> select `Windows` or `Other` for instructions)
-1. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
+7. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and clicking `Connect to feed` -> npm -> select `Windows` or `Other` for instructions)
+8. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
 
 ```
 @[partner-id]:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Partners-[partner-id]/npm/registry/ 
 always-auth=true
 ```
 
-1. If applicable, authorize your NPM for use of your partner NPM repo. You will find more info by accessing the Azure DevOps location of your partner repo and by then clicking `Connect to feed` -> npm -> select `Windows` or `Other` for instructions)
+9. If applicable, authorize your NPM for use of your partner NPM repo. You will find more info by accessing the Azure DevOps location of your partner repo and by then clicking `Connect to feed` -> npm -> select `Windows` or `Other` for instructions)
 
-1. Run `npm i` at the first time, or when you update dependencies
-1. Please adjust `src/PortalsUiComponent.vue` accordingly
+10. Run `npm i` at the first time, or when you update dependencies
+11. Please adjust `src/PortalsUiComponent.vue` accordingly
 
 An example for crafting your own page template will follow soon.
 
@@ -359,25 +359,25 @@ Enterprise plan customers.
 You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
 
 1. In the component folder open a command prompt or terminal window
-1. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
-1. Make sure that your component .npmrc file contains the proper references to our NPM SDK repo:
+2. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
+3. Make sure that your component .npmrc file contains the proper references to our NPM SDK repo:
 
 ```
 @smintio:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Public/npm/registry/
 always-auth=true
 ```
 
-1. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and by then clicking `Connect to feed` -> npm -> select `Windows` or `Other` for instructions)
-1. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
+4. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and by then clicking `Connect to feed` -> npm -> select `Windows` or `Other` for instructions)
+5. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
 
 ```
 @[partner-id]:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Partners-[partner-id]/npm/registry/ 
 always-auth=true
 ```
 
-1. If applicable, authorize your NPM for use of your partner NPM repo. You will find more info by accessing the Azure DevOps location of your partner repo and by then clicking `Connect to feed` -> npm -> select `Windows` or `Other` for instructions)
-1. Run `npm i` at the first time, or when you update dependencies
-1. Run `npm run build` or `npm run watch` to build your frontend component
+6. If applicable, authorize your NPM for use of your partner NPM repo. You will find more info by accessing the Azure DevOps location of your partner repo and by then clicking `Connect to feed` -> npm -> select `Windows` or `Other` for instructions)
+7. Run `npm i` at the first time, or when you update dependencies
+8. Run `npm run build` or `npm run watch` to build your frontend component
 
 ### Publish your custom frontend component
 
