@@ -88,6 +88,11 @@ content *MUST NOT* exceed the UI component's layout box. This is to make sure th
 page stay regular and look good (I am sure you know of situations where padding and margin management quickly became a
 nightmare because of not following this rule).
 
+*Settings*
+
+Your Smint.io Portals UI component should only have settings that actually work. Please do *NEVER* add settings to 
+your Smint.io Portals UI component that have no effect!
+
 *UI component ID and UI component type*
 
 Each Smint.io Portals UI component has an ID that is being defined by the developer of the UI component. Please prefix
@@ -133,6 +138,11 @@ environment upon render time and is responsible to render the UI components to t
 
 Page templates are responsible for padding and margin management. This means that page templates *MUST* take care about
 padding and margins between all of their UI components.
+
+*Settings*
+
+Your Smint.io Portals UI component should only have settings that actually work. Please do *NEVER* add settings to 
+your Smint.io Portals UI component that have no effect!
 
 *Page template ID and page type*
 
