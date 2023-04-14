@@ -43,7 +43,6 @@ This data adapter implements the *IAssets* data adapter interface.
 This data adapter implements the *IAssets* data adapter interface.
 
 - [Root directory](DataAdapters/DataAdapter-SharePoint/)
-- [Data adapter README.md](DataAdapters/DataAdapter-SharePoint/README.md)
 - [Test driver README.md](DataAdapters/Portals-Sharepoint-TestDriver/README.md)
 
 #### Picturepark Connector
@@ -54,6 +53,10 @@ This data adapter implements the *IAssets* data adapter interface.
 
 - [Root directory](DataAdapters/DataAdapter-Picturepark/)
 - [Test driver](DataAdapters/Portals-Picturepark-TestDriver/)
+
+#### Root
+
+- [Data adapter README.md](DataAdapters/README.md)
 
 ## Connector description & flow
 
