@@ -141,8 +141,8 @@ padding and margins between all of their UI components.
 
 *Settings*
 
-Your Smint.io Portals UI component should only have settings that actually work. Please do *NEVER* add settings to 
-your Smint.io Portals UI component that have no effect!
+Your Smint.io Portals page template should only have settings that actually work. Please do *NEVER* add settings to 
+your Smint.io Portals page template that have no effect!
 
 *Page template ID and page type*
 
