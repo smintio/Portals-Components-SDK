@@ -41,7 +41,6 @@ export default (pkg, packagePath) => {
                     "@smintio/portals-component-sdk": "smintio-portals-component-sdk",
                     "@smintio/portals-core": "smintio-portals-core",
                     "@smintio/portals-components": "smintio-portals-components",
-                    "@smintio/helpers": "smintio-helpers",
                     tslib: "tslib",
                     "vue-class-component": "VueClassComponent",
                     "vue-property-decorator": "VuePropertyDecorator",
@@ -63,7 +62,6 @@ return exports;
         external: [
             "@smintio/portals-component-sdk",
             "@smintio/portals-components",
-            "@smintio/helpers",
             "@smintio/portals-core",
             "tslib",
             "vue",

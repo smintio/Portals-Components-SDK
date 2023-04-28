@@ -19,7 +19,6 @@
         "smint-io-pc:production": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env production"
     },
     "dependencies": {
-        "@smintio/helpers": "1.4.7",
         "@smintio/mpa-page-helpers": "0.6.1",
         "@smintio/portals-component-sdk": "1.5.2",
         "@smintio/portals-components": "5.4.0",
