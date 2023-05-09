@@ -7,7 +7,7 @@
     <Version>1.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="5.4.31" />
+    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="5.4.32" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Connectors\Connector-HelloWorld\Connector-HelloWorld.csproj">
