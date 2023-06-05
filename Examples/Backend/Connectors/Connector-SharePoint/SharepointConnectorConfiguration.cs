@@ -37,6 +37,15 @@ namespace SmintIo.Portals.Connector.SharePoint
         [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, false)]
         public string SiteId { get; set; }
 
+        [DisplayName("en", "SharePoint site ID", IsDefault = true)]
+        [DisplayName("de", "SharePoint Site ID")]
+        [Description("en", "Please enter the SharePoint site ID of the SharePoint site whose documents structure should be processed by this connector.",
+            IsDefault = true)]
+        [Description("de",
+            "Bitte geben Sie die SharePoint Site ID der SharePoint Site ein, deren Dokumentenstruktur von diesem Connector verarbeitet werden soll.")]
+        [FormItemVisibility(Visibility = FormItemVisibilityEnum.Advanced)]
+        public string SiteIdString { get; set; }
+
         [DisplayName("en", "SharePoint drive", IsDefault = true)]
         [DisplayName("de", "SharePoint-Laufwerk")]
         [Description("en", "Please select the SharePoint drive whose documents structure should be processed by this connector.",
@@ -94,16 +103,6 @@ namespace SmintIo.Portals.Connector.SharePoint
         [Description("de", "Bitte geben Sie das Client-Secret Ihrer Azure App-Registrierung ein.")]
         [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, true)]
         public string ClientSecret { get; set; }
-
-        [DisplayName("en", "SharePoint site ID", IsDefault = true)]
-        [DisplayName("de", "SharePoint Site ID")]
-        [Description("en", "Please enter the SharePoint site ID of the SharePoint site whose documents structure should be processed by this connector.",
-            IsDefault = true)]
-        [Description("de",
-            "Bitte geben Sie die SharePoint Site ID der SharePoint Site ein, deren Dokumentenstruktur von diesem Connector verarbeitet werden soll.")]
-        [FormItemVisibility(Visibility = FormItemVisibilityEnum.Advanced)]
-        [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, true)]
-        public string SiteIdString { get; set; }
 
         [DisplayName("en", "SharePoint drive", IsDefault = true)]
         [DisplayName("de", "SharePoint-Laufwerk")]

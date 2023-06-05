@@ -89,20 +89,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
             {
                 driveItemsChangesList = await _sharepointClient.GetDriveItemChangesListAsync(deltaLink: parameters.LastContinuationId).ConfigureAwait(false);
             }
-            catch (UriFormatException ex)
-            {
-                if (!string.Equals(ex.Message, "Invalid URI: The format of the URI could not be determined.", StringComparison.OrdinalIgnoreCase))
-                {
-                    throw;
-                }
-
-                driveItemsChangesList = new DriveItemChangesListModel
-                {
-                    ContinuationTooOld = true
-                };
-            }
             catch (ExternalDependencyException ex)
-            when (ex.ErrorCode == ExternalDependencyStatusEnum.CompatiblityIssue)
+            when (ex.ErrorCode == ExternalDependencyStatusEnum.ContinuationUuidTooOld)
             {
                 driveItemsChangesList = new DriveItemChangesListModel
                 {
