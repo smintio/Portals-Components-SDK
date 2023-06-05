@@ -8,6 +8,7 @@ using Picturepark.SDK.V1.Contract;
 using SmintIo.Portals.Connector.Picturepark.Client;
 using SmintIo.Portals.Connector.Picturepark.Search;
 using SmintIo.Portals.DataAdapter.Picturepark.Assets.Common;
+using SmintIo.Portals.DataAdapter.Picturepark.Assets.Extensions;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Constants;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Impl;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
@@ -21,8 +22,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 {
     public partial class PictureparkAssetsDataAdapter : AssetsDataAdapterBaseImpl
     {
-        private const string AllowedCharactersPattern = @"[^a-zA-Z0-9 ]";
-
         public override Task<GetAssetsSearchFeatureSupportResult> GetFeatureSupportAsync(GetAssetsSearchFeatureSupportParameters parameters)
         {
             return Task.FromResult(new GetAssetsSearchFeatureSupportResult()
@@ -134,6 +133,40 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                             }
                         }
                     }
+                }
+            }
+
+            if (parameters.ContentType.HasValue)
+            {
+                var pictureparkContentTypes = parameters.ContentType.GetPictureparkContentTypes();
+
+                var contentTypeAggregationFilter = new AggregationFilter()
+                {
+                    Filter = new TermsFilter
+                    {
+                        Field = nameof(ContentDetail.ContentType).ToLowerCamelCase(),
+                        Terms = pictureparkContentTypes
+                    }
+                };
+
+                var selectedContentTypeAggregationFilter = aggregationFilters.FirstOrDefault(af => af.AggregationName == "contentType");
+
+                if (selectedContentTypeAggregationFilter == null)
+                {
+                    aggregationFilters.Add(contentTypeAggregationFilter);
+                }
+                else
+                {
+                    var orFilter = new OrFilter()
+                    {
+                        Filters = new List<FilterBase>()
+                        {
+                            selectedContentTypeAggregationFilter.Filter,
+                            contentTypeAggregationFilter.Filter
+                        }
+                    };
+
+                    selectedContentTypeAggregationFilter.Filter = orFilter;
                 }
             }
 
@@ -331,6 +364,40 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                             }
                         }
                     }
+                }
+            }
+
+            if (parameters.ContentType.HasValue)
+            {
+                var pictureparkContentTypes = parameters.ContentType.GetPictureparkContentTypes();
+
+                var contentTypeAggregationFilter = new AggregationFilter()
+                {
+                    Filter = new TermsFilter
+                    {
+                        Field = nameof(ContentDetail.ContentType).ToLowerCamelCase(),
+                        Terms = pictureparkContentTypes
+                    }
+                };
+
+                var selectedContentTypeAggregationFilter = aggregationFilters.FirstOrDefault(af => af.AggregationName == "contentType");
+
+                if (selectedContentTypeAggregationFilter == null)
+                {
+                    aggregationFilters.Add(contentTypeAggregationFilter);
+                }
+                else
+                {
+                    var orFilter = new OrFilter()
+                    {
+                        Filters = new List<FilterBase>()
+                        {
+                            selectedContentTypeAggregationFilter.Filter,
+                            contentTypeAggregationFilter.Filter
+                        }
+                    };
+
+                    selectedContentTypeAggregationFilter.Filter = orFilter;
                 }
             }
 

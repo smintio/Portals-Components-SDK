@@ -45,7 +45,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
         private readonly ConnectorMetamodel _metamodel;
 
-        public SharepointMetamodelBuilder(ILogger logger, ISharepointClient sharepointClient, string siteId, string siteListId, IEnumerable<string> siteFolderIds)
+        public SharepointMetamodelBuilder(ILogger logger, ISharepointClient sharepointClient, string siteId, string siteDriveId, string siteListId, IEnumerable<string> siteFolderIds)
         {
             _logger = logger;
             _sharepointClient = sharepointClient;
@@ -56,7 +56,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
             var foldersHash = GetMD5EncodeHash(folderIds);
 
             _metamodel = new ConnectorMetamodel(
-                $"{SharepointConnectorStartup.SharepointConnector}-{siteId}-{siteListId}-{foldersHash}",
+                $"{SharepointConnectorStartup.SharepointConnector}-{siteId}-{siteDriveId}-{siteListId}-{foldersHash}",
                 isRandomAccessSupported: true,
                 isFullTextSearchProposalsSupported: false,
                 isFolderNavigationSupported: false);
@@ -272,7 +272,12 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                 }
 
                 var addressEntityModelKey = $"{locationColumnDefinition.Name}_{AddressModel.Key}";
-                var addressEntityModel = CreateEntityModel(addressEntityModelKey, AddressModel.Key.Localize());
+
+                var (culture, _, _) = LocalizedStringColumnParser.GetCultureAndTranslation(locationColumnDefinition.DisplayName, trimParent: false);
+
+                var addressEntityLabel = locationColumnDefinition.DisplayName.LocalizeByCulture(culture);
+
+                var addressEntityModel = CreateEntityModel(addressEntityModelKey, addressEntityLabel);
 
                 foreach (var columnDefinitionResponse in columnDefinitionResponses)
                 {
@@ -296,7 +301,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                     }
 
                     var propertyName = columnDefinitionKey;
-                    var propertyLabel = columnDefinitionResponse.DisplayName.Localize();
+                    var propertyLabel = columnDefinitionResponse.DisplayName.LocalizeByCulture(culture);
 
                     // Sharepoint is inconsistent, the json object has a property of DisplayName instead of DispName.
                     if (propertyName.Equals(nameof(LocationModel.DispName), StringComparison.OrdinalIgnoreCase))
@@ -318,7 +323,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
                 var addressEntity = _metamodel.AddEntity(addressEntityModel);
 
-                locationEntityModel.AddProperty(AddressModel.Key, DataType.DataObject, addressEntity.Key, AddressModel.Key.Localize());
+                locationEntityModel.AddProperty(AddressModel.Key, DataType.DataObject, addressEntity.Key, addressEntityLabel);
             }
         }
 
@@ -388,7 +393,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
         private void TryAddTaxonomyProperties(IEnumerable<ColumnDefinitionResponse> columnDefinitionResponses)
         {
             var taxonomyColumnDefinitions = columnDefinitionResponses
-                .Where(cdr => cdr.FieldType == SharepointFieldType.TaxonomyMulti)
+                .Where(cdr => cdr.FieldType == SharepointFieldType.Taxonomy || cdr.FieldType == SharepointFieldType.TaxonomyMulti)
                 .ToArray();
 
             if (taxonomyColumnDefinitions.Length == 0)

@@ -155,9 +155,25 @@ namespace SmintIo.Portals.Connector.SharePoint
         {
             var sharepointClient = EnsureSharepointClient();
 
-            var siteId = _configuration.HighSecurityMode
-                ? _configuration.SiteIdString
-                : _configuration.SiteId;
+            string siteId;
+
+            if (_configuration.HighSecurityMode)
+            {
+                siteId = _configuration.SiteIdString;
+            }
+            else
+            {
+                siteId = _configuration.SiteId;
+
+                if (string.IsNullOrEmpty(siteId))
+                {
+                    siteId = _configuration.SiteIdString;
+                }
+            }
+                
+            var siteDriveId = _configuration.HighSecurityMode
+                ? _configuration.SiteDriveIdString
+                : _configuration.SiteDriveId;
 
             var siteListId = _configuration.HighSecurityMode
                 ? _configuration.SiteListIdString
@@ -165,7 +181,7 @@ namespace SmintIo.Portals.Connector.SharePoint
 
             var siteFolderIds = GetSiteFolderIds();
 
-            var sharepointMetamodelBuilder = new SharepointMetamodelBuilder(_logger, sharepointClient, siteId, siteListId, siteFolderIds);
+            var sharepointMetamodelBuilder = new SharepointMetamodelBuilder(_logger, sharepointClient, siteId, siteDriveId, siteListId, siteFolderIds);
 
             return sharepointMetamodelBuilder.BuildAsync();
         }
@@ -429,9 +445,21 @@ namespace SmintIo.Portals.Connector.SharePoint
 
         private ISharepointClient EnsureSharepointClient()
         {
-            var siteId = _configuration.HighSecurityMode
-                ? _configuration.SiteIdString
-                : _configuration.SiteId;
+            string siteId;
+
+            if (_configuration.HighSecurityMode)
+            {
+                siteId = _configuration.SiteIdString;
+            }
+            else
+            {
+                siteId = _configuration.SiteId;
+
+                if (string.IsNullOrEmpty(siteId))
+                {
+                    siteId = _configuration.SiteIdString;
+                }
+            }
 
             var siteDriveId = _configuration.HighSecurityMode
                 ? _configuration.SiteDriveIdString
