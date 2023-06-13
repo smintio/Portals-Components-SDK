@@ -40,7 +40,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                         message.Contains("SubStreamCached_Fatal") ||
                         message.Contains("Service_InvalidInput_FileTooBigToConvert") ||
                         message.Contains("OfficeConversion_BadRequest") ||
-                        message.Contains("VideoBitrateUnsupported_BitrateTooHigh"))
+                        message.Contains("VideoBitrateUnsupported_BitrateTooHigh") ||
+                        message.Contains("Web_416RequestedRangeNotSatisfiable"))
                     {
                         // permanent error, occuring when reading streams
                         // this will cause the returned stream to be NULL
@@ -113,7 +114,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                         string.Equals(errorCode, "SubStreamCached_Fatal") ||
                         string.Equals(errorCode, "Service_InvalidInput_FileTooBigToConvert") ||
                         string.Equals(errorCode, "OfficeConversion_BadRequest") ||
-                        string.Equals(errorCode, "VideoBitrateUnsupported_BitrateTooHigh"))
+                        string.Equals(errorCode, "VideoBitrateUnsupported_BitrateTooHigh") ||
+                        string.Equals(errorCode, "Web_416RequestedRangeNotSatisfiable"))
                     {
                         // permanent error, occuring when reading streams
                         // this will cause the returned stream to be NULL
