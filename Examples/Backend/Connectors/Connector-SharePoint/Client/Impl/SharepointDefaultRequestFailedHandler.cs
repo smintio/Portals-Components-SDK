@@ -37,6 +37,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                     if (message.Contains("VideoProcessing_ByteStreamTypeNotSupported") ||
                         message.Contains("SubStreamCached_GeneralFailure") ||
                         message.Contains("SubStreamCached_FileTooBig") ||
+                        message.Contains("SubStreamCached_Fatal") ||
                         message.Contains("Service_InvalidInput_FileTooBigToConvert") ||
                         message.Contains("OfficeConversion_BadRequest") ||
                         message.Contains("VideoBitrateUnsupported_BitrateTooHigh"))
@@ -109,6 +110,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                     if (string.Equals(errorCode, "VideoProcessing_ByteStreamTypeNotSupported") ||
                         string.Equals(errorCode, "SubStreamCached_GeneralFailure") ||
                         string.Equals(errorCode, "SubStreamCached_FileTooBig") ||
+                        string.Equals(errorCode, "SubStreamCached_Fatal") ||
                         string.Equals(errorCode, "Service_InvalidInput_FileTooBigToConvert") ||
                         string.Equals(errorCode, "OfficeConversion_BadRequest") ||
                         string.Equals(errorCode, "VideoBitrateUnsupported_BitrateTooHigh"))
