@@ -49,5 +49,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
         public string[] HiResOutputFormatIdList { get; set; }
 
         public MetadataAttributeModel[] SmintIoPreserveMetadataAttributes { get; set; }
+
+        public SmintIoDataSearchIndexFulltextSearchType SmintIoSearchIndexFulltextSearchType { get; set; }
     }
 }
