@@ -26,8 +26,6 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
         public override Task<RequestFailedHandlerResult> HandleOtherExceptionAsync(string requestUri, int tryCount, IPortalsContextModel portalsContextModel, Exception exception)
         {
-            _logger.LogError($"DEBUG: Sharepoint other error: {exception}");
-
             if (exception is ServiceException serviceException)
             {
                 // translate service exception to HttpStatusException, handle other Sharepoint states
@@ -98,8 +96,6 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
         public override Task<RequestFailedHandlerResult> HandleHttpStatusExceptionAsync(HttpStatusException httpStatusException)
         {
-            _logger.LogError($"DEBUG: Sharepoint status exception: {httpStatusException}");
-
             var httpResponseMessage = httpStatusException.HttpResponseMessage;
 
             if (httpResponseMessage != null &&
@@ -127,6 +123,14 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                         return Task.FromResult(RequestFailedHandlerResult.Ignore);
                     }
                 }
+            }
+
+            if (httpStatusException.StatusCode == (int)HttpStatusCode.RequestedRangeNotSatisfiable)
+            {
+                // permanent error, occuring when reading streams
+                // this will cause the returned stream to be NULL
+
+                return Task.FromResult(RequestFailedHandlerResult.Ignore);
             }
 
             return base.HandleHttpStatusExceptionAsync(httpStatusException);
