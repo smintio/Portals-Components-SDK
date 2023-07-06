@@ -272,7 +272,14 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
             if (driveItem == null || driveItem.IsFolder())
             {
-                return new GetAssetChangeResult();
+                return new GetAssetChangeResult
+                {
+                    Change = new ChangeModel
+                    {
+                        UnscopedAssetIdentifier = unscopedId,
+                        Type = ChangeType.AssetDeletion
+                    }
+                };
             }
 
             var converter = new SharepointContentConverter(_logger, Context, _sharepointClient, _entityModelProvider);
@@ -284,6 +291,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 Change = new ChangeModel
                 {
                     UnscopedAssetIdentifier = unscopedId,
+                    Type = ChangeType.AssetUpdate,
                     AssetDataObject = assetDataObject
                 }
             };
