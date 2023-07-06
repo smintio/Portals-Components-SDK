@@ -37,7 +37,7 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Integration
 
         protected override int? PageSize => _fixture.AssetOptions.IntegrationLayerPageSize;
 
-        protected override AssetIdentifier UnknownAssetIdentifier => new($"{Guid.NewGuid()}{StringExtensions.DoubleUnderscore}{Guid.NewGuid()}");
+        protected override AssetIdentifier UnknownAssetIdentifier => new(_fixture.AssetOptions.UnknownAssetIdentifier);
 
         protected override AssetIdentifier ValidButNotFoundAssetIdentifier => new(_fixture.AssetOptions.ValidButNotFoundAssetIdentifier);
 

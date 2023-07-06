@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Picturepark.SDK.V1.Contract;
 using SmintIo.Portals.Connector.Picturepark.Client;
@@ -16,6 +15,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.SDK.Core.Configuration;
 using SmintIo.Portals.SDK.Core.Configuration.Model;
+using SmintIo.Portals.SDK.Core.Helpers;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 
 namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
@@ -487,7 +487,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             if (pageSize > 500)
                 pageSize = 500;
 
-            var sanitizedQuery = Regex.Replace(parameters?.QueryString ?? string.Empty, AllowedCharactersPattern, " ");
+            var sanitizedQuery = StringHelpers.Sanitize(parameters?.QueryString ?? string.Empty);
 
             var (response, contentDetails) = await _client.SearchContentAsync(
                 sanitizedQuery,

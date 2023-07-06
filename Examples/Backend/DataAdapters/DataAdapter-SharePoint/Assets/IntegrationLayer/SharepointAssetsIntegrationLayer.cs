@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Graph;
 using SmintIo.Portals.Connector.SharePoint.Extensions;
 using SmintIo.Portals.Connector.SharePoint.Models;
 using SmintIo.Portals.DataAdapter.SharePoint.Assets.Common;
@@ -241,6 +242,61 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
             }
 
             return assetDataObjectsToUpdate;
+        }
+
+        public async Task<GetAssetChangeResult> GetAssetChangeAsync(GetAssetChangeParameters parameters)
+        {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            var unscopedId = parameters.AssetId?.UnscopedId;
+
+            if (string.IsNullOrEmpty(unscopedId))
+            {
+                return new GetAssetChangeResult();
+            }
+
+            DriveItem driveItem = null;
+
+            try
+            {
+                driveItem = await _sharepointClient.GetDriveItemAsync(unscopedId).ConfigureAwait(false);
+            }
+            catch (ExternalDependencyException e)
+            when (e.IsNotFound())
+            {
+                // no permissions or so...
+            }
+
+            if (driveItem == null || driveItem.IsFolder())
+            {
+                return new GetAssetChangeResult
+                {
+                    Change = new ChangeModel
+                    {
+                        UnscopedAssetIdentifier = unscopedId,
+                        Type = ChangeType.AssetDeletion
+                    }
+                };
+            }
+
+            var converter = new SharepointContentConverter(_logger, Context, _sharepointClient, _entityModelProvider);
+
+            var assetDataObject = await converter.GetAssetDataObjectAsync(driveItem).ConfigureAwait(false);
+
+            var assetChangeResult = new GetAssetChangeResult()
+            {
+                Change = new ChangeModel
+                {
+                    UnscopedAssetIdentifier = unscopedId,
+                    Type = ChangeType.AssetUpdate,
+                    AssetDataObject = assetDataObject
+                }
+            };
+
+            return assetChangeResult;
         }
     }
 }
