@@ -402,23 +402,10 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 throw new NotImplementedException();
             }
 
-            if (progressMonitor != null)
-            {
-                var unscopedIds = parameters
-                    .AssetIds?
-                    .Select(i => i.UnscopedId)
-                    .ToList();
-
-                progressMonitor.Maximum = unscopedIds.Count * 2;
-
-                await progressMonitor.ReportProgressAsync(unscopedIds.Count, null).ConfigureAwait(false);
-            }
-
             var assets = await _smintIoIntegrationLayerProvider.GetAssetsAsync(Context, parameters).ConfigureAwait(false);
 
             if (progressMonitor != null)
             {
-                await progressMonitor.ReportProgressAsync(assets.AssetDataObjects.Length, null).ConfigureAwait(false);
                 await progressMonitor.FinishedAsync(null).ConfigureAwait(false);
             }
 
