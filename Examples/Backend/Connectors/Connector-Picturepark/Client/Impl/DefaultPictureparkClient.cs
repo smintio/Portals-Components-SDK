@@ -439,6 +439,20 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
         public async Task<(ContentDetail ContentDetail, ContentType? OriginalContentType)> GetContentAsync(string id)
         {
+            var contentDetail = await GetContentDetailAsync(id);
+
+            if (contentDetail == null)
+            {
+                return (null, null);
+            }
+
+            var originalContentType = await HandleThumbnailReferenceFileTypeAsync(contentDetail).ConfigureAwait(false);
+
+            return (contentDetail, originalContentType);
+        }
+
+        private async Task<ContentDetail> GetContentDetailAsync(string id)
+        {
             await CheckContentChannelAccessAsync(id).ConfigureAwait(false);
 
             var contentDetail = await ExecuteWithBackoffAsync(
@@ -462,14 +476,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                isGet: false
            ).ConfigureAwait(false);
 
-            if (contentDetail == null)
-            {
-                return (null, null);
-            }
-
-            var originalContentType = await HandleThumbnailReferenceFileTypeAsync(contentDetail).ConfigureAwait(false);
-
-            return (contentDetail, originalContentType);
+            return contentDetail;
         }
 
         public async Task<ICollection<ContentDetail>> GetContentsAsync(ICollection<string> ids, bool skipNonAccessibleContents = false)
@@ -884,7 +891,9 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                     continue;
                 }
 
-                var (targetContentDetail, _) = await GetContentAsync(targetContentId).ConfigureAwait(false);
+                // make sure we cause no recursion
+
+                var targetContentDetail = await GetContentDetailAsync(targetContentId).ConfigureAwait(false);
 
                 contentDetail.ContentType = targetContentDetail.ContentType;
             }
