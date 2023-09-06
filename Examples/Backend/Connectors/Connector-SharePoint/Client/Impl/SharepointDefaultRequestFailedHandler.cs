@@ -48,11 +48,6 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
                         return Task.FromResult(RequestFailedHandlerResult.Ignore);
                     }
-
-                    if (message.Contains("InvalidAuthenticationToken"))
-                    {
-                        throw new ExternalDependencyException(ExternalDependencyStatusEnum.AuthorizationValuesExpired, "The authorization expired. Please re-authorize", SharepointConnectorStartup.SharepointConnector);
-                    }
                 }
 
                 var errorCode = serviceException.Error?.Code;
