@@ -21,6 +21,7 @@ using SmintIo.Portals.SDK.Core.Configuration;
 using SmintIo.Portals.SDK.Core.Models.Context;
 using SmintIo.Portals.SDK.Core.Rest.Prefab;
 using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
+using SmintIo.Portals.SDK.Core.Http.Prefab.Exceptions;
 
 namespace SmintIo.Portals.Connector.SharePoint
 {
@@ -415,10 +416,21 @@ namespace SmintIo.Portals.Connector.SharePoint
             {
                 if (postResponse != null &&
                     !string.IsNullOrEmpty(postResponse.Content) &&
-                    postResponse.Content.IndexOf("invalid_grant", StringComparison.Ordinal) > -1)
+                    postResponse.Content.IndexOf("invalid_grant") > -1)
                 {
                     // this is delivered by OAuth clients when grants are expired
 
+                    throw new ExternalDependencyException(
+                        ExternalDependencyStatusEnum.AuthorizationValuesExpired,
+                        "The authorization expired. Please re-authorize",
+                        Key);
+                }
+
+                if (e.InnerException != null &&
+                    e.InnerException is HttpException httpException &&
+                    !string.IsNullOrEmpty(httpException.ResponseBody) &&
+                    httpException.ResponseBody.IndexOf("invalid_grant") > -1)
+                {
                     throw new ExternalDependencyException(
                         ExternalDependencyStatusEnum.AuthorizationValuesExpired,
                         "The authorization expired. Please re-authorize",
