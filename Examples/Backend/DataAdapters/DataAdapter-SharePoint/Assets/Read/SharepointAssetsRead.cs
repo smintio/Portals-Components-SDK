@@ -184,7 +184,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                         break;
                 }
 
-                if (string.IsNullOrEmpty(thumbnailUrl))
+                if (!computePreview && string.IsNullOrEmpty(thumbnailUrl))
                 {
                     return null;
                 }
