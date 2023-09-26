@@ -1099,11 +1099,21 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                             }
                             catch (ServiceException e)
                             {
+                                if (e.StatusCode == HttpStatusCode.NotFound)
+                                {
+                                    if (e.RawResponseBody != null && e.RawResponseBody.Contains("Requested site could not be found"))
+                                    {
+                                        _logger.LogWarning($"Drive item delta request issue reported that site was not found ({_sharepointUrl}): {e}");
+
+                                        throw;
+                                    }
+                                }
+
                                 if (e.StatusCode == HttpStatusCode.Gone || e.StatusCode == HttpStatusCode.NotFound)
                                 {
                                     // If a deltaLink is no longer valid, the service will respond with 410 Gone, or 404 Not Found
 
-                                    _logger.LogWarning($"Drive item delta request issue reported from SharePoint for delta link {deltaLink}, resetting continuation UUID: {e}");
+                                    _logger.LogWarning($"Drive item delta request issue reported from SharePoint for delta link {deltaLink}, resetting continuation UUID ({_sharepointUrl}): {e}");
 
                                     driveItemChangesListModel.ContinuationTooOld = true;
 
