@@ -7,9 +7,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Picturepark.SDK.V1" Version="11.6.23" />
-    <PackageReference Include="SmintIo.Portals.Connector.Test" Version="5.7.8" />
-    <PackageReference Include="SmintIo.Portals.DataAdapter.Test" Version="5.7.8" />
-    <PackageReference Include="SmintIo.Portals.DataAdapterSDK.TestDriver" Version="5.7.8" />
+    <PackageReference Include="SmintIo.Portals.Connector.Test" Version="5.7.9" />
+    <PackageReference Include="SmintIo.Portals.DataAdapter.Test" Version="5.7.9" />
+    <PackageReference Include="SmintIo.Portals.DataAdapterSDK.TestDriver" Version="5.7.9" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
