@@ -32,6 +32,8 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
         private readonly bool _thumbnailPortalPresent;
         private readonly bool _thumbnailExtraLargePresent;
 
+        private readonly bool _legacyThumbnailsEnabled;
+
         private readonly ILogger _logger;
 
         private readonly PictureparkConnector _pictureparkConnector;
@@ -59,6 +61,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             string customerAlias, 
             bool thumbnailPortalPresent, 
             bool thumbnailExtraLargePresent, 
+            bool legacyThumbnailsEnabled,
             ILogger logger)
             : base(PictureparkConnectorStartup.PictureparkConnector, portalsContextModel, httpClientFactory, logger)
         {
@@ -75,6 +78,8 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
             _thumbnailPortalPresent = thumbnailPortalPresent;
             _thumbnailExtraLargePresent = thumbnailExtraLargePresent;
+
+            _legacyThumbnailsEnabled = legacyThumbnailsEnabled;
 
             _logger = logger;
 
@@ -419,6 +424,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                     ContentResolveBehavior.Metadata,
                     ContentResolveBehavior.Content,
                     ContentResolveBehavior.Outputs,
+                    ContentResolveBehavior.DisplayContentOutputs,
                     ContentResolveBehavior.Permissions
                 }).ConfigureAwait(false);
             }
@@ -430,6 +436,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                     ContentResolveBehavior.OuterDisplayValueName,
                     ContentResolveBehavior.Content,
                     ContentResolveBehavior.Outputs,
+                    ContentResolveBehavior.DisplayContentOutputs,
                     ContentResolveBehavior.Permissions
                 }).ConfigureAwait(false);
             }
@@ -446,9 +453,14 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 return (null, null);
             }
 
-            var originalContentType = await HandleThumbnailReferenceFileTypeAsync(contentDetail).ConfigureAwait(false);
+            if (_legacyThumbnailsEnabled)
+            {
+                var originalContentType = await HandleLegacyThumbnailReferenceFileTypeAsync(contentDetail).ConfigureAwait(false);
 
-            return (contentDetail, originalContentType);
+                return (contentDetail, originalContentType);
+            }
+
+            return (contentDetail, OriginalContentType: null);
         }
 
         private async Task<ContentDetail> GetContentDetailAsync(string id)
@@ -467,6 +479,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                         // ContentResolveBehavior.OuterDisplayValueDetail,
                         ContentResolveBehavior.LinkedListItems,
                         ContentResolveBehavior.Outputs,
+                        ContentResolveBehavior.DisplayContentOutputs,
                         ContentResolveBehavior.Permissions,
                         ContentResolveBehavior.DynamicViewFields
                     });
@@ -492,10 +505,14 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 // ContentResolveBehavior.OuterDisplayValueDetail,
                 ContentResolveBehavior.LinkedListItems,
                 ContentResolveBehavior.Outputs,
+                ContentResolveBehavior.DisplayContentOutputs,
                 ContentResolveBehavior.Permissions
             }).ConfigureAwait(false);
 
-            await HandleThumbnailReferenceFileTypeAsync(contentDetails).ConfigureAwait(false);
+            if (_legacyThumbnailsEnabled)
+            {
+                await HandleLegacyThumbnailReferenceFileTypeAsync(contentDetails).ConfigureAwait(false);
+            }
 
             return contentDetails;
         }
@@ -539,11 +556,15 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
                 // ContentResolveBehavior.OuterDisplayValueDetail,
                 ContentResolveBehavior.LinkedListItems,
                 ContentResolveBehavior.Outputs,
+                ContentResolveBehavior.DisplayContentOutputs,
                 ContentResolveBehavior.Permissions,
                 ContentResolveBehavior.DynamicViewFields
             }).ConfigureAwait(false);
 
-            contentDetails = await HandleThumbnailReferenceAsync(contentDetails).ConfigureAwait(false);
+            if (_legacyThumbnailsEnabled)
+            {
+                contentDetails = await HandleLegacyThumbnailReferenceAsync(contentDetails).ConfigureAwait(false);
+            }
 
             return contentDetails;
         }
@@ -731,7 +752,10 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
         public async Task<StreamResponse> GetDownloadStreamForOutputFormatIdAsync(string id, string outputFormatId, long? maxFileSizeBytes)
         {
-            id = await GetThumbnailReferenceIdAsync(id).ConfigureAwait(false);
+            if (_legacyThumbnailsEnabled)
+            {
+                id = await GetLegacyThumbnailReferenceIdAsync(id).ConfigureAwait(false);
+            }
 
             var downloadUri = $"{_apiUrl}v1/Contents/downloads/{Uri.EscapeDataString(id)}/{Uri.EscapeDataString(outputFormatId)}";
 
@@ -823,7 +847,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             return contentDetails;
         }
 
-        private async Task<ICollection<ContentDetail>> HandleThumbnailReferenceAsync(ICollection<ContentDetail> contentDetails)
+        private async Task<ICollection<ContentDetail>> HandleLegacyThumbnailReferenceAsync(ICollection<ContentDetail> contentDetails)
         {
             if (contentDetails == null || !contentDetails.Any())
             {
@@ -839,7 +863,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
             foreach (var contentDetail in contentDetails)
             {
-                var targetContentId = GetThumbnailReferenceTargetContentId(contentDetail);
+                var targetContentId = GetLegacyThumbnailReferenceTargetContentId(contentDetail);
 
                 if (string.IsNullOrEmpty(targetContentId))
                 {
@@ -856,11 +880,11 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             return result;
         }
 
-        private async Task<ContentType?> HandleThumbnailReferenceFileTypeAsync(ContentDetail contentDetail)
+        private async Task<ContentType?> HandleLegacyThumbnailReferenceFileTypeAsync(ContentDetail contentDetail)
         {
             var originalContentType = contentDetail.ContentType;
 
-            await HandleThumbnailReferenceFileTypeAsync(new[] { contentDetail }).ConfigureAwait(false);
+            await HandleLegacyThumbnailReferenceFileTypeAsync(new[] { contentDetail }).ConfigureAwait(false);
 
             if (contentDetail.ContentType != originalContentType)
             {
@@ -870,7 +894,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             return null;
         }
 
-        private async Task HandleThumbnailReferenceFileTypeAsync(ICollection<ContentDetail> contentDetails)
+        private async Task HandleLegacyThumbnailReferenceFileTypeAsync(ICollection<ContentDetail> contentDetails)
         {
             if (contentDetails == null || !contentDetails.Any())
             {
@@ -884,7 +908,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
             foreach (var contentDetail in contentDetails)
             {
-                var targetContentId = GetThumbnailReferenceTargetContentId(contentDetail);
+                var targetContentId = GetLegacyThumbnailReferenceTargetContentId(contentDetail);
 
                 if (string.IsNullOrEmpty(targetContentId))
                 {
@@ -899,7 +923,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             }
         }
 
-        private async Task<string> GetThumbnailReferenceIdAsync(string id)
+        private async Task<string> GetLegacyThumbnailReferenceIdAsync(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -908,7 +932,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
             var (contentDetail, _) = await GetContentAsync(id).ConfigureAwait(false);
 
-            var targetContentId = GetThumbnailReferenceTargetContentId(contentDetail);
+            var targetContentId = GetLegacyThumbnailReferenceTargetContentId(contentDetail);
 
             if (string.IsNullOrEmpty(targetContentId))
             {
@@ -918,7 +942,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             return targetContentId;
         }
 
-        private string GetThumbnailReferenceTargetContentId(ContentDetail contentDetail)
+        private string GetLegacyThumbnailReferenceTargetContentId(ContentDetail contentDetail)
         {
             var layerSchemaIds = contentDetail.LayerSchemaIds;
 

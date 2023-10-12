@@ -445,7 +445,21 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             var pictureparkService = new PictureparkService(settings, httpClient);
 
-            _pictureparkClient = new DefaultPictureparkClient(this, _portalsContext, accessToken, pictureparkService, _configuration.Channel, _cache, _httpClientFactory, httpClient, apiUrl, customerAlias, thumbnailPortalPresent, thumbnailExtraLargePresent, _logger);
+            _pictureparkClient = new DefaultPictureparkClient(
+                this, 
+                _portalsContext, 
+                accessToken, 
+                pictureparkService, 
+                _configuration.Channel, 
+                _cache, 
+                _httpClientFactory, 
+                httpClient, 
+                apiUrl, 
+                customerAlias, 
+                thumbnailPortalPresent, 
+                thumbnailExtraLargePresent, 
+                _configuration.LegacyThumbnailsEnabled,
+                _logger);
 
             return _pictureparkClient;
         }

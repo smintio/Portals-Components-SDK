@@ -8,6 +8,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Converters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Permissions;
 using SmintIo.Portals.SDK.Core.Extensions;
 using SmintIo.Portals.SDK.Core.Models.Context;
+using SmintIo.Portals.SDK.Core.Models.Metamodel;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data.ContentTypes;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Model;
@@ -98,6 +99,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
             asset.ContentType = Convert(contentDetail.ContentType);
 
             ProcessOutputs(asset, contentDetail);
+            ProcessDisplayContentOutputs(asset, contentDetail);
 
             return asset;
         }
@@ -229,6 +231,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
             asset.ContentType = Convert(contentDetail.ContentType);
 
             ProcessOutputs(asset, contentDetail);
+            ProcessDisplayContentOutputs(asset, contentDetail);
 
             if (contentDetail.ContentType != ContentType.Virtual)
             {
@@ -313,16 +316,18 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
 
         private static void ProcessOutputs(AssetDataObject asset, ContentDetail contentDetail)
         {
-            if (contentDetail.Outputs == null || contentDetail.Outputs.Count == 0)
-            {
-                // nothing available
+            var outputs = contentDetail.Outputs;
 
+            if (outputs == null || !outputs.Any())
+            {
                 asset.Version = "0";
 
                 return;
             }
 
-            foreach (var output in contentDetail.Outputs)
+            var hasDisplayContentId = !string.IsNullOrEmpty(contentDetail.DisplayContentId);
+                
+            foreach (var output in outputs)
             {
                 if (output.RenderingState == OutputRenderingState.Failed ||
                     output.RenderingState == OutputRenderingState.NoLicense)
@@ -357,40 +362,76 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                     case "ThumbnailExtraLarge":
                     case "ThumbnailPortal":
                     case "Preview":
-                        asset.IsThumbnailPreviewAvailable = true;
+                        if (!hasDisplayContentId)
+                        {
+                            asset.IsThumbnailPreviewAvailable = true;
+                        }
+
                         break;
 
                     case "ThumbnailLarge":
-                        asset.IsThumbnailLargeAvailable = true;
+                        if (!hasDisplayContentId)
+                        {
+                            asset.IsThumbnailLargeAvailable = true;
+                        }
+
                         break;
 
                     case "ThumbnailMedium":
-                        asset.IsThumbnailMediumAvailable = true;
+                        if (!hasDisplayContentId)
+                        {
+                            asset.IsThumbnailMediumAvailable = true;
+                        }
+
                         break;
 
                     case "ThumbnailSmall":
-                        asset.IsThumbnailSmallAvailable = true;
+                        if (!hasDisplayContentId)
+                        {
+                            asset.IsThumbnailSmallAvailable = true;
+                        }
+
                         break;
 
                     case "VideoLarge":
-                        asset.IsPlaybackLargeAvailable = true;
+                        if (!hasDisplayContentId)
+                        {
+                            asset.IsPlaybackLargeAvailable = true;
+                        }
+
                         break;
 
                     case "VideoSmall":
-                        asset.IsPlaybackSmallAvailable = true;
+                        if (!hasDisplayContentId)
+                        {
+                            asset.IsPlaybackSmallAvailable = true;
+                        }
+
                         break;
 
                     case "AudioSmall":
-                        asset.IsPlaybackSmallAvailable = true;
+                        if (!hasDisplayContentId)
+                        {
+                            asset.IsPlaybackSmallAvailable = true;
+                        }
+
                         break;
 
                     case "Pdf":
-                        asset.IsPdfPreviewAvailable = true;
+                        if (!hasDisplayContentId)
+                        {
+                            asset.IsPdfPreviewAvailable = true;
+                        }
+
                         break;
 
                     case "Svg":
-                        asset.IsThumbnailPreviewAvailable = true;
-                        asset.IsThumbnailLargeAvailable = true;
+                        if (!hasDisplayContentId)
+                        {
+                            asset.IsThumbnailPreviewAvailable = true;
+                            asset.IsThumbnailLargeAvailable = true;
+                        }
+
                         break;
 
                     case "Original":
@@ -402,7 +443,8 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                         continue;
                 }
 
-                if (asset.ThumbnailAspectRatio == null)
+                if (!hasDisplayContentId &&
+                    asset.ThumbnailAspectRatio == null)
                 {
                     int? width = null;
                     int? height = null;
@@ -424,10 +466,164 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                     }
                 }
             }
-            
+
             if (string.IsNullOrEmpty(asset.Version))
             {
                 asset.Version = "0";
+            }
+        }
+
+        private static void ProcessDisplayContentOutputs(AssetDataObject asset, ContentDetail contentDetail)
+        {
+            var displayContentId = contentDetail.DisplayContentId;
+
+            if (string.IsNullOrEmpty(displayContentId))
+            {
+                return;
+            }
+
+            var displayContentOutputs = contentDetail.DisplayContentOutputs;
+
+            if (displayContentOutputs == null || !displayContentOutputs.Any())
+            {
+                return;
+            }
+
+            if (asset.InternalMetadata == null)
+            {
+                asset.InternalMetadata = new DataObjectInternalMetadata();
+            }
+
+            foreach (var displayContentOutput in displayContentOutputs)
+            {
+                if (displayContentOutput.RenderingState == OutputRenderingState.Failed ||
+                    displayContentOutput.RenderingState == OutputRenderingState.NoLicense)
+                {
+                    // ignore likely unrecoverable ones...
+
+                    continue;
+                }
+
+                if (displayContentOutput.RenderingState == OutputRenderingState.Skipped &&
+                    displayContentOutput.DynamicRendering != true)
+                {
+                    // This is no dynamic render, but skipped
+                    // so we skip as well
+
+                    continue;
+                }
+
+                var displayContentOutputDetail = displayContentOutput.Detail;
+
+                if (displayContentOutputDetail == null)
+                {
+                    // no output detail
+
+                    continue;
+                }
+
+                var displayContentOutputFormatId = displayContentOutput.OutputFormatId;
+
+                switch (displayContentOutputFormatId)
+                {
+                    case "ThumbnailExtraLarge":
+                    case "ThumbnailPortal":
+                    case "Preview":
+                        asset.IsThumbnailPreviewAvailable = true;
+
+                        asset.InternalMetadata.PreviewThumbnailSpec = displayContentId;
+
+                        break;
+
+                    case "ThumbnailLarge":
+                        asset.IsThumbnailLargeAvailable = true;
+
+                        asset.InternalMetadata.LargeThumbnailSpec = displayContentId;
+
+                        break;
+
+                    case "ThumbnailMedium":
+                        asset.IsThumbnailMediumAvailable = true;
+
+                        asset.InternalMetadata.MediumThumbnailSpec = displayContentId;
+
+                        break;
+
+                    case "ThumbnailSmall":
+                        asset.IsThumbnailSmallAvailable = true;
+
+                        asset.InternalMetadata.SmallThumbnailSpec = displayContentId;
+
+                        break;
+
+                    case "VideoLarge":
+                        asset.IsPlaybackLargeAvailable = true;
+
+                        asset.InternalMetadata.PlaybackLargeSpec = displayContentId;
+
+                        break;
+
+                    case "VideoSmall":
+                        asset.IsPlaybackSmallAvailable = true;
+
+                        asset.InternalMetadata.PlaybackSmallSpec = displayContentId;
+
+                        break;
+
+                    case "AudioSmall":
+                        asset.IsPlaybackSmallAvailable = true;
+
+                        asset.InternalMetadata.PlaybackSmallSpec = displayContentId;
+
+                        break;
+
+                    case "Pdf":
+                        asset.IsPdfPreviewAvailable = true;
+
+                        asset.InternalMetadata.PdfPreviewSpec = displayContentId;
+
+                        break;
+
+                    case "Svg":
+                        asset.IsThumbnailPreviewAvailable = true;
+                        asset.IsThumbnailLargeAvailable = true;
+
+                        asset.InternalMetadata.PreviewThumbnailSpec = displayContentId;
+                        asset.InternalMetadata.LargeThumbnailSpec = displayContentId;
+
+                        break;
+
+                    case "Original":
+                        // not here
+
+                        break;
+
+                    case "VideoKeyframes":
+                    default:
+                        continue;
+                }
+
+                if (asset.ThumbnailAspectRatio == null)
+                {
+                    int? width = null;
+                    int? height = null;
+
+                    if (displayContentOutputDetail is OutputDataImage outputDataImage)
+                    {
+                        width = outputDataImage.Width;
+                        height = outputDataImage.Height;
+                    }
+                    else if (displayContentOutputDetail is OutputDataVideo outputDataVideo)
+                    {
+                        width = outputDataVideo.Width;
+                        height = outputDataVideo.Height;
+                    }
+
+                    if (width != null && height != null && height > 0)
+                    {
+                        asset.ThumbnailAspectRatio = (decimal)width / (decimal)height;
+                    }
+                }
             }
         }
 
