@@ -16,6 +16,6 @@
     </PackageReference>
     <PackageReference Include="Picturepark.SDK.V1" Version="11.6.23" />
     <PackageReference Include="Polly" Version="7.2.3" />
-    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="5.7.9" />
+    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="5.7.10" />
   </ItemGroup>
 </Project>
