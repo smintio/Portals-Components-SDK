@@ -34,6 +34,15 @@ namespace SmintIo.Portals.Connector.Picturepark
         [MaxLength(255)]
         public string Channel { get; set; }
 
+        [DisplayName("en", "Enable legacy thumbnail override mode", IsDefault = true)]
+        [DisplayName("de", "Veralteten Thumbnail-Override-Modus aktivieren")]
+        [Description("en", "Enable the legacy thumbnail override mode. Please only enable if instructed to do so by Smint.io support.", IsDefault = true)]
+        [Description("de", "Den veralteten Thumbnail-Override-Modus aktivieren. Bitte tun Sie dies nur, wenn Sie vom Smint.io Kundendienst dazu aufgefordert wurden.")]
+        [Required]
+        [DefaultValue(false)]
+        [FormItemVisibility(Visibility = FormItemVisibilityEnum.Expert)]
+        public bool LegacyThumbnailsEnabled { get; set; }
+
         public int? MergeMetamodelToConnectorId { get; set; }
 
         public int? OverrideDataSourceIds { get; set; }

@@ -527,6 +527,13 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
         {
             var unscopedId = assetId?.UnscopedId;
 
+            if (!string.IsNullOrEmpty(thumbnailSpec))
+            {
+                // we have display content ID override
+
+                unscopedId = thumbnailSpec;
+            }
+
             StreamResponse streamResponse;
 
             if (contentType == ContentTypeEnumDataObject.Video &&
