@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Microsoft.Graph;
-using SmintIo.Portals.Connector.SharePoint.Helpers;
+using SmintIo.Portals.ConnectorSDK.Helpers;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 
 namespace SmintIo.Portals.Connector.SharePoint.Extensions
@@ -53,22 +52,25 @@ namespace SmintIo.Portals.Connector.SharePoint.Extensions
         {
             // Mime type is needed for cases like 'svg'.
             // Sharepoint doesn't treat it as image.
-            var mimeType = driveItem.File?.MimeType ?? string.Empty;
+            var mimeType = ContentTypeHelper.SanitizeMimeType(driveItem.File?.MimeType);
+            fileExtension = ContentTypeHelper.SanitizeFileExtension(fileExtension);
 
             // During the initial graphApi search we don't have the file, audio, image nor the video information.
-            if (driveItem.Audio != null || mimeType.StartsWith("audio"))
+            if (driveItem.Audio != null || ContentTypeHelper.IsAudio(fileExtension, mimeType))
             {
                 return ContentTypeEnumDataObject.Audio;
             }
-            else if (driveItem.Video != null || mimeType.StartsWith("video"))
+            else if (driveItem.Video != null || ContentTypeHelper.IsVideo(fileExtension, mimeType))
             {
                 return ContentTypeEnumDataObject.Video;
             }
-            else if (driveItem.Image != null || driveItem.Photo != null || mimeType.StartsWith("image"))
+            else if (driveItem.Image != null ||
+                driveItem.Photo != null ||
+                ContentTypeHelper.IsImage(fileExtension, mimeType))
             {
                 return ContentTypeEnumDataObject.Image;
             }
-            else if (PathHelpers.KnownDocumentFormats.Contains(fileExtension))
+            else if (ContentTypeHelper.IsDocument(fileExtension, mimeType))
             {
                 return ContentTypeEnumDataObject.Document;
             }
