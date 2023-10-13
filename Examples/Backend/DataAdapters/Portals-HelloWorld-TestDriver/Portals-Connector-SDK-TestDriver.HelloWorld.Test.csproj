@@ -5,9 +5,9 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SmintIo.Portals.Connector.Test" Version="5.7.10" />
-    <PackageReference Include="SmintIo.Portals.DataAdapter.Test" Version="5.7.10" />
-    <PackageReference Include="SmintIo.Portals.DataAdapterSDK.TestDriver" Version="5.7.10" />
+    <PackageReference Include="SmintIo.Portals.Connector.Test" Version="5.9.1" />
+    <PackageReference Include="SmintIo.Portals.DataAdapter.Test" Version="5.9.1" />
+    <PackageReference Include="SmintIo.Portals.DataAdapterSDK.TestDriver" Version="5.9.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
