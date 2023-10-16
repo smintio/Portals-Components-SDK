@@ -98,7 +98,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
 
             var fileExtension = driveItem.GetFileExtension();
 
-            var contentType = driveItem.GetContentType(fileExtension, fileName);
+            var contentType = driveItem.GetContentType(fileExtension);
 
             // Because of assets search, we want to reduce Sharepoint calls.
             var additionalDataByFieldNames = _fetchAdditionalData
