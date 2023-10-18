@@ -630,7 +630,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
         public static ContentTypeEnumDataObject Convert(ContentType? contentType)
         {
             if (contentType == null)
-                return ContentTypeEnumDataObject.Unknown;
+                return ContentTypeEnumDataObject.Other;
 
             switch (contentType)
             {
