@@ -18,6 +18,8 @@ namespace SmintIo.Portals.Connector.SharePoint.AllowedValues
     {
         private readonly ISharepointClient _sharepointClient;
 
+        public IDynamicAllowedValuesParametersProvider ParametersProvider => null;
+
         public SharepointDriveIdProvider(IServiceProvider serviceProvider)
         {
             try

@@ -19,6 +19,8 @@ namespace SmintIo.Portals.Connector.Picturepark.AllowedValues
 
         private readonly IPictureparkClient _pictureparkClient;
 
+        public IDynamicAllowedValuesParametersProvider ParametersProvider => null;
+
         public ChannelAllowedValuesProvider(IServiceProvider serviceProvider)
         {
             // if we are configuring the connector, this can be null
