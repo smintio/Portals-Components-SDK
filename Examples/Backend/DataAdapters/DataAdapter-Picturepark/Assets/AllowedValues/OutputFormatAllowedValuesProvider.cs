@@ -17,6 +17,8 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.AllowedValues
 
         private readonly PictureparkAssetsDataAdapter _pictureparkAssetsDataAdapter;
 
+        public IDynamicAllowedValuesParametersProvider ParametersProvider => null;
+
         public OutputFormatAllowedValuesProvider(IServiceProvider serviceProvider)
         {
             _pictureparkAssetsDataAdapter = serviceProvider.GetService<PictureparkAssetsDataAdapter>();
