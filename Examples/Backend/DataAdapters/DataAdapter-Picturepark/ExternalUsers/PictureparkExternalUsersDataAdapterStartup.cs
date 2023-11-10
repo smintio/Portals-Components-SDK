@@ -3,8 +3,10 @@ using SmintIo.Portals.Connector.Picturepark;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.ExternalUsers;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Permissions;
+using SmintIo.Portals.SDK.Core.Configuration;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 using System;
+using System.Threading.Tasks;
 
 namespace SmintIo.Portals.DataAdapter.Picturepark.ExternalUsers
 {
@@ -43,5 +45,10 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.ExternalUsers
         public Type[] PublicApiInterfaces => new Type[] { typeof(IExternalUsersRead) };
 
         public DataAdapterPermission[] Permissions => null;
+
+        public Task FillDefaultFormFieldValuesModelAsync(string connectorEntityModelKey, FormFieldValuesModel formFieldValuesModel)
+        {
+            return Task.CompletedTask;
+        }
     }
 }
