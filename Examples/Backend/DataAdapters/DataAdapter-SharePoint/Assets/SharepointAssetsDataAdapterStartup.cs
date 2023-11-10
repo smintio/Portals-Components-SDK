@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using SmintIo.Portals.Connector.SharePoint;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Permissions;
+using SmintIo.Portals.SDK.Core.Configuration;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 
 namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
@@ -42,5 +44,10 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
         public DataAdapterPermission[] Permissions => null;
 
         public Type[] PublicApiInterfaces => new[] { typeof(IAssets), typeof(IAssetsIntegrationLayerApiProvider) };
+
+        public Task FillDefaultFormFieldValuesModelAsync(string connectorEntityModelKey, FormFieldValuesModel formFieldValuesModel)
+        {
+            return Task.CompletedTask;
+        }
     }
 }
