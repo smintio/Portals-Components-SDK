@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test</RootNamespace>
     <IsPackable>false</IsPackable>
     <AssemblyName>SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test</AssemblyName>
