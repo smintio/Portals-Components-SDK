@@ -274,10 +274,10 @@ namespace SmintIo.Portals.Connector.Picturepark
 
         public async Task<(string AccessToken, PictureparkService Service)> RefreshPassThroughAuthorizationValuesAsync(bool log = false)
         {
-            AuthorizationValuesModel.ClientId = PassThroughAuthenticationTokenProvider.GetClientId();
+            AuthorizationValuesModel.ClientId = PassThroughAuthenticationTokenProvider.ClientId;
 
-            AuthorizationValuesModel.AccessToken = PassThroughAuthenticationTokenProvider.GetAccessToken();
-            AuthorizationValuesModel.RefreshToken = PassThroughAuthenticationTokenProvider.GetRefreshToken();
+            AuthorizationValuesModel.AccessToken = PassThroughAuthenticationTokenProvider.AccessToken;
+            AuthorizationValuesModel.RefreshToken = PassThroughAuthenticationTokenProvider.RefreshToken;
 
             if (log)
             {
