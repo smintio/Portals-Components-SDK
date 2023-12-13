@@ -126,6 +126,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             var assetDataObject = new AssetDataObject(_dataAdapterContext)
             {
                 Id = driveItem.GetAssetId(),
+                ExternalId = driveItem.Id,
                 Description = driveItem.Description.Localize(),
                 Name = fileName.Localize(),
                 ContentType = contentType,
@@ -167,6 +168,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             var folderDataObject = new FolderDataObject(_dataAdapterContext)
             {
                 Id = assetDataObject.Id,
+                ExternalId = assetDataObject.ExternalId,
                 Name = assetDataObject.Name,
                 ParentFolderIds = assetDataObject.ParentFolderIds,
                 Version = assetDataObject.Version,
