@@ -42,6 +42,8 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Search
 
         public Type ConfigurationImplementation => typeof(PictureparkAssetsDataAdapterConfiguration);
 
+        public Type ConfigurationMessages => null;
+
         public Type[] PublicApiInterfaces => new Type[] { typeof(IAssets) };
 
         public DataAdapterPermission[] Permissions => null;

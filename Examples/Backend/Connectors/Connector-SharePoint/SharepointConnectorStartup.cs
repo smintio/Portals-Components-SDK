@@ -28,6 +28,8 @@ namespace SmintIo.Portals.Connector.SharePoint
         public Type ConfigurationImplementation => typeof(SharepointConnectorConfiguration);
         public Type ComponentImplementation => typeof(SharepointConnector);
 
+        public Type ConfigurationMessages => null;
+
         public void ConfigureServices(IServiceCollection services)
         {
         }
