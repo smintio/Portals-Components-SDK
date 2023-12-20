@@ -39,6 +39,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public Type ComponentImplementation => typeof(SharepointAssetsDataAdapter);
 
+        public Type ConfigurationMessages => null;
+
         public string ConnectorKey => SharepointConnectorStartup.SharepointConnector;
 
         public DataAdapterPermission[] Permissions => null;
