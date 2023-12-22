@@ -30,6 +30,8 @@ namespace SmintIo.Portals.Connector.SharePoint
 
         public Type ConfigurationMessages => null;
 
+        public Type MetamodelMessages => null;
+
         public void ConfigureServices(IServiceCollection services)
         {
         }
