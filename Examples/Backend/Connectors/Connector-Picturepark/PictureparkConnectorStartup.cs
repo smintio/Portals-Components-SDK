@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SmintIo.Portals.Connector.Picturepark.Resources;
 using SmintIo.Portals.ConnectorSDK.Connectors;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 using System;
@@ -46,6 +47,6 @@ namespace SmintIo.Portals.Connector.Picturepark
 
         public Type ConfigurationImplementation => typeof(PictureparkConnectorConfiguration);
 
-        public Type ConfigurationMessages => null;
+        public Type ConfigurationMessages => typeof(ConfigurationMessages);
     }
 }
