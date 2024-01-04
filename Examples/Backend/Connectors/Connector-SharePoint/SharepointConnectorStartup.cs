@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using SmintIo.Portals.Connector.SharePoint.Resources;
 using SmintIo.Portals.ConnectorSDK.Connectors;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 
@@ -28,7 +29,7 @@ namespace SmintIo.Portals.Connector.SharePoint
         public Type ConfigurationImplementation => typeof(SharepointConnectorConfiguration);
         public Type ComponentImplementation => typeof(SharepointConnector);
 
-        public Type ConfigurationMessages => null;
+        public Type ConfigurationMessages => typeof(ConfigurationMessages);
 
         public void ConfigureServices(IServiceCollection services)
         {
