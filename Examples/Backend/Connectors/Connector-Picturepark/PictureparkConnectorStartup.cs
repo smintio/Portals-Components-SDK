@@ -47,5 +47,7 @@ namespace SmintIo.Portals.Connector.Picturepark
         public Type ConfigurationImplementation => typeof(PictureparkConnectorConfiguration);
 
         public Type ConfigurationMessages => null;
+
+        public Type MetamodelMessages => null;
     }
 }
