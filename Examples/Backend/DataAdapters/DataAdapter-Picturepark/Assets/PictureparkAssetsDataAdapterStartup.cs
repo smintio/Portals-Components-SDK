@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SmintIo.Portals.Connector.Picturepark;
+using SmintIo.Portals.DataAdapter.Picturepark.Resources;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Permissions;
@@ -42,7 +43,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Search
 
         public Type ConfigurationImplementation => typeof(PictureparkAssetsDataAdapterConfiguration);
 
-        public Type ConfigurationMessages => null;
+        public Type ConfigurationMessages => typeof(ConfigurationMessages);
 
         public Type[] PublicApiInterfaces => new Type[] { typeof(IAssets) };
 
