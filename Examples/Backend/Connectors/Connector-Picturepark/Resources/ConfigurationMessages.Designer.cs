@@ -97,6 +97,15 @@ namespace SmintIo.Portals.Connector.Picturepark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connects Smint.io Portals to the Picturepark Content Platform..
+        /// </summary>
+        public static string c_picturepark_description {
+            get {
+                return ResourceManager.GetString("c_picturepark_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enable the legacy thumbnail override mode. Please only enable if instructed to do so by Smint.io support..
         /// </summary>
         public static string c_picturepark_legacy_thumbnails_enabled_description {
@@ -115,6 +124,15 @@ namespace SmintIo.Portals.Connector.Picturepark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Picturepark Content Platform.
+        /// </summary>
+        public static string c_picturepark_name {
+            get {
+                return ResourceManager.GetString("c_picturepark_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The web address of your Picturepark Content Platform instance. Please visit Picturepark Content Platform, log in, and then copy the URL from the browser address bar. Finally, paste the copied URL here..
         /// </summary>
         public static string c_picturepark_picturepark_url_description {
@@ -129,6 +147,15 @@ namespace SmintIo.Portals.Connector.Picturepark.Resources {
         public static string c_picturepark_picturepark_url_display_name {
             get {
                 return ResourceManager.GetString("c_picturepark_picturepark_url_display_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://www.picturepark.com.
+        /// </summary>
+        public static string c_picturepark_setup_documentation_url {
+            get {
+                return ResourceManager.GetString("c_picturepark_setup_documentation_url", resourceCulture);
             }
         }
     }

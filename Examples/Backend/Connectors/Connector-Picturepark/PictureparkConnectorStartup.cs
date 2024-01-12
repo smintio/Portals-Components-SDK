@@ -16,21 +16,11 @@ namespace SmintIo.Portals.Connector.Picturepark
 
         public ConnectorSetupMethod SetupMethod => ConnectorSetupMethod.Setup;
 
-        public LocalizedStringsModel Name => new LocalizedStringsModel()
-        {
-            { LocalizedStringsModel.DefaultCulture, "Picturepark Content Platform" }
-        };
+        public LocalizedStringsModel Name { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.c_picturepark_name));
 
-        public LocalizedStringsModel Description => new LocalizedStringsModel()
-        {
-            { LocalizedStringsModel.DefaultCulture, "Connects Smint.io Portals to the Picturepark Content Platform." },
-            { "de", "Verbindet Smint.io Portals mit der Picturepark Content Platform." }
-        };
+        public LocalizedStringsModel Description { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.c_picturepark_description));
 
-        public LocalizedStringsModel SetupDocumentationUrl => new LocalizedStringsModel()
-        {
-            { LocalizedStringsModel.DefaultCulture, "https://www.picturepark.com" }
-        };
+        public LocalizedStringsModel SetupDocumentationUrl { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.c_picturepark_setup_documentation_url));
 
         public bool IsAdvanced => true;
 

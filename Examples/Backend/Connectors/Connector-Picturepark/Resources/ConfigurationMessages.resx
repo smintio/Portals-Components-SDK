@@ -129,16 +129,25 @@
   <data name="c_picturepark_channel_display_name" xml:space="preserve">
     <value>Channel</value>
   </data>
+  <data name="c_picturepark_description" xml:space="preserve">
+    <value>Connects Smint.io Portals to the Picturepark Content Platform.</value>
+  </data>
   <data name="c_picturepark_legacy_thumbnails_enabled_description" xml:space="preserve">
     <value>Enable the legacy thumbnail override mode. Please only enable if instructed to do so by Smint.io support.</value>
   </data>
   <data name="c_picturepark_legacy_thumbnails_enabled_display_name" xml:space="preserve">
     <value>Enable legacy thumbnail override mode</value>
   </data>
+  <data name="c_picturepark_name" xml:space="preserve">
+    <value>Picturepark Content Platform</value>
+  </data>
   <data name="c_picturepark_picturepark_url_description" xml:space="preserve">
     <value>The web address of your Picturepark Content Platform instance. Please visit Picturepark Content Platform, log in, and then copy the URL from the browser address bar. Finally, paste the copied URL here.</value>
   </data>
   <data name="c_picturepark_picturepark_url_display_name" xml:space="preserve">
     <value>Your Picturepark URL</value>
+  </data>
+  <data name="c_picturepark_setup_documentation_url" xml:space="preserve">
+    <value>https://www.picturepark.com</value>
   </data>
 </root>
