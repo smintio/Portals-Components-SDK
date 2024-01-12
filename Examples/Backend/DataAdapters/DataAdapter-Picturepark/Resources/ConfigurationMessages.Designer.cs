@@ -88,6 +88,15 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Provides services to read, search and download assets from Picturepark..
+        /// </summary>
+        public static string da_assets_description {
+            get {
+                return ResourceManager.GetString("da_assets_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please select the Picturepark display pattern that should be used for the asset title when showing the asset in a gallery view..
         /// </summary>
         public static string da_assets_gallery_title_display_pattern_description {
@@ -138,6 +147,15 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Resources {
         public static string da_assets_list_name_attribute_display_name {
             get {
                 return ResourceManager.GetString("da_assets_list_name_attribute_display_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset access.
+        /// </summary>
+        public static string da_assets_name {
+            get {
+                return ResourceManager.GetString("da_assets_name", resourceCulture);
             }
         }
         

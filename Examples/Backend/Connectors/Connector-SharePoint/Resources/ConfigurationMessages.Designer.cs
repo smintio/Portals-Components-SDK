@@ -97,6 +97,15 @@ namespace SmintIo.Portals.Connector.SharePoint.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connects Smint.io Portals to Microsoft SharePoint..
+        /// </summary>
+        public static string c_sharepoint_description {
+            get {
+                return ResourceManager.GetString("c_sharepoint_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to If this SharePoint connector is to be used in high security environments, please activate this option. Please note that some convenience features of the connector will then be turned off, e.g. the ability to easily select the SharePoint site from a drop-down list. This feature should be used by experts only..
         /// </summary>
         public static string c_sharepoint_high_security_mode_description {
@@ -111,6 +120,24 @@ namespace SmintIo.Portals.Connector.SharePoint.Resources {
         public static string c_sharepoint_high_security_mode_display_name {
             get {
                 return ResourceManager.GetString("c_sharepoint_high_security_mode_display_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microsoft SharePoint.
+        /// </summary>
+        public static string c_sharepoint_name {
+            get {
+                return ResourceManager.GetString("c_sharepoint_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://www.microsoft.com/microsoft-365/sharepoint.
+        /// </summary>
+        public static string c_sharepoint_setup_documentation_url {
+            get {
+                return ResourceManager.GetString("c_sharepoint_setup_documentation_url", resourceCulture);
             }
         }
         

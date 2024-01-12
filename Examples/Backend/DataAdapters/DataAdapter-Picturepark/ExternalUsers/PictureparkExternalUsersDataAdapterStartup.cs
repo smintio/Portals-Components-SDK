@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SmintIo.Portals.Connector.Picturepark;
+using SmintIo.Portals.DataAdapter.Picturepark.Resources;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.ExternalUsers;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Permissions;
@@ -18,17 +19,9 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.ExternalUsers
 
         public string ConnectorKey => PictureparkConnectorStartup.PictureparkConnector;
 
-        public LocalizedStringsModel Name => new LocalizedStringsModel()
-        {
-            { LocalizedStringsModel.DefaultCulture, "User data access" },
-            { "de", "Zugriff auf Benutzerdaten" },
-        };
+        public LocalizedStringsModel Name { get; } = new ResourceLocalizedStringsModel(nameof(PictureparkExternalUsersConfigurationMessages.da_external_users_name));
 
-        public LocalizedStringsModel Description => new LocalizedStringsModel()
-        {
-            { LocalizedStringsModel.DefaultCulture, "Provides services to query user data from Picturepark." },
-            { "de", "Stellt Dienste zum Abfragen von Benutzerdaten von Picturepark zur Verfügung." }
-        };
+        public LocalizedStringsModel Description { get; } = new ResourceLocalizedStringsModel(nameof(PictureparkExternalUsersConfigurationMessages.da_external_users_description));
 
         public string LogoUrl => null;
 
@@ -42,7 +35,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.ExternalUsers
 
         public Type ConfigurationImplementation => typeof(PictureparkExternalUsersDataAdapterConfiguration);
 
-        public Type ConfigurationMessages => null;
+        public Type ConfigurationMessages => typeof(PictureparkExternalUsersConfigurationMessages);
 
         public Type[] PublicApiInterfaces => new Type[] { typeof(IExternalUsersRead) };
 

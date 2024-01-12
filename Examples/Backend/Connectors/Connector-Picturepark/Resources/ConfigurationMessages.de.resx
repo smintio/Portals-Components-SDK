@@ -126,6 +126,9 @@
   <data name="c_picturepark_channel_description" xml:space="preserve">
     <value>Der zu verwendende Picturepark-Channel.</value>
   </data>
+  <data name="c_picturepark_description" xml:space="preserve">
+    <value>Verbindet Smint.io Portals mit der Picturepark Content Platform.</value>
+  </data>
   <data name="c_picturepark_legacy_thumbnails_enabled_description" xml:space="preserve">
     <value>Den veralteten Thumbnail-Override-Modus aktivieren. Bitte tun Sie dies nur, wenn Sie vom Smint.io Kundendienst dazu aufgefordert wurden.</value>
   </data>

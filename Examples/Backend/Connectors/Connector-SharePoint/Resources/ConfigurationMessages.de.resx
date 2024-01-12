@@ -129,6 +129,9 @@
   <data name="c_sharepoint_client_secret_display_name" xml:space="preserve">
     <value>Azure Client Secret</value>
   </data>
+  <data name="c_sharepoint_description" xml:space="preserve">
+    <value>Verbindet Smint.io Portals mit Microsoft SharePoint.</value>
+  </data>
   <data name="c_sharepoint_high_security_mode_description" xml:space="preserve">
     <value>Wenn dieser SharePoint-Connector in einer hochsicheren Umgebung verwendet werden soll, aktivieren Sie bitte diese Option. Beachten Sie, dass in diesem Fall einige bequeme Features des Konnektors nicht verfügbar sind, wie zB. die Möglichkeit, die zu veröffentlichende SharePoint Site aus einer Liste auszuwählen. Diese Funktionalität sollte nur von Experten verwendet werden.</value>
   </data>

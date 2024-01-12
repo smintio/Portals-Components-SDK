@@ -126,6 +126,9 @@
   <data name="da_assets_default_page_size_display_name" xml:space="preserve">
     <value>Search result page size</value>
   </data>
+  <data name="da_assets_description" xml:space="preserve">
+    <value>Provides services to read, search and download assets from Picturepark.</value>
+  </data>
   <data name="da_assets_gallery_title_display_pattern_description" xml:space="preserve">
     <value>Please select the Picturepark display pattern that should be used for the asset title when showing the asset in a gallery view.</value>
   </data>
@@ -143,6 +146,9 @@
   </data>
   <data name="da_assets_list_name_attribute_display_name" xml:space="preserve">
     <value>List value display name attribute (priority 1)</value>
+  </data>
+  <data name="da_assets_name" xml:space="preserve">
+    <value>Asset access</value>
   </data>
   <data name="da_assets_picturepark_display_pattern_list_display_name" xml:space="preserve">
     <value>List</value>
