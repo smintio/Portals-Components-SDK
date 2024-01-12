@@ -20,17 +20,9 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public string Key => SharepointAssetsDataAdapter;
 
-        public LocalizedStringsModel Name => new LocalizedStringsModel
-        {
-            { LocalizedStringsModel.DefaultCulture, "Asset access" },
-            { "de", "Zugriff auf Assets" },
-        };
+        public LocalizedStringsModel Name { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.da_assets_name));
 
-        public LocalizedStringsModel Description => new LocalizedStringsModel
-        {
-             { LocalizedStringsModel.DefaultCulture, "Provides services to read, search and download assets from SharePoint." },
-            { "de", "Stellt Dienste zum Lesen, Suchen und Herunterladen von SharePoint-Assets zur Verfügung." }
-        };
+        public LocalizedStringsModel Description { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.da_assets_description));
 
         public string LogoUrl => null;
         public string IconUrl => null;
@@ -39,7 +31,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public Type ComponentImplementation => typeof(SharepointAssetsDataAdapter);
 
-        public Type ConfigurationMessages => null;
+        public Type ConfigurationMessages => typeof(Resources.ConfigurationMessages);
 
         public string ConnectorKey => SharepointConnectorStartup.SharepointConnector;
 

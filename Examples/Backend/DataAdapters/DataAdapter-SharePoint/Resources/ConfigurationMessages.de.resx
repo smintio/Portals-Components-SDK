@@ -117,46 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="da_assets_data_mapping_form_group_display_name" xml:space="preserve">
-    <value>Daten-Mapping</value>
-  </data>
-  <data name="da_assets_default_page_size_description" xml:space="preserve">
-    <value>Standard-Größe einer Suchergebnis-Seite.</value>
-  </data>
-  <data name="da_assets_default_page_size_display_name" xml:space="preserve">
-    <value>Größe einer Suchergebnis-Seite</value>
-  </data>
   <data name="da_assets_description" xml:space="preserve">
-    <value>Stellt Dienste zum Lesen, Suchen und Herunterladen von Picturepark-Assets zur Verfügung.</value>
-  </data>
-  <data name="da_assets_gallery_title_display_pattern_description" xml:space="preserve">
-    <value>Bitte wählen Sie das Picturepark-Anzeigemuster das zur Anzeige des Asset-Titels verwendet werden soll, wenn das Asset in einer Galerieansicht dargestellt wird.</value>
-  </data>
-  <data name="da_assets_gallery_title_display_pattern_display_name" xml:space="preserve">
-    <value>Anzeigemuster für Galerie-Titel</value>
-  </data>
-  <data name="da_assets_list_name_attribute_2_description" xml:space="preserve">
-    <value>Wenn Sie in Ihren Listendefinitionen benutzerdefinierte Attribute verwenden, um den Wert für die Namensanzeige der Listenwerte zu speichern, können Sie die entsprechenden Attribut-Kennung hier eingeben. Wenn die Einstellung nicht angegeben ist, oder das Attribut nicht gefunden wurde, wird die Standard-Logik verwendet, um den Anzeigewert zu ermitteln.</value>
-  </data>
-  <data name="da_assets_list_name_attribute_2_display_name" xml:space="preserve">
-    <value>Attribut für die Namensanzeige von Listenwerten (Priorität 2)</value>
-  </data>
-  <data name="da_assets_list_name_attribute_description" xml:space="preserve">
-    <value>Wenn Sie in Ihren Listendefinitionen benutzerdefinierte Attribute verwenden, um den Wert für die Namensanzeige der Listenwerte zu speichern, können Sie die entsprechenden Attribut-Kennung hier eingeben. Wenn die Einstellung nicht angegeben ist, oder das Attribut nicht gefunden wurde, wird die Standard-Logik verwendet, um den Anzeigewert zu ermitteln.</value>
-  </data>
-  <data name="da_assets_list_name_attribute_display_name" xml:space="preserve">
-    <value>Attribut für die Namensanzeige von Listenwerten (Priorität 1)</value>
+    <value>Stellt Dienste zum Lesen, Suchen und Herunterladen von SharePoint-Assets zur Verfügung.</value>
   </data>
   <data name="da_assets_name" xml:space="preserve">
     <value>Zugriff auf Assets</value>
-  </data>
-  <data name="da_assets_picturepark_display_pattern_list_display_name" xml:space="preserve">
-    <value>Liste</value>
-  </data>
-  <data name="da_assets_resolve_list_data_attributes_description" xml:space="preserve">
-    <value>Das Lesen von benutzerdefinierten Daten aus Listenwerten ist äußerst ressourcen- und datenintensiv. Deshalb werden standardmäßig keine benutzerdefinierten Daten aus Listenwerten für Objekte aufgelöst, die mehrere Listenwerte zur gleichen Zeit referenzieren. Sie können hier die Namen jener Objekte angeben, zu denen diese benutzerdefinierte Daten trotzdem ausgelesen werden sollen.</value>
-  </data>
-  <data name="da_assets_resolve_list_data_attributes_display_name" xml:space="preserve">
-    <value>Datenattribute von Listen für Objekte auflösen</value>
   </data>
 </root>

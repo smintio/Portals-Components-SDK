@@ -129,11 +129,20 @@
   <data name="c_sharepoint_client_secret_display_name" xml:space="preserve">
     <value>Azure client secret</value>
   </data>
+  <data name="c_sharepoint_description" xml:space="preserve">
+    <value>Connects Smint.io Portals to Microsoft SharePoint.</value>
+  </data>
   <data name="c_sharepoint_high_security_mode_description" xml:space="preserve">
     <value>If this SharePoint connector is to be used in high security environments, please activate this option. Please note that some convenience features of the connector will then be turned off, e.g. the ability to easily select the SharePoint site from a drop-down list. This feature should be used by experts only.</value>
   </data>
   <data name="c_sharepoint_high_security_mode_display_name" xml:space="preserve">
     <value>High security mode (only for experts)</value>
+  </data>
+  <data name="c_sharepoint_name" xml:space="preserve">
+    <value>Microsoft SharePoint</value>
+  </data>
+  <data name="c_sharepoint_setup_documentation_url" xml:space="preserve">
+    <value>https://www.microsoft.com/microsoft-365/sharepoint</value>
   </data>
   <data name="c_sharepoint_sharepoint_url_description" xml:space="preserve">
     <value>The web address of your SharePoint instance. Please visit SharePoint, log in, and then copy the URL from the browser address bar. Finally, paste the copied URL here.</value>

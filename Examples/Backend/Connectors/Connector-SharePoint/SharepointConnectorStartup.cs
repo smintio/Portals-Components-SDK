@@ -11,16 +11,9 @@ namespace SmintIo.Portals.Connector.SharePoint
         public const string SharepointConnector = "sharepoint";
         public string Key => SharepointConnector;
 
-        public LocalizedStringsModel Name => new LocalizedStringsModel()
-        {
-            {LocalizedStringsModel.DefaultCulture, "Microsoft SharePoint"}
-        };
+        public LocalizedStringsModel Name { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.c_sharepoint_name));
 
-        public LocalizedStringsModel Description => new LocalizedStringsModel()
-        {
-            {LocalizedStringsModel.DefaultCulture, "Connects Smint.io Portals to Microsoft SharePoint."},
-            {"de", "Verbindet Smint.io Portals mit Microsoft SharePoint."}
-        };
+        public LocalizedStringsModel Description { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.c_sharepoint_description));        
 
         public string LogoUrl => "https://www.smint.io/images/connectors/sharepoint.png";
 
@@ -44,9 +37,6 @@ namespace SmintIo.Portals.Connector.SharePoint
         public bool IsAdvanced =>
             true; //once we have the AuthorizationCodeProvider every user can setup the connector on their own
 
-        public LocalizedStringsModel SetupDocumentationUrl => new LocalizedStringsModel()
-        {
-            { LocalizedStringsModel.DefaultCulture, "https://www.microsoft.com/microsoft-365/sharepoint" }
-        };
+        public LocalizedStringsModel SetupDocumentationUrl { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.c_sharepoint_setup_documentation_url));
     }
 }

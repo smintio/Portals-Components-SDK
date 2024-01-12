@@ -14,6 +14,11 @@
       <LastGenOutput>ConfigurationMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\PictureparkExternalUsersConfigurationMessages.de.resx" />
+    <EmbeddedResource Include="Resources\PictureparkExternalUsersConfigurationMessages.resx">
+      <LastGenOutput>PictureparkExternalUsersConfigurationMessages.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DotLiquid" Version="2.2.656" />
@@ -30,6 +35,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>ConfigurationMessages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\PictureparkExternalUsersConfigurationMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PictureparkExternalUsersConfigurationMessages.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>
