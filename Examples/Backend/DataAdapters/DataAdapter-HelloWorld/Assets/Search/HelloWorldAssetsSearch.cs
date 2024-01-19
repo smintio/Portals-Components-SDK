@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SmintIo.Portals.Connector.HelloWorld.Models.Requests;
 using SmintIo.Portals.Connector.HelloWorld.Models.Responses;
@@ -15,6 +14,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Specs;
 using SmintIo.Portals.SDK.Core.Configuration;
 using SmintIo.Portals.SDK.Core.Configuration.Model;
+using SmintIo.Portals.SDK.Core.Helpers;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 
@@ -214,7 +214,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
             int limit,
             int offset)
         {
-            var sanitizedQuery = Regex.Replace(queryString ?? string.Empty, AllowedCharactersPattern, " ");
+            var sanitizedQuery = StringHelpers.Sanitize(queryString ?? string.Empty);
 
             var stringArrayPropertyOptions = formFieldValueModelById.Values
                 .Where(ffvm =>
