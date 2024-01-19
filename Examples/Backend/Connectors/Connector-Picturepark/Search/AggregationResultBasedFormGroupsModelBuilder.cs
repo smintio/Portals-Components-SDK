@@ -5,6 +5,8 @@ using SmintIo.Portals.SDK.Core.Configuration.Model;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 using System.Collections.Generic;
 using System.Linq;
+using SmintIo.Portals.Connector.Picturepark.Resources;
+using SmintIo.Portals.SDK.Core.Extensions;
 
 namespace SmintIo.Portals.Connector.Picturepark.Search
 {
@@ -195,14 +197,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Search
             }
             else
             {
-                name = new LocalizedStringsModel()
-                {
-                    { LocalizedStringsModel.DefaultCulture, "No value" },
-                    { "de", "Kein Wert" },
-                    { "es", "Sin valor" },
-                    { "pt", "Sem valor" },
-                    { "it", "Nessun valore" }
-                };
+                name = MetamodelMessages.c_picturepark_no_value.Localize();
             }
 
             model.Name = name;
