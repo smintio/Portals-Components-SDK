@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SmintIo.Portals.Connector.SharePoint.Client;
 using SmintIo.Portals.Connector.SharePoint.Models;
+using SmintIo.Portals.Connector.SharePoint.Resources;
 using SmintIo.Portals.ConnectorSDK.Metamodel;
 using SmintIo.Portals.ConnectorSDK.Parsers;
 using SmintIo.Portals.SDK.Core.Extensions;
@@ -152,9 +153,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
         private EntityModel AddRootEntityModel()
         {
-            var rootEntityLabels = "SharePoint File".LocalizeByCulture();
-
-            rootEntityLabels.TryAdd("de", "SharePoint-Datei");
+            var rootEntityLabels = new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_sharepoint_root_entity));
 
             var rootEntityModel = CreateEntityModel(RootEntityKey, rootEntityLabels);
 

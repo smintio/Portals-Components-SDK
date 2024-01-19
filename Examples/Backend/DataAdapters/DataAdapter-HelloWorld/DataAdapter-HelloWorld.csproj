@@ -13,7 +13,7 @@
     <EmbeddedResource Include="Resources\ConfigurationMessages.resx">
       <LastGenOutput>ConfigurationMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>        
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="6.6.6" />
