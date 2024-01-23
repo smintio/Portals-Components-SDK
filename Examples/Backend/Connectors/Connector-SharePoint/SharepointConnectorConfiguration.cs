@@ -31,6 +31,7 @@ namespace SmintIo.Portals.Connector.SharePoint
         [DisplayName(translationKey: nameof(ConfigurationMessages.c_sharepoint_site_id_string_display_name))]
         [Description(translationKey: nameof(ConfigurationMessages.c_sharepoint_site_id_string_description))]
         [FormItemVisibility(Visibility = FormItemVisibilityEnum.Advanced)]
+        [VisibleIf(nameof(HighSecurityMode), VisibleIfOperators.Equal, true)]
         public string SiteIdString { get; set; }
 
         [DisplayName(translationKey: nameof(ConfigurationMessages.c_sharepoint_site_drive_id_display_name))]

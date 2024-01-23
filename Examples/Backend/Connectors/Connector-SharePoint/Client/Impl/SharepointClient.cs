@@ -154,7 +154,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             var response = await ExecuteWithBackoffAsync(
                 apiFunc: (_) =>
                     {
-                        var request = new RestRequest("_api/search/query?querytext='contentclass:sts_site'", Method.GET);
+                        var request = new RestRequest("_api/search/query?querytext='contentclass:sts_site'&rowlimit=100&rowsperpage=100", Method.GET);
 
                         SetResponseHeaderType(request);
 
