@@ -165,11 +165,6 @@ namespace SmintIo.Portals.Connector.SharePoint
             else
             {
                 siteId = _configuration.SiteId;
-
-                if (string.IsNullOrEmpty(siteId))
-                {
-                    siteId = _configuration.SiteIdString;
-                }
             }
                 
             var siteDriveId = _configuration.HighSecurityMode
@@ -466,11 +461,6 @@ namespace SmintIo.Portals.Connector.SharePoint
             else
             {
                 siteId = _configuration.SiteId;
-
-                if (string.IsNullOrEmpty(siteId))
-                {
-                    siteId = _configuration.SiteIdString;
-                }
             }
 
             var siteDriveId = _configuration.HighSecurityMode
