@@ -75,7 +75,8 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
         {
             var asset = new AssetDataObject(dataAdapterContext)
             {
-                Id = contentDetail.Id
+                Id = contentDetail.Id,
+                ExternalId = contentDetail.Id,
             };
 
             // Display values have to be loaded
@@ -108,7 +109,8 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
         {
             var asset = new AssetDataObject(_dataAdapterContext)
             {
-                Id = contentDetail.Id
+                Id = contentDetail.Id,
+                ExternalId = contentDetail.Id
             };
 
             if (contentDetail.Audit != null)

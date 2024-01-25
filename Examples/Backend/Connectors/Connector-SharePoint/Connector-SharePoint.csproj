@@ -10,12 +10,26 @@
     <Version>1.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\ConfigurationMessages.de.resx" />
+    <EmbeddedResource Include="Resources\ConfigurationMessages.resx">
+      <LastGenOutput>ConfigurationMessages.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.Graph" Version="4.25.0" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.2.32">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Polly" Version="7.2.3" />
-    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="6.5.4" />
+    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="6.6.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\ConfigurationMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConfigurationMessages.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

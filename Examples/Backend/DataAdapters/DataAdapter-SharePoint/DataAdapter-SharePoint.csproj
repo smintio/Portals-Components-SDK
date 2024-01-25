@@ -3,16 +3,32 @@
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>SmintIo.Portals.DataAdapter.SharePoint</RootNamespace>
     <AssemblyName>SmintIo.Portals.DataAdapter.SharePoint</AssemblyName>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <Version>1.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="6.5.4" />
+    <EmbeddedResource Include="Resources\ConfigurationMessages.de.resx" />
+    <EmbeddedResource Include="Resources\ConfigurationMessages.resx">
+      <LastGenOutput>ConfigurationMessages.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="6.6.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Connectors\Connector-SharePoint\Connector-SharePoint.csproj">
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\ConfigurationMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConfigurationMessages.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

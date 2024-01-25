@@ -30,7 +30,7 @@ namespace SmintIo.Portals.Connector.SharePoint
         public const string SharepointAccessTokenKey = "sharePointAccessToken";
 
         private const string DefaultClientId = "deb473a8-8ee0-40c5-aa5d-5d821d308c4f";
-        private const string DefaultClientSecret = "GjB7Q~9LEPjeHcR9Unp9mP1A6dJN3ce.slzk1";
+        private const string DefaultClientSecret = "RsF8Q~rEA5CZuEofJz1xzB6Bv-fWw4m1Mm2NNa4I";
 
         private const string IdentityServerUrl = "https://login.microsoftonline.com";
         private const string MicrosoftGraphUrl = "https://graph.microsoft.com";
@@ -165,11 +165,6 @@ namespace SmintIo.Portals.Connector.SharePoint
             else
             {
                 siteId = _configuration.SiteId;
-
-                if (string.IsNullOrEmpty(siteId))
-                {
-                    siteId = _configuration.SiteIdString;
-                }
             }
                 
             var siteDriveId = _configuration.HighSecurityMode
@@ -466,11 +461,6 @@ namespace SmintIo.Portals.Connector.SharePoint
             else
             {
                 siteId = _configuration.SiteId;
-
-                if (string.IsNullOrEmpty(siteId))
-                {
-                    siteId = _configuration.SiteIdString;
-                }
             }
 
             var siteDriveId = _configuration.HighSecurityMode

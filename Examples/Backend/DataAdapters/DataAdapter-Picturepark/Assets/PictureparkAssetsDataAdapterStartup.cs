@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SmintIo.Portals.Connector.Picturepark;
+using SmintIo.Portals.DataAdapter.Picturepark.Resources;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Permissions;
@@ -18,17 +19,9 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Search
 
         public string ConnectorKey => PictureparkConnectorStartup.PictureparkConnector;
 
-        public LocalizedStringsModel Name => new LocalizedStringsModel()
-        {
-            { LocalizedStringsModel.DefaultCulture, "Asset access" },
-            { "de", "Zugriff auf Assets" },
-        };
+        public LocalizedStringsModel Name { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.da_assets_name));
 
-        public LocalizedStringsModel Description => new LocalizedStringsModel()
-        {
-            { LocalizedStringsModel.DefaultCulture, "Provides services to read, search and download assets from Picturepark." },
-            { "de", "Stellt Dienste zum Lesen, Suchen und Herunterladen von Picturepark-Assets zur Verfügung." }
-        };
+        public LocalizedStringsModel Description { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.da_assets_description));
 
         public string LogoUrl => null;
 
@@ -41,6 +34,8 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Search
         public Type ComponentImplementation => typeof(PictureparkAssetsDataAdapter);
 
         public Type ConfigurationImplementation => typeof(PictureparkAssetsDataAdapterConfiguration);
+
+        public Type ConfigurationMessages => typeof(ConfigurationMessages);
 
         public Type[] PublicApiInterfaces => new Type[] { typeof(IAssets) };
 
