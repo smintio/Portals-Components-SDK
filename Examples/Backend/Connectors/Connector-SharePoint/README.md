@@ -165,7 +165,7 @@ spf.AddProperty("Owner", DataType.DataObject, userEntityModel.Key, ...);
 ```
 By passing `userEntityModel.Key` as third parameter we specify that the model for `"Owner"` is defined in another entity model, namely `userEntityModel`.  
 
-Simularly to the `MetamodelMessages` examples from [Connector description & flow](#user-content-connector-description--flow)
+Similarily to the `MetamodelMessages` examples from [Connector description & flow](#user-content-connector-description--flow)
 
 `EntityModel`, `EnumEntityModel` and their properties support resource localized translations by using `ResourceLocalizedStringsModel` instance instead of `LocalizedStringsModel`.
 
