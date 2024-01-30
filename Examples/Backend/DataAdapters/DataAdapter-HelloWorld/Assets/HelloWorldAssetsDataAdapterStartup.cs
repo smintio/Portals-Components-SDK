@@ -64,7 +64,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
 
         public Task FillDefaultFormFieldValuesModelAsync(string connectorEntityModelKey, FormFieldValuesModel formFieldValuesModel)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         /// <summary>
