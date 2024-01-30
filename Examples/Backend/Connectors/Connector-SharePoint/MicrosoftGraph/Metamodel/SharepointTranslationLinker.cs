@@ -31,6 +31,8 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
             {
                 if (entityModel.Labels is ResourceLocalizedStringsModel)
                 {
+                    LocalizeProperties(entityModel);
+
                     continue;
                 }
 
