@@ -1,6 +1,8 @@
 Developing Smint.io Portals backend components
 ==============================================
 
+Current version of this document is: 1.0.1 (as of 23rd of January, 2024)
+
 This repository contains examples for Smint.io Portals backend components, which is connectors, data adapters, task handlers, portal templates and identity providers.
 
 Documentation on portal templates, task handlers and identity providers will follow. Please get in touch if you want to leverage that functionality.
@@ -94,6 +96,73 @@ public string AccessToken { get; set; }
 ```
 Smint.io Portals understands the definition of annotations that allow to change the look and feel of the user interface.
 Please note that multiple cultures are supported.
+
+An alternative method for handling translations involves the use of resource files.
+By adding `ConfigurationMessages.resx`, `ConfigurationMessages.de.resx`, or other culture-specific files under a `Resources` folder within the project.
+
+Then, in the `PictureparkConnectorStartup` implementation, the type of the resoure file should be registered like this: 
+
+```C#
+public Type ConfigurationMessages => typeof(ConfigurationMessages);
+```
+
+This ensures that the resource files are processed, validated and plugged into the Smint.io component system.
+
+Note that resource keys should start with `c_` followed by the `Key` of the `IConnectorStartup`.
+An example for the `AccessToken` resource key look like this `c_picturepark_access_token`.
+
+Modified version for the example from above, utilizing a single attribute and referencing keys from the resource file:
+
+```C#
+[DisplayName(translationKey: nameof(ConfigurationMessages.c_picturepark_picturepark_url_display_name))]
+[Description(translationKey: nameof(ConfigurationMessages.c_picturepark_picturepark_url_description))]
+[Required]
+[IsUri(EnforceHttps = true, RemovePathAndQueryString = true)]
+public string PictureparkUrl { get; set; }
+
+[DisplayName(translationKey: nameof(ConfigurationMessages.c_picturepark_access_token_display_name))]
+[Description(translationKey: nameof(ConfigurationMessages.c_picturepark_access_token_description))]
+[MaxLength(100)]
+[Required]
+public string AccessToken { get; set; }
+```
+
+Similarly, the same approach can be applied to `MetamodelMessages` which are dedicated for classes implementing `IMetamodelBuilder`.
+
+```C#
+public Type MetamodelMessages => typeof(MetamodelMessages);
+```
+
+A valid example can be found in the `SharepointMetamodelBuilder`
+
+```C#
+var rootEntityLabels = new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_sharepoint_root_entity));
+
+var rootEntityModel = CreateEntityModel(RootEntityKey, rootEntityLabels);
+```
+
+`ResourceLocalizedStringsModel` is an efficient way of adding a localized label to a metamodel, later resolved by the Smint.io component framework.
+
+This is crucial because metamodel translations must be fully resolved and cached for future use.
+
+Data adapters can leverage the metamodel messages as well. 
+`SearchAssetsAsync` demostrates this in `PictureparkAssetsSearch.cs`
+
+```C#
+new ValueForJsonUiDetailsModel()
+{
+	Value = new ValueForJson() {
+		StringValue = "Advanced"
+	},
+	Name = MetamodelMessages.c_picturepark_advanced.Localize()
+}
+```
+
+The key difference is that here, `MetamodelMessages.c_picturepark_advanced` resolves the string value from the resource file and then it is converted to LocalizedStringsModel using the `Localize` extension method.
+
+This is done because before the execution of SearchAssetsAsync, the correct culture is set for the request and `MetamodelMessages` will resolve culture specific literal value or fall back to the default one.
+
+In this case the `Name` property of `ValueForJson` does not have to be fully localized.
 
 The full list of supported Smint.io Portals annotations can be found [here](../Frontend/docs/smintio-annotations.md).
 

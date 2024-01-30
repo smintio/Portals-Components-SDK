@@ -39,6 +39,6 @@ namespace SmintIo.Portals.Connector.Picturepark
 
         public Type ConfigurationMessages => typeof(ConfigurationMessages);
 
-        public Type MetamodelMessages => null;
+        public Type MetamodelMessages => typeof(MetamodelMessages);
     }
 }

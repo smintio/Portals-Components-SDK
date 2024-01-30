@@ -3,9 +3,18 @@
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>SmintIo.Portals.DataAdapter.HelloWorld</RootNamespace>
     <AssemblyName>SmintIo.Portals.DataAdapter.HelloWorld</AssemblyName>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <Version>1.0.0.0</Version>
   </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ConfigurationMessages.de.resx" />
+    <EmbeddedResource Include="Resources\ConfigurationMessages.resx">
+      <LastGenOutput>ConfigurationMessages.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="6.6.6" />
   </ItemGroup>
@@ -14,5 +23,12 @@
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\ConfigurationMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConfigurationMessages.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

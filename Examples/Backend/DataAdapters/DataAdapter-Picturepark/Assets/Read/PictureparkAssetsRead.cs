@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Picturepark.SDK.V1.Contract;
+using SmintIo.Portals.Connector.Picturepark.Resources;
 using SmintIo.Portals.DataAdapter.Picturepark.Assets.Common;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Impl;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Progress;
+using SmintIo.Portals.SDK.Core.Extensions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 using SmintIo.Portals.SDK.Core.Models.Metamodel;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
@@ -260,230 +262,31 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                         RequiresHiResDownloadPermission = !outputOutputFormatDetails.ViewForAll
                     };
 
-                    switch (content.ContentType)
+                    assetDownloadItemMappingModel.GroupName = content.ContentType switch
                     {
-                        case PictureParkContentType.Unknown:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Unknown" },
-                                { "de", "Unbekannt" },
-                                { "es", "Desconocido" },
-                                { "pt", "Desconhecido" },
-                                { "it", "Sconosciuto" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Bitmap:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Photo" },
-                                { "de", "Bild" },
-                                { "es", "Foto" },
-                                { "pt", "Foto" },
-                                { "it", "Immagine" }
-                            };
-                            break;
-
-                        case PictureParkContentType.VectorGraphic:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Vector illustration" },
-                                { "de", "Vektorgrafik" },
-                                { "es", "Ilustración vectorial" },
-                                { "pt", "Ilustração vetorial" },
-                                { "it", "Illustrazione vettoriale" }
-                            };
-                            break;
-
-                        case PictureParkContentType.RawImage:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Raw image" },
-                                { "de", "Rohe Bilddaten" },
-                                { "es", "Imagen sin procesar" },
-                                { "pt", "Imagem crua" },
-                                { "it", "Immagine grezza" }
-                            };
-                            break;
-
-                        case PictureParkContentType.InterchangeDocument:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Interchange document" },
-                                { "de", "Interchange-Dokument" },
-                                { "es", "Documento de intercambio" },
-                                { "pt", "Documento de intercâmbio" },
-                                { "it", "Documento di scambio" }
-                            };
-                            break;
-
-                        case PictureParkContentType.WordProcessingDocument:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Word processing document" },
-                                { "de", "Textverarbeitungs-Datei" },
-                                { "es", "Documento de procesamiento de texto" },
-                                { "pt", "Documento de processamento de texto" },
-                                { "it", "File di elaborazione testi" }
-                            };
-                            break;
-
-                        case PictureParkContentType.TextDocument:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Text document" },
-                                { "de", "Textdatei" },
-                                { "es", "Documento de texto" },
-                                { "pt", "Documento de texto" },
-                                { "it", "File di testo" }
-                            };
-                            break;
-
-                        case PictureParkContentType.DesktopPublishingDocument:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Desktop publishing document" },
-                                { "de", "Desktop Publishing-Dokument" },
-                                { "es", "Documento de autoedición" },
-                                { "pt", "Documento de editoração eletrônica" },
-                                { "it", "Documento di desktop publishing" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Presentation:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Presentation" },
-                                { "de", "Präsentation" },
-                                { "es", "Presentación" },
-                                { "pt", "Apresentação" },
-                                { "it", "Presentazione" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Spreadsheet:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Spreadsheet" },
-                                { "de", "Kalkulationstabelle" },
-                                { "es", "Hoja de cálculo" },
-                                { "pt", "Planilha" },
-                                { "it", "Foglio di calcolo" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Archive:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Archive" },
-                                { "de", "Archiv" },
-                                { "es", "Archivo" },
-                                { "pt", "Arquivo" },
-                                { "it", "Archivio" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Audio:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Audio" },
-                                { "pt", "Áudio" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Video:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Video" },
-                                { "es", "Vídeo" },
-                                { "pt", "Vídeo" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Font:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Font" },
-                                { "de", "Schriftart" },
-                                { "es", "Fuente" },
-                                { "pt", "Fonte" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Multimedia:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Multimedia" },
-                                { "pt", "Multimídia" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Application:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Application" },
-                                { "de", "Anwendung" },
-                                { "es", "Aplicación" },
-                                { "pt", "Aplicativo" },
-                                { "it", "Applicazione" }
-                            };
-                            break;
-
-                        case PictureParkContentType.SourceCode:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Source code" },
-                                { "de", "Quellcode" },
-                                { "es", "Código fuente" },
-                                { "pt", "Código fonte" },
-                                { "it", "Codice sorgente" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Database:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Database" },
-                                { "de", "Datenbank" },
-                                { "es", "Base de datos" },
-                                { "pt", "Base de dados" },
-                                { "it", "Banca dati" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Cad:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "CAD" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Model3d:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "3D model" },
-                                { "de", "3D-Modell" },
-                                { "es", "Modelo 3D" },
-                                { "pt", "Modelo 3D" },
-                                { "it", "Modello 3D" }
-                            };
-                            break;
-
-                        case PictureParkContentType.Virtual:
-                            assetDownloadItemMappingModel.GroupName = new LocalizedStringsModel()
-                            {
-                                { LocalizedStringsModel.DefaultCulture, "Virtual object" },
-                                { "de", "Virtuelles Objekt" },
-                                { "es", "Objeto virtual" },
-                                { "pt", "Objeto virtual" },
-                                { "it", "Oggetto virtuale" }
-                            };
-                            break;
-
-                        default:
-                            assetDownloadItemMappingModel.GroupName = assetDataObject.ContentType.ListDisplayName;
-                            break;
-                    }
+                        PictureParkContentType.Unknown => MetamodelMessages.c_picturepark_unknown.Localize(),
+                        PictureParkContentType.Bitmap => MetamodelMessages.c_picturepark_bitmap.Localize(),
+                        PictureParkContentType.VectorGraphic => MetamodelMessages.c_picturepark_vector_graphic.Localize(),
+                        PictureParkContentType.RawImage => MetamodelMessages.c_picturepark_raw_image.Localize(),
+                        PictureParkContentType.InterchangeDocument => MetamodelMessages.c_picturepark_interchange_document.Localize(),
+                        PictureParkContentType.WordProcessingDocument => MetamodelMessages.c_picturepark_word_processing_document.Localize(),
+                        PictureParkContentType.TextDocument => MetamodelMessages.c_picturepark_text_document.Localize(),
+                        PictureParkContentType.DesktopPublishingDocument => MetamodelMessages.c_picturepark_desktop_publishing_document.Localize(),
+                        PictureParkContentType.Presentation => MetamodelMessages.c_picturepark_presentation.Localize(),
+                        PictureParkContentType.Spreadsheet => MetamodelMessages.c_picturepark_spread_sheet.Localize(),
+                        PictureParkContentType.Archive => MetamodelMessages.c_picturepark_archive.Localize(),
+                        PictureParkContentType.Audio => MetamodelMessages.c_picturepark_audio.Localize(),
+                        PictureParkContentType.Video => MetamodelMessages.c_picturepark_video.Localize(),
+                        PictureParkContentType.Font => MetamodelMessages.c_picturepark_font.Localize(),
+                        PictureParkContentType.Multimedia => MetamodelMessages.c_picturepark_multimedia.Localize(),
+                        PictureParkContentType.Application => MetamodelMessages.c_picturepark_application.Localize(),
+                        PictureParkContentType.SourceCode => MetamodelMessages.c_picturepark_source_code.Localize(),
+                        PictureParkContentType.Database => MetamodelMessages.c_picturepark_database.Localize(),
+                        PictureParkContentType.Cad => MetamodelMessages.c_picturepark_cad.Localize(),
+                        PictureParkContentType.Model3d => MetamodelMessages.c_picturepark_model_3d.Localize(),
+                        PictureParkContentType.Virtual => MetamodelMessages.c_picturepark_virtual.Localize(),
+                        _ => assetDataObject.ContentType.ListDisplayName,
+                    };
 
                     assetDownloadItemMappingModels.Add(assetDownloadItemMappingModel);
                 }
