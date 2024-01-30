@@ -37,6 +37,8 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.ExternalUsers
 
         public Type ConfigurationMessages => typeof(PictureparkExternalUsersConfigurationMessages);
 
+        public Type MetamodelMessages => null;
+
         public Type[] PublicApiInterfaces => new Type[] { typeof(IExternalUsersRead) };
 
         public DataAdapterPermission[] Permissions => null;

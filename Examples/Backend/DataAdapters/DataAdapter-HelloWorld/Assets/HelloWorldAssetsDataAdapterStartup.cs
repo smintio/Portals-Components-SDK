@@ -56,6 +56,11 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
         public Type ConfigurationMessages => typeof(ConfigurationMessages);
 
         /// <summary>
+        /// The type of resource file for metamodel messages 
+        /// </summary>
+        public Type MetamodelMessages => null;
+
+        /// <summary>
         /// <see cref="IServiceCollection"/> injection hook for this data adapter
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
