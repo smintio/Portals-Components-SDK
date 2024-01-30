@@ -101,7 +101,12 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test.Integration
 
     public class DummyProgressMonitor : IProgressMonitor
     {
-        public Task ReportProgressAsync(double units, LocalizedStringsModel displayText)
+        public Task ReportProgressIncrementAsync(double units, LocalizedStringsModel displayText)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task ReportProgressAbsoluteAsync(double units, LocalizedStringsModel displayText)
         {
             return Task.CompletedTask;
         }
