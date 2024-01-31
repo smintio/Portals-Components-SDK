@@ -117,61 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="c_picturepark_advanced" xml:space="preserve">
-    <value>Avanzate</value>
-  </data>
-  <data name="c_picturepark_application" xml:space="preserve">
-    <value>Applicazione</value>
-  </data>
-  <data name="c_picturepark_archive" xml:space="preserve">
-    <value>Archivio</value>
-  </data>
-  <data name="c_picturepark_bitmap" xml:space="preserve">
-    <value>Immagine</value>
-  </data>
-  <data name="c_picturepark_database" xml:space="preserve">
-    <value>Banca dati</value>
-  </data>
-  <data name="c_picturepark_desktop_publishing_document" xml:space="preserve">
-    <value>Documento di desktop publishing</value>
-  </data>
-  <data name="c_picturepark_interchange_document" xml:space="preserve">
-    <value>Documento di scambio</value>
-  </data>
-  <data name="c_picturepark_model_3d" xml:space="preserve">
-    <value>Modello 3D</value>
-  </data>
   <data name="c_picturepark_no_value" xml:space="preserve">
     <value>Nessun valore</value>
-  </data>
-  <data name="c_picturepark_presentation" xml:space="preserve">
-    <value>Presentazione</value>
-  </data>
-  <data name="c_picturepark_raw_image" xml:space="preserve">
-    <value>Immagine grezza</value>
-  </data>
-  <data name="c_picturepark_search_type" xml:space="preserve">
-    <value>Tipo di ricerca</value>
-  </data>
-  <data name="c_picturepark_source_code" xml:space="preserve">
-    <value>Codice sorgente</value>
-  </data>
-  <data name="c_picturepark_spread_sheet" xml:space="preserve">
-    <value>Foglio di calcolo</value>
-  </data>
-  <data name="c_picturepark_text_document" xml:space="preserve">
-    <value>File di testo</value>
-  </data>
-  <data name="c_picturepark_unknown" xml:space="preserve">
-    <value>Sconosciuto</value>
-  </data>
-  <data name="c_picturepark_vector_graphic" xml:space="preserve">
-    <value>Illustrazione vettoriale</value>
-  </data>
-  <data name="c_picturepark_virtual" xml:space="preserve">
-    <value>Oggetto virtuale</value>
-  </data>
-  <data name="c_picturepark_word_processing_document" xml:space="preserve">
-    <value>File di elaborazione testi</value>
   </data>
 </root>
