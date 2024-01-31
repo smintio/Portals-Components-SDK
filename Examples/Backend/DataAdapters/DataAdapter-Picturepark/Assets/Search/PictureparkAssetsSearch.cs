@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Picturepark.SDK.V1.Contract;
 using SmintIo.Portals.Connector.Picturepark.Client;
-using SmintIo.Portals.Connector.Picturepark.Resources;
 using SmintIo.Portals.Connector.Picturepark.Search;
 using SmintIo.Portals.DataAdapter.Picturepark.Assets.Common;
 using SmintIo.Portals.DataAdapter.Picturepark.Assets.Extensions;
+using SmintIo.Portals.DataAdapter.Picturepark.Resources;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Constants;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Impl;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
@@ -513,7 +513,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             formGroupsModel.FormGroupDefinitions.Add(new FormGroupDefinitionModel()
             {
                 Id = FormConstants.DefaultSmintIoSearchTypeFormGroupKey,
-                Name = MetamodelMessages.c_picturepark_search_type.Localize(),
+                Name = MetamodelMessages.da_assets_search_type.Localize(),
                 IsModified = searchTypeModified,
                 FormItemDefinitions = new List<FormFieldItemDefinitionModel>()
                 {
@@ -537,21 +537,21 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                                 Value = new ValueForJson() {
                                     StringValue = "SimpleAnd"
                                 },
-                                Name = MetamodelMessages.c_picturepark_simple_and.Localize()
+                                Name = MetamodelMessages.da_assets_simple_and.Localize()
                             },
                             new ValueForJsonUiDetailsModel()
                             {
                                 Value = new ValueForJson() {
                                     StringValue = "SimpleOr"
                                 },
-                                Name = MetamodelMessages.c_picturepark_simple_or.Localize()
+                                Name = MetamodelMessages.da_assets_simple_or.Localize()
                             },
                             new ValueForJsonUiDetailsModel()
                             {
                                 Value = new ValueForJson() {
                                     StringValue = "Advanced"
                                 },
-                                Name = MetamodelMessages.c_picturepark_advanced.Localize()
+                                Name = MetamodelMessages.da_assets_advanced.Localize()
                             }
                         }
                     },
@@ -575,7 +575,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             formGroupsModel.FormGroupDefinitions.Add(new FormGroupDefinitionModel()
             {
                 Id = FormConstants.DefaultSmintIoSortByFormGroupKey,
-                Name = DataAdapterSDK.Resources.Messages.da_form_group_definition_sort_by.Localize(),
+                Name = DataAdapterSDK.Resources.MetamodelMessages.da_form_group_definition_sort_by.Localize(),
                 IsModified = sortByModified,
                 FormItemDefinitions = new List<FormFieldItemDefinitionModel>()
                 {
@@ -600,7 +600,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             formGroupsModel.FormGroupDefinitions.Add(new FormGroupDefinitionModel()
             {
                 Id = FormConstants.DefaultSmintIoSortOrderFormGroupKey,
-                Name = DataAdapterSDK.Resources.Messages.da_form_group_definition_sort_order.Localize(),
+                Name = DataAdapterSDK.Resources.MetamodelMessages.da_form_group_definition_sort_order.Localize(),
                 IsModified = sortOrderModified,
                 FormItemDefinitions = new List<FormFieldItemDefinitionModel>()
                 {
@@ -624,14 +624,14 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                                 Value = new ValueForJson() {
                                     StringValue = "asc"
                                 },
-                                Name = DataAdapterSDK.Resources.Messages.da_sort_order_fields_ascending.Localize()
+                                Name = DataAdapterSDK.Resources.MetamodelMessages.da_sort_order_fields_ascending.Localize()
                             },
                             new ValueForJsonUiDetailsModel()
                             {
                                 Value = new ValueForJson() {
                                     StringValue = "desc"
                                 },
-                                Name = DataAdapterSDK.Resources.Messages.da_sort_order_fields_descending.Localize()
+                                Name = DataAdapterSDK.Resources.MetamodelMessages.da_sort_order_fields_descending.Localize()
                             }
                         }
                     }
