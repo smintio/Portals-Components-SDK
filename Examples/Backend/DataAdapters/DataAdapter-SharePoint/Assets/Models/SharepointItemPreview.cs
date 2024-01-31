@@ -64,6 +64,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Models
             var inputFormat = parsedTransformUrlQuery.Get("inputFormat");
             manifestQuery[nameof(inputFormat)] = inputFormat;
 
+            manifestQuery["ctag"] = Ctag;
+
             var cs = parsedTransformUrlQuery.Get("cs");
             manifestQuery[nameof(cs)] = cs;
 

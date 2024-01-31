@@ -1,7 +1,7 @@
 How-to implement the `Connector`
 ================================
 
-Current version of this document is: 1.0.0 (as of 2nd of March, 2023)
+Current version of this document is: 1.0.1 (as of 23rd of January, 2024)
 
 ## SharePoint `Connector` Basics
 
@@ -164,6 +164,17 @@ userEntityModel.AddProperty("Age", DataType.Int32, ...);
 spf.AddProperty("Owner", DataType.DataObject, userEntityModel.Key, ...);
 ```
 By passing `userEntityModel.Key` as third parameter we specify that the model for `"Owner"` is defined in another entity model, namely `userEntityModel`.  
+
+Similarily to the `MetamodelMessages` examples from [Connector description & flow](#user-content-connector-description--flow)
+
+`EntityModel`, `EnumEntityModel` and their properties support resource localized translations by using `ResourceLocalizedStringsModel` instance instead of `LocalizedStringsModel`.
+
+```c#
+var spf = new EntityModel("SharepointFile",..., labels: new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_sharepoint_root_entity)));
+spf.AddProperty("DisplayName", DataType.String, ..., labels: new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_sharepoint_root_entity_display_name)));
+spf.AddProperty("LikeCount", DataType.Int32, ..., labels: new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_sharepoint_root_entity_like_count)));
+// ...
+```
 
 ### Get metadata from Sharepoint
 

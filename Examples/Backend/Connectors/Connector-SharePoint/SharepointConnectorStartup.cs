@@ -24,7 +24,7 @@ namespace SmintIo.Portals.Connector.SharePoint
 
         public Type ConfigurationMessages => typeof(ConfigurationMessages);
 
-        public Type MetamodelMessages => null;
+        public Type MetamodelMessages => typeof(MetamodelMessages);
 
         public void ConfigureServices(IServiceCollection services)
         {

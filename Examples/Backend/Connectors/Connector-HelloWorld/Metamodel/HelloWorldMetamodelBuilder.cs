@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using SmintIo.Portals.Connector.HelloWorld.Client;
 using SmintIo.Portals.Connector.HelloWorld.Extensions;
 using SmintIo.Portals.Connector.HelloWorld.Models.Responses;
+using SmintIo.Portals.Connector.HelloWorld.Resources;
 using SmintIo.Portals.ConnectorSDK.Metamodel;
 using SmintIo.Portals.SDK.Core.Extensions;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Model;
@@ -20,12 +21,6 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
     {
         public const string RootEntityKey = "HelloWorldAsset";
         public const string ContentTypeId = "contentType";
-
-        public static readonly LocalizedStringsModel ContentTypeLabels = new()
-        {
-            { LocalizedStringsModel.DefaultCulture, "Content type" },
-            { "de", "Inhaltstyp" }
-        };
 
         private readonly IHelloWorldClient _helloWorldClient;
         private readonly ILogger _logger;
@@ -69,7 +64,7 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
                 ContentTypeId,
                 DataType.LocalizedStringsModel,
                 targetMetamodelEntityKey: null,
-                labels: ContentTypeLabels);
+                labels: new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_hello_world_content_type)));
 
             foreach (var customField in customFields)
             {
