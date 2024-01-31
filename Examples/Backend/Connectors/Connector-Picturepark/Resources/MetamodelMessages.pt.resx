@@ -117,73 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="c_picturepark_advanced" xml:space="preserve">
-    <value>Avançado</value>
-  </data>
-  <data name="c_picturepark_application" xml:space="preserve">
-    <value>Aplicativo</value>
-  </data>
-  <data name="c_picturepark_archive" xml:space="preserve">
-    <value>Arquivo</value>
-  </data>
-  <data name="c_picturepark_audio" xml:space="preserve">
-    <value>Áudio</value>
-  </data>
-  <data name="c_picturepark_bitmap" xml:space="preserve">
-    <value>Foto</value>
-  </data>
-  <data name="c_picturepark_database" xml:space="preserve">
-    <value>Base de dados</value>
-  </data>
-  <data name="c_picturepark_desktop_publishing_document" xml:space="preserve">
-    <value>Documento de editoração eletrônica</value>
-  </data>
-  <data name="c_picturepark_font" xml:space="preserve">
-    <value>Fonte</value>
-  </data>
-  <data name="c_picturepark_interchange_document" xml:space="preserve">
-    <value>Documento de intercâmbio</value>
-  </data>
-  <data name="c_picturepark_model_3d" xml:space="preserve">
-    <value>Modelo 3D</value>
-  </data>
-  <data name="c_picturepark_multimedia" xml:space="preserve">
-    <value>Multimídia</value>
-  </data>
   <data name="c_picturepark_no_value" xml:space="preserve">
     <value>Sem valor</value>
-  </data>
-  <data name="c_picturepark_presentation" xml:space="preserve">
-    <value>Apresentação</value>
-  </data>
-  <data name="c_picturepark_raw_image" xml:space="preserve">
-    <value>Imagem crua</value>
-  </data>
-  <data name="c_picturepark_search_type" xml:space="preserve">
-    <value>Tipo de busca</value>
-  </data>
-  <data name="c_picturepark_source_code" xml:space="preserve">
-    <value>Código fonte</value>
-  </data>
-  <data name="c_picturepark_spread_sheet" xml:space="preserve">
-    <value>Planilha</value>
-  </data>
-  <data name="c_picturepark_text_document" xml:space="preserve">
-    <value>Documento de texto</value>
-  </data>
-  <data name="c_picturepark_unknown" xml:space="preserve">
-    <value>Desconhecido</value>
-  </data>
-  <data name="c_picturepark_vector_graphic" xml:space="preserve">
-    <value>Ilustração vetorial</value>
-  </data>
-  <data name="c_picturepark_video" xml:space="preserve">
-    <value>Vídeo</value>
-  </data>
-  <data name="c_picturepark_virtual" xml:space="preserve">
-    <value>Objeto virtual</value>
-  </data>
-  <data name="c_picturepark_word_processing_document" xml:space="preserve">
-    <value>Documento de processamento de texto</value>
   </data>
 </root>

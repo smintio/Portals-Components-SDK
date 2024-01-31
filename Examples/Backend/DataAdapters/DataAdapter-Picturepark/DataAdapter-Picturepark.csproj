@@ -14,6 +14,14 @@
       <LastGenOutput>ConfigurationMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MetamodelMessages.de.resx" />
+    <EmbeddedResource Include="Resources\MetamodelMessages.es.resx" />
+    <EmbeddedResource Include="Resources\MetamodelMessages.it.resx" />
+    <EmbeddedResource Include="Resources\MetamodelMessages.pt.resx" />
+    <EmbeddedResource Include="Resources\MetamodelMessages.resx">
+      <LastGenOutput>MetamodelMessages.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\PictureparkExternalUsersConfigurationMessages.de.resx" />
     <EmbeddedResource Include="Resources\PictureparkExternalUsersConfigurationMessages.resx">
       <LastGenOutput>PictureparkExternalUsersConfigurationMessages.Designer.cs</LastGenOutput>
@@ -22,7 +30,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DotLiquid" Version="2.2.656" />
-    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="6.6.8" />
+    <PackageReference Include="SmintIo.Portals.DataAdapterSDK" Version="6.6.9" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Connectors\Connector-Picturepark\Connector-Picturepark.csproj">
@@ -35,6 +43,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>ConfigurationMessages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\MetamodelMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MetamodelMessages.resx</DependentUpon>
     </Compile>
     <Compile Update="Resources\PictureparkExternalUsersConfigurationMessages.Designer.cs">
       <DesignTime>True</DesignTime>

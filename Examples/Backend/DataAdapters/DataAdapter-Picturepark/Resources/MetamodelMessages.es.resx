@@ -117,7 +117,64 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="c_picturepark_no_value" xml:space="preserve">
-    <value>No value</value>
+  <data name="da_assets_advanced" xml:space="preserve">
+    <value>Avanzado</value>
+  </data>
+  <data name="da_assets_application" xml:space="preserve">
+    <value>Aplicación</value>
+  </data>
+  <data name="da_assets_archive" xml:space="preserve">
+    <value>Archivo</value>
+  </data>
+  <data name="da_assets_bitmap" xml:space="preserve">
+    <value>Foto</value>
+  </data>
+  <data name="da_assets_database" xml:space="preserve">
+    <value>Base de datos</value>
+  </data>
+  <data name="da_assets_desktop_publishing_document" xml:space="preserve">
+    <value>Documento de autoedición</value>
+  </data>
+  <data name="da_assets_font" xml:space="preserve">
+    <value>Fuente</value>
+  </data>
+  <data name="da_assets_interchange_document" xml:space="preserve">
+    <value>Documento de intercambio</value>
+  </data>
+  <data name="da_assets_model_3d" xml:space="preserve">
+    <value>Modelo 3D</value>
+  </data>
+  <data name="da_assets_presentation" xml:space="preserve">
+    <value>Presentación</value>
+  </data>
+  <data name="da_assets_raw_image" xml:space="preserve">
+    <value>Imagen sin procesar</value>
+  </data>
+  <data name="da_assets_search_type" xml:space="preserve">
+    <value>Tipo de búsqueda</value>
+  </data>
+  <data name="da_assets_source_code" xml:space="preserve">
+    <value>Código fuente</value>
+  </data>
+  <data name="da_assets_spread_sheet" xml:space="preserve">
+    <value>Hoja de cálculo</value>
+  </data>
+  <data name="da_assets_text_document" xml:space="preserve">
+    <value>Documento de texto</value>
+  </data>
+  <data name="da_assets_unknown" xml:space="preserve">
+    <value>Desconocido</value>
+  </data>
+  <data name="da_assets_vector_graphic" xml:space="preserve">
+    <value>Ilustración vectorial</value>
+  </data>
+  <data name="da_assets_video" xml:space="preserve">
+    <value>Vídeo</value>
+  </data>
+  <data name="da_assets_virtual" xml:space="preserve">
+    <value>Objeto virtual</value>
+  </data>
+  <data name="da_assets_word_processing_document" xml:space="preserve">
+    <value>Documento de procesamiento de texto</value>
   </data>
 </root>

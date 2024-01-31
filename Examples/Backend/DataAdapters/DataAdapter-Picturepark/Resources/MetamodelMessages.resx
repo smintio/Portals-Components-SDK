@@ -117,7 +117,79 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="c_picturepark_no_value" xml:space="preserve">
-    <value>No value</value>
+  <data name="da_assets_advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="da_assets_application" xml:space="preserve">
+    <value>Application</value>
+  </data>
+  <data name="da_assets_archive" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="da_assets_audio" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="da_assets_bitmap" xml:space="preserve">
+    <value>Photo</value>
+  </data>
+  <data name="da_assets_cad" xml:space="preserve">
+    <value>CAD</value>
+  </data>
+  <data name="da_assets_database" xml:space="preserve">
+    <value>Database</value>
+  </data>
+  <data name="da_assets_desktop_publishing_document" xml:space="preserve">
+    <value>Desktop publishing document</value>
+  </data>
+  <data name="da_assets_font" xml:space="preserve">
+    <value>Font</value>
+  </data>
+  <data name="da_assets_interchange_document" xml:space="preserve">
+    <value>Interchange document</value>
+  </data>
+  <data name="da_assets_model_3d" xml:space="preserve">
+    <value>3D model</value>
+  </data>
+  <data name="da_assets_multimedia" xml:space="preserve">
+    <value>Multimedia</value>
+  </data>
+  <data name="da_assets_presentation" xml:space="preserve">
+    <value>Presentation</value>
+  </data>
+  <data name="da_assets_raw_image" xml:space="preserve">
+    <value>Raw image</value>
+  </data>
+  <data name="da_assets_search_type" xml:space="preserve">
+    <value>Search type</value>
+  </data>
+  <data name="da_assets_simple_and" xml:space="preserve">
+    <value>Simple AND</value>
+  </data>
+  <data name="da_assets_simple_or" xml:space="preserve">
+    <value>Simple OR</value>
+  </data>
+  <data name="da_assets_source_code" xml:space="preserve">
+    <value>Source code</value>
+  </data>
+  <data name="da_assets_spread_sheet" xml:space="preserve">
+    <value>Spreadsheet</value>
+  </data>
+  <data name="da_assets_text_document" xml:space="preserve">
+    <value>Text document</value>
+  </data>
+  <data name="da_assets_unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="da_assets_vector_graphic" xml:space="preserve">
+    <value>Vector illustration</value>
+  </data>
+  <data name="da_assets_video" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="da_assets_virtual" xml:space="preserve">
+    <value>Virtual object</value>
+  </data>
+  <data name="da_assets_word_processing_document" xml:space="preserve">
+    <value>Word processing document</value>
   </data>
 </root>

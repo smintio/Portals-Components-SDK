@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Picturepark.SDK.V1.Contract;
-using SmintIo.Portals.Connector.Picturepark.Resources;
 using SmintIo.Portals.DataAdapter.Picturepark.Assets.Common;
+using SmintIo.Portals.DataAdapter.Picturepark.Resources;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Impl;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Progress;
-using SmintIo.Portals.SDK.Core.Extensions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 using SmintIo.Portals.SDK.Core.Models.Metamodel;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
@@ -264,27 +263,27 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 
                     assetDownloadItemMappingModel.GroupName = content.ContentType switch
                     {
-                        PictureParkContentType.Unknown => MetamodelMessages.c_picturepark_unknown.Localize(),
-                        PictureParkContentType.Bitmap => MetamodelMessages.c_picturepark_bitmap.Localize(),
-                        PictureParkContentType.VectorGraphic => MetamodelMessages.c_picturepark_vector_graphic.Localize(),
-                        PictureParkContentType.RawImage => MetamodelMessages.c_picturepark_raw_image.Localize(),
-                        PictureParkContentType.InterchangeDocument => MetamodelMessages.c_picturepark_interchange_document.Localize(),
-                        PictureParkContentType.WordProcessingDocument => MetamodelMessages.c_picturepark_word_processing_document.Localize(),
-                        PictureParkContentType.TextDocument => MetamodelMessages.c_picturepark_text_document.Localize(),
-                        PictureParkContentType.DesktopPublishingDocument => MetamodelMessages.c_picturepark_desktop_publishing_document.Localize(),
-                        PictureParkContentType.Presentation => MetamodelMessages.c_picturepark_presentation.Localize(),
-                        PictureParkContentType.Spreadsheet => MetamodelMessages.c_picturepark_spread_sheet.Localize(),
-                        PictureParkContentType.Archive => MetamodelMessages.c_picturepark_archive.Localize(),
-                        PictureParkContentType.Audio => MetamodelMessages.c_picturepark_audio.Localize(),
-                        PictureParkContentType.Video => MetamodelMessages.c_picturepark_video.Localize(),
-                        PictureParkContentType.Font => MetamodelMessages.c_picturepark_font.Localize(),
-                        PictureParkContentType.Multimedia => MetamodelMessages.c_picturepark_multimedia.Localize(),
-                        PictureParkContentType.Application => MetamodelMessages.c_picturepark_application.Localize(),
-                        PictureParkContentType.SourceCode => MetamodelMessages.c_picturepark_source_code.Localize(),
-                        PictureParkContentType.Database => MetamodelMessages.c_picturepark_database.Localize(),
-                        PictureParkContentType.Cad => MetamodelMessages.c_picturepark_cad.Localize(),
-                        PictureParkContentType.Model3d => MetamodelMessages.c_picturepark_model_3d.Localize(),
-                        PictureParkContentType.Virtual => MetamodelMessages.c_picturepark_virtual.Localize(),
+                        PictureParkContentType.Unknown => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_unknown)),
+                        PictureParkContentType.Bitmap => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_bitmap)),
+                        PictureParkContentType.VectorGraphic => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_vector_graphic)),
+                        PictureParkContentType.RawImage => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_raw_image)),
+                        PictureParkContentType.InterchangeDocument => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_interchange_document)),
+                        PictureParkContentType.WordProcessingDocument => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_word_processing_document)),
+                        PictureParkContentType.TextDocument => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_text_document)),
+                        PictureParkContentType.DesktopPublishingDocument => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_desktop_publishing_document)),
+                        PictureParkContentType.Presentation => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_presentation)),
+                        PictureParkContentType.Spreadsheet => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_spread_sheet)),
+                        PictureParkContentType.Archive => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_archive)),
+                        PictureParkContentType.Audio => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_audio)),
+                        PictureParkContentType.Video => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_video)),
+                        PictureParkContentType.Font => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_font)),
+                        PictureParkContentType.Multimedia => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_multimedia)),
+                        PictureParkContentType.Application => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_application)),
+                        PictureParkContentType.SourceCode => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_source_code)),
+                        PictureParkContentType.Database => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_database)),
+                        PictureParkContentType.Cad => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_cad)),
+                        PictureParkContentType.Model3d => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_model_3d)),
+                        PictureParkContentType.Virtual => MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_virtual)),
                         _ => assetDataObject.ContentType.ListDisplayName,
                     };
 
