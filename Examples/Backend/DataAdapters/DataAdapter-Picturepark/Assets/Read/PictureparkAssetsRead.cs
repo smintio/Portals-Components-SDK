@@ -10,6 +10,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Progress;
+using SmintIo.Portals.SDK.Core.Extensions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 using SmintIo.Portals.SDK.Core.Models.Metamodel;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
@@ -21,27 +22,27 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 {
     public partial class PictureparkAssetsDataAdapter : AssetsDataAdapterBaseImpl
     {
-        private static LocalizedStringsModel _unknownLocalizedStringsModel;
-        private static LocalizedStringsModel _bitmapLocalizedStringsModel;
-        private static LocalizedStringsModel _VectorGraphicLocalizedStringsModel;
-        private static LocalizedStringsModel _rawImageLocalizedStringsModel;
-        private static LocalizedStringsModel _interchangeDocumentLocalizedStringsModel;
-        private static LocalizedStringsModel _wordProcessingDocumentLocalizedStringsModel;
-        private static LocalizedStringsModel _textDocumentLocalizedStringsModel;
-        private static LocalizedStringsModel _desktopPublishingDocumentLocalizedStringsModel;
-        private static LocalizedStringsModel _presentationLocalizedStringsModel;
-        private static LocalizedStringsModel _spreadsheetLocalizedStringsModel;
-        private static LocalizedStringsModel _archiveLocalizedStringsModel;
-        private static LocalizedStringsModel _audioLocalizedStringsModel;
-        private static LocalizedStringsModel _videoLocalizedStringsModel;
-        private static LocalizedStringsModel _fontLocalizedStringsModel;
-        private static LocalizedStringsModel _multimediaLocalizedStringsModel;
-        private static LocalizedStringsModel _applicationLocalizedStringsModel;
-        private static LocalizedStringsModel _sourceCodeLocalizedStringsModel;
-        private static LocalizedStringsModel _databaseLocalizedStringsModel;
-        private static LocalizedStringsModel _cadLocalizedStringsModel;
-        private static LocalizedStringsModel _model3dLocalizedStringsModel;
-        private static LocalizedStringsModel _virtualLocalizedStringsModel;
+        private static readonly LocalizedStringsModel _unknownLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_unknown));
+        private static readonly LocalizedStringsModel _bitmapLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_bitmap));
+        private static readonly LocalizedStringsModel _vectorGraphicLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_vector_graphic));
+        private static readonly LocalizedStringsModel _rawImageLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_raw_image));
+        private static readonly LocalizedStringsModel _interchangeDocumentLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_interchange_document));
+        private static readonly LocalizedStringsModel _wordProcessingDocumentLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_word_processing_document));
+        private static readonly LocalizedStringsModel _textDocumentLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_text_document));
+        private static readonly LocalizedStringsModel _desktopPublishingDocumentLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_desktop_publishing_document));
+        private static readonly LocalizedStringsModel _presentationLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_presentation));
+        private static readonly LocalizedStringsModel _spreadsheetLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_spread_sheet));
+        private static readonly LocalizedStringsModel _archiveLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_archive));
+        private static readonly LocalizedStringsModel _audioLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_audio));
+        private static readonly LocalizedStringsModel _videoLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_video));
+        private static readonly LocalizedStringsModel _fontLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_font));
+        private static readonly LocalizedStringsModel _multimediaLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_multimedia));
+        private static readonly LocalizedStringsModel _applicationLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_application));
+        private static readonly LocalizedStringsModel _sourceCodeLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_source_code));
+        private static readonly LocalizedStringsModel _databaseLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_database));
+        private static readonly LocalizedStringsModel _cadLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_cad));
+        private static readonly LocalizedStringsModel _model3dLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_model_3d));
+        private static readonly LocalizedStringsModel _virtualLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_virtual));
 
         public override async Task<GetAssetResult> GetAssetAsync(GetAssetParameters parameters)
         {
@@ -285,27 +286,27 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 
                     assetDownloadItemMappingModel.GroupName = content.ContentType switch
                     {
-                        PictureParkContentType.Unknown => _unknownLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_unknown)),
-                        PictureParkContentType.Bitmap => _bitmapLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_bitmap)),
-                        PictureParkContentType.VectorGraphic => _VectorGraphicLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_vector_graphic)),
-                        PictureParkContentType.RawImage => _rawImageLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_raw_image)),
-                        PictureParkContentType.InterchangeDocument => _interchangeDocumentLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_interchange_document)),
-                        PictureParkContentType.WordProcessingDocument => _wordProcessingDocumentLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_word_processing_document)),
-                        PictureParkContentType.TextDocument => _textDocumentLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_text_document)),
-                        PictureParkContentType.DesktopPublishingDocument => _desktopPublishingDocumentLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_desktop_publishing_document)),
-                        PictureParkContentType.Presentation => _presentationLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_presentation)),
-                        PictureParkContentType.Spreadsheet => _spreadsheetLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_spread_sheet)),
-                        PictureParkContentType.Archive => _archiveLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_archive)),
-                        PictureParkContentType.Audio => _audioLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_audio)),
-                        PictureParkContentType.Video => _videoLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_video)),
-                        PictureParkContentType.Font => _fontLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_font)),
-                        PictureParkContentType.Multimedia => _multimediaLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_multimedia)),
-                        PictureParkContentType.Application => _applicationLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_application)),
-                        PictureParkContentType.SourceCode => _sourceCodeLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_source_code)),
-                        PictureParkContentType.Database => _databaseLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_database)),
-                        PictureParkContentType.Cad => _cadLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_cad)),
-                        PictureParkContentType.Model3d => _model3dLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_model_3d)),
-                        PictureParkContentType.Virtual => _virtualLocalizedStringsModel ??= MetamodelMessageTranslationsProvider.GetLocalizedStringsModel(nameof(MetamodelMessages.da_assets_virtual)),
+                        PictureParkContentType.Unknown => _unknownLocalizedStringsModel,
+                        PictureParkContentType.Bitmap => _bitmapLocalizedStringsModel,
+                        PictureParkContentType.VectorGraphic => _vectorGraphicLocalizedStringsModel,
+                        PictureParkContentType.RawImage => _rawImageLocalizedStringsModel,
+                        PictureParkContentType.InterchangeDocument => _interchangeDocumentLocalizedStringsModel,
+                        PictureParkContentType.WordProcessingDocument => _wordProcessingDocumentLocalizedStringsModel,
+                        PictureParkContentType.TextDocument => _textDocumentLocalizedStringsModel,
+                        PictureParkContentType.DesktopPublishingDocument => _desktopPublishingDocumentLocalizedStringsModel,
+                        PictureParkContentType.Presentation => _presentationLocalizedStringsModel,
+                        PictureParkContentType.Spreadsheet => _spreadsheetLocalizedStringsModel,
+                        PictureParkContentType.Archive => _archiveLocalizedStringsModel,
+                        PictureParkContentType.Audio => _audioLocalizedStringsModel,
+                        PictureParkContentType.Video => _videoLocalizedStringsModel,
+                        PictureParkContentType.Font => _fontLocalizedStringsModel,
+                        PictureParkContentType.Multimedia => _multimediaLocalizedStringsModel,
+                        PictureParkContentType.Application => _applicationLocalizedStringsModel,
+                        PictureParkContentType.SourceCode => _sourceCodeLocalizedStringsModel,
+                        PictureParkContentType.Database => _databaseLocalizedStringsModel,
+                        PictureParkContentType.Cad => _cadLocalizedStringsModel,
+                        PictureParkContentType.Model3d => _model3dLocalizedStringsModel,
+                        PictureParkContentType.Virtual => _virtualLocalizedStringsModel,
                         _ => assetDataObject.ContentType.ListDisplayName,
                     };
 
