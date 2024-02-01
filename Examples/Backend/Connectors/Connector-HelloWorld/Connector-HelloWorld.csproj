@@ -27,7 +27,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Polly" Version="7.2.3" />
-    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="6.6.9" />
+    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="6.7.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\ConfigurationMessages.Designer.cs">
