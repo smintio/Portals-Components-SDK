@@ -971,7 +971,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
             return layerDataObjects.ToArray();
         }
 
-        protected override DateTimeOffset? GetDateTimeDataType(JToken value, string semanticHint)
+        protected override DateTimeOffset? GetDateTimeDataType(string propertyKey, JToken value, string semanticHint)
         {
             if (value.Type == JTokenType.Null)
             {
@@ -1017,33 +1017,33 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                 return dateTimeOffset;
             }
 
-            return base.GetDateTimeDataType(value, semanticHint);
+            return base.GetDateTimeDataType(propertyKey, value, semanticHint);
         }
 
-        protected override decimal? GetDecimalDataType(JToken value, string semanticHint)
+        protected override decimal? GetDecimalDataType(string propertyKey, JToken value, string semanticHint)
         {
-            var decimalValue = GetTypedValue<decimal?>(value, logWarning: false);
+            var decimalValue = GetTypedValue<decimal?>(propertyKey, value, logWarning: false);
 
             if (decimalValue.HasValue)
             {
                 return decimalValue.Value;
             }
 
-            var longValue = GetTypedValue<long?>(value, logWarning: false);
+            var longValue = GetTypedValue<long?>(propertyKey, value, logWarning: false);
 
             if (longValue.HasValue)
             {
                 return longValue.Value;
             }
 
-            var intValue = GetTypedValue<int?>(value, logWarning: false);
+            var intValue = GetTypedValue<int?>(propertyKey, value, logWarning: false);
 
             if (intValue.HasValue)
             {
                 return intValue.Value;
             }
 
-            return base.GetDecimalDataType(value, semanticHint);
+            return base.GetDecimalDataType(propertyKey, value, semanticHint);
         }
 
         protected override EnumDataObject GetEnumDataObject(string metamodelEntityKey, string targetMetamodelEntityKey, JObject _object)
