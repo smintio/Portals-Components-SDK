@@ -32,41 +32,41 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
 
         protected IDictionary<string, HelloWorldCustomFieldResponse> CustomFieldById { get; }
 
-        protected override string GetStringDataType(object value, string semanticHint)
+        protected override string GetStringDataType(string propertyKey, object value, string semanticHint)
         {
-            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
             if (customFieldValue != null)
             {
-                var stringValue = GetTypedValue<string>(customFieldValue.Value, logWarning: true);
+                var stringValue = GetTypedValue<string>(propertyKey, customFieldValue.Value, logWarning: true);
 
                 return stringValue;
             }
 
-            return base.GetStringDataType(value, semanticHint);
+            return base.GetStringDataType(propertyKey, value, semanticHint);
         }
 
-        protected override string[] GetStringArrayDataType(object value, string semanticHint)
+        protected override string[] GetStringArrayDataType(string propertyKey, object value, string semanticHint)
         {
-            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
             if (customFieldValue != null)
             {
-                var stringArrayValue = GetTypedValue<string[]>(customFieldValue.Value, logWarning: true);
+                var stringArrayValue = GetTypedValue<string[]>(propertyKey, customFieldValue.Value, logWarning: true);
 
                 return stringArrayValue;
             }
 
-            return base.GetStringArrayDataType(value, semanticHint);
+            return base.GetStringArrayDataType(propertyKey, value, semanticHint);
         }
 
-        protected override LocalizedStringsModel GetLocalizedStringsModelDataType(object value, string semanticHint)
+        protected override LocalizedStringsModel GetLocalizedStringsModelDataType(string propertyKey, object value, string semanticHint)
         {
-            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: true);
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: true);
 
             if (customFieldValue != null)
             {
-                var stringFieldValue = GetTypedValue<HelloWorldStringFieldValueResponse>(customFieldValue.Value, logWarning: true);
+                var stringFieldValue = GetTypedValue<HelloWorldStringFieldValueResponse>(propertyKey, customFieldValue.Value, logWarning: true);
 
                 if (stringFieldValue != null)
                 {
@@ -76,16 +76,16 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 }
             }
 
-            return base.GetLocalizedStringsModelDataType(value, semanticHint);
+            return base.GetLocalizedStringsModelDataType(propertyKey, value, semanticHint);
         }
 
-        protected override LocalizedStringsArrayModel GetLocalizedStringsArrayModelDataType(object value, string semanticHint)
+        protected override LocalizedStringsArrayModel GetLocalizedStringsArrayModelDataType(string propertyKey, object value, string semanticHint)
         {
-            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
             if (customFieldValue != null)
             {
-                var stringArrayFieldValue = GetTypedValue<HelloWorldStringArrayFieldValueResponse>(customFieldValue.Value, logWarning: true);
+                var stringArrayFieldValue = GetTypedValue<HelloWorldStringArrayFieldValueResponse>(propertyKey, customFieldValue.Value, logWarning: true);
 
                 if (stringArrayFieldValue != null)
                 {
@@ -95,44 +95,44 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 }
             }
 
-            return base.GetLocalizedStringsArrayModelDataType(value, semanticHint);
+            return base.GetLocalizedStringsArrayModelDataType(propertyKey, value, semanticHint);
         }
 
-        protected override DateTimeOffset? GetDateTimeDataType(object value, string semanticHint)
+        protected override DateTimeOffset? GetDateTimeDataType(string propertyKey, object value, string semanticHint)
         {
-            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
             if (customFieldValue != null)
             {
-                var dateTimeValue = GetTypedValue<DateTimeOffset?>(customFieldValue.Value, logWarning: true);
+                var dateTimeValue = GetTypedValue<DateTimeOffset?>(propertyKey, customFieldValue.Value, logWarning: true);
 
                 return dateTimeValue;
             }
 
-            return base.GetDateTimeDataType(value, semanticHint);
+            return base.GetDateTimeDataType(propertyKey, value, semanticHint);
         }
 
-        protected override decimal? GetDecimalDataType(object value, string semanticHint)
+        protected override decimal? GetDecimalDataType(string propertyKey, object value, string semanticHint)
         {
-            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
             if (customFieldValue != null)
             {
-                var decimalValue = GetTypedValue<decimal?>(customFieldValue.Value, logWarning: true);
+                var decimalValue = GetTypedValue<decimal?>(propertyKey, customFieldValue.Value, logWarning: true);
 
                 return decimalValue;
             }
 
-            return base.GetDecimalDataType(value, semanticHint);
+            return base.GetDecimalDataType(propertyKey, value, semanticHint);
         }
 
-        protected override IDictionary<string, object> GetEnumObject(object value, string semanticHint)
+        protected override IDictionary<string, object> GetEnumObject(string propertyKey, object value, string semanticHint)
         {
-            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(value, logWarning: false);
+            var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
             if (customFieldValue != null)
             {
-                var singleSelectFieldValue = GetTypedValue<HelloWorldSingleSelectFieldValueResponse>(customFieldValue.Value, logWarning: true);
+                var singleSelectFieldValue = GetTypedValue<HelloWorldSingleSelectFieldValueResponse>(propertyKey, customFieldValue.Value, logWarning: true);
 
                 if (singleSelectFieldValue != null)
                 {
@@ -148,17 +148,17 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 }
             }
 
-            var baseEnumObject = base.GetEnumObject(value, semanticHint);
+            var baseEnumObject = base.GetEnumObject(propertyKey, value, semanticHint);
 
             return baseEnumObject;
         }
 
-        protected override IDictionary<string, object> GetObject(object value, string semanticHint)
+        protected override IDictionary<string, object> GetObject(string propertyKey, object value, string semanticHint)
         {
             throw new NotImplementedException();
         }
 
-        protected override IDictionary<string, object>[] GetObjects(object value, string semanticHint)
+        protected override IDictionary<string, object>[] GetObjects(string propertyKey, object value, string semanticHint)
         {
             throw new NotImplementedException();
         }
