@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using SmintIo.Portals.Connector.HelloWorld;
+using SmintIo.Portals.DataAdapter.HelloWorld.Resources;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Permissions;
+using SmintIo.Portals.SDK.Core.Configuration;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 
 namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
@@ -20,20 +23,12 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
         /// <summary>
         /// The localized strings
         /// </summary>
-        public LocalizedStringsModel Name => new()
-        {
-            { LocalizedStringsModel.DefaultCulture, "Asset access" },
-            { "de", "Zugriff auf Assets" },
-        };
+        public LocalizedStringsModel Name => new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.da_assets_name));
 
         /// <summary>
         /// The localized strings
         /// </summary>
-        public LocalizedStringsModel Description => new()
-        {
-            { LocalizedStringsModel.DefaultCulture, "Provides services to read, search and download assets from HelloWorld." },
-            { "de", "Stellt Dienste zum Lesen, Suchen und Herunterladen von HelloWorld-Assets zur Verfügung." }
-        };
+        public LocalizedStringsModel Description => new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.da_assets_description));
 
         /// <summary>
         /// Optional data adapter logo link
@@ -56,10 +51,25 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
         public Type ComponentImplementation => typeof(HelloWorldAssetsDataAdapter);
 
         /// <summary>
+        /// The type of resource file for configuration messages 
+        /// </summary>
+        public Type ConfigurationMessages => typeof(ConfigurationMessages);
+
+        /// <summary>
+        /// The type of resource file for metamodel messages 
+        /// </summary>
+        public Type MetamodelMessages => null;
+
+        /// <summary>
         /// <see cref="IServiceCollection"/> injection hook for this data adapter
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
+        }
+
+        public Task FillDefaultFormFieldValuesModelAsync(string connectorEntityModelKey, FormFieldValuesModel formFieldValuesModel)
+        {
+            return Task.CompletedTask;
         }
 
         /// <summary>

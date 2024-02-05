@@ -15,6 +15,14 @@
       <LastGenOutput>ConfigurationMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MetamodelMessages.de.resx" />
+    <EmbeddedResource Include="Resources\MetamodelMessages.es.resx" />
+    <EmbeddedResource Include="Resources\MetamodelMessages.it.resx" />
+    <EmbeddedResource Include="Resources\MetamodelMessages.pt.resx" />
+    <EmbeddedResource Include="Resources\MetamodelMessages.resx">
+      <LastGenOutput>MetamodelMessages.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.2.32">
@@ -23,13 +31,18 @@
     </PackageReference>
     <PackageReference Include="Picturepark.SDK.V1" Version="11.9.40" />
     <PackageReference Include="Polly" Version="7.2.3" />
-    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="6.6.6" />
+    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="6.7.4" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\ConfigurationMessages.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>ConfigurationMessages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\MetamodelMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MetamodelMessages.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

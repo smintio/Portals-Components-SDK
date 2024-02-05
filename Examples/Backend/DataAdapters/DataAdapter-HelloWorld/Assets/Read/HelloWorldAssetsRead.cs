@@ -283,7 +283,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
             {
                 progressMonitor.Maximum = unscopedIds.Length * 2;
 
-                await progressMonitor.ReportProgressAsync(unscopedIds.Length, null).ConfigureAwait(false);
+                await progressMonitor.ReportProgressIncrementAsync(unscopedIds.Length, null).ConfigureAwait(false);
             }
 
 
@@ -293,7 +293,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
             {
                 if (progressMonitor != null)
                 {
-                    await progressMonitor.ReportProgressAsync(progressMonitor.Maximum, null).ConfigureAwait(false);
+                    await progressMonitor.ReportProgressIncrementAsync(progressMonitor.Maximum, null).ConfigureAwait(false);
 
                     await progressMonitor.FinishedAsync(null).ConfigureAwait(false);
                 }
@@ -319,7 +319,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
 
             if (progressMonitor != null)
             {
-                await progressMonitor.ReportProgressAsync(progressMonitor.Maximum, null).ConfigureAwait(false);
+                await progressMonitor.ReportProgressIncrementAsync(progressMonitor.Maximum, null).ConfigureAwait(false);
 
                 await progressMonitor.FinishedAsync(null).ConfigureAwait(false);
             }

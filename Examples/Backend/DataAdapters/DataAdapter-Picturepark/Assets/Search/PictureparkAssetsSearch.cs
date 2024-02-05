@@ -8,6 +8,7 @@ using SmintIo.Portals.Connector.Picturepark.Client;
 using SmintIo.Portals.Connector.Picturepark.Search;
 using SmintIo.Portals.DataAdapter.Picturepark.Assets.Common;
 using SmintIo.Portals.DataAdapter.Picturepark.Assets.Extensions;
+using SmintIo.Portals.DataAdapter.Picturepark.Resources;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Constants;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Impl;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
@@ -15,6 +16,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.SDK.Core.Configuration;
 using SmintIo.Portals.SDK.Core.Configuration.Model;
+using SmintIo.Portals.SDK.Core.Extensions;
 using SmintIo.Portals.SDK.Core.Helpers;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 
@@ -511,14 +513,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             formGroupsModel.FormGroupDefinitions.Add(new FormGroupDefinitionModel()
             {
                 Id = FormConstants.DefaultSmintIoSearchTypeFormGroupKey,
-                Name = new LocalizedStringsModel()
-                {
-                    { LocalizedStringsModel.DefaultCulture, "Search type" },
-                    { "de", "Suchtyp" },
-                    { "es", "Tipo de búsqueda" },
-                    { "pt", "Tipo de busca" },
-                    { "it", "Tipo di ricerca" }
-                },
+                Name = MetamodelMessages.da_assets_search_type.Localize(),
                 IsModified = searchTypeModified,
                 FormItemDefinitions = new List<FormFieldItemDefinitionModel>()
                 {
@@ -542,36 +537,21 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                                 Value = new ValueForJson() {
                                     StringValue = "SimpleAnd"
                                 },
-                                Name = new LocalizedStringsModel()
-                                {
-                                    { LocalizedStringsModel.DefaultCulture, "Simple AND" },
-                                    { "de", "Einfach UND" }
-                                }
+                                Name = MetamodelMessages.da_assets_simple_and.Localize()
                             },
                             new ValueForJsonUiDetailsModel()
                             {
                                 Value = new ValueForJson() {
                                     StringValue = "SimpleOr"
                                 },
-                                Name = new LocalizedStringsModel()
-                                {
-                                    { LocalizedStringsModel.DefaultCulture, "Simple OR" },
-                                    { "de", "Einfach ODER" }
-                                }
+                                Name = MetamodelMessages.da_assets_simple_or.Localize()
                             },
                             new ValueForJsonUiDetailsModel()
                             {
                                 Value = new ValueForJson() {
                                     StringValue = "Advanced"
                                 },
-                                Name = new LocalizedStringsModel()
-                                {
-                                    { LocalizedStringsModel.DefaultCulture, "Advanced" },
-                                    { "de", "Erweitert" },
-                                    { "es", "Avanzado" },
-                                    { "pt", "Avançado" },
-                                    { "it", "Avanzate" }
-                                }
+                                Name = MetamodelMessages.da_assets_advanced.Localize()
                             }
                         }
                     },
@@ -595,14 +575,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             formGroupsModel.FormGroupDefinitions.Add(new FormGroupDefinitionModel()
             {
                 Id = FormConstants.DefaultSmintIoSortByFormGroupKey,
-                Name = new LocalizedStringsModel()
-                {
-                    { LocalizedStringsModel.DefaultCulture, "Sort by" },
-                    { "de", "Sortieren nach" },
-                    { "es", "Ordenar por" },
-                    { "pt", "Ordenar por" },
-                    { "it", "Ordina per" }
-                },
+                Name = DataAdapterSDK.Resources.MetamodelMessages.da_form_group_definition_sort_by.Localize(),
                 IsModified = sortByModified,
                 FormItemDefinitions = new List<FormFieldItemDefinitionModel>()
                 {
@@ -627,14 +600,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             formGroupsModel.FormGroupDefinitions.Add(new FormGroupDefinitionModel()
             {
                 Id = FormConstants.DefaultSmintIoSortOrderFormGroupKey,
-                Name = new LocalizedStringsModel()
-                {
-                    { LocalizedStringsModel.DefaultCulture, "Sort order" },
-                    { "de", "Reihenfolge" },
-                    { "es", "Orden de clasificación" },
-                    { "pt", "Ordem de classificação" },
-                    { "it", "Ordinamento" }
-                },
+                Name = DataAdapterSDK.Resources.MetamodelMessages.da_form_group_definition_sort_order.Localize(),
                 IsModified = sortOrderModified,
                 FormItemDefinitions = new List<FormFieldItemDefinitionModel>()
                 {
@@ -658,28 +624,14 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                                 Value = new ValueForJson() {
                                     StringValue = "asc"
                                 },
-                                Name = new LocalizedStringsModel()
-                                {
-                                    { LocalizedStringsModel.DefaultCulture, "Ascending" },
-                                    { "de", "Aufsteigend" },
-                                    { "es", "Ascendente" },
-                                    { "pt", "Ascendente" },
-                                    { "it", "Ascendente" }
-                                }
+                                Name = DataAdapterSDK.Resources.MetamodelMessages.da_sort_order_fields_ascending.Localize()
                             },
                             new ValueForJsonUiDetailsModel()
                             {
                                 Value = new ValueForJson() {
                                     StringValue = "desc"
                                 },
-                                Name = new LocalizedStringsModel()
-                                {
-                                    { LocalizedStringsModel.DefaultCulture, "Descending" },
-                                    { "de", "Absteigend" },
-                                    { "es", "Descendiendo" },
-                                    { "pt", "Descendente" },
-                                    { "it", "Discendente" }
-                                }
+                                Name = DataAdapterSDK.Resources.MetamodelMessages.da_sort_order_fields_descending.Localize()
                             }
                         }
                     }

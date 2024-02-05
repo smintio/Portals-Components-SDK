@@ -6,7 +6,6 @@ using SmintIo.Portals.Connector.HelloWorld.Extensions;
 using SmintIo.Portals.Connector.HelloWorld.Metamodel;
 using SmintIo.Portals.Connector.HelloWorld.Models.Responses;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Constants;
-using SmintIo.Portals.DataAdapterSDK.DataAdapters.FormGroupDefinitions;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Specs;
 using SmintIo.Portals.SDK.Core.Configuration;
 using SmintIo.Portals.SDK.Core.Configuration.Model;
@@ -22,14 +21,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Search
 
         private readonly int _multiSelectItemCount;
 
-        private static readonly Dictionary<string, LocalizedStringsModel> _defaultAllowedSortFields = new()
+        private readonly Dictionary<string, LocalizedStringsModel> _defaultAllowedSortFields = new()
         {
-            {
-                "name", new LocalizedStringsModel()
-                {
-                    { LocalizedStringsModel.DefaultCulture, "Name" }
-                }
-            }
+            { "name", DataAdapterSDK.Resources.MetamodelMessages.da_sort_fields_name.Localize() }
         };
 
         internal HelloWorldSearchAssetsFormGroupsModelBuilder(int multiSelectItemCount)
@@ -124,7 +118,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Search
             formGroupDefinitionModels.Add(new FormGroupDefinitionModel()
             {
                 Id = FormConstants.DefaultSmintIoSortByFormGroupKey,
-                Name = FormGroupDefinitionLabels.SortBy,
+                Name = DataAdapterSDK.Resources.MetamodelMessages.da_form_group_definition_sort_by.Localize(),
                 IsModified = sortByModified,
                 FormItemDefinitions = new List<FormFieldItemDefinitionModel>()
                 {
@@ -157,7 +151,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Search
             formGroupDefinitionModels.Add(new FormGroupDefinitionModel()
             {
                 Id = FormConstants.DefaultSmintIoSortOrderFormGroupKey,
-                Name = FormGroupDefinitionLabels.SortOrder,
+                Name = DataAdapterSDK.Resources.MetamodelMessages.da_form_group_definition_sort_order.Localize(),
                 IsModified = sortDirectionIsModified,
                 FormItemDefinitions = new List<FormFieldItemDefinitionModel>()
                 {
@@ -180,14 +174,14 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Search
                                 Value = new ValueForJson() {
                                     StringValue = SortDirection.Asc.ToString().ToLower()
                                 },
-                                Name = FormGroupDefinitionLabels.Ascending
+                                Name = DataAdapterSDK.Resources.MetamodelMessages.da_sort_order_fields_ascending.Localize()
                             },
                             new ValueForJsonUiDetailsModel()
                             {
                                 Value = new ValueForJson() {
                                     StringValue = SortDirection.Desc.ToString().ToLower()
                                 },
-                                Name = FormGroupDefinitionLabels.Descending
+                                Name = DataAdapterSDK.Resources.MetamodelMessages.da_sort_order_fields_descending.Localize()
                             }
                         }
                     }
@@ -339,7 +333,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Search
 
             var formGroupDefinitionModel = GetFormGroupDefinitionModel(
                 HelloWorldMetamodelBuilder.ContentTypeId,
-                labels: HelloWorldMetamodelBuilder.ContentTypeLabels,
+                labels: Connector.HelloWorld.Resources.MetamodelMessages.c_hello_world_content_type.Localize(),
                 isMultipleOption: false,
                 currentValue,
                 assetTypeItemJsonUiDetailsModels,

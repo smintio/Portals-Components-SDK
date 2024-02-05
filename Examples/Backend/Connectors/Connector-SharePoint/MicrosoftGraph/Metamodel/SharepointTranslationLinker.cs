@@ -29,6 +29,13 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
             foreach (var entityModel in connectorMetamodel.Entities)
             {
+                if (entityModel.Labels is ResourceLocalizedStringsModel)
+                {
+                    LocalizeProperties(entityModel);
+
+                    continue;
+                }
+
                 if (!entityModel.Labels.TryGetValue(LocalizedStringsModel.DefaultCulture, out var labelValue))
                 {
                     throw new InvalidOperationException($"Missing '{LocalizedStringsModel.DefaultCulture}' label for {nameof(EntityModel)} with key '{entityModel.Key}'");

@@ -10,6 +10,7 @@ using SmintIo.Portals.SDK.Core.Extensions;
 using SmintIo.Portals.SDK.Core.Models.Paging;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 using SmintIo.Portals.SDK.Core.Providers;
+using SmintIo.Portals.SDK.Core.Resources;
 using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 
 namespace SmintIo.Portals.Connector.SharePoint.AllowedValues
@@ -57,11 +58,7 @@ namespace SmintIo.Portals.Connector.SharePoint.AllowedValues
                 return new UiDetailsModel<string>()
                 {
                     Value = RootFolderId,
-                    Name = new LocalizedStringsModel()
-                    {
-                        { LocalizedStringsModel.DefaultCulture, "Top level" },
-                        { "de", "Oberste Ebene" }
-                    }
+                    Name = MetamodelMessages.core_root_folder.Localize()
                 };
             }
 
@@ -114,11 +111,7 @@ namespace SmintIo.Portals.Connector.SharePoint.AllowedValues
             uiDetailsModels.Insert(0, new UiDetailsModel<string>()
             {
                 Value = RootFolderId,
-                Name = new LocalizedStringsModel()
-                {
-                    { LocalizedStringsModel.DefaultCulture, "Top level" },
-                    { "de", "Oberste Ebene" }
-                }
+                Name = MetamodelMessages.core_root_folder.Localize()
             });
 
             if (offset.HasValue && limit.HasValue)

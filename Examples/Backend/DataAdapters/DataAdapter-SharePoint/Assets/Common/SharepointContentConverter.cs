@@ -448,13 +448,13 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             return property.Name.ConvertToPascalCase();
         }
 
-        protected override IDictionary<string, object> GetEnumObject(object value, string semanticHint)
+        protected override IDictionary<string, object> GetEnumObject(string propertyKey, object value, string semanticHint)
         {
-            var enumValue = GetTypedValue<string>(value, logWarning: false);
+            var enumValue = GetTypedValue<string>(propertyKey, value, logWarning: false);
 
             if (string.IsNullOrEmpty(enumValue))
             {
-                return GetObject(value, semanticHint);
+                return GetObject(propertyKey, value, semanticHint);
             }
 
             var enumObject = new Dictionary<string, object>
@@ -465,9 +465,9 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             return enumObject;
         }
 
-        protected override CurrencyModel GetCurrencyModelDataType(object value, string semanticHint)
+        protected override CurrencyModel GetCurrencyModelDataType(string propertyKey, object value, string semanticHint)
         {
-            var currencyModelValue = GetDecimalDataType(value, semanticHint);
+            var currencyModelValue = GetDecimalDataType(propertyKey, value, semanticHint);
 
             var currencyModel = new CurrencyModel
             {
