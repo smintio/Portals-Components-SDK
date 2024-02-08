@@ -971,6 +971,25 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
             return layerDataObjects.ToArray();
         }
 
+        protected override LocalizedStringsModel GetLocalizedStringsModelDataType(string propertyKey, JToken value, string semanticHint)
+        {
+            var dictionary = GetTypedValue<Dictionary<string, string>>(propertyKey, value, logWarning: false);
+
+            if (dictionary != null)
+            {
+                dictionary = FixDictionary(dictionary);
+
+                if (dictionary != null)
+                {
+                    return new LocalizedStringsModel(dictionary);
+                }
+
+                return null;
+            }
+
+            return base.GetLocalizedStringsModelDataType(propertyKey, value, semanticHint);
+        }
+
         protected override DateTimeOffset? GetDateTimeDataType(string propertyKey, JToken value, string semanticHint)
         {
             if (value.Type == JTokenType.Null)
