@@ -39,7 +39,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public DataAdapterPermission[] Permissions => null;
 
-        public Type[] PublicApiInterfaces => new[] { typeof(IAssets), typeof(IAssetsIntegrationLayerApiProvider) };
+        public Type[] PublicApiInterfaces { get; } = [typeof(IAssets), typeof(IAssetsIntegrationLayerApiProvider)];
 
         public Task FillDefaultFormFieldValuesModelAsync(string connectorEntityModelKey, FormFieldValuesModel formFieldValuesModel)
         {

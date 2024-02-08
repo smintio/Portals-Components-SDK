@@ -39,7 +39,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Search
 
         public Type MetamodelMessages => typeof(MetamodelMessages);
 
-        public Type[] PublicApiInterfaces => new Type[] { typeof(IAssets) };
+        public Type[] PublicApiInterfaces { get; } = [typeof(IAssets)];
 
         public DataAdapterPermission[] Permissions => null;
 
