@@ -43,8 +43,8 @@ namespace SmintIo.Portals.Connector.Picturepark
         private const string ThumbnailPortalPresent = "thumbnail_portal_present";
         private const string ThumbnailExtraLargePresent = "thumbnail_extra_large_present";
 
-        public override string[] RequiredScopes => new string[]
-        {
+        public override string[] RequiredScopes { get; } =
+        [
             "all_scopes",
             "channel_read",
             "schema_read",
@@ -52,7 +52,7 @@ namespace SmintIo.Portals.Connector.Picturepark
             "profile",
             "picturepark_api",
             "offline_access"
-        };
+        ];
 
         private readonly IPortalsContextModel _portalsContext;
 

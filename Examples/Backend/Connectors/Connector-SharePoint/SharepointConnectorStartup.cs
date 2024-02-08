@@ -30,7 +30,7 @@ namespace SmintIo.Portals.Connector.SharePoint
         {
         }
 
-        public string[] DefaultDataAdapterKeys => new[] { "assets" };
+        public string[] DefaultDataAdapterKeys { get; } = ["assets"];
 
         public ConnectorSetupMethod SetupMethod => ConnectorSetupMethod.Redirect;
 

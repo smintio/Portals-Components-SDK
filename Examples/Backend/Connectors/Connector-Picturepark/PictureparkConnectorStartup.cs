@@ -12,7 +12,7 @@ namespace SmintIo.Portals.Connector.Picturepark
 
         public string Key => PictureparkConnector;
 
-        public string[] DefaultDataAdapterKeys => new string[] { "assets" };
+        public string[] DefaultDataAdapterKeys { get; } = ["assets"];
 
         public ConnectorSetupMethod SetupMethod => ConnectorSetupMethod.Setup;
 
