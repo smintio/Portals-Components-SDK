@@ -8,6 +8,7 @@ using Microsoft.Graph;
 using SmintIo.Portals.Connector.SharePoint.Client;
 using SmintIo.Portals.Connector.SharePoint.Extensions;
 using SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel;
+using SmintIo.Portals.Connector.SharePoint.Models;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Converters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Converters.Extensions;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Permissions;
@@ -446,6 +447,37 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
         {
             // Sharepoint property keys are returned in an inconsistent way
             return property.Name.ConvertToPascalCase();
+        }
+
+        protected override long? GetInt64DataType(string propertyKey, object value, string semanticHint)
+        {
+            var intValue = GetTypedValue<int?>(propertyKey, value, logWarning: false);
+
+            if (intValue.HasValue)
+            {
+                return intValue;
+            }
+
+            return base.GetInt64DataType(propertyKey, value, semanticHint);
+        }
+
+        protected override IDictionary<string, object>[] GetEnumObjects(string propertyKey, object value, string semanticHint)
+        {
+            var sharedWithModels = GetTypedValue<ICollection<SharedWithModel>>(propertyKey, value, logWarning: false);
+
+            if (sharedWithModels != null && sharedWithModels.Any())
+            {
+                return sharedWithModels
+                    .Select(sw => new Dictionary<string, object>
+                    {
+                        {  EntityModel.PropName_Id, sw.LookupId.ToString() },
+                        {  EntityModel.PropName_ListDisplayName, sw.LookupValue },
+                        {  nameof(SharedWithModel.Email), sw.Email },
+                    })
+                    .ToArray();
+            }
+
+            return base.GetObjects(propertyKey, value, semanticHint);
         }
 
         protected override IDictionary<string, object> GetEnumObject(string propertyKey, object value, string semanticHint)

@@ -42,6 +42,8 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                     return ColumnType.CalculatedValue;
                 case SharepointFieldType.User:
                     return ColumnType.PersonOrGroup;
+                case SharepointFieldType.UserMulti:
+                    return ColumnType.PersonOrGroupMulti;
                 case SharepointFieldType.Geolocation:
                     return ColumnType.Geolocation;
                 case SharepointFieldType.Location:
@@ -82,6 +84,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                 case ColumnType.Image:
                 case ColumnType.Taxonomy:
                 case ColumnType.TaxonomyMulti:
+                case ColumnType.PersonOrGroupMulti:
                     return true;
                 case ColumnType.CalculatedValue:
                 case ColumnType.YesNo:
@@ -128,6 +131,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                 ColumnType.Long => DataType.Int64,
                 ColumnType.DateTime => DataType.DateTime,
                 ColumnType.PersonOrGroup => DataType.String,
+                ColumnType.PersonOrGroupMulti => DataType.EnumArray,
                 ColumnType.Location => DataType.DataObject,
                 ColumnType.Url => DataType.DataObject,
                 ColumnType.Taxonomy => DataType.DataObject,

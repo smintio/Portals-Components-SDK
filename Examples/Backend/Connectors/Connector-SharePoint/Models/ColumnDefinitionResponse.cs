@@ -51,6 +51,10 @@ namespace SmintIo.Portals.Connector.SharePoint.Models
                 {
                     FieldTypeKind = (int)SharepointFieldType.TaxonomyMulti;
                 }
+                else if (_typeAsString.Equals("UserMulti"))
+                {
+                    FieldTypeKind = (int)SharepointFieldType.UserMulti;
+                }
             }
         }
 
