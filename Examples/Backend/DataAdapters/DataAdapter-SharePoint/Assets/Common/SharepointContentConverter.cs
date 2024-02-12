@@ -451,7 +451,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
 
         protected override IDictionary<string, object>[] GetEnumObjects(string propertyKey, object value, string semanticHint)
         {
-            var sharedWithModels = GetTypedValue<ICollection<SharedWithModel>>(propertyKey, value, logWarning: false);
+            var sharedWithModels = GetTypedValue<ICollection<SharedWithModel>>(propertyKey, value, logWarning: true);
 
             if (sharedWithModels != null && sharedWithModels.Any())
             {
@@ -475,7 +475,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
                     .ToArray();
             }
 
-            return base.GetObjects(propertyKey, value, semanticHint);
+            return base.GetEnumObjects(propertyKey, value, semanticHint);
         }
 
         protected override IDictionary<string, object> GetEnumObject(string propertyKey, object value, string semanticHint)
