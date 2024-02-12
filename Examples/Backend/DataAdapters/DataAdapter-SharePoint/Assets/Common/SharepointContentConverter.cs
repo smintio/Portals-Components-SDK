@@ -449,18 +449,6 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             return property.Name.ConvertToPascalCase();
         }
 
-        protected override long? GetInt64DataType(string propertyKey, object value, string semanticHint)
-        {
-            var intValue = GetTypedValue<int?>(propertyKey, value, logWarning: false);
-
-            if (intValue.HasValue)
-            {
-                return intValue;
-            }
-
-            return base.GetInt64DataType(propertyKey, value, semanticHint);
-        }
-
         protected override IDictionary<string, object>[] GetEnumObjects(string propertyKey, object value, string semanticHint)
         {
             var sharedWithModels = GetTypedValue<ICollection<SharedWithModel>>(propertyKey, value, logWarning: false);
