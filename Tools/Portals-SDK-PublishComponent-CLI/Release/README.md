@@ -19,7 +19,7 @@ Get in touch with [Smint.io](https://www.smint.io) or [support@smint.io](mailto:
 Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals.
 Enterprise plan customers.
 
-Current version of this document is: 1.0.0 (as of 24th of November, 2022)
+Current version of this document is: 1.0.1 (as of 12th of January, 2024)
 
 ## Download
 
@@ -137,13 +137,14 @@ Optionally, backend developers can register the tool as a global CLI tool:
 1. Install as a global tool
     - dotnet tool install --global --add-source `<SMINT-IO-PRIVATE-SOURCE-FEED>` SmintIo.Portals.SDK.PublishComponent.CLI
 1. Confirm the message
-    - Tool 'smintio.portals.sdk.publishcomponent.cli' (version '1.0.0.0') was successfully installed
+    - You can invoke the tool using the following command: smint-io-pc
+    - Tool 'smintio.portals.sdk.publishcomponent.cli' (version '2.0.0.0') was successfully installed
 	- The version number may vary
 	- You can then invoke the tool using the following command: `smint-io-pc`
 1. Go to the .NET global tools folder
 	- For Windows, go to `%USERPROFILE%\.dotnet\tools`
 	- For Linux, go to `$HOME/.dotnet/tools`
-1. Go to folder `.store\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\smintio.portals.sdk.publishcomponent.cli\1.0.0.0\tools\net8.0\any`
+1. Go to folder `.store\smintio.portals.sdk.publishcomponent.cli\2.0.0.0\smintio.portals.sdk.publishcomponent.cli\2.0.0.0\tools\net8.0\any`
 	- The version number may vary
 1. Edit the applicable development, staging, and/or production app settings files similarly to [App Settings](#app-settings)
 1. Useful links
@@ -155,7 +156,7 @@ Optionally, backend developers can register the tool as a global CLI tool:
 1. Run
 	- dotnet tool uninstall --global SmintIo.Portals.SDK.PublishComponent.CLI
 1. Confirm the message
-	- 'Tool 'smintio.portals.sdk.publishcomponent.cli' (version '1.0.0.0') was successfully uninstalled.'
+	- 'Tool 'smintio.portals.sdk.publishcomponent.cli' (version '2.0.0.0') was successfully uninstalled.'
 
 #### Publish using the registered global CLI tool
 
