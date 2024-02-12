@@ -456,11 +456,21 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             if (sharedWithModels != null && sharedWithModels.Any())
             {
                 return sharedWithModels
-                    .Select(sw => new Dictionary<string, object>
+                    .Where(sw => sw.LookupId > 0 && !string.IsNullOrEmpty(sw.LookupValue))
+                    .Select(sw => 
                     {
-                        {  EntityModel.PropName_Id, sw.LookupId.ToString() },
-                        {  EntityModel.PropName_ListDisplayName, sw.LookupValue },
-                        {  nameof(SharedWithModel.Email), sw.Email },
+                        var enumDataObject = new Dictionary<string, object>
+                        {
+                            {  EntityModel.PropName_Id, sw.LookupId.ToString() },
+                            {  EntityModel.PropName_ListDisplayName, sw.LookupValue },
+                        };
+
+                        if (!string.IsNullOrEmpty(sw.Email))
+                        {
+                            enumDataObject.Add(nameof(SharedWithModel.Email), sw.Email);
+                        }
+
+                        return enumDataObject;
                     })
                     .ToArray();
             }
