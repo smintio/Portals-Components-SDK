@@ -451,23 +451,26 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
 
         protected override IDictionary<string, object>[] GetEnumObjects(string propertyKey, object value, string semanticHint)
         {
-            var sharedWithModels = GetTypedValue<ICollection<SharedWithModel>>(propertyKey, value, logWarning: true);
+            var lookupModel = GetTypedValue<ICollection<LookupModel>>(propertyKey, value, logWarning: false);
 
-            if (sharedWithModels != null && sharedWithModels.Any())
+            if (lookupModel != null && lookupModel.All(l => l.LookupId > 0))
             {
-                return sharedWithModels
-                    .Where(sw => sw.LookupId > 0 && !string.IsNullOrEmpty(sw.LookupValue))
-                    .Select(sw => 
+                return lookupModel
+                    .Select(l => 
                     {
                         var enumDataObject = new Dictionary<string, object>
                         {
-                            {  EntityModel.PropName_Id, sw.LookupId.ToString() },
-                            {  EntityModel.PropName_ListDisplayName, sw.LookupValue },
+                            {  EntityModel.PropName_Id, l.LookupId.ToString() }
                         };
 
-                        if (!string.IsNullOrEmpty(sw.Email))
+                        if (!string.IsNullOrEmpty(l.LookupValue))
                         {
-                            enumDataObject.Add(nameof(SharedWithModel.Email), sw.Email);
+                            enumDataObject.Add(EntityModel.PropName_ListDisplayName, l.LookupValue);
+                        }
+
+                        if (!string.IsNullOrEmpty(l.Email))
+                        {
+                            enumDataObject.Add(nameof(LookupModel.Email), l.Email);
                         }
 
                         return enumDataObject;

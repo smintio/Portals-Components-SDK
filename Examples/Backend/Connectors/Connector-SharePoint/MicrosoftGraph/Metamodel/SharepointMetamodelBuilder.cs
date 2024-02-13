@@ -145,7 +145,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
             TryAddImageProperties(columnDefinitionResponses);
             TryAddUrlProperties(columnDefinitionResponses);
             TryAddTaxonomyProperties(columnDefinitionResponses);
-            TryAddSharedWithProperties(columnDefinitionResponses);
+            TryAddLookupProperties(columnDefinitionResponses);
 
             var translationLinker = new SharepointTranslationLinker();
 
@@ -431,7 +431,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
             }
         }
 
-        private void TryAddSharedWithProperties(IEnumerable<ColumnDefinitionResponse> columnDefinitionResponses)
+        private void TryAddLookupProperties(IEnumerable<ColumnDefinitionResponse> columnDefinitionResponses)
         {
             var userMultiColumnDefinitions = columnDefinitionResponses
                 .Where(cdr => cdr.FieldType == SharepointFieldType.UserMulti)
@@ -444,17 +444,17 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
             foreach (var userMultiColumnDefinition in userMultiColumnDefinitions)
             {
-                var sharedWithEntityModel = _metamodel.Entities.SingleOrDefault(e => e.Key.Equals(userMultiColumnDefinition.Name, StringComparison.OrdinalIgnoreCase));
+                var lookupEntityModel = _metamodel.Entities.SingleOrDefault(e => e.Key.Equals(userMultiColumnDefinition.Name, StringComparison.OrdinalIgnoreCase));
 
-                if (sharedWithEntityModel == null)
+                if (lookupEntityModel == null)
                 {
                     continue;
                 }
 
-                var emailLabels = GetStaticColumnLabels(sharedWithEntityModel, nameof(SharedWithModel.Email));
+                var emailLabels = GetStaticColumnLabels(lookupEntityModel, nameof(LookupModel.Email));
                 var emailLocalizedStringsModel = new LocalizedStringsModel(emailLabels);
 
-                AddProperty(sharedWithEntityModel, new ColumnDefinitionResponse(), nameof(SharedWithModel.Email), emailLocalizedStringsModel);
+                AddProperty(lookupEntityModel, new ColumnDefinitionResponse(), nameof(LookupModel.Email), emailLocalizedStringsModel);
             }
         }
     }

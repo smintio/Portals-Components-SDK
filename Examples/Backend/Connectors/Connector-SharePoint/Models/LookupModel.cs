@@ -1,6 +1,6 @@
 ﻿namespace SmintIo.Portals.Connector.SharePoint.Models
 {
-    public class SharedWithModel
+    public class LookupModel
     {
         public int LookupId { get; set; }
 
