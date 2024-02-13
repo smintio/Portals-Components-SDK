@@ -453,24 +453,24 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
         {
             var lookupModel = GetTypedValue<ICollection<LookupModel>>(propertyKey, value, logWarning: false);
 
-            if (lookupModel != null && lookupModel.All(l => l.LookupId > 0))
+            if (lookupModel != null && lookupModel.All(lookup => lookup != null && lookup.LookupId > 0))
             {
                 return lookupModel
-                    .Select(l => 
+                    .Select(lookup => 
                     {
                         var enumDataObject = new Dictionary<string, object>
                         {
-                            {  EntityModel.PropName_Id, l.LookupId.ToString() }
+                            {  EntityModel.PropName_Id, lookup.LookupId.ToString() }
                         };
 
-                        if (!string.IsNullOrEmpty(l.LookupValue))
+                        if (!string.IsNullOrEmpty(lookup.LookupValue))
                         {
-                            enumDataObject.Add(EntityModel.PropName_ListDisplayName, l.LookupValue);
+                            enumDataObject.Add(EntityModel.PropName_ListDisplayName, lookup.LookupValue);
                         }
 
-                        if (!string.IsNullOrEmpty(l.Email))
+                        if (!string.IsNullOrEmpty(lookup.Email))
                         {
-                            enumDataObject.Add(nameof(LookupModel.Email), l.Email);
+                            enumDataObject.Add(nameof(LookupModel.Email), lookup.Email);
                         }
 
                         return enumDataObject;
