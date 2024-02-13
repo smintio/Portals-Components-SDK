@@ -453,10 +453,10 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
         {
             var lookupModel = GetTypedValue<ICollection<LookupModel>>(propertyKey, value, logWarning: false);
 
-            if (lookupModel != null && lookupModel.All(lookup => lookup != null && lookup.LookupId > 0))
+            if (lookupModel != null && lookupModel.All(lookup => lookup.LookupId > 0))
             {
                 return lookupModel
-                    .Select(lookup => 
+                    .Select(lookup =>
                     {
                         var enumDataObject = new Dictionary<string, object>
                         {
