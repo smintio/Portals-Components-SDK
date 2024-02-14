@@ -43,13 +43,17 @@ namespace SmintIo.Portals.Connector.SharePoint.Models
                 _typeAsString = value;
 
                 // Sharepint doesn't have Taxonomy field defined as fieldType.
-                if (_typeAsString.Equals("TaxonomyFieldType"))
+                if (string.Equals(_typeAsString, "TaxonomyFieldType"))
                 {
                     FieldTypeKind = (int)SharepointFieldType.Taxonomy;
                 }
-                else if (_typeAsString.Equals("TaxonomyFieldTypeMulti"))
+                else if (string.Equals(_typeAsString, "TaxonomyFieldTypeMulti"))
                 {
                     FieldTypeKind = (int)SharepointFieldType.TaxonomyMulti;
+                }
+                else if (string.Equals(_typeAsString, "UserMulti"))
+                {
+                    FieldTypeKind = (int)SharepointFieldType.UserMulti;
                 }
             }
         }

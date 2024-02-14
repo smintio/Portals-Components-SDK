@@ -145,6 +145,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
             TryAddImageProperties(columnDefinitionResponses);
             TryAddUrlProperties(columnDefinitionResponses);
             TryAddTaxonomyProperties(columnDefinitionResponses);
+            TryAddLookupProperties(columnDefinitionResponses);
 
             var translationLinker = new SharepointTranslationLinker();
 
@@ -427,6 +428,33 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                 };
 
                 AddProperty(taxonomyEntityModel, wssIdColumnDefinitionResponse, nameof(TaxonomyModel.WssId), wssIdLocalizedStringsModel);
+            }
+        }
+
+        private void TryAddLookupProperties(IEnumerable<ColumnDefinitionResponse> columnDefinitionResponses)
+        {
+            var userMultiColumnDefinitions = columnDefinitionResponses
+                .Where(cdr => cdr.FieldType == SharepointFieldType.UserMulti)
+                .ToArray();
+
+            if (userMultiColumnDefinitions.Length == 0)
+            {
+                return;
+            }
+
+            foreach (var userMultiColumnDefinition in userMultiColumnDefinitions)
+            {
+                var lookupEntityModel = _metamodel.Entities.SingleOrDefault(e => e.Key.Equals(userMultiColumnDefinition.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (lookupEntityModel == null)
+                {
+                    continue;
+                }
+
+                var emailLabels = GetStaticColumnLabels(lookupEntityModel, nameof(LookupModel.Email));
+                var emailLocalizedStringsModel = new LocalizedStringsModel(emailLabels);
+
+                AddProperty(lookupEntityModel, new ColumnDefinitionResponse(), nameof(LookupModel.Email), emailLocalizedStringsModel);
             }
         }
     }
