@@ -453,7 +453,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
         {
             var lookupModel = GetTypedValue<ICollection<LookupModel>>(propertyKey, value, logWarning: false);
 
-            if (lookupModel != null && lookupModel.All(lookup => lookup.LookupId > 0))
+            if (lookupModel != null && lookupModel.Any())
             {
                 return lookupModel
                     .Select(lookup =>
