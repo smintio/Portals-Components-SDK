@@ -23,6 +23,7 @@
         Location = 33,
         Image = 34,
         Taxonomy = 98,
-        TaxonomyMulti = 99
+        TaxonomyMulti = 99,
+        UserMulti = 100
     }
 }

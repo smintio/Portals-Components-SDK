@@ -8,6 +8,7 @@ using Microsoft.Graph;
 using SmintIo.Portals.Connector.SharePoint.Client;
 using SmintIo.Portals.Connector.SharePoint.Extensions;
 using SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel;
+using SmintIo.Portals.Connector.SharePoint.Models;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Converters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Converters.Extensions;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Permissions;
@@ -446,6 +447,38 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
         {
             // Sharepoint property keys are returned in an inconsistent way
             return property.Name.ConvertToPascalCase();
+        }
+
+        protected override IDictionary<string, object>[] GetEnumObjects(string propertyKey, object value, string semanticHint)
+        {
+            var lookupModel = GetTypedValue<ICollection<LookupModel>>(propertyKey, value, logWarning: false);
+
+            if (lookupModel != null && lookupModel.Any())
+            {
+                return lookupModel
+                    .Select(lookup =>
+                    {
+                        var enumDataObject = new Dictionary<string, object>
+                        {
+                            {  EntityModel.PropName_Id, lookup.LookupId.ToString() }
+                        };
+
+                        if (!string.IsNullOrEmpty(lookup.LookupValue))
+                        {
+                            enumDataObject.Add(EntityModel.PropName_ListDisplayName, lookup.LookupValue);
+                        }
+
+                        if (!string.IsNullOrEmpty(lookup.Email))
+                        {
+                            enumDataObject.Add(nameof(LookupModel.Email), lookup.Email);
+                        }
+
+                        return enumDataObject;
+                    })
+                    .ToArray();
+            }
+
+            return base.GetEnumObjects(propertyKey, value, semanticHint);
         }
 
         protected override IDictionary<string, object> GetEnumObject(string propertyKey, object value, string semanticHint)

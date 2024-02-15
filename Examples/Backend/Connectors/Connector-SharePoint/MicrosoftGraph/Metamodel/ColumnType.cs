@@ -18,6 +18,7 @@
         Url,
         Image,
         Taxonomy,
-        TaxonomyMulti
+        TaxonomyMulti,
+        PersonOrGroupMulti
     }
 }

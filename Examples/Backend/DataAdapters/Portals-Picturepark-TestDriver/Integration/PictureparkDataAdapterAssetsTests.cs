@@ -97,19 +97,19 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test.Integration
 
             if (!assetDataObject.RawData.Any())
             {
-                Assert.False(true, "No raw data");
+                Assert.Fail("No raw data");
             }
 
             var connectorMetamodel = GetConnectorMetamodel();
 
             if (connectorMetamodel == null)
             {
-                Assert.False(true, "Unable to get connector metamodel");
+                Assert.Fail("Unable to get connector metamodel");
             }
 
             if (connectorMetamodel.Entities == null)
             {
-                Assert.False(true, "The memamodel has no entities");
+                Assert.Fail("The memamodel has no entities");
             }
 
             foreach (var rawData in assetDataObject.RawData)
