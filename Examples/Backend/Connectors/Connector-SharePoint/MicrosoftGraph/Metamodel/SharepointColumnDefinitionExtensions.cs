@@ -56,6 +56,8 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                     return ColumnType.Taxonomy;
                 case SharepointFieldType.TaxonomyMulti:
                     return ColumnType.TaxonomyMulti;
+                case SharepointFieldType.Html:
+                    return ColumnType.Html;
                 default:
                     throw new InvalidOperationException($"Unsupported Sharepoint field type '{columnDefinitionResponse.TypeAsString}' with value of '{columnDefinitionResponse.FieldTypeKind}'");
             }
@@ -96,6 +98,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                 case ColumnType.Currency:
                 case ColumnType.Geolocation:
                 case ColumnType.Long:
+                case ColumnType.Html:
                     return false;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(columnType), columnType, null);
@@ -139,6 +142,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                 ColumnType.Image => DataType.DataObject,
                 ColumnType.Text => DataType.String,
                 ColumnType.CalculatedValue => DataType.String,
+                ColumnType.Html => DataType.String,
                 _ => throw new ArgumentOutOfRangeException(nameof(columnType), columnType, null)
             };
         }
