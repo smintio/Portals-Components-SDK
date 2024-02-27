@@ -19,6 +19,7 @@
         Image,
         Taxonomy,
         TaxonomyMulti,
-        PersonOrGroupMulti
+        PersonOrGroupMulti,
+        Html
     }
 }
