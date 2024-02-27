@@ -227,7 +227,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
             if (columnDefinitionResponse.FieldType == SharepointFieldType.Html)
             {
-                // propertyModel.SemanticType = SemanticType.Html;
+                propertyModel.SemanticType = SemanticType.Html;
             }
         }
 
