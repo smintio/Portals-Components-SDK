@@ -224,6 +224,11 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                 : entityModel.AddProperty(propertyName, dataType, localizedStringsModel);
 
             SetCurrencySymbol(columnDefinitionResponse, dataType, propertyModel);
+
+            if (columnDefinitionResponse.FieldType == SharepointFieldType.Html)
+            {
+                propertyModel.SemanticType = SemanticType.Html;
+            }
         }
 
         private void SetCurrencySymbol(ColumnDefinitionResponse columnDefinitionResponse, DataType dataType, PropertyModel propertyModel)

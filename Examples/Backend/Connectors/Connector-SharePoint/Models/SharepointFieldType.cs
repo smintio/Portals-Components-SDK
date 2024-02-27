@@ -24,6 +24,7 @@
         Image = 34,
         Taxonomy = 98,
         TaxonomyMulti = 99,
-        UserMulti = 100
+        UserMulti = 100,
+        Html = 101
     }
 }
