@@ -235,7 +235,7 @@ namespace SmintIo.Portals.Connector.SharePoint
 
             var tenantId = _configuration.HighSecurityMode ? _configuration.TenantId : "common";
 
-            var request = new RestRequest($"/{tenantId}/oauth2/v2.0/token", Method.POST);
+            var request = new RestRequest($"/{tenantId}/oauth2/v2.0/token", Method.Post);
 
             // Microsoft Identity Platform requires that the redirect_uri be present
             request.AddParameter("client_id", clientId, ParameterType.GetOrPost);
@@ -363,7 +363,7 @@ namespace SmintIo.Portals.Connector.SharePoint
         {
             var tenantId = _configuration.HighSecurityMode ? _configuration.TenantId : "common";
 
-            var request = new RestRequest($"/{tenantId}/oauth2/v2.0/token", Method.POST);
+            var request = new RestRequest($"/{tenantId}/oauth2/v2.0/token", Method.Post);
 
             request.AddParameter("client_id", clientId, ParameterType.GetOrPost);
             request.AddParameter("refresh_token", refreshToken, ParameterType.GetOrPost);
@@ -396,7 +396,7 @@ namespace SmintIo.Portals.Connector.SharePoint
 
             request.AcceptApplicationJson();
 
-            IRestResponse<OAuth2GetAccessTokenResponse> postResponse = null;
+            RestResponse<OAuth2GetAccessTokenResponse> postResponse = null;
 
             try
             {
