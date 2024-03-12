@@ -145,8 +145,14 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                     "The SharePoint URL is not yet set up");
             }
 
-            _restSharpClient = new RestSharpClient(new Uri($"{_sharepointUrl}"));
-            _restSharpClient.Client.Authenticator = new SharepointBearerAuthenticator(_getAuthorizationValuesFunc);
+            var authenticator = new SharepointBearerAuthenticator(_getAuthorizationValuesFunc);
+
+            var restClientOptions = new RestClientOptions(new Uri($"{_sharepointUrl}"))
+            {
+                Authenticator = authenticator
+            };
+
+            _restSharpClient = new RestSharpClient(restClientOptions);
         }
 
         public async Task<ICollection<SiteResponse>> GetSitesAsync(string query = null)
@@ -154,7 +160,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             var response = await ExecuteWithBackoffAsync(
                 apiFunc: (_) =>
                     {
-                        var request = new RestRequest("_api/search/query?querytext='contentclass:sts_site'&rowlimit=100&rowsperpage=100", Method.GET);
+                        var request = new RestRequest("_api/search/query?querytext='contentclass:sts_site'&rowlimit=100&rowsperpage=100", Method.Get);
 
                         SetResponseHeaderType(request);
 
@@ -254,7 +260,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                apiFunc: (_) =>
                {
                    var resource = $"/sites/{site.Name}/_api/lists(guid'{documentList.Id}')/fields";
-                   var request = new RestRequest(resource, Method.GET);
+                   var request = new RestRequest(resource, Method.Get);
 
                    SetResponseHeaderType(request);
 
