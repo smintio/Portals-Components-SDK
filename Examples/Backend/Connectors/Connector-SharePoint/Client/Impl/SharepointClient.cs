@@ -152,7 +152,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 Authenticator = authenticator
             };
 
-            _restSharpClient = new RestSharpClient(restClientOptions);
+            var httpClient = HttpClientFactory.CreateClient();
+            _restSharpClient = new RestSharpClient(httpClient, restClientOptions);
         }
 
         public async Task<ICollection<SiteResponse>> GetSitesAsync(string query = null)
