@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using RestSharp;
 using RestSharp.Authenticators;
 using SmintIo.Portals.ConnectorSDK.Models;
@@ -14,12 +15,14 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Authenticators
             _getAuthorizationValuesFunc = getAuthorizationValuesFunc;
         }
 
-        public void Authenticate(IRestClient client, IRestRequest request)
+        public ValueTask Authenticate(IRestClient client, RestRequest request)
         {
             var authorizationValues = _getAuthorizationValuesFunc();
             var sharepointAccessToken = authorizationValues.KeyValueStore[SharepointConnector.SharepointAccessTokenKey];
 
             request.AddHeader("Authorization", $"Bearer {sharepointAccessToken}");
+
+            return ValueTask.CompletedTask;
         }
     }
 }

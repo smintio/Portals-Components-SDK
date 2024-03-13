@@ -109,11 +109,11 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             var restSharpClient = new RestSharpClient(parsedBaseUrl);
 
-            var request = new RestRequest($"/service/info/customer", Method.GET);
+            var request = new RestRequest($"/service/info/customer", Method.Get);
 
             request.AcceptApplicationJson();
 
-            IRestResponse<CustomerServiceInfoResponse> getResponse = null;
+            RestResponse<CustomerServiceInfoResponse> getResponse = null;
 
             try
             {
@@ -337,11 +337,11 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             var restSharpClient = new RestSharpClient(parsedBaseUrl);
 
-            var request = new RestRequest($"/service/info/customer", Method.GET);
+            var request = new RestRequest($"/service/info/customer", Method.Get);
 
             request.AcceptApplicationJson();
 
-            IRestResponse<CustomerServiceInfoResponse> getResponse = null;
+            RestResponse<CustomerServiceInfoResponse> getResponse = null;
 
             try
             {
