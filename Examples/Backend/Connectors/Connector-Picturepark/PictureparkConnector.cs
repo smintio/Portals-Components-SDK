@@ -67,7 +67,7 @@ namespace SmintIo.Portals.Connector.Picturepark
         private readonly ICache _cache;
 
         public PictureparkConnector(IHttpClientFactory httpClientFactory, PictureparkConnectorConfiguration configuration, ICache cache, ILogger logger, IServiceProvider serviceProvider) :
-            base(null, logger)
+            base(null, httpClientFactory, logger)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
@@ -107,7 +107,8 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             var parsedBaseUrl = uriBuilder.Uri;
 
-            var restSharpClient = new RestSharpClient(parsedBaseUrl);
+            var httpClient = _httpClientFactory.CreateClient();
+            var restSharpClient = new RestSharpClient(httpClient, parsedBaseUrl);
 
             var request = new RestRequest($"/service/info/customer", Method.Get);
 
@@ -335,7 +336,8 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             var parsedBaseUrl = uriBuilder.Uri;
 
-            var restSharpClient = new RestSharpClient(parsedBaseUrl);
+            var httpClient = _httpClientFactory.CreateClient();
+            var restSharpClient = new RestSharpClient(httpClient, parsedBaseUrl);
 
             var request = new RestRequest($"/service/info/customer", Method.Get);
 

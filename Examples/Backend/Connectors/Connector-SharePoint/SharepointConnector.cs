@@ -49,7 +49,7 @@ namespace SmintIo.Portals.Connector.SharePoint
             ICache cache,
             IHttpClientFactory httpClientFactory,
             SharepointConnectorConfiguration configuration)
-            : base(null, logger)
+            : base(null, httpClientFactory, logger)
         {
             _logger = logger;
             _cache = cache;
@@ -231,7 +231,8 @@ namespace SmintIo.Portals.Connector.SharePoint
             var code = GetCode(bootstrapAuthorizationValuesModel);
             var originalRedirectUrl = GetOriginalRedirectUrl(bootstrapAuthorizationValuesModel);
 
-            var restSharpClient = new RestSharpClient(new Uri(identityServerUrl));
+            var httpClient = _httpClientFactory.CreateClient();
+            var restSharpClient = new RestSharpClient(httpClient, new Uri(identityServerUrl));
 
             var tenantId = _configuration.HighSecurityMode ? _configuration.TenantId : "common";
 
@@ -392,7 +393,8 @@ namespace SmintIo.Portals.Connector.SharePoint
                 request.AddParameter("scope", scopes);
             }
 
-            var restSharpClient = new RestSharpClient(new Uri(identityServerUrl));
+            var httpClient = _httpClientFactory.CreateClient();
+            var restSharpClient = new RestSharpClient(httpClient, new Uri(identityServerUrl));
 
             request.AcceptApplicationJson();
 
