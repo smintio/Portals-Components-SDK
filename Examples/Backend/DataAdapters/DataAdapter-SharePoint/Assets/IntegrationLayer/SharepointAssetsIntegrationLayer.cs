@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using SmintIo.Portals.Connector.SharePoint.Extensions;
 using SmintIo.Portals.Connector.SharePoint.Models;
 using SmintIo.Portals.DataAdapter.SharePoint.Assets.Common;

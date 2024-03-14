@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using SmintIo.Portals.Connector.SharePoint.Client;
 using SmintIo.Portals.Connector.SharePoint.Extensions;
 using SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel;

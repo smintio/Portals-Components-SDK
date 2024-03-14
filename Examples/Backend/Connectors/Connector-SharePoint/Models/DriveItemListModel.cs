@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Graph;
+using Microsoft.Graph.Models;
 
 namespace SmintIo.Portals.Connector.SharePoint.Models
 {

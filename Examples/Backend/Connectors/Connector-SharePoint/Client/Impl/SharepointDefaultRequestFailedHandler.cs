@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Graph;
+using Microsoft.Graph.Models.ODataErrors;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Exceptions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Extensions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.RequestFailedHandlers;
@@ -26,11 +26,14 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
         public override Task<RequestFailedHandlerResult> HandleOtherExceptionAsync(string requestUri, int tryCount, IPortalsContextModel portalsContextModel, Exception exception)
         {
-            if (exception is ServiceException serviceException)
+            if (exception is ODataError oDataError)
             {
+                var errorCode = oDataError?.Error?.Code;
+                var statusCode = oDataError.ResponseStatusCode;
+
                 // translate service exception to HttpStatusException, handle other Sharepoint states
 
-                var message = serviceException.Message;
+                var message = oDataError.Message;
 
                 if (!string.IsNullOrEmpty(message))
                 {
@@ -50,9 +53,6 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                     }
                 }
 
-                var errorCode = serviceException.Error?.Code;
-                var statusCode = (int)serviceException.StatusCode;
-
                 // https://learn.microsoft.com/en-us/graph/errors
                 // https://github.com/microsoftgraph/msgraph-sdk-dotnet/blob/dev/src/Microsoft.Graph/Enums/GraphErrorCode.cs
 
@@ -60,17 +60,17 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 {
                     if (string.Equals(errorCode, "itemNotFound"))
                     {
-                        throw new ExternalDependencyException(ExternalDependencyStatusEnum.GetNotFound, "The desired record was not found", SharepointConnectorStartup.SharepointConnector, serviceException);
+                        throw new ExternalDependencyException(ExternalDependencyStatusEnum.GetNotFound, "The desired record was not found", SharepointConnectorStartup.SharepointConnector, oDataError);
                     }
-                    else if (serviceException.StatusCode == HttpStatusCode.TooManyRequests ||
+                    else if (statusCode == (int)HttpStatusCode.TooManyRequests ||
                         statusCode == 509 || // Bandwidth Limit Exceeded
-                        string.Equals(errorCode, "activityLimitReached") || 
-                        string.Equals(errorCode, "tooManyRetries") || 
+                        string.Equals(errorCode, "activityLimitReached") ||
+                        string.Equals(errorCode, "tooManyRetries") ||
                         string.Equals(errorCode, "tooManyRedirects"))
                     {
-                        var retryAfter = GetRetryAfter(serviceException.ResponseHeaders);
+                        var retryAfter = GetRetryAfter(oDataError.ResponseHeaders);
 
-                        throw new TooManyRequestsExternalDependencyException("Quota exceeded", retryAfter, SharepointConnectorStartup.SharepointConnector, serviceException);
+                        throw new TooManyRequestsExternalDependencyException("Quota exceeded", retryAfter, SharepointConnectorStartup.SharepointConnector, oDataError);
                     }
                     else if (string.Equals(errorCode, "notSupported"))
                     {
@@ -86,9 +86,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                     tryCount,
                     portalsContextModel,
                     statusCode,
-                    statusMessage: $"{serviceException.Message} (error code {errorCode})",
+                    statusMessage: $"{message} (error code {errorCode})",
                     responseBody: null,
-                    innerException: serviceException);
+                    innerException: oDataError);
             }
 
             return base.HandleOtherExceptionAsync(requestUri, tryCount, portalsContextModel, exception);
@@ -141,9 +141,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
         /// https://learn.microsoft.com/en-us/graph/throttling-limits
         /// https://learn.microsoft.com/en-us/azure/architecture/patterns/throttling
         /// </summary>
-        private TimeSpan? GetRetryAfter(HttpResponseHeaders httpResponseHeaders)
+        private TimeSpan? GetRetryAfter(IDictionary<string, IEnumerable<string>> httpResponseHeaders)
         {
-            if (httpResponseHeaders == null || !httpResponseHeaders.TryGetValues(_retryAfter, out var retryAfterValues))
+            if (httpResponseHeaders == null || !httpResponseHeaders.TryGetValue(_retryAfter, out var retryAfterValues))
             {
                 _logger.LogWarning("SharePoint returned too many requests response without retry after header");
 

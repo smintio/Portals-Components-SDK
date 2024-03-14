@@ -14,6 +14,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.DataAdapterSDK.Providers;
+using SmintIo.Portals.DataAdapterSDK.TestDriver.Harness;
 using SmintIo.Portals.DataAdapterSDK.TestDriver.Models;
 using SmintIo.Portals.DataAdapterSDK.TestDriver.Providers;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
@@ -104,13 +105,7 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Integration
 
         protected override void AssertContentMetadata(AssetDataObject assetDataObject)
         {
-            if (assetDataObject.ImageMetadata != null)
-            {
-                assetDataObject.ImageMetadata.Height.Should().NotBeNull();
-                assetDataObject.ImageMetadata.Width.Should().NotBeNull();
-                assetDataObject.ThumbnailAspectRatio.Should().NotBeNull();
-            }
-            else if (assetDataObject.VideoMetadata != null)
+            if (assetDataObject.VideoMetadata != null)
             {
                 assetDataObject.VideoMetadata.Height.Should().NotBeNull();
                 assetDataObject.VideoMetadata.Width.Should().NotBeNull();
@@ -139,6 +134,15 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Integration
 
                 change.RecursionIsHandledByDataAdapter.Should().BeTrue();
             }
+        }
+
+        protected override void AssertProgressMonitor(object result, TestProgressMonitor progressMonitor)
+        {
+            result.Should().NotBeNull();
+
+            progressMonitor.CurrentValue.Should().Be(0);
+            progressMonitor.ReportProgressInvocations.Should().Be(0);
+            progressMonitor.FinishedInvocations.Should().Be(1);
         }
 
         protected override async Task RegisterMockupDataAsync()

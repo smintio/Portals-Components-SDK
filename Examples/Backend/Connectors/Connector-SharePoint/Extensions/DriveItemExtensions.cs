@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using SmintIo.Portals.ConnectorSDK.Helpers;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 

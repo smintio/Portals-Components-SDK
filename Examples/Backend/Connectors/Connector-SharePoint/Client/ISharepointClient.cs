@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using SmintIo.Portals.Connector.SharePoint.Models;
 using SmintIo.Portals.ConnectorSDK.Clients.Prefab;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Extensions;
