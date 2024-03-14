@@ -84,7 +84,7 @@ namespace SmintIo.Portals.Connector.SharePoint.AllowedValues
 
             if (lists == null)
             {
-                lists = new List<Microsoft.Graph.List>();
+                lists = new List<Microsoft.Graph.Models.List>();
             }
 
             var uiDetailsModels = lists
