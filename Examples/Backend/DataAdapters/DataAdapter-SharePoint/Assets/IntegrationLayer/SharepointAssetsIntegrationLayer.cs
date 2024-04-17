@@ -106,8 +106,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 Changes = changes,
                 Details = new GetChangesDetailsModel
                 {
-                    ContinuationUuid = driveItemsChangesList?.ContinuationUuid,
-                    HasMoreResults = driveItemsChangesList?.HasContinuationUuid ?? false,
+                    ContinuationUuid = driveItemsChangesList?.ContinuationUuid
                 },
                 ContinuationUuidTooOld = driveItemsChangesList?.ContinuationTooOld ?? false
             };
