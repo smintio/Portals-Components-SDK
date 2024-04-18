@@ -27,7 +27,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="7.2.9" />
+    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="7.2.12" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\ConfigurationMessages.Designer.cs">
