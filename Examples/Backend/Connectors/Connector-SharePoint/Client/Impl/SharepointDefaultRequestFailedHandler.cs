@@ -94,34 +94,54 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             return base.HandleOtherExceptionAsync(requestUri, tryCount, portalsContextModel, exception);
         }
 
-        public override Task<RequestFailedHandlerResult> HandleHttpStatusExceptionAsync(HttpStatusException httpStatusException)
+        public override async Task<RequestFailedHandlerResult> HandleHttpStatusExceptionAsync(HttpStatusException httpStatusException)
         {
             var httpResponseMessage = httpStatusException.HttpResponseMessage;
 
-            if (httpResponseMessage != null &&
-                httpResponseMessage.Headers != null &&
-                httpResponseMessage.Headers.TryGetValues("x-errorcode", out var values) &&
-                values != null &&
-                values.Any())
+            if (httpResponseMessage != null)
             {
-                var errorCode = values.First();
-
-                if (!string.IsNullOrEmpty(errorCode))
+                if (httpResponseMessage.Headers != null &&
+                    httpResponseMessage.Headers.TryGetValues("x-errorcode", out var values) &&
+                    values != null &&
+                    values.Any())
                 {
-                    if (string.Equals(errorCode, "VideoProcessing_ByteStreamTypeNotSupported") ||
-                        string.Equals(errorCode, "SubStreamCached_GeneralFailure") ||
-                        string.Equals(errorCode, "SubStreamCached_FileTooBig") ||
-                        string.Equals(errorCode, "SubStreamCached_Fatal") ||
-                        string.Equals(errorCode, "Service_InvalidInput_FileTooBigToConvert") ||
-                        string.Equals(errorCode, "OfficeConversion_BadRequest") ||
-                        string.Equals(errorCode, "VideoBitrateUnsupported_BitrateTooHigh") ||
-                        string.Equals(errorCode, "Web_416RequestedRangeNotSatisfiable"))
+                    var errorCode = values.First();
+
+                    if (!string.IsNullOrEmpty(errorCode))
+                    {
+                        if (string.Equals(errorCode, "VideoProcessing_ByteStreamTypeNotSupported") ||
+                            string.Equals(errorCode, "SubStreamCached_GeneralFailure") ||
+                            string.Equals(errorCode, "SubStreamCached_FileTooBig") ||
+                            string.Equals(errorCode, "SubStreamCached_Fatal") ||
+                            string.Equals(errorCode, "Service_InvalidInput_FileTooBigToConvert") ||
+                            string.Equals(errorCode, "OfficeConversion_BadRequest") ||
+                            string.Equals(errorCode, "VideoBitrateUnsupported_BitrateTooHigh") ||
+                            string.Equals(errorCode, "Web_416RequestedRangeNotSatisfiable"))
+                        {
+                            // permanent error, occuring when reading streams
+                            // this will cause the returned stream to be NULL
+
+                            return RequestFailedHandlerResult.Ignore;
+                        }
+                    }
+                }
+
+                try
+                {
+                    var content = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                    if (!string.IsNullOrEmpty(content) &&
+                        content.Contains("RequestedRangeNotSatisfiable"))
                     {
                         // permanent error, occuring when reading streams
                         // this will cause the returned stream to be NULL
 
-                        return Task.FromResult(RequestFailedHandlerResult.Ignore);
+                        return RequestFailedHandlerResult.Ignore;
                     }
+                }
+                catch (Exception)
+                {
+                    // cannot read content, ignore...
                 }
             }
 
@@ -130,10 +150,10 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 // permanent error, occuring when reading streams
                 // this will cause the returned stream to be NULL
 
-                return Task.FromResult(RequestFailedHandlerResult.Ignore);
+                return RequestFailedHandlerResult.Ignore;
             }
 
-            return base.HandleHttpStatusExceptionAsync(httpStatusException);
+            return await base.HandleHttpStatusExceptionAsync(httpStatusException).ConfigureAwait(false);
         }
 
         /// <summary>
