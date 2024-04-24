@@ -41,7 +41,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                         message.Contains("Service_InvalidInput_FileTooBigToConvert") ||
                         message.Contains("OfficeConversion_BadRequest") ||
                         message.Contains("VideoBitrateUnsupported_BitrateTooHigh") ||
-                        message.Contains("Web_416RequestedRangeNotSatisfiable"))
+                        message.Contains("Web_416RequestedRangeNotSatisfiable") ||
+                        message.Contains("RequestedRangeNotSatisfiable"))
                     {
                         // permanent error, occuring when reading streams
                         // this will cause the returned stream to be NULL
