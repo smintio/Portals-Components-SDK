@@ -36,6 +36,9 @@ Download the ZIP archive suitable for your operating system to a convenient loca
 
 Extract the archive.
 
+Trust the rootCA.pem self signed root authority, to allow HTTPS connection to your local dev server. 
+The root authority certificate has been issued by Smint.io.
+
 ## App settings
 
 A few things needs to be configured for Portals-DevServer to work properly.
