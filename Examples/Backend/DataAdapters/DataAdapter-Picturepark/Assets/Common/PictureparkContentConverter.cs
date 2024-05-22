@@ -92,8 +92,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
             {
                 var name = new LocalizedStringsModel(dictionary);
 
-                asset.ListDisplayName = name;
-
                 asset.Name = name;
             }
 
@@ -199,8 +197,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                 {
                     var name = new LocalizedStringsModel(dictionary);
 
-                    asset.ListDisplayName = name;
-
                     asset.Name = name;
                 }
                 else
@@ -223,8 +219,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                 if (dictionary != null)
                 {
                     var name = new LocalizedStringsModel(dictionary);
-
-                    asset.ListDisplayName = name;
 
                     asset.Name = name;
                 }
@@ -890,9 +884,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                 if (dictionary != null)
                 {
                     var name = new LocalizedStringsModel(dictionary);
-
-                    target.ListDisplayName = name;
-                    target.DetailDisplayName = name;
 
                     target.Name = name;
                 }
