@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using SmintIo.Portals.Connector.SharePoint.Client;
@@ -324,6 +325,10 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             {
                 var thumbnailSet = driveItem.Thumbnails?.FirstOrDefault();
 
+                assetDataObject.InternalMetadata.SmallThumbnailETag = GetETag(thumbnailSet?.Small?.Url);
+                assetDataObject.InternalMetadata.MediumThumbnailETag = GetETag(thumbnailSet?.Medium?.Url);
+                assetDataObject.InternalMetadata.LargeThumbnailETag = GetETag(thumbnailSet?.Large?.Url);
+
                 assetDataObject.IsThumbnailSmallAvailable = !string.IsNullOrEmpty(thumbnailSet?.Small?.Url);
                 assetDataObject.IsThumbnailMediumAvailable = !string.IsNullOrEmpty(thumbnailSet?.Medium?.Url);
                 assetDataObject.IsThumbnailLargeAvailable = !string.IsNullOrEmpty(thumbnailSet?.Large?.Url);
@@ -332,6 +337,10 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             else if (assetDataObject.ContentType.Id == ContentTypeEnumDataObject.Video.Id)
             {
                 var thumbnailSet = driveItem.Thumbnails?.FirstOrDefault();
+
+                assetDataObject.InternalMetadata.SmallThumbnailETag = GetETag(thumbnailSet?.Small?.Url);
+                assetDataObject.InternalMetadata.MediumThumbnailETag = GetETag(thumbnailSet?.Medium?.Url);
+                assetDataObject.InternalMetadata.LargeThumbnailETag = GetETag(thumbnailSet?.Large?.Url);
 
                 assetDataObject.IsThumbnailSmallAvailable = !string.IsNullOrEmpty(thumbnailSet?.Small?.Url);
                 assetDataObject.IsThumbnailMediumAvailable = !string.IsNullOrEmpty(thumbnailSet?.Medium?.Url);
@@ -348,6 +357,10 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             else
             {
                 var thumbnailSet = driveItem.Thumbnails?.FirstOrDefault();
+
+                assetDataObject.InternalMetadata.SmallThumbnailETag = GetETag(thumbnailSet?.Small?.Url);
+                assetDataObject.InternalMetadata.MediumThumbnailETag = GetETag(thumbnailSet?.Medium?.Url);
+                assetDataObject.InternalMetadata.LargeThumbnailETag = GetETag(thumbnailSet?.Large?.Url);
 
                 assetDataObject.IsThumbnailSmallAvailable = !string.IsNullOrEmpty(thumbnailSet?.Small?.Url);
                 assetDataObject.IsThumbnailMediumAvailable = !string.IsNullOrEmpty(thumbnailSet?.Medium?.Url);
@@ -394,6 +407,35 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
                     Logger.LogWarning($"Mime type is empty for file {driveItem.Name}");
                 }
             }
+        }
+
+        private static string GetETag(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                return null;
+            }
+
+            var uriBuilder = new UriBuilder(url);
+
+            var queryString = HttpUtility.ParseQueryString(uriBuilder.Query);
+
+            var docIdUrl = queryString.Get("docid");
+
+            if (string.IsNullOrEmpty(docIdUrl))
+            {
+                return null;
+            }
+
+            queryString.Remove("docid");
+
+            var docIdUri = new Uri(docIdUrl);
+            
+            queryString.Set("docid", docIdUri.GetLeftPart(UriPartial.Path));
+
+            uriBuilder.Query = queryString.ToString();
+
+            return uriBuilder.ToString();
         }
 
         private static decimal? ComputeAspectRatio(int? width, int? height)
