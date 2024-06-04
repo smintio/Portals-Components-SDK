@@ -1,4 +1,5 @@
 ﻿using Picturepark.SDK.V1.Contract;
+using SmintIo.Portals.Connector.Picturepark.Resources;
 using SmintIo.Portals.ConnectorSDK.Metamodel;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Model;
 using SmintIo.Portals.SDK.Core.Models.Strings;
@@ -235,6 +236,9 @@ namespace SmintIo.Portals.Connector.Picturepark.Metamodel
                 if (targetEntity == null)
                     return null;
 
+                var targetIdProperty = targetEntity.AddProperty("_targetId", DataType.String, new ResourceLocalizedStringsModel(MetamodelMessages.c_picturepark_target_id));
+                targetIdProperty.SemanticType = SemanticType.Relationship;
+
                 return entity.AddProperty(field.Id, Type, targetEntity.Key, new LocalizedStringsModel(field.Names));
             }
         }
@@ -259,6 +263,9 @@ namespace SmintIo.Portals.Connector.Picturepark.Metamodel
 
                 if (targetEntity == null)
                     return null;
+
+                var targetIdProperty = targetEntity.AddProperty("_targetId", DataType.String, new ResourceLocalizedStringsModel(MetamodelMessages.c_picturepark_target_id));
+                targetIdProperty.SemanticType = SemanticType.Relationship;
 
                 return entity.AddProperty(field.Id, Type, targetEntity.Key, new LocalizedStringsModel(field.Names));
             }
