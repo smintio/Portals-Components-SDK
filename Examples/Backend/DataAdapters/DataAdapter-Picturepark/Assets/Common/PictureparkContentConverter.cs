@@ -962,7 +962,34 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
             return layerDataObjects.ToArray();
         }
 
-        protected override LocalizedStringsModel GetLocalizedStringsModelDataType(string propertyKey, JToken value, string semanticHint)
+        protected override string GetStringDataType(string propertyKey, JToken value, SemanticType? semanticType, string semanticHint)
+        {
+            var stringValue = base.GetStringDataType(propertyKey, value, semanticType, semanticHint);
+
+            if (semanticType == SemanticType.Relationship && !string.IsNullOrEmpty(stringValue))
+            {
+                stringValue = new ScopedAssetIdentifier(_dataAdapterContext.InstanceKey, ContentTypeEnumDataObject.Unknown.Id, stringValue).ToString();
+            }
+
+            return stringValue;
+        }
+
+        protected override string[] GetStringArrayDataType(string propertyKey, JToken value, SemanticType? semanticType, string semanticHint)
+        {
+            var stringArrayValue = base.GetStringArrayDataType(propertyKey, value, semanticType, semanticHint);
+
+            if (semanticType == SemanticType.Relationship && stringArrayValue != null && stringArrayValue.Any())
+            {
+                stringArrayValue = stringArrayValue
+                    .Where(stringValue => !string.IsNullOrEmpty(stringValue))
+                    .Select(stringValue => new ScopedAssetIdentifier(_dataAdapterContext.InstanceKey, ContentTypeEnumDataObject.Unknown.Id, stringValue).ToString())
+                    .ToArray();
+            }
+
+            return stringArrayValue;
+        }
+
+        protected override LocalizedStringsModel GetLocalizedStringsModelDataType(string propertyKey, JToken value, SemanticType? semanticType, string semanticHint)
         {
             var dictionary = GetTypedValue<Dictionary<string, string>>(propertyKey, value, logWarning: false);
 
@@ -978,10 +1005,10 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                 return null;
             }
 
-            return base.GetLocalizedStringsModelDataType(propertyKey, value, semanticHint);
+            return base.GetLocalizedStringsModelDataType(propertyKey, value, semanticType, semanticHint);
         }
 
-        protected override DateTimeOffset? GetDateTimeDataType(string propertyKey, JToken value, string semanticHint)
+        protected override DateTimeOffset? GetDateTimeDataType(string propertyKey, JToken value, SemanticType? semanticType, string semanticHint)
         {
             if (value.Type == JTokenType.Null)
             {
@@ -1027,10 +1054,10 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                 return dateTimeOffset;
             }
 
-            return base.GetDateTimeDataType(propertyKey, value, semanticHint);
+            return base.GetDateTimeDataType(propertyKey, value, semanticType, semanticHint);
         }
 
-        protected override decimal? GetDecimalDataType(string propertyKey, JToken value, string semanticHint)
+        protected override decimal? GetDecimalDataType(string propertyKey, JToken value, SemanticType? semanticType, string semanticHint)
         {
             var decimalValue = GetTypedValue<decimal?>(propertyKey, value, logWarning: false);
 
@@ -1053,25 +1080,25 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                 return intValue.Value;
             }
 
-            return base.GetDecimalDataType(propertyKey, value, semanticHint);
+            return base.GetDecimalDataType(propertyKey, value, semanticType, semanticHint);
         }
 
-        protected override EnumDataObject GetEnumDataObject(string metamodelEntityKey, string targetMetamodelEntityKey, JObject _object)
+        protected override EnumDataObject GetEnumDataObject(string metamodelEntityKey, string targetMetamodelEntityKey, JObject _object, int level)
         {
-            var enumDataObject = base.GetEnumDataObject(metamodelEntityKey, targetMetamodelEntityKey, _object);
+            var enumDataObject = base.GetEnumDataObject(metamodelEntityKey, targetMetamodelEntityKey, _object, level);
 
             SetEnumData(enumDataObject, _object);
 
             return enumDataObject;
         }
 
-        protected override EnumDataObject[] GetEnumDataObjects(string metamodelEntityKey, string targetMetamodelEntityKey, JObject[] _objects)
+        protected override EnumDataObject[] GetEnumDataObjects(string metamodelEntityKey, string targetMetamodelEntityKey, JObject[] _objects, int level)
         {
             if (_objects.Count() <= 1)
             {
                 // single ref is OK
 
-                return base.GetEnumDataObjects(metamodelEntityKey, targetMetamodelEntityKey, _objects);
+                return base.GetEnumDataObjects(metamodelEntityKey, targetMetamodelEntityKey, _objects, level);
             }
 
             bool isExpensive = true;
@@ -1105,7 +1132,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
 
             if (!isExpensive)
             {
-                return base.GetEnumDataObjects(metamodelEntityKey, targetMetamodelEntityKey, _objects);
+                return base.GetEnumDataObjects(metamodelEntityKey, targetMetamodelEntityKey, _objects, level);
             }
 
             var enumDataObjects = _objects
