@@ -120,4 +120,7 @@
   <data name="c_picturepark_no_value" xml:space="preserve">
     <value>No value</value>
   </data>
+  <data name="c_picturepark_target_id" xml:space="preserve">
+    <value>Target identifier</value>
+  </data>
 </root>

@@ -449,7 +449,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             return property.Name.ConvertToPascalCase();
         }
 
-        protected override IDictionary<string, object>[] GetEnumObjects(string propertyKey, object value, string semanticHint)
+        protected override IDictionary<string, object>[] GetEnumObjects(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             var lookupModel = GetTypedValue<ICollection<LookupModel>>(propertyKey, value, logWarning: false);
 
@@ -478,16 +478,16 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
                     .ToArray();
             }
 
-            return base.GetEnumObjects(propertyKey, value, semanticHint);
+            return base.GetEnumObjects(propertyKey, value, semanticType, semanticHint);
         }
 
-        protected override IDictionary<string, object> GetEnumObject(string propertyKey, object value, string semanticHint)
+        protected override IDictionary<string, object> GetEnumObject(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             var enumValue = GetTypedValue<string>(propertyKey, value, logWarning: false);
 
             if (string.IsNullOrEmpty(enumValue))
             {
-                return GetObject(propertyKey, value, semanticHint);
+                return GetObject(propertyKey, value, semanticType, semanticHint);
             }
 
             var enumObject = new Dictionary<string, object>
@@ -498,9 +498,9 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             return enumObject;
         }
 
-        protected override CurrencyModel GetCurrencyModelDataType(string propertyKey, object value, string semanticHint)
+        protected override CurrencyModel GetCurrencyModelDataType(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
-            var currencyModelValue = GetDecimalDataType(propertyKey, value, semanticHint);
+            var currencyModelValue = GetDecimalDataType(propertyKey, value, semanticType, semanticHint);
 
             var currencyModel = new CurrencyModel
             {
