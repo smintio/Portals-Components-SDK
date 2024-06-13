@@ -25,7 +25,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public MetadataAttributeModel[] SmintIoSearchIndexOnlyIndexAssetsWithAttributes { get; set; }
 
-        public string SmintIoSearchIndexOnlyIndexAssetsWithAttributeValue { get; set; }
+        public string[] SmintIoSearchIndexOnlyIndexAssetsWithAttributeValues { get; set; }
 
         [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProviderBaseImpl))]
         public string[] OutputFormatIdAllowList { get; set; }
