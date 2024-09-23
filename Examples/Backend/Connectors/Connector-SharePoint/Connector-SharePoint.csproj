@@ -10,14 +10,24 @@
     <Version>1.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ConfigurationMessages.de.resx" />
-    <EmbeddedResource Include="Resources\ConfigurationMessages.resx">
-      <LastGenOutput>ConfigurationMessages.Designer.cs</LastGenOutput>
+    <EmbeddedResource Include="Resources\OneDriveConfigurationMessages.de.resx" />
+    <EmbeddedResource Include="Resources\OneDriveConfigurationMessages.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>OneDriveConfigurationMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\OneDriveMetamodelMessages.de.resx" />
+    <EmbeddedResource Include="Resources\OneDriveMetamodelMessages.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>OneDriveMetamodelMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SharepointConfigurationMessages.de.resx" />
+    <EmbeddedResource Include="Resources\SharepointConfigurationMessages.resx">
+      <LastGenOutput>SharepointConfigurationMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\MetamodelMessages.de.resx" />
-    <EmbeddedResource Include="Resources\MetamodelMessages.resx">
-      <LastGenOutput>MetamodelMessages.Designer.cs</LastGenOutput>
+    <EmbeddedResource Include="Resources\SharepointMetamodelMessages.de.resx" />
+    <EmbeddedResource Include="Resources\SharepointMetamodelMessages.resx">
+      <LastGenOutput>SharepointMetamodelMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
@@ -30,15 +40,25 @@
     <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="8.2.33" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Resources\ConfigurationMessages.Designer.cs">
+    <Compile Update="Resources\OneDriveConfigurationMessages.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>ConfigurationMessages.resx</DependentUpon>
+      <DependentUpon>OneDriveConfigurationMessages.resx</DependentUpon>
     </Compile>
-    <Compile Update="Resources\MetamodelMessages.Designer.cs">
+    <Compile Update="Resources\OneDriveMetamodelMessages.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>MetamodelMessages.resx</DependentUpon>
+      <DependentUpon>OneDriveMetamodelMessages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\SharepointConfigurationMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SharepointConfigurationMessages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\SharepointMetamodelMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SharepointMetamodelMessages.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

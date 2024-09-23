@@ -22,6 +22,7 @@ using SmintIo.Portals.SDK.Core.Models.Context;
 using SmintIo.Portals.SDK.Core.Rest.Prefab;
 using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Exceptions;
+using System.Runtime.CompilerServices;
 
 namespace SmintIo.Portals.Connector.SharePoint
 {
@@ -38,8 +39,10 @@ namespace SmintIo.Portals.Connector.SharePoint
         private readonly ILogger _logger;
         private readonly ICache _cache;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly SharepointConnectorConfiguration _configuration;
+        private readonly ISharepointOneDriveConnectorConfiguration _configuration;
         private readonly IPortalsContextModel _portalsContext;
+
+        private readonly bool _isSharepoint;
 
         private SharepointClient _sharepointClient;
 
@@ -47,16 +50,27 @@ namespace SmintIo.Portals.Connector.SharePoint
             IServiceProvider serviceProvider,
             ILogger logger,
             ICache cache,
-            IHttpClientFactory httpClientFactory,
-            SharepointConnectorConfiguration configuration)
+            IHttpClientFactory httpClientFactory)
             : base(null, httpClientFactory, logger)
         {
             _logger = logger;
             _cache = cache;
             _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
 
             _portalsContext = serviceProvider.GetService<IPortalsContextModel>();
+
+            _configuration = serviceProvider.GetService<SharepointConnectorConfiguration>();
+
+            if (_configuration == null)
+            {
+                _configuration = serviceProvider.GetRequiredService<OneDriveConnectorConfiguration>();
+
+                _isSharepoint = false;
+            }
+            else
+            {
+                _isSharepoint = true;
+            }
         }
 
         public override string Key => SharepointConnectorStartup.SharepointConnector;
@@ -177,7 +191,14 @@ namespace SmintIo.Portals.Connector.SharePoint
 
             var siteFolderIds = GetSiteFolderIds();
 
-            var sharepointMetamodelBuilder = new SharepointMetamodelBuilder(_logger, sharepointClient, siteId, siteDriveId, siteListId, siteFolderIds);
+            var sharepointMetamodelBuilder = new SharepointMetamodelBuilder(
+                _logger, 
+                _isSharepoint,
+                sharepointClient, 
+                siteId, 
+                siteDriveId, 
+                siteListId, 
+                siteFolderIds);
 
             return sharepointMetamodelBuilder.BuildAsync();
         }

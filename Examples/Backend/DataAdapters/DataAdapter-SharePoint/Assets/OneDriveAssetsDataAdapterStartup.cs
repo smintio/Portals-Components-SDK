@@ -11,15 +11,15 @@ using SmintIo.Portals.SDK.Core.Models.Strings;
 
 namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 {
-    public class SharepointAssetsDataAdapterStartup : IDataAdapterStartup
+    public class OneDriveAssetsDataAdapterStartup : IDataAdapterStartup
     {
-        public const string SharepointAssetsDataAdapter = "assets";
+        public const string OneDriveAssetsDataAdapter = "assets";
 
         public void ConfigureServices(IServiceCollection services)
         {
         }
 
-        public string Key => SharepointAssetsDataAdapter;
+        public string Key => OneDriveAssetsDataAdapter;
 
         public LocalizedStringsModel Name { get; } = new ResourceLocalizedStringsModel(nameof(OneDriveConfigurationMessages.da_assets_name));
 
@@ -36,7 +36,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public Type MetamodelMessages => null;
 
-        public string ConnectorKey => SharepointConnectorStartup.SharepointConnector;
+        public string ConnectorKey => OneDriveConnectorStartup.OneDriveConnector;
 
         public DataAdapterPermission[] Permissions => null;
 
