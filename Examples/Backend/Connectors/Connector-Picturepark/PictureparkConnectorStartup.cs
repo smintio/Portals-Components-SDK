@@ -24,9 +24,9 @@ namespace SmintIo.Portals.Connector.Picturepark
 
         public bool IsAdvanced => true;
 
-        public string LogoUrl => "https://www.smint.io/images/connectors/picturepark.png";
+        public string LogoUrl => "https://cdn.smint.io/images/connectors/picturepark.png";
 
-        public string IconUrl => "https://www.smint.io/images/connectors/picturepark_icon_large.png";
+        public string IconUrl => "https://cdn.smint.io/images/connectors/picturepark_icon_large.png";
 
         public void ConfigureServices(IServiceCollection services)
         {

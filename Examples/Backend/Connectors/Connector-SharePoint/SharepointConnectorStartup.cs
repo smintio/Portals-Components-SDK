@@ -15,9 +15,9 @@ namespace SmintIo.Portals.Connector.SharePoint
 
         public LocalizedStringsModel Description { get; } = new ResourceLocalizedStringsModel(nameof(Resources.ConfigurationMessages.c_sharepoint_description));        
 
-        public string LogoUrl => "https://www.smint.io/images/connectors/sharepoint.png";
+        public string LogoUrl => "https://cdn.smint.io/images/connectors/sharepoint.png";
 
-        public string IconUrl => "https://www.smint.io/images/connectors/sharepoint_icon_large.png";
+        public string IconUrl => "https://cdn.smint.io/images/connectors/sharepoint_icon_large.png";
 
         public Type ConfigurationImplementation => typeof(SharepointConnectorConfiguration);
         public Type ComponentImplementation => typeof(SharepointConnector);
