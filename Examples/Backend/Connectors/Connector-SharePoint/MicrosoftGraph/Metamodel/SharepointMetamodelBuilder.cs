@@ -44,9 +44,11 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
         private readonly ISharepointClient _sharepointClient;
         private readonly string _siteId;
 
+        private readonly bool _isSharepoint;
+
         private readonly ConnectorMetamodel _metamodel;
 
-        public SharepointMetamodelBuilder(ILogger logger, ISharepointClient sharepointClient, string siteId, string siteDriveId, string siteListId, IEnumerable<string> siteFolderIds)
+        public SharepointMetamodelBuilder(ILogger logger, bool isSharepoint, ISharepointClient sharepointClient, string siteId, string siteDriveId, string siteListId, IEnumerable<string> siteFolderIds)
         {
             _logger = logger;
             _sharepointClient = sharepointClient;
@@ -61,6 +63,8 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
                 isRandomAccessSupported: true,
                 isFullTextSearchProposalsSupported: false,
                 isFolderNavigationSupported: false);
+
+            _isSharepoint = isSharepoint;
         }
 
         private static string GetMD5EncodeHash(string value)
@@ -154,7 +158,11 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
 
         private EntityModel AddRootEntityModel()
         {
-            var rootEntityLabels = new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_sharepoint_root_entity));
+            var rootEntityLabels = new ResourceLocalizedStringsModel(
+                _isSharepoint ?
+                    nameof(SharepointMetamodelMessages.c_sharepoint_root_entity) :
+                    nameof(OneDriveMetamodelMessages.c_onedrive_root_entity)
+            );
 
             var rootEntityModel = CreateEntityModel(RootEntityKey, rootEntityLabels);
 

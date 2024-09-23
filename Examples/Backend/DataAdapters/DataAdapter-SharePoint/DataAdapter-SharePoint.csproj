@@ -9,10 +9,15 @@
     <Version>1.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ConfigurationMessages.de.resx" />
-    <EmbeddedResource Include="Resources\ConfigurationMessages.resx">
-      <LastGenOutput>ConfigurationMessages.Designer.cs</LastGenOutput>
+    <EmbeddedResource Include="Resources\OneDriveConfigurationMessages.de.resx" />
+    <EmbeddedResource Include="Resources\OneDriveConfigurationMessages.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>OneDriveConfigurationMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SharepointConfigurationMessages.de.resx" />
+    <EmbeddedResource Include="Resources\SharepointConfigurationMessages.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>SharepointConfigurationMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -29,6 +34,16 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>ConfigurationMessages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\OneDriveConfigurationMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>OneDriveConfigurationMessages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\SharepointConfigurationMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SharepointConfigurationMessages.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>
