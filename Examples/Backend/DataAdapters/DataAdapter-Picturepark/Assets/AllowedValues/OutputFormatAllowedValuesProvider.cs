@@ -1,30 +1,25 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Picturepark.SDK.V1.Contract;
 using SmintIo.Portals.SDK.Core.Models.Paging;
-using SmintIo.Portals.SDK.Core.Providers;
 using SmintIo.Portals.SDK.Core.Models.Strings;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SmintIo.Portals.DataAdapterSDK.DataAdapters.AllowedValuesProviders;
+using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
 
 namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.AllowedValues
 {
-    public class OutputFormatAllowedValuesProvider : IDynamicValueListProvider<string>
+    public class OutputFormatAllowedValuesProvider : OutputFormatAllowedValuesProviderBaseImpl
     {
-        public bool SupportsSearch => false;
-
-        public bool SupportsPagination => false;
-
         private readonly PictureparkAssetsDataAdapter _pictureparkAssetsDataAdapter;
-
-        public IDynamicAllowedValuesParametersProvider ParametersProvider => null;
 
         public OutputFormatAllowedValuesProvider(IServiceProvider serviceProvider)
         {
             _pictureparkAssetsDataAdapter = serviceProvider.GetService<PictureparkAssetsDataAdapter>();
         }
 
-        public async Task<UiDetailsModel<string>> GetDynamicValueAsync(string outputFormatId)
+        public override async Task<UiDetailsModel<string>> GetDynamicValueAsync(string outputFormatId)
         {
             if (_pictureparkAssetsDataAdapter == null)
             {
@@ -32,6 +27,11 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.AllowedValues
                 {
                     Value = outputFormatId
                 };
+            }
+
+            if (string.Equals(outputFormatId, nameof(AssetThumbnailSize.Custom)))
+            {
+                return await base.GetDynamicValueAsync(outputFormatId).ConfigureAwait(false);
             }
 
             try
@@ -67,18 +67,23 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.AllowedValues
             }
         }
 
-        public async Task<PagingResult<UiDetailsModel<string>>> GetDynamicValueListAsync(string searchTerm, int? offset, int? limit, string parentValue)
+        public override async Task<PagingResult<UiDetailsModel<string>>> GetDynamicValueListAsync(string searchTerm, int? offset, int? limit, string parentValue)
         {
             if (_pictureparkAssetsDataAdapter == null)
                 return null;
 
             var outputFormats = await _pictureparkAssetsDataAdapter.GetOutputFormatsAsync().ConfigureAwait(false);
 
-            var uiDetailsModels = outputFormats?.Select(outputFormat => new UiDetailsModel<string>()
-            {
-                Value = outputFormat.Id,
-                Name = outputFormat.Names?.ConvertToLocalizedStringsModel()
-            }).ToList();
+            var customOutputFormat = await base.GetDynamicValueAsync(nameof(AssetThumbnailSize.Custom)).ConfigureAwait(false);
+
+            var uiDetailsModels = outputFormats?
+                .Select(outputFormat => new UiDetailsModel<string>()
+                    {
+                        Value = outputFormat.Id,
+                        Name = outputFormat.Names?.ConvertToLocalizedStringsModel()
+                    })
+                .Append(customOutputFormat)
+                .ToList();
 
             return new PagingResult<UiDetailsModel<string>>()
             {
