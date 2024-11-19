@@ -69,8 +69,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client
         /// <summary>
         /// Gets a flat list of folders as <see cref="DriveItem"/> from Sharepoint.
         /// </summary>
+        /// <param name="searchTermParts">The folder parts to search for, by level</param>
         /// <returns>A list of <see cref="DriveItem"/> items.</returns>
-        Task<ICollection<DriveItem>> GetFoldersListAsync();
+        Task<ICollection<DriveItem>> GetFoldersListAsync(string[] searchTermParts);
 
         /// <summary>
         /// Gets a <see cref="DriveItem"/> by identifier from Sharepoint.

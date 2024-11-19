@@ -90,7 +90,9 @@ namespace SmintIo.Portals.Connector.SharePoint.AllowedValues
                 return null;
             }
 
-            var folderDriveItems = await _sharepointClient.GetFoldersListAsync().ConfigureAwait(false);
+            var searchTermParts = searchTerm?.Split(">", StringSplitOptions.TrimEntries);
+
+            var folderDriveItems = await _sharepointClient.GetFoldersListAsync(searchTermParts).ConfigureAwait(false);
 
             if (folderDriveItems == null)
             {

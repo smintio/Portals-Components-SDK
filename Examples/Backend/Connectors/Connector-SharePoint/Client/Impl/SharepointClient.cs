@@ -539,23 +539,37 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             };
         }
 
-        public async Task<ICollection<DriveItem>> GetFoldersListAsync()
+        public async Task<ICollection<DriveItem>> GetFoldersListAsync(string[] searchTermParts)
         {
             if (string.IsNullOrEmpty(SiteId))
             {
                 return null;
             }
 
-            var rootDriveItems = await GetRootDriveItemListAsync(skipToken: null, pageSize: null).ConfigureAwait(false);
-
-            var folderDriveItems = await GetFoldersListInternallyAsync(rootDriveItems).ConfigureAwait(false);
-
-            return folderDriveItems;
-        }
-
-        private async Task<ICollection<DriveItem>> GetFoldersListInternallyAsync(DriveItemListModel rootDriveItemList)
-        {
             var folderDriveItems = new List<DriveItem>();
+
+            if (searchTermParts == null)
+            {
+                searchTermParts = [];
+            }
+
+            string searchTermPart = null;
+
+            if (searchTermParts.Length > 0)
+            {
+                searchTermPart = searchTermParts[0];
+
+                if (searchTermParts.Length > 1)
+                {
+                    searchTermParts = searchTermParts[1..];
+                }
+                else
+                {
+                    searchTermParts = [];
+                }
+            }
+
+            var rootDriveItemList = await GetRootDriveItemListAsync(skipToken: null, pageSize: null).ConfigureAwait(false);
 
             if (rootDriveItemList == null || !rootDriveItemList.DriveItems.Any())
             {
@@ -568,9 +582,20 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
             foreach (var rootFolderDriveItem in rootFoldersDriveItems)
             {
+                if (!string.IsNullOrEmpty(searchTermPart) &&
+                    !rootFolderDriveItem.Name.StartsWith(searchTermPart, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 folderDriveItems.Add(rootFolderDriveItem);
 
-                await GetChildrenRecursivelyAsync(folderDriveItems, rootFolderDriveItem, rootFolderDriveItem.Name, foldersOnly: true).ConfigureAwait(false);
+                if (!searchTermParts.Any())
+                {
+                    continue;
+                }
+
+                await GetChildrenRecursivelyAsync(folderDriveItems, rootFolderDriveItem, rootFolderDriveItem.Name, searchTermParts, foldersOnly: true).ConfigureAwait(false);
             }
 
             return folderDriveItems;
@@ -676,8 +701,24 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             };
         }
 
-        private async Task<DriveItem> GetChildrenRecursivelyAsync(ICollection<DriveItem> folderDriveItems, DriveItem driveItem, string parentFolderName, bool foldersOnly = false)
+        private async Task GetChildrenRecursivelyAsync(ICollection<DriveItem> folderDriveItems, DriveItem driveItem, string parentFolderName, string[] searchTermParts, bool foldersOnly)
         {
+            string searchTermPart = null;
+
+            if (searchTermParts.Length > 0)
+            {
+                searchTermPart = searchTermParts[0];
+
+                if (searchTermParts.Length > 1)
+                {
+                    searchTermParts = searchTermParts[1..];
+                }
+                else
+                {
+                    searchTermParts = [];
+                }
+            }
+
             var driveItemList = await GetChildrenDriveItemsInternallyAsync(driveItem, skipToken: null, pageSize: null).ConfigureAwait(false);
 
             var childDriveItems = foldersOnly
@@ -688,17 +729,26 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
             foreach (var childDriveItem in childDriveItems)
             {
+                if (!string.IsNullOrEmpty(searchTermPart) &&
+                    !childDriveItem.Name.StartsWith(searchTermPart, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 if (!string.IsNullOrEmpty(parentFolderName))
                 {
                     childDriveItem.Name = $"{parentFolderName} > {childDriveItem.Name}";
                 }
 
-                var child = await GetChildrenRecursivelyAsync(folderDriveItems, childDriveItem, childDriveItem.Name, foldersOnly).ConfigureAwait(false);
+                folderDriveItems.Add(childDriveItem);
 
-                folderDriveItems.Add(child);
+                if (!searchTermParts.Any())
+                {
+                    continue;
+                }
+
+                await GetChildrenRecursivelyAsync(folderDriveItems, childDriveItem, childDriveItem.Name, searchTermParts, foldersOnly).ConfigureAwait(false);
             }
-
-            return driveItem;
         }
 
         public async Task<DriveItem> GetFolderDriveItemAsync(string assetId)
