@@ -38,6 +38,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                         message.Contains("SubStreamCached_GeneralFailure") ||
                         message.Contains("SubStreamCached_FormatNotSupported") ||
                         message.Contains("SubStreamCached_FileTooBig") ||
+                        message.Contains("SubStreamCached_SandboxTimeout") ||
                         message.Contains("SubStreamCached_Fatal") ||
                         message.Contains("Service_InvalidInput_FileTooBigToConvert") ||
                         message.Contains("OfficeConversion_BadRequest") ||
@@ -115,6 +116,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                             string.Equals(errorCode, "SubStreamCached_GeneralFailure") ||
                             string.Equals(errorCode, "SubStreamCached_FormatNotSupported") ||
                             string.Equals(errorCode, "SubStreamCached_FileTooBig") ||
+                            string.Equals(errorCode, "SubStreamCached_SandboxTimeout") ||
                             string.Equals(errorCode, "SubStreamCached_Fatal") ||
                             string.Equals(errorCode, "Service_InvalidInput_FileTooBigToConvert") ||
                             string.Equals(errorCode, "OfficeConversion_BadRequest") ||
