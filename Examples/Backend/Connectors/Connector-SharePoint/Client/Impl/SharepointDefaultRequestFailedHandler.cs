@@ -75,7 +75,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
                         throw new TooManyRequestsExternalDependencyException("Quota exceeded", retryAfter, SharepointConnectorStartup.SharepointConnector, serviceException);
                     }
-                    else if (string.Equals(errorCode, "notSupported"))
+                    else if (string.Equals(errorCode, "notSupported") ||
+                        string.Equals(errorCode, "invalidRequest"))
                     {
                         // permanent error, occuring when reading streams
                         // this will cause the returned stream to be NULL
