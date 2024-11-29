@@ -121,7 +121,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                             string.Equals(errorCode, "Service_InvalidInput_FileTooBigToConvert") ||
                             string.Equals(errorCode, "OfficeConversion_BadRequest") ||
                             string.Equals(errorCode, "VideoBitrateUnsupported_BitrateTooHigh") ||
-                            string.Equals(errorCode, "Web_416RequestedRangeNotSatisfiable"))
+                            string.Equals(errorCode, "Web_416RequestedRangeNotSatisfiable") ||
+                            string.Equals(errorCode, "BadArgument"))
                         {
                             // permanent error, occuring when reading streams
                             // this will cause the returned stream to be NULL
