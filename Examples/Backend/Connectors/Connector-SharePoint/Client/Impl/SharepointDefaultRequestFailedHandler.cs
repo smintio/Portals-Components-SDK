@@ -133,6 +133,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                             string.Equals(errorCode, "SubStreamCached_FileTooBig") ||
                             string.Equals(errorCode, "SubStreamCached_SandboxTimeout") ||
                             string.Equals(errorCode, "SubStreamCached_Fatal") ||
+                            // e.g. Sandbox_VideoProcessing_CorruptInput_1894.08ce
+                            errorCode.StartsWith("Sandbox_VideoProcessing_CorruptInput") ||
                             string.Equals(errorCode, "Service_InvalidInput_FileTooBigToConvert") ||
                             string.Equals(errorCode, "OfficeConversion_BadRequest") ||
                             string.Equals(errorCode, "VideoBitrateUnsupported_BitrateTooHigh") ||
