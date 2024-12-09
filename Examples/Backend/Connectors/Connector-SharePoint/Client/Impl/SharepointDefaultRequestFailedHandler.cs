@@ -39,7 +39,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                         message.Contains("SubStreamCached_FormatNotSupported") ||
                         message.Contains("SubStreamCached_FileTooBig") ||
                         message.Contains("SubStreamCached_SandboxTimeout") ||
+                        message.Contains("SubStreamCached_SandBoxFailure") ||
                         message.Contains("SubStreamCached_Fatal") ||
+                        message.Contains("Sandbox_VideoProcessing_CorruptInput") ||
                         message.Contains("Service_InvalidInput_FileTooBigToConvert") ||
                         message.Contains("OfficeConversion_BadRequest") ||
                         message.Contains("VideoBitrateUnsupported_BitrateTooHigh") ||
@@ -89,7 +91,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
                         if (!string.IsNullOrEmpty(innerErrorCode))
                         {
-                            if (string.Equals(innerErrorCode, "Sandbox_VideoProcessing_CorruptInput"))
+                            if (string.Equals(innerErrorCode, "SubStreamCached_SandBoxFailure") ||
+                                string.Equals(innerErrorCode, "Sandbox_VideoProcessing_CorruptInput"))
                             {
                                 // permanent error
 
@@ -132,6 +135,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                             string.Equals(errorCode, "SubStreamCached_FormatNotSupported") ||
                             string.Equals(errorCode, "SubStreamCached_FileTooBig") ||
                             string.Equals(errorCode, "SubStreamCached_SandboxTimeout") ||
+                            string.Equals(errorCode, "SubStreamCached_SandBoxFailure") ||
                             string.Equals(errorCode, "SubStreamCached_Fatal") ||
                             // e.g. Sandbox_VideoProcessing_CorruptInput_1894.08ce
                             errorCode.StartsWith("Sandbox_VideoProcessing_CorruptInput") ||
