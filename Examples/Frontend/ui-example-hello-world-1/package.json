@@ -20,8 +20,8 @@
     },
     "dependencies": {
         "@smintio/mpa-page-helpers": "0.6.1",
-        "@smintio/portals-component-sdk": "3.2.5",
-        "@smintio/portals-components": "7.3.0",
+        "@smintio/portals-component-sdk": "3.3.0",
+        "@smintio/portals-components": "7.3.25",
         "vue": "2.6.14",
         "vue-property-decorator": "9.1.2",
         "vue-router": "3.5.2",
