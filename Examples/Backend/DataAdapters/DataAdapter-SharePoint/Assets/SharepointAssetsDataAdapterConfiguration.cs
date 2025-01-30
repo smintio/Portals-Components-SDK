@@ -51,5 +51,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
         public MetadataAttributeModel[] SmintIoPreserveMetadataAttributes { get; set; }
 
         public SmintIoDataSearchIndexFulltextSearchType SmintIoSearchIndexFulltextSearchType { get; set; }
+
+        public bool EnableFolderNavigation { get; set; }
     }
 }
