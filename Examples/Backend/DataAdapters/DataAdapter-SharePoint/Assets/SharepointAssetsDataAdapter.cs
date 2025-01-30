@@ -20,10 +20,13 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
         private readonly IEntityModelProvider _entityModelProvider;
         private readonly ISmintIoIntegrationLayerProvider _smintIoIntegrationLayerProvider;
 
+        private readonly SharepointAssetsDataAdapterConfiguration _configuration;
+
         public SharepointAssetsDataAdapter(
             ILogger logger,
             IServiceProvider serviceProvider,
-            ISharepointClient sharepointClient)
+            ISharepointClient sharepointClient,
+            SharepointAssetsDataAdapterConfiguration configuration)
             : base(serviceProvider)
         {
             _logger = logger;
@@ -31,6 +34,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
             _entityModelProvider = serviceProvider.GetService<IEntityModelProvider>();
             _smintIoIntegrationLayerProvider = serviceProvider.GetService<ISmintIoIntegrationLayerProvider>();
+
+            _configuration = configuration;
         }
 
         public override Task<GetAssetsSearchFeatureSupportResult> GetFeatureSupportAsync(GetAssetsSearchFeatureSupportParameters parameters)
