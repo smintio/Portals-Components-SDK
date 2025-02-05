@@ -395,7 +395,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             };
         }
 
-        private async Task<bool> CanAccessDriveItemAsync(DriveItem driveItem)
+        private async Task<bool> CanAccessDriveItemAsync(DriveItem driveItem, bool allowSelf)
         {
             var assetId = driveItem.GetAssetId();
 
@@ -405,7 +405,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return true;
             }
 
-            if (_siteFolderIds.Contains(assetId))
+            if (allowSelf && _siteFolderIds.Contains(assetId))
             {
                 return true;
             }
@@ -471,7 +471,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             {
                 var driveItem = driveItems.ElementAt(i);
 
-                var canAccess = await CanAccessDriveItemAsync(driveItem).ConfigureAwait(false);
+                var canAccess = await CanAccessDriveItemAsync(driveItem, allowSelf: true).ConfigureAwait(false);
 
                 if (!canAccess)
                 {
@@ -801,7 +801,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            var canAccess = await CanAccessDriveItemAsync(driveItem).ConfigureAwait(false);
+            var canAccess = await CanAccessDriveItemAsync(driveItem, allowSelf: true).ConfigureAwait(false);
 
             if (!canAccess)
             {
@@ -1259,7 +1259,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                         continue;
                     }
 
-                    var canAccess = await CanAccessDriveItemAsync(driveItem).ConfigureAwait(false);
+                    var canAccess = await CanAccessDriveItemAsync(driveItem, allowSelf: false).ConfigureAwait(false);
 
                     if (canAccess)
                     {
