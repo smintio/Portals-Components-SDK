@@ -1254,18 +1254,6 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 {
                     var driveItem = driveItemChangesList.DriveItems.ElementAt(i);
 
-                    // During get changes root folders should be ignored and stay out of scope!
-
-                    var isFolder = driveItem.IsFolder();
-
-                    if (isFolder && 
-                        _siteFolderIds.Contains(driveItem.GetAssetId()))
-                    {
-                        driveItemChangesList.DriveItems.Remove(driveItem);
-
-                        continue;
-                    }
-
                     if (driveItem.Deleted != null)
                     {
                         continue;
@@ -1280,7 +1268,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
                     // We are deleting assets that we no longer have can access to
 
-                    if (isFolder)
+                    if (driveItem.IsFolder())
                     {
                         // We will not receive notifications for the individual assets, so we will delete them recursively
 
