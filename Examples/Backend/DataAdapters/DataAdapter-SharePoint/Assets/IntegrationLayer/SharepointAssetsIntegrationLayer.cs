@@ -40,7 +40,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                     Details = new GetFolderContentsDetailsModel
                     {
                         TotalResults = 0,
-                        HasMoreResults = false
+                        HasMoreResults = false,
+                        IgnoreTopLevelFolders = true
                     },
                     AssetDataObjects = new AssetDataObject[0],
                     FolderDataObjects = new FolderDataObject[0]
@@ -68,7 +69,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 {
                     ResultSetId = driveItemList.ContinuationUuid,
                     CurrentItemsPerPage = pageSize,
-                    HasMoreResults = driveItemList.HasContinuationUuid
+                    HasMoreResults = driveItemList.HasContinuationUuid,
+                    IgnoreTopLevelFolders = true
                 },
                 AssetDataObjects = assetDataObjects,
                 FolderDataObjects = folderDataObjects
