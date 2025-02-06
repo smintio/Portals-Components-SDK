@@ -88,6 +88,13 @@ namespace SmintIo.Portals.Connector.SharePoint.Client
         Task<DriveItem> GetDriveItemAsync(string assetId);
 
         /// <summary>
+        /// Gets a non root <see cref="DriveItem"/> for a given Sharepoint Id. 
+        /// </summary>
+        /// <param name="assetId">The asset Id is a complex key following this format DriveId__DriveItemId</param>
+        /// <returns>Returns null if nothing found.</returns>
+        Task<DriveItem> GetNonRootDriveItemAsync(string assetId);
+
+        /// <summary>
         /// Gets additional (raw) meta data for a driveItem. 
         /// </summary>
         /// <param name="item">The <see cref="DriveItem"/> for which the metadata should be obtained.</param>
