@@ -348,7 +348,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             return columnDefinition;
         }
 
-        public async Task<DriveItemListModel> GetFolderDriveItemsAsync(string assetId, string skipToken, int? pageSize)
+        public async Task<DriveItemListModel> GetFolderDriveItemsAsync(string folderId, string skipToken, int? pageSize)
         {
             if (string.IsNullOrEmpty(SiteId) || !_siteFolderIds.Any())
             {
@@ -356,9 +356,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             }
 
             // Sync selected asset
-            if (!string.IsNullOrEmpty(assetId))
+            if (!string.IsNullOrEmpty(folderId))
             {
-                var folderDriveItemList = await GetChildrenDriveItemsAsync(assetId, skipToken, pageSize).ConfigureAwait(false);
+                var folderDriveItemList = await GetChildrenDriveItemsAsync(folderId, skipToken, pageSize).ConfigureAwait(false);
 
                 return folderDriveItemList;
             }
@@ -777,7 +777,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
         public Task<DriveItem> GetDriveItemAsync(string assetId)
         {
-            return GetDriveItemAsync(assetId, allowRootFolders: true);
+            return GetDriveItemAsync(assetId, allowRootFolders: false);
         }
 
         private async Task<DriveItem> GetDriveItemAsync(string assetId, bool allowRootFolders)
