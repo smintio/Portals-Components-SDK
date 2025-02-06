@@ -780,11 +780,6 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             return GetDriveItemAsync(assetId, allowRootFolders: true);
         }
 
-        public Task<DriveItem> GetNonRootDriveItemAsync(string assetId)
-        {
-            return GetDriveItemAsync(assetId, allowRootFolders: false);
-        }
-
         private async Task<DriveItem> GetDriveItemAsync(string assetId, bool allowRootFolders)
         {
             if (string.IsNullOrEmpty(SiteId) || !_siteFolderIds.Any())
@@ -935,7 +930,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            var driveItem = await EnsureDriveItemAccessAsync(assetId, allowRootFolders: true).ConfigureAwait(false);
+            var driveItem = await EnsureDriveItemAccessAsync(assetId, allowRootFolders: false).ConfigureAwait(false);
 
             if (driveItem == null)
             {
@@ -967,7 +962,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            var driveItem = await EnsureDriveItemAccessAsync(assetId, allowRootFolders: true).ConfigureAwait(false);
+            var driveItem = await EnsureDriveItemAccessAsync(assetId, allowRootFolders: false).ConfigureAwait(false);
 
             if (driveItem == null)
             {
@@ -1029,7 +1024,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            var driveItem = await EnsureDriveItemAccessAsync(assetId, allowRootFolders: true).ConfigureAwait(false);
+            var driveItem = await EnsureDriveItemAccessAsync(assetId, allowRootFolders: false).ConfigureAwait(false);
 
             if (driveItem == null)
             {
@@ -1077,7 +1072,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            var driveItem = await EnsureDriveItemAccessAsync(assetId, allowRootFolders: true).ConfigureAwait(false);
+            var driveItem = await EnsureDriveItemAccessAsync(assetId, allowRootFolders: false).ConfigureAwait(false);
 
             if (driveItem == null)
             {

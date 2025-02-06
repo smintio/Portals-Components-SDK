@@ -263,7 +263,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
             try
             {
-                driveItem = await _sharepointClient.GetNonRootDriveItemAsync(unscopedId).ConfigureAwait(false);
+                driveItem = await _sharepointClient.GetDriveItemAsync(unscopedId).ConfigureAwait(false);
             }
             catch (ExternalDependencyException e)
             when (e.IsNotFound())
