@@ -141,6 +141,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
                 ETag = eTag
             };
 
+            assetDataObject.ParentFolderPaths = await GetParentFolderPathsAsync(driveItem).ConfigureAwait(false);
+
             SetFileMetaData(driveItem, assetDataObject, fileName, fileExtension);
 
             SetThumbnails(assetDataObject, driveItem);
@@ -155,6 +157,42 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             SetPermissionUuids(assetDataObject);
 
             return assetDataObject;
+        }
+
+        private async Task<FolderPathDataObject[]> GetParentFolderPathsAsync(DriveItem driveItem)
+        {
+            var parentFolderIds = new HashSet<string>();
+
+            await SetParentFolderIdsRecursivelyAsync(parentFolderIds, driveItem).ConfigureAwait(false);
+
+            return new[]
+            {
+                new FolderPathDataObject()
+                {
+                    FolderIds = parentFolderIds.ToArray()
+                }
+            };
+        }
+
+        private async Task SetParentFolderIdsRecursivelyAsync(HashSet<string> parentFolderIds, DriveItem driveItem)
+        {
+            var parentAssetId = driveItem.GetParentAssetId();
+
+            if (string.IsNullOrEmpty(parentAssetId))
+            {
+                return;
+            }
+
+            parentFolderIds.Add(parentAssetId);
+
+            var parentFolderDriveItem = await _sharepointClient.GetFolderDriveItemAsync(parentAssetId).ConfigureAwait(false);
+
+            if (parentFolderDriveItem == null)
+            {
+                return;
+            }
+
+            await SetParentFolderIdsRecursivelyAsync(parentFolderIds, parentFolderDriveItem).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -172,6 +210,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
                 ExternalId = assetDataObject.ExternalId,
                 Name = assetDataObject.Name,
                 ParentFolderIds = assetDataObject.ParentFolderIds,
+                ParentFolderPaths = assetDataObject.ParentFolderPaths,
                 Version = assetDataObject.Version,
                 RawData = assetDataObject.RawData,
                 PermissionUuids = assetDataObject.PermissionUuids,

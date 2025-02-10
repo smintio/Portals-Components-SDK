@@ -412,6 +412,11 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
             var parentDriveItemAssetId = driveItem.GetParentAssetId();
 
+            if (string.IsNullOrEmpty(parentDriveItemAssetId))
+            {
+                return false;
+            }
+
             while (true)
             {
                 if (_siteFolderIds.Contains(parentDriveItemAssetId))
@@ -758,7 +763,25 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            var driveItem = await GetDriveItemInternallyAsync(assetId).ConfigureAwait(false);
+            var cacheKey = $"folder_drive_item__{SiteId}_{_siteListId}_{assetId}";
+
+            var driveItem = await _cache.GetAsync<DriveItem>(cacheKey).ConfigureAwait(false);
+
+            bool canAccess;
+
+            if (driveItem != null)
+            {
+                canAccess = await CanAccessDriveItemAsync(driveItem, allowRootFolders: false).ConfigureAwait(false);
+
+                if (canAccess)
+                {
+                    return driveItem;
+                }
+
+                return null;
+            }
+
+            driveItem = await GetDriveItemInternallyAsync(assetId).ConfigureAwait(false);
 
             if (driveItem == null)
             {
@@ -772,7 +795,16 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 return null;
             }
 
-            return driveItem;
+            await _cache.StoreAsync(cacheKey, driveItem, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
+
+            canAccess = await CanAccessDriveItemAsync(driveItem, allowRootFolders: false).ConfigureAwait(false);
+
+            if (canAccess)
+            {
+                return driveItem;
+            }
+
+            return null;
         }
 
         public Task<DriveItem> GetDriveItemAsync(string assetId)
@@ -816,7 +848,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             return driveItem;
         }
 
-        private async Task<DriveItem> GetDriveItemInternallyAsync(string assetId)
+        internal async Task<DriveItem> GetDriveItemInternallyAsync(string assetId)
         {
             (string driveId, string itemId) = assetId.Parse();
 
