@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using SmintIo.Portals.Connector.SharePoint.Client;
-using SmintIo.Portals.Connector.SharePoint.Client.Impl;
 using SmintIo.Portals.Connector.SharePoint.Extensions;
 using SmintIo.Portals.SDK.Core.Extensions;
 using SmintIo.Portals.SDK.Core.Models.Paging;
@@ -65,26 +64,23 @@ namespace SmintIo.Portals.Connector.SharePoint.AllowedValues
 
             try
             {
-                var folderDriveItem = await ((SharepointClient)_sharepointClient).GetDriveItemInternallyAsync(assetId).ConfigureAwait(false);
+                var folderDriveItem = await _sharepointClient.GetFolderDriveItemAsync(assetId).ConfigureAwait(false);
 
-                if (folderDriveItem.IsFolder())
+                return new UiDetailsModel<string>
                 {
-                    return new UiDetailsModel<string>
-                    {
-                        Value = folderDriveItem.GetAssetId(),
-                        Name = folderDriveItem.Name.Localize()
-                    };
-                }
+                    Value = folderDriveItem.GetAssetId(),
+                    Name = folderDriveItem.Name.Localize()
+                };
             }
             catch (Exception)
             {
                 // some issue
-            }
 
-            return new UiDetailsModel<string>
-            {
-                Value = assetId
-            };
+                return new UiDetailsModel<string>
+                {
+                    Value = assetId
+                };
+            }
         }
 
         public async Task<PagingResult<UiDetailsModel<string>>> GetDynamicValueListAsync(string searchTerm, int? offset, int? limit, string parentValue)
