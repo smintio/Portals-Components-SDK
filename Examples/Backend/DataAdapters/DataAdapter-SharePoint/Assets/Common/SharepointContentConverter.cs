@@ -46,17 +46,21 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
         private readonly IDataAdapterContextModel _dataAdapterContext;
         private readonly ISharepointClient _sharepointClient;
 
+        private readonly IDictionary<string, string> _parentFolderIdsByAssetId;
+
         public SharepointContentConverter(
             ILogger logger,
             IDataAdapterContextModel dataAdapterContext,
             ISharepointClient sharepointClient,
-            IEntityModelProvider entityModelProvider)
+            IEntityModelProvider entityModelProvider,
+            IDictionary<string, string> parentFolderIdsByAssetId)
             : this(
                   logger,
                   dataAdapterContext,
                   sharepointClient,
                   entityModelProvider,
-                  postProcessObjectConverter: entityModelProvider != null ? new SharepointPostProcessObjectConverter(entityModelProvider) : null)
+                  postProcessObjectConverter: entityModelProvider != null ? new SharepointPostProcessObjectConverter(entityModelProvider) : null,
+                  parentFolderIdsByAssetId)
         {
         }
 
@@ -65,12 +69,15 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             IDataAdapterContextModel dataAdapterContext,
             ISharepointClient sharepointClient,
             IEntityModelProvider entityModelProvider,
-            IPostProcessObjectConverter postProcessObjectConverter)
+            IPostProcessObjectConverter postProcessObjectConverter,
+            IDictionary<string, string> parentFolderIdsByAssetId)
             : base(logger, entityModelProvider, postProcessObjectConverter)
         {
             _fetchAdditionalData = entityModelProvider != null;
             _dataAdapterContext = dataAdapterContext;
             _sharepointClient = sharepointClient;
+
+            _parentFolderIdsByAssetId = parentFolderIdsByAssetId ?? new Dictionary<string, string>();
         }
 
         protected override ICollection<DataType> SupportedTranslationPropertyDataTypes
@@ -124,6 +131,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
                 version = "0";
             }
 
+            var parentAssetId = driveItem.GetParentAssetId();
+
             var assetDataObject = new AssetDataObject(_dataAdapterContext)
             {
                 Id = driveItem.GetAssetId(),
@@ -133,7 +142,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
                 ContentType = contentType,
                 RawData = GetDataObjects(additionalDataByFieldNames),
                 Version = version,
-                ParentFolderIds = new[] { driveItem.GetParentAssetId() },
+                ParentFolderIds = new[] { parentAssetId },
                 CreatedAt = driveItem.CreatedDateTime,
                 ModifiedAt = driveItem.LastModifiedDateTime,
                 CreatedBy = driveItem.CreatedBy?.User?.DisplayName,
@@ -141,7 +150,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
                 ETag = eTag
             };
 
-            assetDataObject.ParentFolderPaths = await GetParentFolderPathsAsync(driveItem).ConfigureAwait(false);
+            assetDataObject.ParentFolderPaths = GetParentFolderPaths(parentAssetId);
 
             SetFileMetaData(driveItem, assetDataObject, fileName, fileExtension);
 
@@ -159,11 +168,16 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             return assetDataObject;
         }
 
-        private async Task<FolderPathDataObject[]> GetParentFolderPathsAsync(DriveItem driveItem)
+        private FolderPathDataObject[] GetParentFolderPaths(string parentAssetId)
         {
-            var parentFolderIds = new HashSet<string>();
+            if (string.IsNullOrEmpty(parentAssetId))
+            {
+                return null;
+            }
 
-            await SetParentFolderIdsRecursivelyAsync(parentFolderIds, driveItem).ConfigureAwait(false);
+            var parentFolderIds = new List<string>();
+
+            SetParentFolderIdsRecursively(parentFolderIds, parentAssetId);
 
             return new[]
             {
@@ -174,25 +188,19 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets.Common
             };
         }
 
-        private async Task SetParentFolderIdsRecursivelyAsync(HashSet<string> parentFolderIds, DriveItem driveItem)
+        private void SetParentFolderIdsRecursively(ICollection<string> parentFolderIds, string assetId)
         {
-            var parentAssetId = driveItem.GetParentAssetId();
-
-            if (string.IsNullOrEmpty(parentAssetId))
+            if (string.IsNullOrEmpty(assetId))
             {
                 return;
             }
 
-            parentFolderIds.Add(parentAssetId);
+            parentFolderIds.Add(assetId);
 
-            var parentFolderDriveItem = await _sharepointClient.GetFolderDriveItemAsync(parentAssetId).ConfigureAwait(false);
-
-            if (parentFolderDriveItem == null)
+            if (_parentFolderIdsByAssetId.TryGetValue(assetId, out var parentAssetId))
             {
-                return;
+                SetParentFolderIdsRecursively(parentFolderIds, parentAssetId);
             }
-
-            await SetParentFolderIdsRecursivelyAsync(parentFolderIds, parentFolderDriveItem).ConfigureAwait(false);
         }
 
         /// <summary>

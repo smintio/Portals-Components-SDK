@@ -412,11 +412,6 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
             var parentDriveItemAssetId = driveItem.GetParentAssetId();
 
-            if (string.IsNullOrEmpty(parentDriveItemAssetId))
-            {
-                return false;
-            }
-
             while (true)
             {
                 if (_siteFolderIds.Contains(parentDriveItemAssetId))
@@ -544,7 +539,60 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             };
         }
 
-        public async Task<ICollection<DriveItem>> GetFoldersListAsync(string[] searchTermParts)
+        public async Task<IDictionary<string, string>> GetParentFolderIdsByAssetIdAsync(ICollection<DriveItem> driveItems)
+        {
+            if (string.IsNullOrEmpty(SiteId) || 
+                driveItems == null ||
+                !driveItems.Any())
+            {
+                return null;
+            }
+
+            var parentFolderIdsById = new Dictionary<string, string>();
+
+            foreach (var driveItem in driveItems.OrderByDescending(driveItem => driveItem.IsFolder()))
+            {
+                if (driveItem.CanBeDeleted())
+                {
+                    continue;
+                }
+
+                var parentAssetId = driveItem.GetParentAssetId();
+
+                if (driveItem.IsFolder())
+                {
+                    parentFolderIdsById.TryAdd(driveItem.GetAssetId(), parentAssetId);
+                }
+
+                await GetParentsRecursivelyAsync(parentFolderIdsById, parentAssetId).ConfigureAwait(false);
+            }
+
+            return parentFolderIdsById;
+        }
+
+        private async Task GetParentsRecursivelyAsync(IDictionary<string, string> parentFolderIdsByAssetId, string assetId)
+        {
+            if (string.IsNullOrEmpty(assetId) || 
+                parentFolderIdsByAssetId.ContainsKey(assetId))
+            {
+                return;
+            }
+
+            var driveItem = await GetDriveItemInternallyAsync(assetId).ConfigureAwait(false);
+
+            if (driveItem == null)
+            {
+                return;
+            }
+
+            var parentAssetId = driveItem.GetParentAssetId();
+
+            parentFolderIdsByAssetId.Add(assetId, parentAssetId);
+
+            await GetParentsRecursivelyAsync(parentFolderIdsByAssetId, parentAssetId).ConfigureAwait(false);
+        }
+
+        internal async Task<ICollection<DriveItem>> GetFoldersListAsync(string[] searchTermParts)
         {
             if (string.IsNullOrEmpty(SiteId))
             {
@@ -756,7 +804,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             }
         }
 
-        public async Task<DriveItem> GetFolderDriveItemAsync(string assetId)
+        internal async Task<DriveItem> GetFolderDriveItemAsync(string assetId)
         {
             if (string.IsNullOrEmpty(SiteId) || !_siteFolderIds.Any())
             {

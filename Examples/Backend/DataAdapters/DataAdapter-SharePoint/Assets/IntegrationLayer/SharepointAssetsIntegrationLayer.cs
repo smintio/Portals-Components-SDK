@@ -48,7 +48,9 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 };
             }
 
-            var converter = new SharepointContentConverter(_logger, Context, _sharepointClient, _entityModelProvider);
+            var parentFolderIdsByAssetId = await _sharepointClient.GetParentFolderIdsByAssetIdAsync(driveItemList.DriveItems);
+
+            var converter = new SharepointContentConverter(_logger, Context, _sharepointClient, _entityModelProvider, parentFolderIdsByAssetId);
 
             var assetDataObjectTasks = driveItemList.DriveItems
                 .Where(di => di.IsAsset())
@@ -163,7 +165,9 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 return Array.Empty<ChangeModel>();
             }
 
-            var converter = new SharepointContentConverter(_logger, Context, _sharepointClient, _entityModelProvider);
+            var parentFolderIdsByAssetId = await _sharepointClient.GetParentFolderIdsByAssetIdAsync(driveItemsChangesList.DriveItems).ConfigureAwait(false);
+
+            var converter = new SharepointContentConverter(_logger, Context, _sharepointClient, _entityModelProvider, parentFolderIdsByAssetId);
 
             var folderDataObjectsToUpdate = await GetFolderDriveItemsToUpdateAsync(driveItemsChangesList, converter).ConfigureAwait(false);
 
@@ -283,7 +287,14 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 };
             }
 
-            var converter = new SharepointContentConverter(_logger, Context, _sharepointClient, _entityModelProvider);
+            var driveItems = new List<DriveItem>()
+            {
+                driveItem
+            };
+
+            var parentFolderIdsByAssetId = await _sharepointClient.GetParentFolderIdsByAssetIdAsync(driveItems).ConfigureAwait(false);
+
+            var converter = new SharepointContentConverter(_logger, Context, _sharepointClient, _entityModelProvider, parentFolderIdsByAssetId);
 
             var assetDataObject = await converter.GetAssetDataObjectAsync(driveItem).ConfigureAwait(false);
 
