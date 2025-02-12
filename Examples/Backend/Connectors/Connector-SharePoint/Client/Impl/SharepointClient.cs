@@ -108,11 +108,15 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             _siteListId = siteListId;
             _siteFolderIds = siteFolderIds;
 
+            IsRootFolderSync = siteFolderIds.Contains(RootFolderId);
+
             DefaultRequestFailedHandler = new SharepointDefaultRequestFailedHandler(logger);
 
             CreateGraphApiClient();
             CreateRestApiClient();
         }
+
+        public bool IsRootFolderSync { get; }
 
         public string SiteId { get; }
 
