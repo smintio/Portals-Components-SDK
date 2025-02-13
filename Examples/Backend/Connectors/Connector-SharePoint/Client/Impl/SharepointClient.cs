@@ -116,9 +116,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             CreateRestApiClient();
         }
 
-        public bool IsRootFolderSync { get; }
-
         public string SiteId { get; }
+
+        public bool IsRootFolderSync { get; }
 
         /// <summary>
         /// Creates GraphApi client with delayed bearer authentication via <see cref="_getAuthorizationValuesFunc"/>.

@@ -17,14 +17,14 @@ namespace SmintIo.Portals.Connector.SharePoint.Client
         IRequestFailedHandler DefaultRequestFailedHandler { get; }
 
         /// <summary>
-        /// Indicates whether the root folder is selected for sync
-        /// </summary>
-        bool IsRootFolderSync { get; }
-
-        /// <summary>
         /// The identifier of sharepoint site.
         /// </summary>
         string SiteId { get; }
+
+        /// <summary>
+        /// Indicates whether the root folder is selected for sync
+        /// </summary>
+        bool IsRootFolderSync { get; }
 
         /// <summary>
         /// Gets all sites of the Sharepoint instance the user has access to.
