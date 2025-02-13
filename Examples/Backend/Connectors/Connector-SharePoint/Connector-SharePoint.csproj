@@ -37,7 +37,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="8.5.10-alpha-22" />
+    <PackageReference Include="SmintIo.Portals.ConnectorSDK" Version="8.5.15" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\OneDriveConfigurationMessages.Designer.cs">
