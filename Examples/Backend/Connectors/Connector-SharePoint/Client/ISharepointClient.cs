@@ -22,6 +22,11 @@ namespace SmintIo.Portals.Connector.SharePoint.Client
         string SiteId { get; }
 
         /// <summary>
+        /// Indicates whether the root folder is selected for sync
+        /// </summary>
+        bool IsRootFolderSync { get; }
+
+        /// <summary>
         /// Gets all sites of the Sharepoint instance the user has access to.
         /// </summary>
         /// <param name="query">optionally supply a query string, e.g. a part of the site's name</param>
