@@ -108,6 +108,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             _siteListId = siteListId;
             _siteFolderIds = siteFolderIds;
 
+            IsRootFolderSync = siteFolderIds.Contains(RootFolderId);
+
             DefaultRequestFailedHandler = new SharepointDefaultRequestFailedHandler(logger);
 
             CreateGraphApiClient();
@@ -115,6 +117,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
         }
 
         public string SiteId { get; }
+
+        public bool IsRootFolderSync { get; }
 
         /// <summary>
         /// Creates GraphApi client with delayed bearer authentication via <see cref="_getAuthorizationValuesFunc"/>.
