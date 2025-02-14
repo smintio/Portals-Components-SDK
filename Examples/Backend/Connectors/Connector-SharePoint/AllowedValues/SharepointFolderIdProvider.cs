@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using SmintIo.Portals.Connector.SharePoint.Client;
+using SmintIo.Portals.Connector.SharePoint.Client.Impl;
 using SmintIo.Portals.Connector.SharePoint.Extensions;
 using SmintIo.Portals.SDK.Core.Extensions;
 using SmintIo.Portals.SDK.Core.Models.Paging;
@@ -64,7 +65,7 @@ namespace SmintIo.Portals.Connector.SharePoint.AllowedValues
 
             try
             {
-                var folderDriveItem = await _sharepointClient.GetFolderDriveItemAsync(assetId).ConfigureAwait(false);
+                var folderDriveItem = await ((SharepointClient)_sharepointClient).GetFolderDriveItemAsync(assetId).ConfigureAwait(false);
 
                 return new UiDetailsModel<string>
                 {
@@ -92,7 +93,7 @@ namespace SmintIo.Portals.Connector.SharePoint.AllowedValues
 
             var searchTermParts = searchTerm?.Split(">", StringSplitOptions.TrimEntries);
 
-            var folderDriveItems = await _sharepointClient.GetFoldersListAsync(searchTermParts).ConfigureAwait(false);
+            var folderDriveItems = await ((SharepointClient)_sharepointClient).GetFoldersListAsync(searchTermParts).ConfigureAwait(false);
 
             if (folderDriveItems == null)
             {
