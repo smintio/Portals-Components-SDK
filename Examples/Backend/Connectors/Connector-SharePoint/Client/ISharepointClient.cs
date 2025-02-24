@@ -72,18 +72,10 @@ namespace SmintIo.Portals.Connector.SharePoint.Client
         Task<DriveItemListModel> GetFolderDriveItemsAsync(string assetId, string skipToken, int? pageSize);
 
         /// <summary>
-        /// Gets a flat list of folders as <see cref="DriveItem"/> from Sharepoint.
+        /// Gets parent folder IDs by asset ID
         /// </summary>
-        /// <param name="searchTermParts">The folder parts to search for, by level</param>
         /// <returns>A list of <see cref="DriveItem"/> items.</returns>
-        Task<ICollection<DriveItem>> GetFoldersListAsync(string[] searchTermParts);
-
-        /// <summary>
-        /// Gets a <see cref="DriveItem"/> by identifier from Sharepoint.
-        /// </summary>
-        /// <param name="assetId">The asset Id is a complex key following this format DriveId__DriveItemId</param>
-        /// <returns>Returns null if nothing found.</returns>
-        Task<DriveItem> GetFolderDriveItemAsync(string assetId);
+        Task<IDictionary<string, string>> GetParentFolderIdsByAssetIdAsync(ICollection<DriveItem> driveItems);
 
         /// <summary>
         /// Gets a <see cref="DriveItem"/> for a given Sharepoint Id. 
