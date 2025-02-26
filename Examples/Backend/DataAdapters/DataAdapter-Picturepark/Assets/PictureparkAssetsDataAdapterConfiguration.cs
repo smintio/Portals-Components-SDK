@@ -96,6 +96,21 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
         [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProvider))]
         public string[] HiResOutputFormatIdList { get; set; }
 
+        [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProvider))]
+        public string[] HiResOutputImagesFormatIdList { get; set; }
+
+        [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProvider))]
+        public string[] HiResOutputVideosFormatIdList { get; set; }
+
+        [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProvider))]
+        public string[] HiResOutputAudioFilesFormatIdList { get; set; }
+
+        [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProvider))]
+        public string[] HiResOutputDocumentsFormatIdList { get; set; }
+
+        [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProvider))]
+        public string[] HiResOutputOtherFileTypesFormatIdList { get; set; }
+
         public MetadataAttributeModel[] SmintIoPreserveMetadataAttributes { get; set; }
     }
 }
