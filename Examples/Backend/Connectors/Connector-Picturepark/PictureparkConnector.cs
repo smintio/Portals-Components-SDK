@@ -305,7 +305,7 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             var authClient = new AccessTokenAuthClient(apiUrl, accessToken, customerAlias);
 
-            var settings = new PictureparkServiceSettings(authClient)
+            var settings = new PictureparkServiceSettings(authClient, "Smint.io Portals")
             {
                 DisplayLanguage = CultureInfo.CurrentCulture.TwoLetterISOLanguageName
             };
@@ -438,7 +438,7 @@ namespace SmintIo.Portals.Connector.Picturepark
 
             var authClient = new AccessTokenAuthClient(apiUrl, accessToken, customerAlias);
 
-            var settings = new PictureparkServiceSettings(authClient)
+            var settings = new PictureparkServiceSettings(authClient, "Smint.io Portals")
             {
                 DisplayLanguage = CultureInfo.CurrentCulture.TwoLetterISOLanguageName
             };

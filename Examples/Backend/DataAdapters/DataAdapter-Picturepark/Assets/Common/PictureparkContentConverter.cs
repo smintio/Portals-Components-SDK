@@ -100,6 +100,21 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
             ProcessOutputs(asset, contentDetail);
             ProcessDisplayContentOutputs(asset, contentDetail);
 
+            if (contentDetail.ContentType != ContentType.Virtual)
+            {
+                FileMetadata fileMetadata = contentDetail.GetFileMetadata();
+
+                if (!(fileMetadata is null))
+                {
+                    asset.Version = fileMetadata.Sha1Hash;
+                }
+            }
+
+            if (string.IsNullOrEmpty(asset.Version))
+            {
+                asset.Version = "0";
+            }
+
             return asset;
         }
 
@@ -235,6 +250,8 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
 
                 if (!(fileMetadata is null))
                 {
+                    asset.Version = fileMetadata.Sha1Hash;
+
                     if (fileMetadata is ImageMetadata imageMetadata)
                     {
                         var (imageMetadataDataObject, fileMetadataDataObject) = Convert(imageMetadata);
@@ -307,6 +324,11 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
 
             asset.PermissionUuids = permissionUuids.ToArray();
 
+            if (string.IsNullOrEmpty(asset.Version))
+            {
+                asset.Version = "0";
+            }
+
             return asset;
         }
 
@@ -316,8 +338,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
 
             if (outputs == null || !outputs.Any())
             {
-                asset.Version = "0";
-
                 return;
             }
 
@@ -325,15 +345,14 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                 
             foreach (var output in outputs)
             {
-                if (output.RenderingState == OutputRenderingState.Failed ||
-                    output.RenderingState == OutputRenderingState.NoLicense)
+                if (output.RenderingStateV2 == OutputRenderingStateV2.Failed)
                 {
                     // ignore likely unrecoverable ones...
 
                     continue;
                 }
 
-                if (output.RenderingState == OutputRenderingState.Skipped &&
+                if (output.RenderingStateV2 == OutputRenderingStateV2.Renderable &&
                     output.DynamicRendering != true)
                 {
                     // This is no dynamic render, but skipped
@@ -431,9 +450,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                         break;
 
                     case "Original":
-                        asset.Version = $"{output.FileVersion}";
-                        break;
-
                     case "VideoKeyframes":
                     default:
                         continue;
@@ -462,11 +478,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                     }
                 }
             }
-
-            if (string.IsNullOrEmpty(asset.Version))
-            {
-                asset.Version = "0";
-            }
         }
 
         private static void ProcessDisplayContentOutputs(AssetDataObject asset, ContentDetail contentDetail)
@@ -492,15 +503,14 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
 
             foreach (var displayContentOutput in displayContentOutputs)
             {
-                if (displayContentOutput.RenderingState == OutputRenderingState.Failed ||
-                    displayContentOutput.RenderingState == OutputRenderingState.NoLicense)
+                if (displayContentOutput.RenderingStateV2 == OutputRenderingStateV2.Failed)
                 {
                     // ignore likely unrecoverable ones...
 
                     continue;
                 }
 
-                if (displayContentOutput.RenderingState == OutputRenderingState.Skipped &&
+                if (displayContentOutput.RenderingStateV2 == OutputRenderingStateV2.Renderable &&
                     displayContentOutput.DynamicRendering != true)
                 {
                     // This is no dynamic render, but skipped
