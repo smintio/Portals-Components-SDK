@@ -48,6 +48,21 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
         [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProviderBaseImpl))]
         public string[] HiResOutputFormatIdList { get; set; }
 
+        [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProviderBaseImpl))]
+        public string[] HiResOutputImagesFormatIdList { get; set; }
+
+        [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProviderBaseImpl))]
+        public string[] HiResOutputVideosFormatIdList { get; set; }
+
+        [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProviderBaseImpl))]
+        public string[] HiResOutputAudioFilesFormatIdList { get; set; }
+
+        [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProviderBaseImpl))]
+        public string[] HiResOutputDocumentsFormatIdList { get; set; }
+
+        [DynamicAllowedValuesProvider(typeof(OutputFormatAllowedValuesProviderBaseImpl))]
+        public string[] HiResOutputOtherFileTypesFormatIdList { get; set; }
+
         public MetadataAttributeModel[] SmintIoPreserveMetadataAttributes { get; set; }
 
         public SmintIoDataSearchIndexFulltextSearchType SmintIoSearchIndexFulltextSearchType { get; set; }

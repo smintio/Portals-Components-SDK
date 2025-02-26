@@ -339,7 +339,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                    !string.Equals(outputFormatId, "AudioSmall");
         }
 
-        protected override bool DefaultIsHiRes(string outputFormatId, bool requiresHiResDownloadPermission)
+        protected override bool DefaultIsHiRes(string contentTypeId, string outputFormatId, bool requiresHiResDownloadPermission)
         {
             return string.Equals(outputFormatId, "Original") ||
                    string.Equals(outputFormatId, "HiResJPEG") ||
