@@ -249,16 +249,15 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 
                 foreach (var output in outputs)
                 { 
-                    if (output.RenderingState == OutputRenderingState.Failed ||
-                        output.RenderingState == OutputRenderingState.NoLicense)
+                    if (output.RenderingStateV2 == OutputRenderingStateV2.Failed)
                     {
                         // ignore likely unrecoverable ones...
 
                         continue;
                     }
 
-                    if (output.RenderingState == OutputRenderingState.Skipped &&
-                    output.DynamicRendering != true)
+                    if (output.RenderingStateV2 == OutputRenderingStateV2.Renderable &&
+                        output.DynamicRendering != true)
                     {
                         // This is no dynamic render, but skipped
                         // so we skip as well

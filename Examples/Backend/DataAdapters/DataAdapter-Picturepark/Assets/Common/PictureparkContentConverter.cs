@@ -100,13 +100,18 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
             ProcessOutputs(asset, contentDetail);
             ProcessDisplayContentOutputs(asset, contentDetail);
 
-            if (contentDetail.ContentType != ContentType.Virtual)
+            if (string.IsNullOrEmpty(asset.Version))
             {
-                FileMetadata fileMetadata = contentDetail.GetFileMetadata();
+                var fileMetadata = contentDetail.GetFileMetadata();
 
-                if (!(fileMetadata is null))
+                if (fileMetadata != null)
                 {
-                    asset.Version = fileMetadata.Sha1Hash;
+                    var sha1Hash = fileMetadata.Sha1Hash;
+
+                    if (!string.IsNullOrEmpty(sha1Hash))
+                    {
+                        asset.Version = sha1Hash;
+                    }
                 }
             }
 
@@ -250,7 +255,15 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
 
                 if (!(fileMetadata is null))
                 {
-                    asset.Version = fileMetadata.Sha1Hash;
+                    if (string.IsNullOrEmpty(asset.Version))
+                    {
+                        var sha1Hash = fileMetadata.Sha1Hash;
+
+                        if (!string.IsNullOrEmpty(sha1Hash))
+                        {
+                            asset.Version = sha1Hash;
+                        }
+                    }
 
                     if (fileMetadata is ImageMetadata imageMetadata)
                     {
@@ -450,6 +463,14 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                         break;
 
                     case "Original":
+                        var sha1Hash = output.Detail?.Sha1Hash;
+
+                        if (!string.IsNullOrEmpty(sha1Hash))
+                        {
+                            asset.Version = sha1Hash;
+                        }
+
+                        break;
                     case "VideoKeyframes":
                     default:
                         continue;
