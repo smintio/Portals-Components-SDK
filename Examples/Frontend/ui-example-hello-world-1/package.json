@@ -1,7 +1,7 @@
 {
     "name": "@smintio/ui-example-hello-world-1",
     "description": "Smint.io Portals UI example component hello world",
-    "version": "1.0.0",
+    "version": "8.5.0",
     "author": "Smint.io GmbH",
     "private": false,
     "type-check": "tsc",
@@ -20,8 +20,8 @@
     },
     "dependencies": {
         "@smintio/mpa-page-helpers": "0.6.1",
-        "@smintio/portals-component-sdk": "3.3.10",
-        "@smintio/portals-components": "7.4.1",
+        "@smintio/portals-component-sdk": "3.4.3",
+        "@smintio/portals-components": "7.4.3",
         "vue": "2.6.14",
         "vue-property-decorator": "9.1.2",
         "vue-router": "3.5.2",
