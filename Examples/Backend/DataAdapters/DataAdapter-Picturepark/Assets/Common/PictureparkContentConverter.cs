@@ -1388,7 +1388,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                 return null;
 
             dictionary = dictionary
-                .Where(entry => !string.IsNullOrEmpty(entry.Value))
+                .Where(entry => !string.IsNullOrWhiteSpace(entry.Value))
                 .ToDictionary(entry => entry.Key, entry => entry.Value);
 
             if (dictionary.Count == 0)
