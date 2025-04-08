@@ -23,12 +23,12 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
         {
             if (exception is ContentPermissionException)
             {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.Forbidden, $"Picturepark did not allow the operation to complete", PictureparkConnectorStartup.PictureparkConnector, exception);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.Forbidden, $"Picturepark did not allow the operation to complete", PictureparkConnectorStartup.PictureparkConnector, innerException: exception);
             }
 
             if (exception is PictureparkNotFoundException)
             {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.GetNotFound, $"Picturepark did not find the requested record (not found)", PictureparkConnectorStartup.PictureparkConnector, exception);
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.GetNotFound, $"Picturepark did not find the requested record (not found)", PictureparkConnectorStartup.PictureparkConnector, innerException: exception);
             }
 
             if (exception is ApiException apiException)

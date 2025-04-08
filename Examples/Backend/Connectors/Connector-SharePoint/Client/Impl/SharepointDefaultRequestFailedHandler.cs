@@ -65,7 +65,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                 {
                     if (string.Equals(errorCode, "itemNotFound"))
                     {
-                        throw new ExternalDependencyException(ExternalDependencyStatusEnum.GetNotFound, "The desired record was not found", SharepointConnectorStartup.SharepointConnector, serviceException);
+                        throw new ExternalDependencyException(ExternalDependencyStatusEnum.GetNotFound, "The desired record was not found", SharepointConnectorStartup.SharepointConnector, innerException: serviceException);
                     }
                     else if (serviceException.StatusCode == HttpStatusCode.TooManyRequests ||
                         statusCode == 509 || // Bandwidth Limit Exceeded
