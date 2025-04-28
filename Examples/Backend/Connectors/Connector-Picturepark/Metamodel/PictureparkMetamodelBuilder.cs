@@ -261,7 +261,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Metamodel
                 {
                     foreach (var formItemDefinitionModel in formItemDefinitionModels)
                     {
-                        formItemModels.Add(new FormItemModel(formItemDefinitionModel.Id, formItemDefinitionModel.Name));
+                        formItemModels.Add(new FormItemModel(formItemDefinitionModel.Id, formItemDefinitionModel.Name, formItemDefinitionModel.DataType));
                     }
                 }
 
