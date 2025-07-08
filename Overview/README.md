@@ -82,13 +82,13 @@ be:
 
 ## [Backend components](../Examples/Backend/)
 
-### Connector
+### Connectors
 
 The purpose of a connector is to provide a way to communicate with an external provider via a client, expose user interface configurations, authentication processing, verify settings and build a translatable meta-model.
 
 Each connector is dedicated to a certain external system, e.g. Microsoft SharePoint or Picturepark.
 
-### Data adapter
+### Data adapters
 
 Each Smint.io Portals backend or frontend component can tie itself to public API interfaces published by Smint.io Portals data adapters.
 
@@ -97,7 +97,7 @@ UI component.
 
 Data adapters can also define *custom permissions* to facilitate fine-grained access management by the Smint.io Portals admin.
 
-### Data processor
+### Data processors
 
 Data processors can hook into data adapter interfaces and/or can use other specific lifecycle hooks of a data adapter, and can then 
 manipulate the input or the output of data adapter operations.
@@ -105,13 +105,13 @@ manipulate the input or the output of data adapter operations.
 This can be used for a multitude of creative purposes, e.g., to modify file names when downloading files, or to check specific access 
 conditions when accessing assets (we use this for our Dynamic Content Routing feature).
 
-### Task handler
+### Task handlers
 
 Task handlers work with the *Smint.io Portals task framework* to provide user-defined tasks and state machines to a Smint.io Portals portal.
 
 This can be used, e.g., for approval workflows, or for integrating external state machine states into Smint.io.
 
-### Portal template
+### Portal templates
 
 The topmost level of the structure of a Smint.io Portals portal is introduced by the *portal
 template*. A portal template combines and configures page templates for a complete portal experience. The portal
@@ -122,7 +122,7 @@ You may wonder why the portal template is a backend component, and not a fronten
 instantiating a new Smint.io Portals portal instance runs in the backend. So, this component type needs to be implemented
 using a backend SDK, and not a frontend SDK.
 
-### Identity provider
+### Identity providers
 
 Identity providers implement authentication scenarios for use within Smint.io.
 
