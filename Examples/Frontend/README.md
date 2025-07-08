@@ -28,7 +28,7 @@ Current version of this document is: 1.0.1 (as of 12th of April, 2023)
 
 ## UI components
 
-The most atomic part of a Smint.io Portal is the *Smint.io Portals UI component*. A UI component could, for example, be:
+The most atomic part of a Smint.io Portal is the *UI component*. A UI component could, for example, be:
 
 - A header bar
 - A text block
@@ -56,7 +56,7 @@ additional options to your UI components and increase the flexibility of your UI
 Please note, that components are high level elements. So, it is not possible to nest UI components. An UI component
 may *NOT* contain another UI component.
 
-*Note*: this applies to *Smint.io Portals UI components*. Of course you can nest non-Smint.io Portals UI components (aka
+*Note*: this applies to *UI components*. Of course you can nest non-Smint.io Portals UI components (aka
 Vue.js components, see below) within your Smint.io Portals UI component as you like!
 
 *Note*: there is a concept called *sections*. A section consists of the *section start* UI component (typically written
@@ -116,7 +116,7 @@ running our very simple *Smint.io Portals DevServer*.
 
 ## Page templates
 
-The second level of structure on top of UI components is introduced by *Smint.io Page Templates*. A page template
+The second level of structure on top of UI components is the *page template*. A page template
 defines the structure of a Smint.io Portals page by defining and rendering so-called *slots* (do NOT confuse with Vue.js
 slots, which is a completely different concept to Smint.io Portals slots). The typical slots of a page could for example
 be:
@@ -166,8 +166,8 @@ running our very simple *Smint.io Portals DevServer*.
 
 ## Portal templates
 
-To wrap the story up, the topmost level of the structure of a Smint.io Portals portal is introduced by *Smint.io portal
-templates*. A portal template combines and configures page templates for a complete portal experience. The portal
+To wrap the story up, the topmost level of the structure of a Smint.io Portals portal is introduced by the *portal
+template*. A portal template combines and configures page templates for a complete portal experience. The portal
 template itself does *NOT* render any output to the frontend itself, it is just being used when instantiating a new
 Smint.io Portal from the portal template.
 
