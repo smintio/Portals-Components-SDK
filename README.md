@@ -3,7 +3,9 @@ Description
 
 This repository contains examples and tools for rapid developing of custom components targeting the Smint.io Portals solution.
 
-Please find guides about frontend or backend component development here:
+Please find guides about Smint.io Portals component development here:
+
+- [Smint.io Portals component overview](Overview/)
 
 - [Developing frontend components](Examples/Frontend/)
 
