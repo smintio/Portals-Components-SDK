@@ -16,6 +16,7 @@ Please find guides about Smint.io Portals component development here:
 
 	- Connectors
 	- Data adapters
+	- Data processors
 	- Task handlers
 	- Portal templates
 	- Identity providers
