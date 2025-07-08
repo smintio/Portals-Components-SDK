@@ -82,6 +82,10 @@ be:
 
 ### Connector
 
+The purpose of a connector is to provide a way to communicate with an external provider via a client, expose user interface configurations, authentication processing, verify settings and build a translatable meta-model.
+
+Each connector is dedicated to a certain external system, e.g. Microsoft SharePoint or Picturepark.
+
 ### Data adapter
 
 ### Data processor
