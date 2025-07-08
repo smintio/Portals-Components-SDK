@@ -88,7 +88,18 @@ Each connector is dedicated to a certain external system, e.g. Microsoft SharePo
 
 ### Data adapter
 
+Each Smint.io Portals backend or frontend component can tie itself to public API interfaces published by Smint.io Portals data adapters.
+
+This can be done by requesting a data adapter public API interface through the configuration of the Smint.io Portals backend or 
+UI component.
+
 ### Data processor
+
+Data processors can hook into data adapter interfaces and/or can use other specific lifecycle hooks of a data adapter, and can then 
+manipulate the input or the output of data adapter operations.
+
+This can be used for a multitude of creative purposes, e.g., to modify file names when downloading files, or to check specific access 
+conditions when accessing assets (we use this for our Dynamic Content Routing feature).
 
 ### Task handler
 

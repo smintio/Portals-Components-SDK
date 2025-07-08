@@ -298,10 +298,10 @@ Naturally EntityModel is completely translatable, as are its properties.
 
 ## Data adapter public API interfaces
 
-Each Smint.io Portals backend or UI component can tie itself to public API interfaces published by Smint.io Portals data adapters.
+Each Smint.io Portals backend or frontend component can tie itself to public API interfaces published by Smint.io Portals data adapters.
 
 This can be done by requesting a data adapter public API interface through the configuration of the Smint.io Portals backend or 
-UI component:
+frontend component:
 
 #### .NET example (for Smint.io Portals backend components)
 ```C#
