@@ -27,6 +27,8 @@ The *Startup* class of a Smint.io Portals component provides a static entry poin
 
 Please note that there is no separate *Startup* class for Smint.io Portals frontend components. Smint.io Portals frontend components contain all the necessary information directly in the component's source code, added as annotations. When a Smint.io Portals frontend component is loaded, the system then generates the frontend component's *Startup* class on the fly.
 
+[Here](../Examples/Backend/Connectors/Connector-SharePoint/SharepointConnectorStartup.cs) you find an example of a component's *Startup* class (this one is part of our *Microsoft SharePoint* connector)
+
 ### The *Configuration* class
 
 The *Configuration* class of a Smint.io Portals component contains all settings that a user can adjust during component configuration in the Smint.io Portals backend.
@@ -34,6 +36,8 @@ The *Configuration* class of a Smint.io Portals component contains all settings 
 When Smint.io Portals instantiates a component, it reads the user provided component configuration from the database and provides the component with a fully initialized instance of the *Configuration* class.
 
 Please note that there is no separate *Configuration* class for Smint.io Portals frontend components. Smint.io Portals frontend components contain all the necessary information directly in the component's source code, added as annotations. When a Smint.io Portals frontend component is loaded, the system then generates the frontend component's *Configuration* class on the fly.
+
+[Here](../Examples/Backend/Connectors/Connector-SharePoint/SharepointConnectorConfiguration.cs) you find an example of a component's *Configuration* class (this one is part of our *Microsoft SharePoint* connector)
 
 ### Types of components
 
