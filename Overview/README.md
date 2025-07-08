@@ -103,6 +103,10 @@ conditions when accessing assets (we use this for our Dynamic Content Routing fe
 
 ### Task handler
 
+Task handlers work with the *Smint.io Portals task framework* to provide user-defined tasks and state machines to a Smint.io Portals portal.
+
+This can be used, e.g., for approval workflows, or for integrating external state machine states into Smint.io.
+
 ### Portal template
 
 The topmost level of the structure of a Smint.io Portals portal is introduced by the *portal
@@ -115,6 +119,11 @@ instantiating a new Smint.io Portals portal instance runs in the backend. So, th
 using a backend SDK, and not a frontend SDK.
 
 ### Identity provider
+
+Identity providers implement authentication scenarios for use within Smint.io.
+
+There are default identity provider implementations for OIDC and SAML, but if there is specific authentication workflows required
+to authenticate a user, those can be implemented using the *identity provider* component type.
 
 ## Questions
 
