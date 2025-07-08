@@ -95,6 +95,10 @@ template*. A portal template combines and configures page templates for a comple
 template itself does *NOT* render any output to the frontend itself, it is just being used when instantiating a new
 Smint.io Portal from the portal template.
 
+You may wonder why the portal template is a backend component, and not a frontend component. The reason is that the code for
+instantiating a new Smint.io Portals portal instance runs in the backend. So, this component type needs to be implemented
+using a backend SDK, and not a frontend SDK.
+
 ### Identity provider
 
 ## Questions
