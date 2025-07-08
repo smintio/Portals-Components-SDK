@@ -56,7 +56,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 
 ### UI components
 
-The most atomic part of a Smint.io Portal is the *Smint.io Portals UI component*. A UI component could, for example, be:
+The most atomic part of a Smint.io Portal is the *UI component*. A UI component could, for example, be:
 
 - A header bar
 - A text block
@@ -67,7 +67,7 @@ For sure you know this concept also from popular page builders like Wix.
 
 ### Page templates
 
-The second level of structure on top of UI components is the *Smint.io page templates*. A page template
+The second level of structure on top of UI components is the *page template*. A page template
 defines the structure of a Smint.io Portals page by defining and rendering so-called *slots* (do NOT confuse with Vue.js
 slots, which is a completely different concept to Smint.io Portals slots). The typical slots of a page could for example
 be:
@@ -90,7 +90,7 @@ be:
 
 ### Portal template
 
-The topmost level of the structure of a Smint.io Portals portal is introduced by the *Smint.io portal
+The topmost level of the structure of a Smint.io Portals portal is introduced by the *portal
 template*. A portal template combines and configures page templates for a complete portal experience. The portal
 template itself does *NOT* render any output to the frontend itself, it is just being used when instantiating a new
 Smint.io Portal from the portal template.
