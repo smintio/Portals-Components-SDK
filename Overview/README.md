@@ -66,9 +66,9 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 	
 ## Details
 
-## Visual representation
+### Visual representation
 
-![Visual representationC](./images/components.png "Visual representationC")
+![Visual representationC](./images/components.png "Visual representation")
 
 ## Questions
 
