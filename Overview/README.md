@@ -93,6 +93,8 @@ Each Smint.io Portals backend or frontend component can tie itself to public API
 This can be done by requesting a data adapter public API interface through the configuration of the Smint.io Portals backend or 
 UI component.
 
+Data adapters can also define *custom permissions* to facilitate fine-grained access management by the Smint.io Portals admin.
+
 ### Data processor
 
 Data processors can hook into data adapter interfaces and/or can use other specific lifecycle hooks of a data adapter, and can then 
