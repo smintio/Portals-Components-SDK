@@ -39,7 +39,16 @@ Please note that there is no separate *Configuration* class for Smint.io Portals
 
 [Here](../Examples/Backend/Connectors/Connector-Picturepark/PictureparkConnectorConfiguration.cs) you find an example of a component's *Configuration* class (this one is part of our *Picturepark connector)
 
-### Types of components
+## SDKs
+
+For each of the Smint.io Portals component types, there is a *Smint.io Portals SDK* that you can use to implement that component type yourself.
+
+Access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io) and request access.
+Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals Enterprise plan customers.
+
+You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
+
+## Types of Smint.io Portals components
 
 - [Frontend components](../Examples/Frontend/)
 
@@ -54,6 +63,12 @@ Please note that there is no separate *Configuration* class for Smint.io Portals
 	- Task handlers
 	- Portal templates
 	- Identity providers
+	
+## Details
+
+## Visual representation
+
+![Visual representationC](./images/components.png "Visual representationC")
 
 ## Questions
 
