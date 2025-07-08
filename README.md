@@ -5,7 +5,7 @@ This repository contains examples and tools for rapid developing of custom compo
 
 Please find guides about Smint.io Portals component development here:
 
-- [Smint.io Portals component overview](Overview/)
+- [What are Smint.io Portals components?](Overview/)
 
 - [Developing frontend components](Examples/Frontend/)
 
