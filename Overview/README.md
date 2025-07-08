@@ -48,29 +48,54 @@ Access will be granted to either Smint.io Solution Partners or to all our Smint.
 
 You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
 
-## Types of Smint.io Portals components
-
-- [Frontend components](../Examples/Frontend/)
-
-	- Page templates
-	- UI components
-	
-- [Backend components](../Examples/Backend/)
-
-	- Connectors
-	- Data adapters
-	- Data processors
-	- Task handlers
-	- Portal templates
-	- Identity providers
-	
-## Details
-
-### Visual representation
+## Smint.io Portals component diagram
 
 ![Visual representationC](./images/components-overview.png "Visual representation")
 
-### 
+## [Frontend components](../Examples/Frontend/)
+
+### UI components
+
+The most atomic part of a Smint.io Portal is the *Smint.io Portals UI component*. A UI component could, for example, be:
+
+- A header bar
+- A text block
+- A search result display
+- And so on
+
+For sure you know this concept also from popular page builders like Wix.
+
+### Page templates
+
+The second level of structure on top of UI components is the *Smint.io page templates*. A page template
+defines the structure of a Smint.io Portals page by defining and rendering so-called *slots* (do NOT confuse with Vue.js
+slots, which is a completely different concept to Smint.io Portals slots). The typical slots of a page could for example
+be:
+
+- Header slot
+- Left slot
+- Right slot
+- Content slot
+- Footer slot
+
+## [Backend components](../Examples/Backend/)
+
+### Connector
+
+### Data adapter
+
+### Data processor
+
+### Task handler
+
+### Portal template
+
+The topmost level of the structure of a Smint.io Portals portal is introduced by the *Smint.io portal
+template*. A portal template combines and configures page templates for a complete portal experience. The portal
+template itself does *NOT* render any output to the frontend itself, it is just being used when instantiating a new
+Smint.io Portal from the portal template.
+
+### Identity provider
 
 ## Questions
 

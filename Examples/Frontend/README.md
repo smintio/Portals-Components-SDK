@@ -116,7 +116,7 @@ running our very simple *Smint.io Portals DevServer*.
 
 ## Page templates
 
-The second level of structure on top of UI components is introduced by *Smint.io Page Templates*. A page template
+The second level of structure on top of UI components is the *Smint.io page template*. A page template
 defines the structure of a Smint.io Portals page by defining and rendering so-called *slots* (do NOT confuse with Vue.js
 slots, which is a completely different concept to Smint.io Portals slots). The typical slots of a page could for example
 be:
@@ -166,8 +166,8 @@ running our very simple *Smint.io Portals DevServer*.
 
 ## Portal templates
 
-To wrap the story up, the topmost level of the structure of a Smint.io Portals portal is introduced by *Smint.io portal
-templates*. A portal template combines and configures page templates for a complete portal experience. The portal
+To wrap the story up, the topmost level of the structure of a Smint.io Portals portal is introduced by the *Smint.io portal
+template*. A portal template combines and configures page templates for a complete portal experience. The portal
 template itself does *NOT* render any output to the frontend itself, it is just being used when instantiating a new
 Smint.io Portal from the portal template.
 
