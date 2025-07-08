@@ -37,7 +37,7 @@ When Smint.io Portals instantiates a component, it reads the user provided compo
 
 Please note that there is no separate *Configuration* class for Smint.io Portals frontend components. Smint.io Portals frontend components contain all the necessary information directly in the component's source code, added as annotations. When a Smint.io Portals frontend component is loaded, the system then generates the frontend component's *Configuration* class on the fly.
 
-[Here](../Examples/Backend/Connectors/Connector-SharePoint/SharepointConnectorConfiguration.cs) you find an example of a component's *Configuration* class (this one is part of our *Microsoft SharePoint* connector)
+[Here](../Examples/Backend/Connectors/Connector-Picturepark/PictureparkConnectorConfiguration.cs) you find an example of a component's *Configuration* class (this one is part of our *Picturepark connector)
 
 ### Types of components
 
