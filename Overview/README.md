@@ -3,6 +3,8 @@ What are Smint.io Portals components?
 
 This README.md serves to clarify the general concept of Smint.io Portals components.
 
+Current version of this document is: 1.0.0 (as of 8th of July, 2025)
+
 ## Overview
 
 When you create a Smint.io Portals portal, you're not just creating static HTML/JavaScript pages. 
