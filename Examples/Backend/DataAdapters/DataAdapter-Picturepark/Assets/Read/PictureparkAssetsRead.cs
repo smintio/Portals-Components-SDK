@@ -99,6 +99,11 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                 throw new ArgumentException(nameof(parameters.AssetIds));
             }
 
+            if (parameters.IgnoreMissingAssets == true)
+            {
+                throw new NotSupportedException();
+            }
+
             ICollection<ContentDetail> contents = await _client.GetContentsAsync(parameters?.AssetIds?.Select(i => i.UnscopedId).ToList());
 
             var converter = new PictureparkContentConverter(
