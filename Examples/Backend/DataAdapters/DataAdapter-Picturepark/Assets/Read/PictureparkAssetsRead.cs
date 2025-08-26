@@ -169,7 +169,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                 };
             }
 
-            if (contents.Count != parameters.AssetIds.Length)
+            if (parameters.IgnoreMissingAssets != true && contents.Count != parameters.AssetIds.Length)
             {
                 throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetsNotFound, "One of the assets was not found");
             }
