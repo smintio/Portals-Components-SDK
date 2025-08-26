@@ -99,11 +99,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                 throw new ArgumentException(nameof(parameters.AssetIds));
             }
 
-            if (parameters.IgnoreMissingAssets == true)
-            {
-                throw new NotSupportedException();
-            }
-
             ICollection<ContentDetail> contents = await _client.GetContentsAsync(parameters?.AssetIds?.Select(i => i.UnscopedId).ToList());
 
             var converter = new PictureparkContentConverter(
@@ -174,7 +169,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                 };
             }
 
-            if (contents.Count != parameters.AssetIds.Length)
+            if (parameters.IgnoreMissingAssets != true && contents.Count != parameters.AssetIds.Length)
             {
                 throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetsNotFound, "One of the assets was not found");
             }
