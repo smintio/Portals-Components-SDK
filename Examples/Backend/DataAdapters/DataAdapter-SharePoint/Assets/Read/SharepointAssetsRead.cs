@@ -397,11 +397,6 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            if (parameters.IgnoreMissingAssets == true)
-            {
-                throw new NotSupportedException();
-            }
-
             if (_smintIoIntegrationLayerProvider == null)
             {
                 throw new NotImplementedException();
