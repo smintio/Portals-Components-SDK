@@ -169,11 +169,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                 };
             }
 
-            if (contents.Count != parameters.AssetIds.Length)
-            {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetsNotFound, "One of the assets was not found");
-            }
-
             HashSet<string> outputFormatIds = new HashSet<string>();
 
             foreach (var content in contents)
