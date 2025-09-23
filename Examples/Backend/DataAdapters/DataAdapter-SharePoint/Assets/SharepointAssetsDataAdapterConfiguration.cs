@@ -67,6 +67,12 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public SmintIoDataSearchIndexFulltextSearchType SmintIoSearchIndexFulltextSearchType { get; set; }
 
+        public SmintIoDataAiSearchMergingBehaviorType SmintIoAiSearchMergingBehaviorType { get; set; }
+
         public bool EnableFolderNavigation { get; set; }
+
+        public bool EnableNaturalLanguageSearch { get; set; }
+
+        public bool EnableReverseImageSearch { get; set; }
     }
 }
