@@ -49,5 +49,15 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
             return Task.FromResult(featureSupport);
         }
+
+        public override Task<GetAssetsReadFeatureSupportResult> GetAssetsReadFeatureSupportAsync(GetAssetsReadFeatureSupportParameters parameters)
+        {
+            var featureSupport = new GetAssetsReadFeatureSupportResult
+            {
+                IsFastGetAssetsSupported = true
+            };
+
+            return Task.FromResult(featureSupport);
+        }
     }
 }
