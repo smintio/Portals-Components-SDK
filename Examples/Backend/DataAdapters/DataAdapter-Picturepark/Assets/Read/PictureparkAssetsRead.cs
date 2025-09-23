@@ -44,6 +44,16 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
         private static readonly LocalizedStringsModel _model3dLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_model_3d));
         private static readonly LocalizedStringsModel _virtualLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_virtual));
 
+        public override Task<GetAssetsReadFeatureSupportResult> GetAssetsReadFeatureSupportAsync(GetAssetsReadFeatureSupportParameters parameters)
+        {
+            var featureSupport = new GetAssetsReadFeatureSupportResult
+            {
+                IsFastGetAssetsSupported = false
+            };
+
+            return Task.FromResult(featureSupport);
+        }
+
         public override async Task<GetAssetResult> GetAssetAsync(GetAssetParameters parameters)
         {
             if (parameters == null)

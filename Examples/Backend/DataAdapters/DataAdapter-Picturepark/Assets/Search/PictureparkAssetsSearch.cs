@@ -34,16 +34,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             });
         }
 
-        public override Task<GetAssetsReadFeatureSupportResult> GetAssetsReadFeatureSupportAsync(GetAssetsReadFeatureSupportParameters parameters)
-        {
-            var featureSupport = new GetAssetsReadFeatureSupportResult
-            {
-                IsFastGetAssetsSupported = true
-            };
-
-            return Task.FromResult(featureSupport);
-        }
-
         public override async Task<GetFullTextSearchProposalsResult> GetFullTextSearchProposalsAsync(GetFullTextSearchProposalsParameters parameters)
         {
             var assets = await SearchAssetsAsync(new SearchAssetsParameters()
