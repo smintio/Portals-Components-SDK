@@ -412,9 +412,29 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
             return assets;
         }
 
-        public override Task<GetAssetsPermissionsResult> GetAssetsPermissionsAsync(GetAssetsPermissionsParameters parameters)
+        public override async Task<GetAssetsPermissionsResult> GetAssetsPermissionsAsync(GetAssetsPermissionsParameters parameters)
         {
-            return Task.FromResult<GetAssetsPermissionsResult>(null);
+            if (_smintIoIntegrationLayerProvider == null)
+            {
+                return null;
+            }
+
+            if (parameters == null || parameters.AssetIds == null)
+            {
+                return null;
+            }
+
+            var getAssetsParameters = new GetAssetsParameters
+            {
+                AssetIds = parameters.AssetIds
+            };
+
+            var getAssetsResult = await GetAssetsAsync(getAssetsParameters, progressMonitor: null).ConfigureAwait(false);
+
+            return new GetAssetsPermissionsResult()
+            {
+                AssetDataObjects = getAssetsResult?.AssetDataObjects
+            };
         }
 
         public override Task<FolderDownloadStreamModel> GetFolderThumbnailDownloadStreamAsync(FolderIdentifier assetId, FolderThumbnailSize size, string thumbnailSpec)
