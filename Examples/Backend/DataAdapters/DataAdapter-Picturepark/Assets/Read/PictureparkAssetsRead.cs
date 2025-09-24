@@ -15,7 +15,6 @@ using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 using SmintIo.Portals.SDK.Core.Models.Metamodel;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 using SmintIo.Portals.SDK.Core.Models.Strings;
-using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 using PictureParkContentType = Picturepark.SDK.V1.Contract.ContentType;
 
 namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
@@ -48,7 +47,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
         {
             var featureSupport = new GetAssetsReadFeatureSupportResult
             {
-                IsFastGetAssetsSupported = false
+                IsFastGetAssetsSupported = true
             };
 
             return Task.FromResult(featureSupport);
