@@ -16,7 +16,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 throw new NotImplementedException();
             }
 
-            return _smintIoIntegrationLayerProvider.GetFormItemDefinitionAllowedValuesAsync(Context, parameters, _configuration.EnableNaturalLanguageSearch, _configuration.EnableReverseImageSearch, _configuration.EnableFolderNavigation);
+            return _smintIoIntegrationLayerProvider.GetFormItemDefinitionAllowedValuesAsync(_portalsContextModel, Context, parameters, _configuration.EnableNaturalLanguageSearch, _configuration.EnableReverseImageSearch, _configuration.EnableFolderNavigation);
         }
 
         public override Task<SearchAssetsResult> SearchAssetsAsync(SearchAssetsParameters parameters)
@@ -26,7 +26,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 throw new NotImplementedException();
             }
 
-            return _smintIoIntegrationLayerProvider.SearchAssetsAsync(Context, parameters, _configuration.EnableNaturalLanguageSearch, _configuration.EnableReverseImageSearch, _configuration.EnableFolderNavigation);
+            return _smintIoIntegrationLayerProvider.SearchAssetsAsync(_portalsContextModel, Context, parameters, _configuration.EnableNaturalLanguageSearch, _configuration.EnableReverseImageSearch, _configuration.EnableFolderNavigation);
         }
 
         public override Task<GetFullTextSearchProposalsResult> GetFullTextSearchProposalsAsync(GetFullTextSearchProposalsParameters parameters)

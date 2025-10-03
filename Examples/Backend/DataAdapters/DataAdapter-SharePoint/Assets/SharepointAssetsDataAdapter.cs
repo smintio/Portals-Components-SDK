@@ -8,6 +8,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.DataAdapterSDK.Providers;
+using SmintIo.Portals.SDK.Core.Models.Context;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Model;
 
 namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
@@ -19,6 +20,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         private readonly IEntityModelProvider _entityModelProvider;
         private readonly ISmintIoIntegrationLayerProvider _smintIoIntegrationLayerProvider;
+
+        private readonly IPortalsContextModel _portalsContextModel;
 
         private readonly SharepointAssetsDataAdapterConfiguration _configuration;
 
@@ -34,6 +37,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
             _entityModelProvider = serviceProvider.GetService<IEntityModelProvider>();
             _smintIoIntegrationLayerProvider = serviceProvider.GetService<ISmintIoIntegrationLayerProvider>();
+
+            _portalsContextModel = serviceProvider.GetService<IPortalsContextModel>();
 
             _configuration = configuration;
         }
