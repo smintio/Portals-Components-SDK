@@ -32,7 +32,6 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
             SharepointAssetsDataAdapterConfiguration configuration)
             : base(serviceProvider)
         {
-            _logger = logger;
             _sharepointClient = sharepointClient;
 
             _entityModelProvider = serviceProvider.GetService<IEntityModelProvider>();
@@ -41,6 +40,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
             _portalsContextModel = serviceProvider.GetService<IPortalsContextModel>();
 
             _configuration = configuration;
+
+            _logger = logger;
         }
 
         public override Task<GetAssetsSearchFeatureSupportResult> GetFeatureSupportAsync(GetAssetsSearchFeatureSupportParameters parameters)
