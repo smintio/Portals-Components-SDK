@@ -63,7 +63,7 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Integration
         [Fact]
         public async Task GetDynamicValuesList_WithSearch_YieldsResultAsync()
         {
-            var pagingResult = await _provider.GetDynamicValueListAsync("ConnectorTest", null, null, null);
+            var pagingResult = await _provider.GetDynamicValueListAsync("ConnectorTranslationTest", null, null, null);
 
             pagingResult.Result.Should().NotBeEmpty().And.HaveCount(1);
             pagingResult.Result.Should().OnlyContain(model =>
