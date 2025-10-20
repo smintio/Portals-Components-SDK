@@ -12,7 +12,7 @@ using SmintIo.Portals.DataAdapterSDK.TestDriver.Harness;
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Harness
 {
-    public class SharepointFixture : BaseDataAdapterFixture<OAuthOptions, SharepointConnector>
+    public class SharepointFixture : BaseDataAdapterFixture<OAuthOptions, SharepointConnector, SharepointAssetsDataAdapter>
     {
         protected override void BindSections(IConfiguration configuration)
         {

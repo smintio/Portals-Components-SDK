@@ -13,7 +13,7 @@ using SmintIo.Portals.DataAdapterSDK.TestDriver.Harness;
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test.Harness
 {
-    public class PictureparkFixture : BaseDataAdapterFixture<PictureparkConfigurationOptions, PictureparkConnector>
+    public class PictureparkFixture : BaseDataAdapterFixture<PictureparkConfigurationOptions, PictureparkConnector, PictureparkAssetsDataAdapter>
     {
         public PictureparkExternalUsersDataAdapter ExternalUsersDataAdapter { get; protected set; }
 
