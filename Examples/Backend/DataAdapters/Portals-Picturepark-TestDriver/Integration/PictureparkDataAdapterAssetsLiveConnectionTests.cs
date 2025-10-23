@@ -9,18 +9,18 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Parameters;
 using SmintIo.Portals.DataAdapterSDK.TestDriver.Harness;
 using SmintIo.Portals.DataAdapterSDK.TestDriver.Models;
 using SmintIo.Portals.DataAdapterSDK.TestDriver.Tests;
+using SmintIo.Portals.SDK.Core.Components;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
-using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 using Xunit;
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test.Integration
 {
     [Collection(nameof(PictureparkFixtureCollection))]
-    public class PictureparkDataAdapterAssetsTests : DataAdapterAssetsTests
+    public class PictureparkDataAdapterAssetsLiveConnectionTests : DataAdapterAssetsLiveConnectionTests
     {
         private readonly PictureparkFixture _fixture;
 
-        public PictureparkDataAdapterAssetsTests(PictureparkFixture fixture)
+        public PictureparkDataAdapterAssetsLiveConnectionTests(PictureparkFixture fixture)
         {
             _fixture = fixture;
         }
@@ -48,6 +48,8 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test.Integration
         protected override AssetIdentifier ValidButNotFoundAssetIdentifier => new(_fixture.AssetOptions.ValidButNotFoundAssetIdentifier);
 
         protected override ConnectorMetamodel GetConnectorMetamodel() => _fixture.Metamodel;
+
+        protected override IComponentConfiguration GetDataAdapterComponentConfiguration() => _fixture.DataAdapterConfiguration;
 
         protected override AssetsDataAdapterBaseImpl GetDataAdapter(Type componentImplementation) => _fixture.DataAdapter;
 

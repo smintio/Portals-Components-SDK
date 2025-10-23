@@ -13,7 +13,7 @@ using SmintIo.Portals.DataAdapterSDK.TestDriver.Harness;
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test.Harness
 {
-    public class PictureparkFixture : BaseDataAdapterFixture<PictureparkConfigurationOptions, PictureparkConnector, PictureparkAssetsDataAdapter>
+    public class PictureparkFixture : BaseDataAdapterFixture<PictureparkConfigurationOptions, PictureparkConnector, PictureparkAssetsDataAdapterConfiguration, PictureparkAssetsDataAdapter>
     {
         public PictureparkExternalUsersDataAdapter ExternalUsersDataAdapter { get; protected set; }
 
@@ -43,6 +43,12 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test.Harness
 
             ServiceProvider = services.BuildServiceProvider();
 
+            DataAdapterConfiguration = new PictureparkAssetsDataAdapterConfiguration
+            {
+                DefaultPageSize = 50,
+                MultiSelectItemCount = 15
+            };
+
             DataAdapter = await CreateDataAdapterAsync().ConfigureAwait(false);
             ExternalUsersDataAdapter = await CreateExternalUsersDataAdapterAsync().ConfigureAwait(false);
         }
@@ -54,15 +60,9 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test.Harness
                 throw new ArgumentNullException(nameof(Connector));
             }
 
-            var dataAdapterConfiguration = new PictureparkAssetsDataAdapterConfiguration
-            {
-                DefaultPageSize = 50,
-                MultiSelectItemCount = 15
-            };
-
             var dataAdapterTestDriver = new DataAdapterTestDriver(Connector, Metamodel);
 
-            await dataAdapterTestDriver.InstantiateDataAdapterAsync(typeof(PictureparkAssetsDataAdapterStartup), dataAdapterConfiguration);
+            await dataAdapterTestDriver.InstantiateDataAdapterAsync(typeof(PictureparkAssetsDataAdapterStartup), DataAdapterConfiguration);
 
             var dataAdapter = dataAdapterTestDriver.DataAdapter;
 
