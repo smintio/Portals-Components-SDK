@@ -15,7 +15,6 @@ using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 using SmintIo.Portals.SDK.Core.Models.Metamodel;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 using SmintIo.Portals.SDK.Core.Models.Strings;
-using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 using PictureParkContentType = Picturepark.SDK.V1.Contract.ContentType;
 
 namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
@@ -43,6 +42,16 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
         private static readonly LocalizedStringsModel _cadLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_cad));
         private static readonly LocalizedStringsModel _model3dLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_model_3d));
         private static readonly LocalizedStringsModel _virtualLocalizedStringsModel = MetamodelMessages.ResourceManager.FullyResolveToLocalizedStringsModel(name: nameof(MetamodelMessages.da_assets_virtual));
+
+        public override Task<GetAssetsReadFeatureSupportResult> GetAssetsReadFeatureSupportAsync(GetAssetsReadFeatureSupportParameters parameters)
+        {
+            var featureSupport = new GetAssetsReadFeatureSupportResult
+            {
+                IsFastGetAssetsSupported = true
+            };
+
+            return Task.FromResult(featureSupport);
+        }
 
         public override async Task<GetAssetResult> GetAssetAsync(GetAssetParameters parameters)
         {

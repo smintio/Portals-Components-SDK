@@ -16,6 +16,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Results;
 using SmintIo.Portals.DataAdapterSDK.Providers;
 using SmintIo.Portals.DataAdapterSDK.TestDriver.Models;
 using SmintIo.Portals.DataAdapterSDK.TestDriver.Providers;
+using SmintIo.Portals.SDK.Core.Components;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 using Xunit;
 
@@ -60,6 +61,8 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Integration
         protected override ICollection<FolderItemOption> SampleFolders => _fixture.AssetOptions.Folders;
 
         protected override ConnectorMetamodel GetConnectorMetamodel() => _fixture.Metamodel;
+
+        protected override IComponentConfiguration GetDataAdapterComponentConfiguration() => _fixture.DataAdapterConfiguration;
 
         protected override AssetsDataAdapterBaseImpl GetDataAdapter(Type componentImplementation) => _fixture.DataAdapter;
 

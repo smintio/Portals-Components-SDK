@@ -12,7 +12,7 @@ using SmintIo.Portals.DataAdapterSDK.TestDriver.Harness;
 
 namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Harness
 {
-    public class SharepointFixture : BaseDataAdapterFixture<OAuthOptions, SharepointConnector>
+    public class SharepointFixture : BaseDataAdapterFixture<OAuthOptions, SharepointConnector, SharepointAssetsDataAdapterConfiguration, SharepointAssetsDataAdapter>
     {
         protected override void BindSections(IConfiguration configuration)
         {
@@ -40,6 +40,8 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Harness
 
             ServiceProvider = services.BuildServiceProvider();
 
+            DataAdapterConfiguration = new SharepointAssetsDataAdapterConfiguration();
+
             DataAdapter = await CreateDataAdapterAsync().ConfigureAwait(false);
         }
 
@@ -50,11 +52,9 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Sharepoint.Test.Harness
                 throw new ArgumentNullException(nameof(Connector));
             }
 
-            var config = new SharepointAssetsDataAdapterConfiguration();
-
             var dataAdapterTestDriver = new DataAdapterTestDriver(Connector, Metamodel);
 
-            await dataAdapterTestDriver.InstantiateDataAdapterAsync(typeof(SharepointAssetsDataAdapterStartup), config);
+            await dataAdapterTestDriver.InstantiateDataAdapterAsync(typeof(SharepointAssetsDataAdapterStartup), DataAdapterConfiguration);
 
             var dataAdapter = dataAdapterTestDriver.DataAdapter;
 

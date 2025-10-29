@@ -18,6 +18,8 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 {
     public class DefaultPictureparkClient : BaseHttpClientApiClient, IPictureparkClient
     {
+        private const int ChunkSize = 100;
+
         protected HttpClient HttpClient { get; private set; }
 
         private string _debugAccessTokenCache;
@@ -240,18 +242,16 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
         /// <returns></returns>
         public async Task<ICollection<SchemaDetail>> GetSchemaDetailsAsync(ICollection<Schema> schemas)
         {
-            const int MaxLimit = 100;
             List<SchemaDetail> result = new List<SchemaDetail>();
 
-            for (int i = 0, to = schemas.Count; i < to; i += MaxLimit)
-            {
-                int count = Math.Min(to - i, MaxLimit);
-                IEnumerable<string> schemaIds = schemas.Skip(i).Take(count).Select(s => s.Id);
+            foreach (var chunkedSchemas in schemas.Chunk(ChunkSize))
+            { 
+                var chunkedSchemaIds = chunkedSchemas.Select(chunkedSchema => chunkedSchema.Id);
 
                 var schemaDetails = await ExecuteWithBackoffAsync(
                     apiFunc: (_) =>
                         {
-                            return _service.Schema.GetManyAsync(schemaIds);
+                            return _service.Schema.GetManyAsync(chunkedSchemaIds);
                         },
                     requestFailedHandler: DefaultRequestFailedHandler,
                     hint: "Get schema details",
@@ -534,9 +534,9 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
         public async Task<ICollection<ContentDetail>> GetContentPermissionsAsync(ICollection<string> ids)
         {
-            var contentSearchResult = await GetContentChannelAccessIdsAsync(ids).ConfigureAwait(false);
+            var (contentChannelAccessIds, _) = await GetContentChannelAccessIdsAsync(ids).ConfigureAwait(false);
 
-            var contentDetails = await GetManyAsync(contentSearchResult.Results?.Select(result => result.Id), new ContentResolveBehavior[] {
+            var contentDetails = await GetManyAsync(contentChannelAccessIds, new ContentResolveBehavior[] {
                 ContentResolveBehavior.Permissions
             }).ConfigureAwait(false);
 
@@ -545,9 +545,9 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
         public async Task<ICollection<ContentDetail>> GetContentOutputsAsync(ICollection<string> ids)
         {
-            var contentSearchResult = await GetContentChannelAccessIdsAsync(ids).ConfigureAwait(false);
+            var (contentChannelAccessIds, _) = await GetContentChannelAccessIdsAsync(ids).ConfigureAwait(false);
 
-            var contentDetails = await GetManyAsync(contentSearchResult.Results?.Select(result => result.Id), new ContentResolveBehavior[] {
+            var contentDetails = await GetManyAsync(contentChannelAccessIds, new ContentResolveBehavior[] {
                 ContentResolveBehavior.Metadata,
                 ContentResolveBehavior.Content,
                 ContentResolveBehavior.OuterDisplayValueThumbnail,
@@ -569,40 +569,59 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             return contentDetails;
         }
 
-        private async Task<ContentSearchResult> GetContentChannelAccessIdsAsync(ICollection<string> ids, int? limit = null)
+        private async Task<(List<string> Result, long TotalResults)> GetContentChannelAccessIdsAsync(ICollection<string> contentIds, bool justCheckExistence = false)
         {
-            ContentSearchRequest request = new ContentSearchRequest()
+            List<string> contentChannelAccessIds = new List<string>();
+            long totalResults = 0;
+
+            foreach (var chunkedContentIds in contentIds.Chunk(ChunkSize))
             {
-                ChannelId = _channelId,
-                Filter = new TermsFilter()
+                ContentSearchRequest request = new ContentSearchRequest()
                 {
-                    Field = "id",
-                    Terms = ids
-                },
-                AggregationFilters = null,
-                SearchString = null,
-                SearchBehaviors = new SearchBehavior[]
-                {
-                    SearchBehavior.SimplifiedSearch
-                },
-                PageToken = null,
-                Limit = limit == null ? ids.Count : (int)limit,
-                BrokenDependenciesFilter = BrokenDependenciesFilter.All,
-                SearchType = ContentSearchType.Metadata,
-                Sort = null
-            };
+                    ChannelId = _channelId,
+                    Filter = new TermsFilter()
+                    {
+                        Field = "id",
+                        Terms = chunkedContentIds
+                    },
+                    AggregationFilters = null,
+                    SearchString = null,
+                    SearchBehaviors = new SearchBehavior[]
+                    {
+                        SearchBehavior.SimplifiedSearch
+                    },
+                    PageToken = null,
+                    Limit = justCheckExistence ? 0 : chunkedContentIds.Length,
+                    BrokenDependenciesFilter = BrokenDependenciesFilter.All,
+                    SearchType = ContentSearchType.Metadata,
+                    Sort = null
+                };
 
-            var contentSearchResult = await ExecuteWithBackoffAsync(
-                apiFunc: (_) =>
-                {
-                    return _service.Content.SearchAsync(request);
-                },
-                requestFailedHandler: DefaultRequestFailedHandler,
-                hint: "Get content channel access IDs",
-                isGet: false
-            ).ConfigureAwait(false);
+                var contentSearchResult = await ExecuteWithBackoffAsync(
+                    apiFunc: (_) =>
+                    {
+                        return _service.Content.SearchAsync(request);
+                    },
+                    requestFailedHandler: DefaultRequestFailedHandler,
+                    hint: "Get content channel access IDs",
+                    isGet: false
+                ).ConfigureAwait(false);
 
-            return contentSearchResult;
+                if (contentSearchResult != null)
+                {
+                    if (contentSearchResult.Results != null && contentSearchResult.Results.Any())
+                    {
+                        foreach (var content in contentSearchResult.Results)
+                        {
+                            contentChannelAccessIds.Add(content.Id);
+                        }
+                    }
+
+                    totalResults += contentSearchResult.TotalResults;
+                }
+            }
+
+            return (contentChannelAccessIds, totalResults);
         }
 
         private async Task CheckContentChannelAccessAsync(string id)
@@ -621,9 +640,9 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
             if (!skipNonAccessibleContents)
             { 
-                var contentSearchResult = await GetContentChannelAccessIdsAsync(ids, limit: 0);
+                var (_, totalResults) = await GetContentChannelAccessIdsAsync(ids, justCheckExistence: true);
 
-                if (contentSearchResult.TotalResults < ids.Count)
+                if (totalResults < ids.Count)
                 {
                     throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetNotFound, "The asset was not found", ids.First());
                 }
@@ -632,14 +651,9 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             }
             else
             {
-                var contentSearchResult = await GetContentChannelAccessIdsAsync(ids).ConfigureAwait(false);
+                var (contentChannelAccessIds, _) = await GetContentChannelAccessIdsAsync(ids).ConfigureAwait(false);
 
-                if (contentSearchResult.Results == null)
-                {
-                    return Array.Empty<string>();
-                }
-                        
-                return contentSearchResult.Results.Select(result => result.Id).ToList();
+                return contentChannelAccessIds;
             }
         }
 
@@ -818,17 +832,12 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
 
             if (contentIds != null && contentIds.Any())
             {
-                const int MaxLimit = 100;
-
-                for (int i = 0, to = contentIds.Count(); i < to; i += MaxLimit)
+                foreach (var chunkedContentIds in contentIds.Chunk(ChunkSize))
                 {
-                    int count = Math.Min(to - i, MaxLimit);
-                    IEnumerable<string> partialContentIds = contentIds.Skip(i).Take(count);
-
                     var partialContentDetails = await ExecuteWithBackoffAsync(
                        apiFunc: (_) =>
                        {
-                           return _service.Content.GetManyAsync(partialContentIds, contentResolveBehaviors);
+                           return _service.Content.GetManyAsync(chunkedContentIds, contentResolveBehaviors);
                        },
                        requestFailedHandler: DefaultRequestFailedHandler,
                        hint: "Get many",
