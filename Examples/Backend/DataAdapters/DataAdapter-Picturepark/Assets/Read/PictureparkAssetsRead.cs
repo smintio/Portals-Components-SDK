@@ -15,6 +15,7 @@ using SmintIo.Portals.SDK.Core.Http.Prefab.Models;
 using SmintIo.Portals.SDK.Core.Models.Metamodel;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 using SmintIo.Portals.SDK.Core.Models.Strings;
+using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 using PictureParkContentType = Picturepark.SDK.V1.Contract.ContentType;
 
 namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
@@ -168,9 +169,22 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
                 throw new ArgumentException(nameof(parameters.AssetIds));
             }
 
-            ICollection<ContentDetail> contents = await _client.GetContentOutputsAsync(parameters?.AssetIds?.Select(i => i.UnscopedId).ToList());
+            var assetIds = parameters.AssetIds
+                .Select(i => i.UnscopedId)
+                .ToList();
 
-            if (contents == null || contents.Count == 0)
+            ICollection<ContentDetail> contents = await _client.GetContentOutputsAsync(assetIds) ?? [];
+
+            if (parameters.IgnoreMissingAssets != true && assetIds.Count != contents.Count)
+            {
+                var missingAssetIds = assetIds
+                    .Except(contents.Select(contentDetail => contentDetail.Id))
+                    .ToList();
+
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.AssetsNotFound, "One of the assets was not found", identifier: string.Join(" ", missingAssetIds));
+            }
+
+            if (contents.Count == 0)
             {
                 return new GetAssetsDownloadItemMappingsResult()
                 {
