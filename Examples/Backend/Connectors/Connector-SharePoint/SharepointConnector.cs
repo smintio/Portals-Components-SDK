@@ -31,7 +31,7 @@ namespace SmintIo.Portals.Connector.SharePoint
         public const string SharepointAccessTokenKey = "sharePointAccessToken";
 
         private const string DefaultClientId = "deb473a8-8ee0-40c5-aa5d-5d821d308c4f";
-        private const string DefaultClientSecret = "RsF8Q~rEA5CZuEofJz1xzB6Bv-fWw4m1Mm2NNa4I";
+        private const string DefaultClientSecret = "gB.8Q~B7AG~e5T7jvL4_1PMxTXaxCj7OApN4ta3Q";
 
         private const string IdentityServerUrl = "https://login.microsoftonline.com";
         private const string MicrosoftGraphUrl = "https://graph.microsoft.com";
