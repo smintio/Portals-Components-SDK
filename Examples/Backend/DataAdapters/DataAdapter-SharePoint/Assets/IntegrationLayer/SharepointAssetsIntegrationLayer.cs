@@ -19,16 +19,13 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 {
     public partial class SharepointAssetsDataAdapter : AssetsDataAdapterBaseImpl, IAssetsIntegrationLayerApiProvider
     {
+        public bool IsSetup => _sharepointClient.IsSetup;
+
         public async Task<GetFolderContentsResult> GetFolderContentsForIntegrationLayerAsync(GetFolderContentsParameters parameters)
         {
             if (parameters == null)
             {
                 throw new ArgumentNullException(nameof(parameters));
-            }
-
-            if (!_sharepointClient.IsSetup)
-            {
-                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The connector is not yet fully set up");
             }
 
             var pageSize = parameters.PageSize ?? 50;
