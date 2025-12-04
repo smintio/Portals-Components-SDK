@@ -26,6 +26,11 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
                 throw new ArgumentNullException(nameof(parameters));
             }
 
+            if (!_sharepointClient.IsSetup)
+            {
+                throw new ExternalDependencyException(ExternalDependencyStatusEnum.NotSetup, "The connector is not yet fully set up");
+            }
+
             var pageSize = parameters.PageSize ?? 50;
 
             var driveItemList = await _sharepointClient.GetFolderDriveItemsAsync(

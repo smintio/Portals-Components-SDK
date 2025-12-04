@@ -27,6 +27,11 @@ namespace SmintIo.Portals.Connector.SharePoint.Client
         bool IsRootFolderSync { get; }
 
         /// <summary>
+        /// Indicates if the connector is fully set up
+        /// </summary>
+        bool IsSetup { get; }
+
+        /// <summary>
         /// Gets all sites of the Sharepoint instance the user has access to.
         /// </summary>
         /// <param name="query">optionally supply a query string, e.g. a part of the site's name</param>
