@@ -19,6 +19,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 {
     public partial class SharepointAssetsDataAdapter : AssetsDataAdapterBaseImpl, IAssetsIntegrationLayerApiProvider
     {
+        public bool IsSetup => _sharepointClient.IsSetup;
+
         public async Task<GetFolderContentsResult> GetFolderContentsForIntegrationLayerAsync(GetFolderContentsParameters parameters)
         {
             if (parameters == null)

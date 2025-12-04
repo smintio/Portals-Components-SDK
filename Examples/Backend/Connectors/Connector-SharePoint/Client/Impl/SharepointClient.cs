@@ -123,6 +123,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
 
         public bool IsRootFolderSync { get; }
 
+        public bool IsSetup => !string.IsNullOrEmpty(SiteId) && _siteFolderIds.Any();
+
         /// <summary>
         /// Creates GraphApi client with delayed bearer authentication via <see cref="_getAuthorizationValuesFunc"/>.
         /// </summary>
