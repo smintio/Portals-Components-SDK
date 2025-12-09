@@ -34,6 +34,9 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
             "id",
             "name",
             "createdBy",
+            "createdDateTime",
+            "lastModifiedBy",
+            "lastModifiedDateTime",
             "parentReference",
             "audio",
             "video",
@@ -119,6 +122,8 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
         public string SiteId { get; }
 
         public bool IsRootFolderSync { get; }
+
+        public bool IsSetup => !string.IsNullOrEmpty(SiteId) && _siteFolderIds.Any();
 
         /// <summary>
         /// Creates GraphApi client with delayed bearer authentication via <see cref="_getAuthorizationValuesFunc"/>.
