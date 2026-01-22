@@ -129,33 +129,6 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             };
         }
 
-        public override async Task<GetAssetsPermissionsResult> GetAssetsPermissionsAsync(GetAssetsPermissionsParameters parameters)
-        {
-            if (parameters == null || parameters.AssetIds == null)
-            {
-                return null;
-            }
-
-            ICollection<ContentDetail> contents = await _client.GetContentPermissionsAsync(parameters?.AssetIds?.Select(i => i.UnscopedId).ToList());
-
-            var converter = new PictureparkContentConverter(
-                _logger,
-                Context,
-                _entityModelProvider,
-                _configuration.ListNameAttribute,
-                _configuration.ListNameAttribute2,
-                resolveListDataAttributes: null);
-
-            var assetDataObjects = contents
-                .Select(c => converter.Convert(c, titleDisplayPattern: null))
-                .ToArray();
-
-            return new GetAssetsPermissionsResult()
-            {
-                AssetDataObjects = assetDataObjects
-            };
-        }
-
         public override async Task<GetAssetsDownloadItemMappingsResult> GetAssetsDownloadItemMappingsAsync(GetAssetsDownloadItemMappingsParameters parameters, IProgressMonitor progressMonitor)
         {
             if (parameters == null)

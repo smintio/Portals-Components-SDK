@@ -532,17 +532,6 @@ namespace SmintIo.Portals.Connector.Picturepark.Client.Impl
             return outputFormats;
         }
 
-        public async Task<ICollection<ContentDetail>> GetContentPermissionsAsync(ICollection<string> ids)
-        {
-            var (contentChannelAccessIds, _) = await GetContentChannelAccessIdsAsync(ids).ConfigureAwait(false);
-
-            var contentDetails = await GetManyAsync(contentChannelAccessIds, new ContentResolveBehavior[] {
-                ContentResolveBehavior.Permissions
-            }).ConfigureAwait(false);
-
-            return contentDetails;
-        }
-
         public async Task<ICollection<ContentDetail>> GetContentOutputsAsync(ICollection<string> ids)
         {
             var (contentChannelAccessIds, _) = await GetContentChannelAccessIdsAsync(ids).ConfigureAwait(false);

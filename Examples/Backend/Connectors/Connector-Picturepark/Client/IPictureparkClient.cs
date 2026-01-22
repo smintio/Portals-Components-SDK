@@ -43,8 +43,6 @@ namespace SmintIo.Portals.Connector.Picturepark.Client
 
         Task<ICollection<ContentDetail>> GetContentsAsync(ICollection<string> ids, bool skipNonAccessibleContents = false);
 
-        Task<ICollection<ContentDetail>> GetContentPermissionsAsync(ICollection<string> ids);
-
         Task<ICollection<ContentDetail>> GetContentOutputsAsync(ICollection<string> ids);
 
         Task<ICollection<OutputFormatDetail>> GetOutputFormatsAsync(ICollection<string> outputFormatIds);
