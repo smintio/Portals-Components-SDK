@@ -49,7 +49,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
             var featureSupport = new GetAssetsSearchFeatureSupportResult
             {
                 IsRandomAccessSupported = true,
-				IsFullTextSearchProposalsSupported = false,
+				IsFullTextSearchProposalsSupported = true,
                 IsFolderNavigationSupported = false
             };
 

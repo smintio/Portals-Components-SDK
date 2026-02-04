@@ -39,7 +39,7 @@ namespace SmintIo.Portals.Connector.Picturepark.Metamodel
             _metamodel = new ConnectorMetamodel(
                 PictureparkConnectorStartup.PictureparkConnector, 
                 isRandomAccessSupported: false, 
-                isFullTextSearchProposalsSupported: true, 
+                isFullTextSearchProposalsSupported: false, 
                 isFolderNavigationSupported: false);
 
             _client = client;
