@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Picturepark.SDK.V1.Contract;
@@ -29,29 +28,14 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
             return Task.FromResult(new GetAssetsSearchFeatureSupportResult()
             {
                 IsRandomAccessSupported = false,
-                IsFullTextSearchProposalsSupported = true,
+                IsFullTextSearchProposalsSupported = false,
                 IsFolderNavigationSupported = false
             });
         }
 
-        public override async Task<GetFullTextSearchProposalsResult> GetFullTextSearchProposalsAsync(GetFullTextSearchProposalsParameters parameters)
+        public override Task<GetFullTextSearchProposalsResult> GetFullTextSearchProposalsAsync(GetFullTextSearchProposalsParameters parameters)
         {
-            var assets = await SearchAssetsAsync(new SearchAssetsParameters()
-            {
-                QueryString = parameters?.SearchQueryString,
-                CurrentFilters = parameters?.CurrentFilters,
-                PageSize = parameters?.MaxResultCount
-            }).ConfigureAwait(false);
-
-            var cultureInfo = CultureInfo.CurrentCulture;
-
-            return new GetFullTextSearchProposalsResult
-            {
-                FullTextProposals = assets.AssetDataObjects
-                    .Where(assetDataObject => assetDataObject.Name != null)
-                    .Select(assetDataObject => assetDataObject.Name.ResolveLocalizedString(cultureInfo))
-                    .ToArray()
-            };
+            throw new NotImplementedException();
         }
 
         public override async Task<GetFormItemDefinitionAllowedValuesResult> GetFormItemDefinitionAllowedValuesAsync(GetFormItemDefinitionAllowedValuesParameters parameters)

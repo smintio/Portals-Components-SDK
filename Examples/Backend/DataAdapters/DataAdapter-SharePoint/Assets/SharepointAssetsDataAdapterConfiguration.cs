@@ -67,6 +67,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public SmintIoDataSearchIndexFulltextSearchType SmintIoSearchIndexFulltextSearchType { get; set; }
 
+        public bool SmintIoSearchIndexEnableAutoCompletion { get; set; }
+
         public bool EnableFolderNavigation { get; set; }
 
         public bool SmintIoSearchIndexEnableNaturalLanguageSearch { get; set; }

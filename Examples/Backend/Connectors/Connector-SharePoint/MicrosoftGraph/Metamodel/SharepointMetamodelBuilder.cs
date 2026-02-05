@@ -61,7 +61,7 @@ namespace SmintIo.Portals.Connector.SharePoint.MicrosoftGraph.Metamodel
             _metamodel = new ConnectorMetamodel(
                 $"{SharepointConnectorStartup.SharepointConnector}-{siteId}-{siteDriveId}-{siteListId}-{foldersHash}",
                 isRandomAccessSupported: true,
-                isFullTextSearchProposalsSupported: false,
+                isFullTextSearchProposalsSupported: true,
                 isFolderNavigationSupported: false);
 
             _isSharepoint = isSharepoint;
