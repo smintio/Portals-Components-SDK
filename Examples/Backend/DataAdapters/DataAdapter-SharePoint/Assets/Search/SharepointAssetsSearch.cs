@@ -31,7 +31,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public override Task<GetFullTextSearchProposalsResult> GetFullTextSearchProposalsAsync(GetFullTextSearchProposalsParameters parameters)
         {
-            if (_smintIoIntegrationLayerProvider == null)
+            if (_smintIoIntegrationLayerProvider == null || !_configuration.SmintIoSearchIndexEnableAutoCompletion)
             {
                 throw new NotImplementedException();
             }

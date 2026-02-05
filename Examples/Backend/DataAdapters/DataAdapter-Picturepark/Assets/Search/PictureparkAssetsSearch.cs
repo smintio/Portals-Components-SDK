@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Picturepark.SDK.V1.Contract;
@@ -36,10 +35,7 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets
 
         public override Task<GetFullTextSearchProposalsResult> GetFullTextSearchProposalsAsync(GetFullTextSearchProposalsParameters parameters)
         {
-            return Task.FromResult(new GetFullTextSearchProposalsResult()
-            {
-                FullTextProposals = Array.Empty<string>()
-            });
+            throw new NotImplementedException();
         }
 
         public override async Task<GetFormItemDefinitionAllowedValuesResult> GetFormItemDefinitionAllowedValuesAsync(GetFormItemDefinitionAllowedValuesParameters parameters)
