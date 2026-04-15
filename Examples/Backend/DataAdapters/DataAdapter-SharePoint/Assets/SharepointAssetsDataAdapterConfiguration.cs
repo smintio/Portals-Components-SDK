@@ -71,6 +71,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public bool EnableFolderNavigation { get; set; }
 
+        public bool SearchSubFoldersEnabledByDefault { get; set; }
+
         public bool SmintIoSearchIndexEnableNaturalLanguageSearch { get; set; }
 
         public bool SmintIoSearchIndexEnableReverseImageSearch { get; set; }
