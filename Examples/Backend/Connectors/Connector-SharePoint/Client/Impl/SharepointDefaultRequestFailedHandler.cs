@@ -40,6 +40,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                         message.Contains("SubStreamCached_FileTooBig") ||
                         message.Contains("SubStreamCached_SandboxTimeout") ||
                         message.Contains("SubStreamCached_SandBoxFailure") ||
+                        message.Contains("SubStreamCached_BadRequest") ||
                         message.Contains("SubStreamCached_ImageProcessingFailure") ||
                         message.Contains("SubStreamCached_Fatal") ||
                         message.Contains("Sandbox_VideoProcessing_CorruptInput") ||
@@ -93,6 +94,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                         if (!string.IsNullOrEmpty(innerErrorCode))
                         {
                             if (string.Equals(innerErrorCode, "SubStreamCached_SandBoxFailure") ||
+                                string.Equals(innerErrorCode, "SubStreamCached_BadRequest") ||
                                 string.Equals(innerErrorCode, "Sandbox_VideoProcessing_CorruptInput"))
                             {
                                 // permanent error
@@ -137,6 +139,7 @@ namespace SmintIo.Portals.Connector.SharePoint.Client.Impl
                             string.Equals(errorCode, "SubStreamCached_FileTooBig") ||
                             string.Equals(errorCode, "SubStreamCached_SandboxTimeout") ||
                             string.Equals(errorCode, "SubStreamCached_SandBoxFailure") ||
+                            string.Equals(errorCode, "SubStreamCached_BadRequest") ||
                             string.Equals(errorCode, "SubStreamCached_ImageProcessingFailure") ||
                             string.Equals(errorCode, "SubStreamCached_Fatal") ||
                             // e.g. Sandbox_VideoProcessing_CorruptInput_1894.08ce
