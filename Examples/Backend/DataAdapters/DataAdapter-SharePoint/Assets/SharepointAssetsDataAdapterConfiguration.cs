@@ -1,6 +1,7 @@
 ﻿using System;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.AllowedValuesProviders;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Configurations;
+using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Ai;
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Prefab;
 using SmintIo.Portals.SDK.Core.Configuration.Annotations;
 using SmintIo.Portals.SDK.Core.Models.MetadataAttributes;
@@ -86,5 +87,7 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
         public SmintIoDataSearchIndexAiSearchMergingBehaviorType SmintIoSearchIndexReverseImageSearchAiSearchMergingBehaviorType { get; set; }
 
         public SmintIoDataSearchIndexAiSearchMergingBehaviorType SmintIoSearchIndexAiSearchMergingBehaviorType { get; set; }
+
+        public ISmintedAi SmintedAiDataAdapter { get; set; }
     }
 }
