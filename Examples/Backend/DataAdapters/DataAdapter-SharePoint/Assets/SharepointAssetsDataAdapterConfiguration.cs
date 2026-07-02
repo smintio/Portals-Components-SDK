@@ -15,6 +15,8 @@ namespace SmintIo.Portals.DataAdapter.SharePoint.Assets
 
         public MetadataAttributeModel[] SmintIoIntegrationLayerSearchIndexSortMetadataAttributeList { get; set; }
 
+        public MetadataAttributeModel[] SmintIoIntegrationLayerSearchIndexSortFallbackMetadataAttributeList { get; set; }
+
         public MetadataAttributeModel SmintIoIntegrationLayerSearchIndexOverrideNameAttribute { get; set; }
 
         public SmintIoDataSearchIndexFileType[] SmintIoSearchIndexFileTypeAllowList { get; set; }
