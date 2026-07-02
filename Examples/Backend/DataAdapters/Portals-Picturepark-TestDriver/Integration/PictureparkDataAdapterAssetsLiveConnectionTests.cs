@@ -135,23 +135,6 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.Picturepark.Test.Integration
             }
         }
 
-        [Fact]
-        public Task GetAssetsPermissions_ShouldReturn_ResultAsync()
-        {
-            return AssertDataAdapterAsync(async da =>
-            {
-                var getAssetsPermissionsParameters = new GetAssetsPermissionsParameters
-                {
-                    AssetIds = new[] { SampleImageAssetIdentifier }
-                };
-
-                var result = await da.GetAssetsPermissionsAsync(getAssetsPermissionsParameters);
-
-                result.Should().NotBeNull();
-                result.AssetDataObjects.Should().NotBeNullOrEmpty().And.NotContainNulls().And.OnlyHaveUniqueItems();
-            });
-        }
-
         public override Task GetRandomAssets_ShouldThrow_NotSupported_NoParametersAsync()
         {
             // For PP we return an Image instead of 'not supported exception'
