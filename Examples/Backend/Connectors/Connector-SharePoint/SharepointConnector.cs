@@ -40,7 +40,7 @@ namespace SmintIo.Portals.Connector.SharePoint
         private readonly ICache _cache;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        private readonly ISecretsStorage _secretsStorage;
+        private readonly IConfigurationStorage _configurationStorage;
 
         private readonly ISharepointOneDriveConnectorConfiguration _configuration;
         private readonly IPortalsContextModel _portalsContext;
@@ -62,7 +62,7 @@ namespace SmintIo.Portals.Connector.SharePoint
             _cache = cache;
             _httpClientFactory = httpClientFactory;
 
-            _secretsStorage = serviceProvider.GetService<ISecretsStorage>();
+            _configurationStorage = serviceProvider.GetService<IConfigurationStorage>();
 
             _portalsContext = serviceProvider.GetService<IPortalsContextModel>();
 
@@ -253,9 +253,9 @@ namespace SmintIo.Portals.Connector.SharePoint
         {
             HandleInitializationError(originalSecret, secret, bootstrapAuthorizationValuesModel);
 
-            if (_secretsStorage != null)
+            if (_configurationStorage != null)
             {
-                _defaultClientSecret = await _secretsStorage.GetAsync("OAuth2:DefaultClientSecret").ConfigureAwait(false);
+                _defaultClientSecret = await _configurationStorage.GetAsync("OAuth2:DefaultClientSecret").ConfigureAwait(false);
             }
 
             var clientId = GetClientId(bootstrapAuthorizationValuesModel);
