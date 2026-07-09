@@ -23,6 +23,7 @@ using SmintIo.Portals.SDK.Core.Rest.Prefab;
 using SmintIo.Portals.SDK.Core.Rest.Prefab.Exceptions;
 using SmintIo.Portals.SDK.Core.Http.Prefab.Exceptions;
 using System.Runtime.CompilerServices;
+using SmintIo.Portals.SDK.Core.Storage;
 
 namespace SmintIo.Portals.Connector.SharePoint
 {
@@ -31,7 +32,6 @@ namespace SmintIo.Portals.Connector.SharePoint
         public const string SharepointAccessTokenKey = "sharePointAccessToken";
 
         private const string DefaultClientId = "deb473a8-8ee0-40c5-aa5d-5d821d308c4f";
-        private const string DefaultClientSecret = "gB.8Q~B7AG~e5T7jvL4_1PMxTXaxCj7OApN4ta3Q";
 
         private const string IdentityServerUrl = "https://login.microsoftonline.com";
         private const string MicrosoftGraphUrl = "https://graph.microsoft.com";
@@ -39,10 +39,15 @@ namespace SmintIo.Portals.Connector.SharePoint
         private readonly ILogger _logger;
         private readonly ICache _cache;
         private readonly IHttpClientFactory _httpClientFactory;
+
+        private readonly ISecretsStorage _secretsStorage;
+
         private readonly ISharepointOneDriveConnectorConfiguration _configuration;
         private readonly IPortalsContextModel _portalsContext;
 
         private readonly bool _isSharepoint;
+
+        private string _defaultClientSecret;
 
         private SharepointClient _sharepointClient;
 
@@ -56,6 +61,8 @@ namespace SmintIo.Portals.Connector.SharePoint
             _logger = logger;
             _cache = cache;
             _httpClientFactory = httpClientFactory;
+
+            _secretsStorage = serviceProvider.GetService<ISecretsStorage>();
 
             _portalsContext = serviceProvider.GetService<IPortalsContextModel>();
 
@@ -117,7 +124,7 @@ namespace SmintIo.Portals.Connector.SharePoint
                 return base.GetClientSecret(authorizationValuesModel);
             }
 
-            return DefaultClientSecret;
+            return _defaultClientSecret;
         }
 
         public override Task PerformPostConfigurationChecksAsync(AuthorizationValuesModel authorizationValuesModel)
@@ -245,6 +252,11 @@ namespace SmintIo.Portals.Connector.SharePoint
             AuthorizationValuesModel bootstrapAuthorizationValuesModel)
         {
             HandleInitializationError(originalSecret, secret, bootstrapAuthorizationValuesModel);
+
+            if (_secretsStorage != null)
+            {
+                _defaultClientSecret = await _secretsStorage.GetAsync("OAuth2:DefaultClientSecret").ConfigureAwait(false);
+            }
 
             var clientId = GetClientId(bootstrapAuthorizationValuesModel);
 
