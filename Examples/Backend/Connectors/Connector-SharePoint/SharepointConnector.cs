@@ -253,7 +253,7 @@ namespace SmintIo.Portals.Connector.SharePoint
         {
             HandleInitializationError(originalSecret, secret, bootstrapAuthorizationValuesModel);
 
-            if (_configurationStorage != null)
+            if (_configurationStorage != null && string.IsNullOrEmpty(_defaultClientSecret))
             {
                 _defaultClientSecret = await _configurationStorage.GetAsync("OAuth2:DefaultClientSecret").ConfigureAwait(false);
             }
@@ -316,6 +316,11 @@ namespace SmintIo.Portals.Connector.SharePoint
 
         public override async Task<AuthorizationValuesModel> RefreshAuthorizationValuesAsync(AuthorizationValuesModel authorizationValuesModel)
         {
+            if (_configurationStorage != null && string.IsNullOrEmpty(_defaultClientSecret))
+            {
+                _defaultClientSecret = await _configurationStorage.GetAsync("OAuth2:DefaultClientSecret").ConfigureAwait(false);
+            }
+
             var identityServerUrl = GetIdentityServerUrl(authorizationValuesModel);
             var (clientId, secret) = GetClientIdAndSecret(authorizationValuesModel);
             var redirectUri = GetOriginalRedirectUrl(authorizationValuesModel);
