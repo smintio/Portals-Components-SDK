@@ -115,6 +115,14 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
                 }
             }
 
+            if (contentDetail.ContentPermissionSetIds != null && contentDetail.ContentPermissionSetIds.Any())
+            {
+                asset.ExternalSecurity = new ExternalSecurityDataObject()
+                {
+                    ExternalSecurityGroupIds = contentDetail.ContentPermissionSetIds?.ToArray()
+                };
+            }
+
             if (string.IsNullOrEmpty(asset.Version))
             {
                 asset.Version = "0";
@@ -336,6 +344,14 @@ namespace SmintIo.Portals.DataAdapter.Picturepark.Assets.Common
             }
 
             asset.PermissionUuids = permissionUuids.ToArray();
+
+            if (contentDetail.ContentPermissionSetIds != null && contentDetail.ContentPermissionSetIds.Any())
+            {
+                asset.ExternalSecurity = new ExternalSecurityDataObject()
+                {
+                    ExternalSecurityGroupIds = contentDetail.ContentPermissionSetIds?.ToArray()
+                };
+            }
 
             if (string.IsNullOrEmpty(asset.Version))
             {
