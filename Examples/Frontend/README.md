@@ -22,6 +22,8 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
 1. [Overview of Smint.io frontend component types](docs/smintio-frontend-component-types.md)
 1. [Frontend reference: services, filters, property mixins, providers, CSS](docs/smintio-frontend-reference.md)
+1. [Data adapter reference: every public API interface and model](docs/smintio-data-adapter-reference.md)
+1. [Page type contracts: what a page hands to the components it hosts](docs/smintio-page-type-contracts.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
 1. [Crafting a page template instead](#user-content-crafting-a-page-template-instead)
 1. [Building a section component](#user-content-building-a-section-component)
@@ -235,7 +237,10 @@ this.searchBarAutoCompletion.getFullTextSearchProposalsAsync({ searchQueryString
 	});
 ```
 
-In the above example, the `IAssetsSearch` is a standard public API interface provided by Smint.io Portals. 
+In the above example, the `IAssetsSearch` is a standard public API interface provided by Smint.io Portals.
+Every standard interface, every parameter and result model, and every enumeration is listed in the
+[data adapter reference](docs/smintio-data-adapter-reference.md) — including `IAssetDataObject`, the shape of an
+asset, which is what most components end up rendering.
 
 Two things to keep in mind when calling a data adapter public API interface:
 
@@ -554,6 +559,27 @@ always-auth=true
 Never edit `portals-ui-component.json` or `portals-page-template.json` by hand — they are build output and are
 overwritten on the next build.
 
+#### If you also have a newer node installed
+
+`npm run build` runs the shims in `node_modules/.bin`, and those pick whichever `node` comes
+first on your `PATH` — not necessarily the version you selected with NVM. On a machine that
+also has a modern node, rollup then fails with:
+
+```
+Error loading `tslib` helper library.
+[!] Error: Package subpath './package.json' is not defined by "exports" in .../tslib/package.json
+```
+
+The fix is to run the two build tools with the node 12 binary directly, from your component
+folder:
+
+```
+<path-to-node-12>/node.exe node_modules/rollup/dist/bin/rollup -c --environment BUILD:production
+<path-to-node-12>/node.exe node_modules/@smintio/portals-resource-builder-cli/bin/resource-builder-cli.js
+```
+
+Those two commands are exactly what `build:dist` and `build:resources` do.
+
 ### Publish your custom frontend component
 
 1. In the component folder open a command prompt or terminal window
@@ -588,8 +614,21 @@ More information about the *Portals-SDK-PublishComponent-CLI tool* can be found 
 
 This is the part that makes developing Smint.io Portals frontend components pleasant: the dev
 server reroutes the requests that load your component's JavaScript to the files in your own
-working folder. Your local build then runs inside a **real portal**, against real data, with
-no publishing step in between.
+working folder. Your local build then runs inside a **real portal**, against real data.
+
+#### What the dev server covers, and what still needs publishing
+
+Please read this before you start, it saves a lot of confusion:
+
+| What you changed | What is needed |
+|---|---|
+| The template, the script body, the styles — your component's **HTML and JavaScript** | Rebuild and reload the browser. The dev server serves your local files. **No publishing.** |
+| **Annotations** — a new or renamed configuration property, a changed `DisplayName`, `Description`, `DefaultValue`, `AllowedValues`, `VisibleIf` or `FormGroup`, the component metadata, or a page template's slots | **Publish your component.** The configuration form and the component metadata live on the Smint.io server, not in your bundle. Until you publish, the portal editor will not offer the new setting, nor show a changed label. |
+| A **brand new component** | **Publish your component**, and add it to the dev server's `ComponentMappings` so the dev server can find your local build at all. |
+
+So: publish once when you create the component and whenever you change its settings, then
+iterate freely on markup and behaviour without publishing. When you are finished, publish once
+more, so that what is registered with Smint.io matches your final result.
 
 1. Get in touch with [support@smint.io](mailto:support@smint.io) so that we can set up a development portal for you
 1. Download the [Portals Dev-Server](../../Tools/Portals-DevServer/Release/) and install the .NET 8 runtime
@@ -605,19 +644,26 @@ no publishing step in between.
 }
 ```
 
-   The path must match the `main` entry of your component's `package.json`.
+   The path must match the `main` entry of your component's `package.json`. Please note that
+   the dev server reads `appsettings.json` when it starts, so restart it after you add a mapping.
 
 1. Start the dev server — `SmintIo.Portals.DevServer.exe` on Windows, `dotnet Portals-DevServer.dll` on Mac or Linux.
    It listens on `https://development-host.smint.io:8000` and logs every request it serves
+1. Build and publish your component once, so that Smint.io knows it and the portal editor can offer it
 1. Run `npm run watch` for continuous building of your frontend component
 1. Turn off your browser's cache
 1. Navigate to your development portal, add your frontend component to a page
 1. Change some code in your frontend component, and refresh the browser page. Enjoy! :)
+1. Whenever you change an annotation, build and publish again before you continue
+1. When you are finished, build and publish the final result
 
 If your component does not show up, the dev server's request log is the first place to look:
 it will show whether the request was rerouted to your file or served from the published
-package. The usual cause is a mapping that does not match, or a bundle that has not been built
-yet.
+package. The usual causes are a mapping that does not match, a bundle that has not been built
+yet, or a dev server that was not restarted after the mapping was added.
+
+If instead your component shows up but a *setting* you added is missing from the configuration
+form, that is the publishing boundary described above — build and publish, and it will appear.
 
 ### Common problems
 
@@ -627,7 +673,8 @@ yet.
 | A property you added does not appear in the configuration form | it has no `FormGroup`, or its `VisibleIf` condition is never true |
 | Settings that portals had already saved are suddenly empty | the TypeScript property was renamed without keeping the same `ComponentProperty` name |
 | `portals-ui-component.json` or `portals-page-template.json` is out of date | `npm run watch` does not run the resource builder — run `npm run build:resources` |
-| Your local change does not show up in the portal | the dev server mapping is missing or points at the wrong bundle path, or the browser cache is on |
+| Your local change does not show up in the portal | the dev server mapping is missing or points at the wrong bundle path, the dev server was not restarted after the mapping was added, or the browser cache is on |
+| A setting you added is not in the configuration form, or your new component is not offered in the editor | the component has not been published since you changed its annotations — the configuration form lives on the Smint.io server, not in your bundle |
 | Publishing fails right away | the `version` in `package.json` was not increased, or `SMINT_IO_SDK_HOME` is not set |
 | Unexpected rollup or babel errors when building | the wrong node version — see the build chapter above |
 | Two identical `CSS class` fields in the configuration form | `SCssProps` and `SHtmlProps` were mixed in together; use only one of them |
