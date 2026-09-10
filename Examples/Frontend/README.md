@@ -20,11 +20,12 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Overview of Smint.io page templates](docs/smintio-page-templates.md)
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
 1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
+1. [Overview of Smint.io frontend component types](docs/smintio-frontend-component-types.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
 1. [Extras for Smint.io Certified partners](#user-content-extras-for-smintio-certified-partners)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.0.1 (as of 12th of April, 2023)
+Current version of this document is: 1.1.0 (as of 10th of September, 2026)
 
 ## UI components
 
@@ -108,8 +109,11 @@ page.
 
 *SDK*
 
-Smint.io Portals UI components can be developed using the *SmintIo-UIComponents-SDK*. The SDK is based on *TypeScript*, 
-*Vue.js* and *Vuetify*. Vue.js *props* can be made available for editing UI component properties by the user through *annotations*. 
+Smint.io Portals UI components are developed against the *Smint.io Portals UI component SDK*, which you consume as the
+npm package `@smintio/portals-component-sdk`, usually together with the shared component library
+`@smintio/portals-components`. The SDK is based on *TypeScript*, *Vue.js 2* and *Vuetify 2*. Vue.js *props* can be made
+available for editing UI component properties by the user through *annotations*.
+
 The UI components can then be published to any NPM repository from where our system can consume the
 components. You can locally develop Smint.io Portals UI components while having them run in our production system by
 running our very simple *Smint.io Portals DevServer*.
@@ -158,11 +162,15 @@ below) or b) when the user creates a new page from a page template.
 
 *SDK*
 
-Smint.io page templates can be developed using the *SmintIo-PageTemplate-SDK*. The SDK is based on *TypeScript*, *
-Vue.js* and *Vuetify*. Vue.js *props* can be made available for editing page template properties by the user through *
-annotations*. The page templates can then be published to any NPM repository from where our system can consume the page
-templates. You can locally develop Smint.io Portals page templates while having them run in our production system by
-running our very simple *Smint.io Portals DevServer*.
+Smint.io page templates are developed against the very same npm SDK as UI components — `@smintio/portals-component-sdk`,
+usually together with `@smintio/portals-components`. There is no separate npm SDK for page templates. The SDK is based
+on *TypeScript*, *Vue.js 2* and *Vuetify 2*. Vue.js *props* can be made available for editing page template properties
+by the user through *annotations*. The page templates can then be published to any NPM repository from where our system
+can consume the page templates. You can locally develop Smint.io Portals page templates while having them run in our
+production system by running our very simple *Smint.io Portals dev server*.
+
+The differences of a page template to a UI component are small and are described under
+[How develop your own frontend component](#user-content-how-develop-your-own-frontend-component) below.
 
 ## Portal templates
 
@@ -180,7 +188,8 @@ you need an additional portal type, please get in touch.
 
 *SDK*
 
-Smint.io portal templates can be developed using the *SmintIo-PortalTemplate-SDK*. The SDK is based on *C#* (.NET Core).
+Smint.io portal templates can be developed using the *Smint.io Portals portal template SDK*
+(`SmintIo.Portals.PortalTemplateSDK`). Unlike UI components and page templates, this SDK is based on *C#* (.NET).
 Template properties can be made available for editing by the user through *annotations*. Portal templates need to be
 submitted to Smint.io for approval and inclusion to our portal template library.
 
@@ -211,7 +220,7 @@ public readonly searchBarAutoCompletion!: IAssetsSearch;
 Once the Smint.io Portals UI component is instanciated, you can easily call methods of that public API interface.
 
 ```javascript
-this.searchBarAutoCompletion.getFullTextSearchProposalsAsync({ queryString: this.searchQuery })
+this.searchBarAutoCompletion.getFullTextSearchProposalsAsync({ searchQueryString: this.searchQuery })
 	.catch((e) => {
 		...
 	})
@@ -224,6 +233,12 @@ this.searchBarAutoCompletion.getFullTextSearchProposalsAsync({ queryString: this
 ```
 
 In the above example, the `IAssetsSearch` is a standard public API interface provided by Smint.io Portals. 
+
+Two things to keep in mind when calling a data adapter public API interface:
+
+- The property can be `undefined`, because the portal editor may not have configured a data source for it. Guard for it.
+- Each data adapter will implement all the methods of the interfaces it supports. If functionality is not supported,
+  the data adapter does not declare the interface, and it can then not be selected for the purpose requested by you.
 
 *The great thing is*: if you develop your own Smint.io Portals data adapter, you can easily publish your own custom 
 public API interfaces as well. This enables you to easily develop any custom functionality required using the Smint.io 
@@ -290,8 +305,6 @@ always-auth=true
 	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
 	
 11. Please adjust `src/PortalsUiComponent.vue` accordingly
-
-An example for crafting your own page template will follow soon.
 
 ### Things to do for Mac or Linux users
 
@@ -366,6 +379,74 @@ The full list of supported Smint.io Portals annotations can be found [here](docs
 
 By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
 
+# Crafting a page template instead
+
+A page template is the same kind of npm package, built with the same SDK. Start from the same
+`ui-example-hello-world-1` directory and change the following:
+
+| | UI component | Page template |
+|---|---|---|
+| Directory name prefix | `ui-` | `page-` |
+| Source file | `src/PortalsUiComponent.vue` | `src/PortalsPage.vue` |
+| Class decorator | `@PortalsUiComponent` | `@PortalsPageTemplateComponent` |
+| `type` | a UI component type | a page type |
+| Rollup entry point in your rollup config | `src/PortalsUiComponent.vue` | `src/PortalsPage.vue` |
+| `main` in `package.json` | `./lib/portals-ui-component.umd.min.js` | `./lib/portals-page.umd.js` |
+| Resource builder call in `resources/definition.ts` | `buildUIComponentResourceDefinition` | `buildPageTemplateResourceDefinition` |
+| Generated resource file | `portals-ui-component.json` | `portals-page-template.json` |
+
+Instead of configuration properties alone, a page template declares its *slots*:
+
+```javascript
+import type { IUIComponentInfo } from "@smintio/portals-component-sdk";
+import { UIComponentSlot } from "@smintio/portals-component-sdk";
+
+@UIComponentSlot({
+    slotId: "header",
+    minimumItems: 0,
+    maximumItems: 1,
+    allowedUiComponentTypes: ["ui-type-header"],
+})
+public headerSlot: IUIComponentInfo[] = [];
+
+@UIComponentSlot({ slotId: "content", minimumItems: 1 })
+public contentSlot: IUIComponentInfo[] = [];
+```
+
+and renders them with the slot components from `@smintio/portals-components`:
+
+```vue
+<s-header-slot :ui-slot="headerSlot" />
+
+<v-main>
+    <s-generic-slot
+        :ui-slot="contentSlot"
+        :content-gap="contentGap"
+        :apply-top-content-gap="true"
+        :apply-bottom-content-gap="true"
+    />
+</v-main>
+```
+
+`@UIComponentSlot` does not create an ordinary data property — it replaces the field with a computed property that
+reads the slot's components from the page context, so declare it with an `= []` initializer and never assign to it.
+
+Remember that the page template — not the UI component — owns all padding and margins between the components it hosts.
+
+To hand data and event handlers to the components in a slot, use `ui-slot-data`, a Vue render data object:
+
+```vue
+<s-generic-slot
+    :ui-slot="searchResultSlot"
+    :ui-slot-data="{
+        props: { currentSearch, results, isSearching },
+        on: { 'next-search-page': onNextSearchPage },
+    }"
+/>
+```
+
+This is how a page fulfils the contract that the UI components of its page type expect.
+
 ### Build your custom frontend component
 
 Please note that access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io)
@@ -398,6 +479,16 @@ always-auth=true
 	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
 	
 8. Run `npm run build` or `npm run watch` to build your frontend component
+
+`npm run build` runs two steps: `build:dist` (rollup, producing the bundle under `lib/`) and `build:resources`
+(the `portals-resource-builder-cli`, producing `portals-ui-component.json` or `portals-page-template.json` from
+`resources/definition.ts`).
+
+`npm run watch` runs **rollup only**. It does not regenerate the resource definition file. After changing
+`resources/definition.ts`, run `npm run build:resources` or a full `npm run build`.
+
+Never edit `portals-ui-component.json` or `portals-page-template.json` by hand — they are build output and are
+overwritten on the next build.
 
 ### Publish your custom frontend component
 
