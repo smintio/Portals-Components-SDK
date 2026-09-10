@@ -3,19 +3,41 @@ Smint.io Portals frontend component mixins
 
 We have prepared several Vue.js mixins that help you to perform common tasks more quickly in your Smint.io Portals frontend components.
 
-* [Download asset(s)](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-mixins.md#download-assets)
-* [Collect asset(s)](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-mixins.md#collect-assets)
-* [Remember asset(s)](https://github.com/smintio/Portals-UIComponents-Overview/blob/main/docs/smintio-mixins.md#remember-assets)
+They are all exported from `@smintio/portals-components`.
 
-Current version of this document is: 1.0.0 (as of 3rd of March, 2022)
+* [Download asset(s)](#download-assets)
+* [Remember (collect) asset(s)](#remember-collect-assets)
+* [Share asset(s)](#share-assets)
+* [Other useful mixins](#other-useful-mixins)
+
+Current version of this document is: 2.0.0 (as of 10th of September, 2026)
+
+## How the mixins are built
+
+Each of the three asset action mixins comes as a pair, already combined for you:
+
+* an `S...Props` mixin, which contributes the **configuration properties** (all the dialog
+  texts, as localized strings), their form group and their default values, and
+* a dialog mixin, which contributes the **behaviour** (the methods you call and the
+  `...DialogProps` getter you bind to the dialog).
+
+You only mix in the `S...Props` one — it already mixes in the behaviour.
+
+The dialog components themselves are registered globally by the Smint.io Portals runtime.
+Use the kebab-case tags directly in your template; do **not** import or register them.
+
+> **Note:** in earlier SDK versions you had to add the dialog texts by hand to
+> `resources/definition.ts` via `setFormFieldValues`. That is no longer necessary — the
+> `S...Props` mixins carry the correct string resource ids as `@DefaultValue`.
+
+---
 
 ## Download asset(s)
 
-When you want the user to be able to open the download asset(s) dialog in your top level Smint.io component you need to make sure that the following steps are implemented:
-
 ### 1. Use the mixin in the Smint.io frontend component
 
-```js
+```ts
+import { Mixins } from "vue-property-decorator";
 import { SDownloadProps } from "@smintio/portals-components";
 
 export default class PortalsUiComponentImplementation extends Mixins(SDownloadProps) {
@@ -29,187 +51,39 @@ export default class PortalsUiComponentImplementation extends Mixins(SDownloadPr
 <s-download-dialog v-model="showDownloadDialog" v-bind="downloadDialogProps" />
 ```
 
-### 3. Add the following resource definitions to `resources/definition.ts`
-
-```js
-{
-    "id": "buttonDownloadText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_download",
-},
-{
-    "id": "downloadSelectDownloadFormatsText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_select_download_formats",
-},
-{
-    "id": "downloadNoDownloadFormatsAvailableText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_no_download_formats_available",
-},
-{
-    "id": "downloadButtonDownloadImmediatelyText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_download_immediately",
-},
-{
-    "id": "downloadButtonSendDownloadLinkText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_send_download_link",
-},
-{
-    "id": "downloadDownloadImmediatelyDoneText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_download_immediately_done",
-},
-{
-    "id": "downloadSendDownloadLinkDoneText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_download_send_download_link_done",
-},
-{
-    "id": "downloadButtonCancelText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_cancel",
-},
-```
-
-### 4. Usage:
-
-There are 2 functions in the mixin that you can use in order to download an assets or collections:
+### 3. Usage
 
 ```ts
-public downloadAssets(assetIds: IAssetIdentifier[]): void {
-  ...
-}
+public downloadAssets(assetIds: IAssetIdentifier[]): void;
+public downloadCollection(collectionId: string): void;
 
-public downloadCollection(collectionId: string): void {
-  ...
-}
+// for assets and collections reached through a share link
+public downloadSharedAssets(assetIds: IAssetIdentifier[], shareId: string, shareSecret: string): void;
+public downloadSharedCollection(collectionId: string, shareId: string, shareSecret: string): void;
 ```
 
-You can call one, or the other in order to fire the download dialog.
+Call any of them to open the download dialog.
+
+Before you offer a download button, check the permission:
+
+```ts
+import { AssetPermissionsMixin } from "@smintio/portals-components";
+// ...
+this.hasDownloadPermission(asset)
+```
 
 ---
 
-## Collect asset(s)
+## Remember (collect) asset(s)
 
+"Remember" is the collect-into-a-collection flow. The dialog lets the user pick an existing
+collection or create a new one.
 
-When you want the user to be able to open the collect asset(s) dialog in your top level Smint.io component need to make sure that the following steps are implemented:
-
-### 1. Use the mixin in the Smint.io component
-
-```js
-import { SSelectOrCreateCollectionProps } from "@smintio/portals-components";
-
-export default class PortalsUiComponentImplementation extends Mixins(SSelectOrCreateCollectionProps) {
-    ...
-}
-```
-
-### 2. Use the dialog in the template
-
-```vue
-<s-select-or-create-collection-dialog
-    v-model="showSelectOrCreateCollectionDialog"
-    v-bind="selectOrCreateCollectionDialogProps"
-    :create-new="true"
-    @collection-created=""
-    @collection-selected=""
-    @collection-create:start=""
-    @collection-create:end=""
-/>
-```
-
-### 3. Add the following resource definitions to `resources/definition.ts`
-
-```js
-{
-    "id": "buttonRememberText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_remember"
-},
-{
-    "id": "rememberSelectCollectionText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_select_collection"
-},
-{
-    "id": "rememberCreateCollectionText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_crete_collection"
-},
-{
-    "id": "rememberNewCollectionText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_new_collection"
-},
-{
-    "id": "rememberButtonSaveText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_save"
-},
-{
-    "id": "rememberDoneText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_remember_done"
-},
-{
-    "id": "rememberButtonCancelText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_cancel"
-},
-{
-    "id": "rememberButtonCreateCollectionText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_create_collection"
-},
-```
-
-### 4. Usage:
-
-In order to open the select or create collection dialog you should call `openSelectOrCreateCollectionDialog`  function. 
+### 1. Use the mixin in the Smint.io frontend component
 
 ```ts
-public openSelectOrCreateCollectionDialog(assetIds: IAssetIdentifier[] = []): void {
-  ...
-}
-```
- 
-If you want to create the collection and collect the items at the same time you should pass `assetIds` param.
-
-The mixin provides the `addAssetsToCollection` function that handles the adding assets to existing collection.
-
-```ts
-public async addAssetsToCollection(collectionId: string, assetIds: IAssetIdentifier[]): Promise<void> {
-  ...
-}
-```
-
-Typical usage: 
-```vue
-<s-select-or-create-collection-dialog
-    v-model="showSelectOrCreateCollectionDialog"
-    v-bind="selectOrCreateCollectionDialogProps"
-    @collection-created="showCollectionDoneNotification(1)"
-    @collection-selected="addAssetsToCollection($event.collectionId, [assetIdentifier])"
-    @collection-create:start="isCollecting = true"
-    @collection-create:end="isCollecting = false"
-/>
-```
-
-If you want ONLY to create new collection pass the `:create-new='true'` prop.
-
----
-
-## Remember asset(s)
-
-When you want the user to be able to open the remember asset(s) dialog in your top level Smint.io component you need to make sure that the following steps are implemented:
-
-### 1. Use the mixin in the Smint.io component
-
-```js
 import { SRememberProps } from "@smintio/portals-components";
+
 export default class PortalsUiComponentImplementation extends Mixins(SRememberProps) {
     ...
 }
@@ -228,58 +102,125 @@ export default class PortalsUiComponentImplementation extends Mixins(SRememberPr
 />
 ```
 
-### 3. Add the following resource definitions to `resources/definition.ts`
-
-```js
-{
-    "id": "buttonRememberText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_remember",
-},
-{
-    "id": "rememberCreateCollectionText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_create_collection",
-},
-{
-    "id": "rememberSelectCollectionText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_select_collection",
-},
-{
-    "id": "rememberCollectionNameText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_collection_name",
-},
-{
-    "id": "rememberButtonSaveText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_save",
-},
-{
-    "id": "rememberDoneText",
-    "dataType": "resource_id",
-    "resourceIdValue": "text_collect_assets_done",
-},
-{
-    "id": "rememberButtonCancelText",
-    "dataType": "resource_id",
-    "resourceIdValue": "button_cancel",
-},
-```
-
-### 4. Usage:
-
-There is one function in the mixin that you can use in order to add assets to the collection:
+### 3. Usage
 
 ```ts
-public async addAssetsToCollection(
-  collectionId: string, 
-  assetIds: IAssetIdentifier[]
-): Promise<void> {
-  ...
+// open the dialog; pass asset ids to collect them as soon as a collection is chosen or created
+public openRememberDialog(assetIds: IAssetIdentifier[] = []): void;
+
+// add assets to an existing collection without the dialog
+public async addAssetsToCollection(collectionId: string, assetIds: IAssetIdentifier[]): Promise<void>;
+
+// show the "added to collection" confirmation
+public showCollectionDoneNotification(count = 0): void;
+```
+
+A typical wiring:
+
+```vue
+<s-remember-dialog
+    v-model="showRememberDialog"
+    v-bind="rememberDialogProps"
+    @collection-created="showCollectionDoneNotification(1)"
+    @collection-selected="addAssetsToCollection($event.collectionId, [assetIdentifier])"
+    @collection-create:start="isCollecting = true"
+    @collection-create:end="isCollecting = false"
+/>
+```
+
+---
+
+## Share asset(s)
+
+### 1. Use the mixin in the Smint.io frontend component
+
+```ts
+import { SShareProps } from "@smintio/portals-components";
+
+export default class PortalsUiComponentImplementation extends Mixins(SShareProps) {
+    ...
 }
 ```
+
+### 2. Use the dialog in the template
+
+```vue
+<s-share-dialog v-model="showShareDialog" v-bind="shareDialogProps" />
+```
+
+### 3. Usage
+
+```ts
+public shareAssets(assetIds: IAssetIdentifier[]): void;
+public shareCollection(collectionId: string): void;
+public editShare(shareId: string): void;
+```
+
+Sharing is not available in every portal. Guard the UI with `AuthMixin`:
+
+```ts
+import { AuthMixin } from "@smintio/portals-components";
+// ...
+v-if="shareAvailable"
+```
+
+---
+
+## All three at once
+
+The three mixins compose. This is what a component offering download, share and collect
+looks like:
+
+```ts
+import { Mixins } from "vue-property-decorator";
+import {
+    AssetPermissionsMixin,
+    AuthMixin,
+    SDownloadProps,
+    SRememberProps,
+    SShareProps,
+} from "@smintio/portals-components";
+
+export default class PortalsUiComponentImplementation extends Mixins(
+    Mixins<AssetPermissionsMixin, AuthMixin>(AssetPermissionsMixin, AuthMixin),
+    Mixins<SDownloadProps, SRememberProps, SShareProps>(SDownloadProps, SRememberProps, SShareProps),
+) {
+    ...
+}
+```
+
+```vue
+<s-download-dialog v-model="showDownloadDialog" v-bind="downloadDialogProps" />
+<s-share-dialog v-model="showShareDialog" v-bind="shareDialogProps" />
+<s-remember-dialog
+    v-model="showRememberDialog"
+    v-bind="rememberDialogProps"
+    @collection-created="onCollectionCreated"
+    @collection-selected="onCollectionSelected"
+    @collection-create:start="isCollecting = true"
+    @collection-create:end="isCollecting = false"
+/>
+```
+
+---
+
+## Other useful mixins
+
+| Mixin | What it gives you |
+|---|---|
+| `AuthMixin` | `isLoggedIn`, `user`, `loginAvailable`, `shareAvailable`, `ratingAvailable`, `commentingAvailable` and the related feature flags |
+| `AssetPermissionsMixin` | `hasViewPermission`, `hasHiResPermission`, `hasLoResPermission`, `hasDownloadPermission` |
+| `RoutingMixin` | `generateRouterLocation()`, `generateRouterLocationForAssetDataObject()` |
+| `AssetsReferenceMixin` | resolves an `IAssetsReferenceModel` configuration property into actual assets |
+| `MetadataMixin` | `getLocalizedTags()`, `getLocalizedAttributeValue()`, `getLocalizedAttributeValues()`, `getLinks()` |
+| `GalleryAssetConverterMixin` | converts assets into gallery items for the gallery components |
+| `AssetDetailsPageNavigationMixin` | previous/next navigation through search results on an asset details page |
+| `MenuItemMixin` | builds effective menu items and their image URLs |
+| `QuickViewModalMixin` | quick view modal wiring |
+
+The `S...Props` configuration mixins (text, links, images, colors, layout gaps, content
+width, custom CSS class and anchor) are documented alongside the UI components — mix them in
+rather than declaring the same properties again.
 
 Contributors
 ============
