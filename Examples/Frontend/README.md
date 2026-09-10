@@ -21,7 +21,10 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
 1. [Overview of Smint.io annotations](docs/smintio-annotations.md)
 1. [Overview of Smint.io frontend component types](docs/smintio-frontend-component-types.md)
+1. [Frontend reference: services, filters, property mixins, providers, CSS](docs/smintio-frontend-reference.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
+1. [Crafting a page template instead](#user-content-crafting-a-page-template-instead)
+1. [Building a section component](#user-content-building-a-section-component)
 1. [Extras for Smint.io Certified partners](#user-content-extras-for-smintio-certified-partners)
 1. [Problems](#user-content-problems)
 
@@ -390,10 +393,17 @@ A page template is the same kind of npm package, built with the same SDK. Start 
 | Source file | `src/PortalsUiComponent.vue` | `src/PortalsPage.vue` |
 | Class decorator | `@PortalsUiComponent` | `@PortalsPageTemplateComponent` |
 | `type` | a UI component type | a page type |
-| Rollup entry point in your rollup config | `src/PortalsUiComponent.vue` | `src/PortalsPage.vue` |
+| Shared rollup config imported by your `rollup.config.js` | `../config/rollup/rollup-config.ts` | `../config/rollup/rollup-config-page.ts` |
 | `main` in `package.json` | `./lib/portals-ui-component.umd.min.js` | `./lib/portals-page.umd.js` |
 | Resource builder call in `resources/definition.ts` | `buildUIComponentResourceDefinition` | `buildPageTemplateResourceDefinition` |
 | Generated resource file | `portals-ui-component.json` | `portals-page-template.json` |
+
+The shared rollup config for page templates is already part of this repository, so the only
+change to your `rollup.config.js` is the import:
+
+```javascript
+import rollupConfig from "../config/rollup/rollup-config-page.ts";
+```
 
 Instead of configuration properties alone, a page template declares its *slots*:
 
@@ -446,6 +456,60 @@ To hand data and event handlers to the components in a slot, use `ui-slot-data`,
 ```
 
 This is how a page fulfils the contract that the UI components of its page type expect.
+
+# Building a section component
+
+A *section* is the one sanctioned way for a UI component to wrap other UI components. The
+portal editor adds your *section start* component, then any number of components, and finally
+the generic *section end* component `smintio-ui-generic-section-end-1`. The runtime collects
+everything in between and hands it to your component.
+
+Declare your component with `type: "ui-type-section"`, and receive the collected components in
+a plain Vue prop named `subUiComponentInfos`:
+
+```javascript
+import type { IUIComponentInfo } from "@smintio/portals-component-sdk";
+import { Prop } from "vue-property-decorator";
+import { SGenericSlot } from "@smintio/portals-components";
+
+@PortalsUiComponent({
+    type: "ui-type-section",
+    key: "smintio-ui-example-section-start-1",
+    displayName: { [DefaultCulture]: "Start example section" },
+    components: {
+        SGenericSlot,
+    },
+    inheritAttrs: false,
+})
+export default class PortalsUiComponentImplementation extends Mixins(SHtmlProps) {
+    @Prop({ default: [] })
+    public readonly subUiComponentInfos!: IUIComponentInfo[];
+}
+```
+
+Then render them wherever your layout wants them, with the same `s-generic-slot` renderer a
+page template uses. Pass `$attrs` and `$listeners` through, so that the components inside your
+section still receive whatever the page handed to the section as a whole:
+
+```vue
+<s-generic-slot
+    :ui-slot="subUiComponentInfos"
+    :ui-slot-data="{
+        attrs: $attrs,
+        on: $listeners,
+    }"
+/>
+```
+
+Sections may be nested — the runtime tracks the nesting level and matches each section start
+to its own section end. Because your component decides where the collected components go, you
+can build quite sophisticated constructs this way: our own
+`smintio-ui-generic-section-start-table-1` distributes them over the cells of a responsive
+table, and there are further variants for expansion panels, tab panels and conditional
+display.
+
+Please remember that a section start component still follows all the usual UI component rules
+— in particular, it must fill its layout box and add no white space of its own.
 
 ### Build your custom frontend component
 
@@ -522,13 +586,51 @@ More information about the *Portals-SDK-PublishComponent-CLI tool* can be found 
 
 ### Local development
 
+This is the part that makes developing Smint.io Portals frontend components pleasant: the dev
+server reroutes the requests that load your component's JavaScript to the files in your own
+working folder. Your local build then runs inside a **real portal**, against real data, with
+no publishing step in between.
+
 1. Get in touch with [support@smint.io](mailto:support@smint.io) so that we can set up a development portal for you
-1. Set up the [Portals Dev-Server](../../Tools/Portals-DevServer/Release/) to point to the root folder, and map your new frontend component
-1. Run the dev server
+1. Download the [Portals Dev-Server](../../Tools/Portals-DevServer/Release/) and install the .NET 8 runtime
+1. Trust the `rootCA.pem` shipped with the dev server, so that your browser accepts its local HTTPS listener
+1. In the dev server's `appsettings.json`, set `RootDirectory` to the folder that contains your component folders
+1. In the same file, add one entry under `ComponentMappings` for each component you want to
+   develop locally, mapping the component id to its built bundle, relative to `RootDirectory`:
+
+```
+"ComponentMappings": {
+    "ui-example-hello-world-1": "ui-example-hello-world-1/lib/portals-ui-component.umd.min.js",
+    "page-example-hello-world-1": "page-example-hello-world-1/lib/portals-page.umd.js"
+}
+```
+
+   The path must match the `main` entry of your component's `package.json`.
+
+1. Start the dev server — `SmintIo.Portals.DevServer.exe` on Windows, `dotnet Portals-DevServer.dll` on Mac or Linux.
+   It listens on `https://development-host.smint.io:8000` and logs every request it serves
 1. Run `npm run watch` for continuous building of your frontend component
 1. Turn off your browser's cache
 1. Navigate to your development portal, add your frontend component to a page
 1. Change some code in your frontend component, and refresh the browser page. Enjoy! :)
+
+If your component does not show up, the dev server's request log is the first place to look:
+it will show whether the request was rerouted to your file or served from the published
+package. The usual cause is a mapping that does not match, or a bundle that has not been built
+yet.
+
+### Common problems
+
+| What you see | What it usually means |
+|---|---|
+| `Some properties lack type definition: [...]` when the component loads | one of your configuration properties has no `Is...` or `Implements` annotation |
+| A property you added does not appear in the configuration form | it has no `FormGroup`, or its `VisibleIf` condition is never true |
+| Settings that portals had already saved are suddenly empty | the TypeScript property was renamed without keeping the same `ComponentProperty` name |
+| `portals-ui-component.json` or `portals-page-template.json` is out of date | `npm run watch` does not run the resource builder — run `npm run build:resources` |
+| Your local change does not show up in the portal | the dev server mapping is missing or points at the wrong bundle path, or the browser cache is on |
+| Publishing fails right away | the `version` in `package.json` was not increased, or `SMINT_IO_SDK_HOME` is not set |
+| Unexpected rollup or babel errors when building | the wrong node version — see the build chapter above |
+| Two identical `CSS class` fields in the configuration form | `SCssProps` and `SHtmlProps` were mixed in together; use only one of them |
 
 ## Extras for Smint.io Certified partners
 

@@ -6,7 +6,7 @@ Smint.io Portals frontend component types
 * [Page types](#page-types)
 * [Page types for the login system](#page-types-for-the-login-system)
 
-Current version of this document is: 1.0.0 (as of 29th of November, 2022)
+Current version of this document is: 1.1.0 (as of 10th of September, 2026)
 
 ## UI component types
 
@@ -42,6 +42,10 @@ Current version of this document is: 1.0.0 (as of 29th of November, 2022)
 | `RequestPermissionForm`            | `ui-type-request-permission-form`                    |   **Request permission form**                              |
 | `RequestDownloadForm`              | `ui-type-request-download-form`                      |   **Request download form**                                |
 | `Location`                         | `ui-type-location`                                   |   **Location / address**                                   |
+| `Document`                         | `ui-type-document`                                   |   **Document**                                             |
+| `UploadForm`                       | `ui-type-upload-form`                                |   **Asset upload form**                                    |
+| `RequestGenericForm`               | `ui-type-request-generic-form`                       |   **Generic request form**                                 |
+| `AssetDetailsBanner`               | `ui-type-asset-details-banner`                       |   **Banner for asset details view**                        |
 | `Custom`                           | `ui-type-custom`                                     |   **Custom component**                                     |
 | `Section`                          | `ui-type-section`                                    |   **Section**                                              |
 ---
@@ -86,6 +90,10 @@ Current version of this document is: 1.0.0 (as of 29th of November, 2022)
 | `RequestDownload`                  | `page-type-request-download`                         |   **Request download**                                    |
 | `Generic`                          | `page-type-generic`                                  |   **Content page**                                        |
 | `GenericDialog`                    | `page-type-generic-dialog`                           |   **Generic dialog**                                      |
+| `Imprint`                          | `page-type-imprint`                                  |   **Imprint**                                             |
+| `PrivacyPolicy`                    | `page-type-privacy-policy`                           |   **Privacy policy**                                      |
+| `TermsAndConditions`               | `page-type-terms-and-conditions`                     |   **Terms and conditions**                                |
+| `Mpa`                              | `page-type-mpa`                                      |   **Multi-page application**                              |
 ---
 
 ## Page types for the login system

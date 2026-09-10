@@ -4,10 +4,10 @@
     "version": "8.7.1",
     "author": "Smint.io GmbH",
     "private": false,
-    "type-check": "tsc",
     "main": "./lib/portals-ui-component.umd.min.js",
     "typings": "./lib/PortalsUiComponent.vue.d.ts",
     "scripts": {
+        "type-check": "tsc",
         "build": "npm run build:dist && npm run build:resources",
         "build:dist": "rollup -c --environment BUILD:production",
         "build:resources": "portals-resource-builder-cli",
