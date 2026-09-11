@@ -293,7 +293,7 @@ it is a short conversation, and it saves a rewrite.
 |---|---|
 | Which portal types is it for, and which page does it go on? | whether you restrict it with `allowedPortalTypes`, and which contract applies — [what a page hands to the components it hosts](docs/smintio-page-type-contracts.md) |
 | Where does the content come from: the component's own configuration, a Smint.io data adapter, or a system of your own? | whether you work against the [data adapter public API interfaces](docs/smintio-data-adapter-reference.md), or declare your own interface |
-| Which existing component is the closest starting point? | how much you have to write. `ui-example-hello-world-1` is the minimal skeleton; the [overview of Smint.io UI components](docs/smintio-ui-components.md) shows what already exists |
+| Which existing component is the closest starting point — and is yours *that component plus something*, or something new? | how much you have to write, and whether you copy it or extend it. `ui-example-hello-world-1` is the minimal skeleton; the [overview of Smint.io UI components](docs/smintio-ui-components.md) shows what already exists. An addition to an existing component should [extend it](#user-content-is-your-component-an-existing-one-plus-something-extend-it-do-not-copy-it) — a copy is a fork, and forks stop receiving later improvements to the component they came from |
 | Which settings must the portal user be able to change, and which of them are advanced? | your configuration properties. Start with few — you can add options later, you cannot take them away. Text, link, colour and layout settings already exist as [mixins](docs/smintio-mixins.md), so only ask for what those do not cover |
 
 *Content and language*
@@ -433,6 +433,75 @@ The full list of supported Smint.io Portals annotations can be found [here](docs
 
 `ILocalizedStringsModel` is a custom object type defined by Smint.io that can return the correct text value of a component according to the selected language by the user.
 
+#### Is your component an existing one plus something? Extend it, do not copy it
+
+Starting from the closest existing component is good advice, and it splits into two very different moves.
+If your component is genuinely new, copy a similar one and change it. But if it is **an existing component
+plus an addition** — the standard header with extra menu items, the standard search result with one more
+badge — then take the published component as a dependency and extend it. A copy is a fork: it is large, and
+it silently opts out of every later fix and feature of the component you copied from.
+
+Add the component you are extending to your `dependencies`, then mix it in:
+
+```javascript
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import SmintIoPortalsUiComponentImplementation from "@smintio/ui-generic-header-1";
+
+@PortalsUiComponent({
+    type: "ui-type-header",
+    key: "smintio-ui-<yours>-1",
+    // ...
+})
+export default class PortalsUiComponentImplementation extends Mixins(
+    SmintIoPortalsUiComponentImplementation,
+    Mixins<AssetsReferenceMixin, RoutingMixin>(AssetsReferenceMixin, RoutingMixin)
+) {
+```
+
+Your component then has the base's markup, its sub components, its props and all of its configuration
+properties, and you declare only your own additions and override only what differs.
+
+Five things worth knowing before you do it:
+
+- **Leave out the `<template>` block entirely** when you are not changing the markup. Vue's mixin merge then
+  keeps the base's compiled render function. A `.vue` file containing only a `<script>` block is valid.
+- **Override the smallest thing that expresses your change** — usually one computed property. `super` is not
+  available (vue-class-component moves getters into the component options), so if you need the base's result
+  first, call the base's own helper methods to reproduce it, then add to it.
+- **The base ships type definitions.** Do not re-declare inherited members to satisfy TypeScript: declaring an
+  inherited *getter* as a property fails the build with `TS2610: ... is defined as an accessor ... but is
+  overridden here as an instance property`.
+- **Lifecycle hooks merge.** Your `created()` runs in addition to the base's, not instead of it.
+- **The base's annotations come along**, including its display names and descriptions in every language it
+  ships. Your own language choices apply only to the properties you declare yourself.
+
+#### Do not hand write settings the shared props mixins already give you
+
+Text, link, colour, image, effect and layout settings are not yours to invent. `@smintio/portals-components`
+ships them as `S...Props` mixins — `STextsProps`, `SBackgroundProps`, `SImageProps`, `SEffectsProps`,
+`SBottomGapProps` and others — and mixing one in gives your component the same settings, the same wording and
+the same form group as every Smint.io component. A portal editor then finds your component's settings exactly
+where they expect them. Declaring your own equivalents produces a component that looks subtly foreign in the
+editor, and the property names you pin are permanent.
+
+**Include the layout ones even when your component does not read them.** `SBottomGapProps` is the one most
+easily forgotten: it declares a single `bottomGap` property — the editor's *Gap bottom* — and your template
+never touches it. The **page slot** reads the configured value and puts the matching
+`s-mb-space-between-components-*` class on the component's wrapper. So there is nothing to apply and nothing to
+test in your own markup; mixing the class in *is* the entire implementation:
+
+```javascript
+export default class PortalsUiComponentImplementation extends Mixins(
+    STextsProps,
+    SBottomGapProps
+) {
+```
+
+A component without it simply has no spacing setting, and the omission only surfaces when an editor goes
+looking for the gap control that every other component on the page has. Check the
+[mixin reference](docs/smintio-frontend-reference.md) when you start a component, not after.
+
 #### Is your text a resource, or just a text field?
 
 Answer this before anything else, because a resource is the more involved of the two and you
@@ -562,6 +631,116 @@ It will not show up in the page editor until you publish your component.
 
 Page templates ship string resources in exactly the same way, through
 `buildPageTemplateResourceDefinition`.
+
+#### Before you point a property at a resource the portal already has
+
+A portal carries resources of its own, and their ids are tempting to reuse — they are already
+there, already translated, and they cost you nothing to ship. The catch is that **the id tells
+you nothing about the wording**, which was written for whichever component introduced it. A
+generic browse button resource may well read *"Browse all related assets"*, which is fine on the
+component it was written for and wrong next to your own button.
+
+So: reach for an existing portal resource only when the text genuinely has to read identically
+across components — and when you do, look at its value on a live portal first. Otherwise ship
+your own resource, as described above. It is a few lines in `resources/definition.ts` and it is
+yours to change.
+
+#### Linking to a search page from your component
+
+A button that opens a pre-filtered search is a common requirement — "show me all assets in this
+category". It is tempting to assemble the URL by hand from an id and a query parameter. Do not:
+the filter is data, it already exists, and hand-built URLs go stale the moment the data side
+changes.
+
+**Take the search that is already attached to the asset.** An `IAssetDataObject` carries its
+related searches in `relatedAssets`, one entry per relationship type, each with a complete
+search spec — filters, data adapter instance, query string. `AssetsReferenceMixin` hands it to
+you:
+
+```ts
+const assetsReference = this.getAssetReferenceByRelationshipType(asset, "<relationship type>");
+
+if (!assetsReference || assetsReference.type !== AssetsReferenceType.SearchAssetsSpec) {
+    return undefined;       // no such relationship - render no button at all
+}
+
+const query = this.searchAssetsSpecQuery(assetsReference.searchAssetsSpecModel);
+
+return this.generateRouterLocation(this.searchPage, { query });
+```
+
+**A search page restores a search from the query string** in a fixed shape: one parameter per
+filter, named after the search field, plus the same name prefixed with `dt-` carrying the
+field's data type, and the free text as `query`:
+
+```ts
+for (const formFieldValueModel of searchAssetsSpecModel.currentFilters.values) {
+    const id = formFieldValueModel.id;
+
+    switch (formFieldValueModel.dataType) {
+        case ValueType.String:
+            if (formFieldValueModel.stringValue === undefined) {
+                continue;
+            }
+
+            query[id] = formFieldValueModel.stringValue;
+            break;
+
+        // ... one case per ValueType you support: StringArray, Int32, Int64, Decimal,
+        // Boolean, DateTime. Anything else cannot be expressed in a query string
+
+        default:
+            continue;
+    }
+
+    query[`dt-${id}`] = formFieldValueModel.dataType;
+}
+
+if (searchAssetsSpecModel.queryString) {
+    query.query = searchAssetsSpecModel.queryString;
+}
+```
+
+Take the data type from the spec, never from a sample URL you copied out of a browser — the two
+can disagree, and the spec is the one the search page agrees with.
+
+#### A page reference resolves to a named route, so it has no path
+
+`generateRouterLocation(page, { query })` gives you a router location that looks like this:
+
+```javascript
+{ name: "pgt:34987", query: { … }, hash: "" }        // note: no path, and no fullPath
+```
+
+Bind that object to a `:to` and everything works. But some renderings want a URL **string** rather than a
+location object — menu items are the common case — and there is nothing to build that string from. Do not
+assemble it out of `location.path`; it is `undefined`, and the result is a link that quietly does not exist.
+Ask the router:
+
+```javascript
+const url = this.$router.resolve(location).href;
+```
+
+This failure mode is worth recognising because it is silent: no URL means no link, and if your component then
+skips items that have nothing to link to, it renders **nothing at all** with no error in the console. Which
+leads to a general rule — **when your component decides to render nothing, log why**. An empty component is
+otherwise indistinguishable from a wrong configuration, a stale bundle or a component that never loaded, and
+you will spend that debugging time in a browser rather than in your editor.
+
+#### Many links to the same search page: use `exact`
+
+If your component renders a list and every entry links to the same search page, differing only
+in the query, add `exact` to the link or button:
+
+```html
+<v-btn :to="searchLocationFor(item)" exact outlined small color="primary">…</v-btn>
+```
+
+Vue-router's default active matching compares the path and **ignores the query string**. Without
+`exact`, following one entry's link marks every entry's link as the current route, and the whole
+list takes on the active styling at once — which reads as a rendering bug. `exact` makes the
+comparison include the query, so only the link you actually followed is active. It looks like a
+prop you could drop; it is not, so leave a comment next to it.
 
 By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
 
@@ -786,6 +965,28 @@ Please note that calling the command repeatedly with the same package version wi
 
 With each code change, the version number must be increased in the `package.json` file.
 
+#### The two steps fail independently — and the second one needs your `.npmrc`
+
+`npm run smint-io-pc*` is `npm publish` **and then** the registration call, and they can fail apart. If the
+publish succeeded and only the registration failed, do **not** run the whole script again: that version number
+is already taken and `npm publish` alone will fail. Rerun just the registration, which is the piped command
+shown above.
+
+The failure to expect on a **brand new component** looks like this:
+
+```
++ @your-scope/ui-your-component-1@1.0.0
+npm ERR! code E404
+npm ERR! 404 '@your-scope/ui-your-component-1' is not in the npm registry.
+info: Missing component name
+```
+
+The publish worked; the registration did not, because the registration step pipes `npm info --json` into the
+CLI and `npm info` resolves the registry from the **component folder's `.npmrc`**, not from `publishConfig` in
+`package.json`. A new component folder without an `.npmrc` therefore asks the public npm registry, which has
+never heard of your package, and the CLI receives nothing to register. Make sure the folder has the `.npmrc`
+described in *Getting started*, then rerun the registration on its own.
+
 #### Which tenant your component is published for
 
 Nothing in your component's source decides this, and there is nothing you need to add to it.
@@ -837,7 +1038,43 @@ So: publish once when you create the component and whenever you change its setti
 iterate freely on markup and behaviour without publishing. When you are finished, publish once
 more, so that what is registered with Smint.io matches your final result.
 
-1. Get in touch with [support@smint.io](mailto:support@smint.io) so that we can set up a development portal for you
+The flip side is worth stating plainly: while the rerouting is active, **a working page proves
+your working folder works, not that anything is published**. If you need to know which version
+the portal is actually registered against, read it out of the request that loads your component
+— the version is part of the URL:
+
+```
+https://<dev server host>:8443/components/js/js/uic-<type>-<key>-1.2.3.js
+```
+
+That same request answers a question that otherwise costs a lot of guessing: if it is not there
+at all, your component is not on the page you are looking at — check the page rather than the
+component.
+
+#### Two switches decide whether your local build is asked for at all
+
+The rerouting is a decision of the **portal**, not of the dev server. The portal only offers a
+local URL for a component's JavaScript when **both** of these are true:
+
+1. **The portal has development mode enabled** — *Basic settings > Development mode* in the
+   portal's settings. Without it, the portal always uses the published component and never
+   looks at your machine.
+1. **A user is logged in whom Smint.io has cleared as a developer.** The clearance belongs to
+   the logged-in frontend user, not to the portal, so an anonymous visitor never gets it — not
+   even on a development portal. Please ask us to clear the login you develop with.
+
+Both are things we set up for you, so please mention them when you get in touch.
+
+If either one is missing, the symptom is easy to misread: the portal renders perfectly
+normally, and the dev server's request log stays **empty**, because your local listener is
+never contacted. So read the log this way — requests that arrive but are served from the
+published package mean a wrong or missing mapping, whereas **no requests at all** mean one of
+these two switches, and changing the mapping will not help.
+
+1. Get in touch with [support@smint.io](mailto:support@smint.io) so that we can set up a development portal for you,
+   enable *Basic settings > Development mode* on it, and clear your login as a developer —
+   see [the two switches above](#user-content-two-switches-decide-whether-your-local-build-is-asked-for-at-all).
+   Stay logged in with that user while you develop
 1. Download the [Portals Dev-Server](../../Tools/Portals-DevServer/Release/) and install the .NET 8 runtime
 1. Trust the `rootCA.pem` shipped with the dev server, so that your browser accepts its local HTTPS listener
 1. In the dev server's `appsettings.json`, set `RootDirectory` to the folder that contains your component folders
@@ -869,6 +1106,10 @@ it will show whether the request was rerouted to your file or served from the pu
 package. The usual causes are a mapping that does not match, a bundle that has not been built
 yet, or a dev server that was not restarted after the mapping was added.
 
+If the log shows **no requests at all**, the portal never asked for your local build: either
+*Basic settings > Development mode* is off for that portal, or the user you are logged in with
+has not been cleared as a developer by us (see above).
+
 If instead your component shows up but a *setting* you added is missing from the configuration
 form, that is the publishing boundary described above — build and publish, and it will appear.
 
@@ -881,11 +1122,21 @@ form, that is the publishing boundary described above — build and publish, and
 | Settings that portals had already saved are suddenly empty | the TypeScript property was renamed without keeping the same `ComponentProperty` name |
 | `portals-ui-component.json` or `portals-page-template.json` is out of date | `npm run watch` does not run the resource builder — run `npm run build:resources` |
 | Your local change does not show up in the portal | the dev server mapping is missing or points at the wrong bundle path, the dev server was not restarted after the mapping was added, or the browser cache is on |
+| Your local change does not show up **and the dev server log stays empty** | the portal never asked for your local build: *Basic settings > Development mode* is off for that portal, or the logged-in user has not been cleared as a developer by Smint.io — anonymous visitors never are |
 | A setting you added is not in the configuration form, or your new component is not offered in the editor | the component has not been published since you changed its annotations — the configuration form lives on the Smint.io server, not in your bundle |
 | Publishing fails right away | the `version` in `package.json` was not increased, or `SMINT_IO_SDK_HOME` is not set |
+| `npm publish` succeeded but the component was not registered | publishing is two steps and they fail independently. **Do not raise the version and publish again** — that version is already on the feed. Rerun only the registration: `npm info --json \| %SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env <environment>` |
+| Registration fails with a permissions error seconds after a successful `npm publish` | the feed may not have made the new version visible yet. Retry the registration step once before treating it as a permissions problem |
+| Every link in your list highlights after you follow one of them | they all resolve to the same route and differ only in the query — add `exact` to the link, see [Many links to the same search page](#many-links-to-the-same-search-page-use-exact) |
+| A filtered search link opens the search page but finds nothing | check the filter *value*, not your code: compare the value your link sends with the values the search page offers in its own facet list for that field |
 | Your component does not appear in the page editor of the portal you expected | it was published against a different `SmintIo.ApiUrl` — the tenant comes from the CLI's `appsettings.<Env>.json`, not from the component |
 | Unexpected rollup or babel errors when building | the wrong node version — see the build chapter above |
 | Two identical `CSS class` fields in the configuration form | `SCssProps` and `SHtmlProps` were mixed in together; use only one of them |
+| Your component renders **nothing at all**, with no error in the console | it decided to render nothing. A link that could not be built, a lookup that returned empty, a guard that skipped every item — log the reason at the point where your component gives up, then read the console |
+| A link built from a page reference goes nowhere | a page reference resolves to a *named* route with no `path`; use `this.$router.resolve(location).href` when you need a URL string, see [A page reference resolves to a named route](#a-page-reference-resolves-to-a-named-route-so-it-has-no-path) |
+| `TS2610: ... is defined as an accessor ... but is overridden here as an instance property` | you extended another component and re-declared one of its members. The base ships its own type definitions — use the member, do not declare it again |
+| `E404 ... is not in the npm registry` followed by `info: Missing component name` | the registration step read the wrong registry: your component folder has no `.npmrc`. Add it, then rerun only the registration |
+| A page shows your latest change although you never published | that is the dev server serving your working folder. It says nothing about what is registered — read the version out of the component's script URL |
 
 ## Extras for Smint.io Certified partners
 
