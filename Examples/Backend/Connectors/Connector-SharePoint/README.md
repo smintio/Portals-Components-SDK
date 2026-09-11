@@ -1,7 +1,7 @@
 How-to implement the `Connector`
 ================================
 
-Current version of this document is: 1.0.1 (as of 23rd of January, 2024)
+Current version of this document is: 1.0.2 (as of 11th of September, 2026)
 
 ## SharePoint `Connector` Basics
 
@@ -106,13 +106,14 @@ var postResponse = await restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenRe
 
 ## The connector meta-model
 
-Generally speaking the meta-model describes what types of *objects* exist in the external system and what properties they have. In other words: the meta-model describes the _data_ that is delivered by Sharepoint. 
+This section is a **worked example**: how the meta-model concepts apply to one real system. The reference — data types,
+entity and property members, enum entities, indexing, semantic types, form groups, the lifecycle — is
+[the connector meta-model](../../docs/smintio-connector-metamodel.md).
 
-This meta-model is then used throughout Smint.io Portals to interpret the external metadata delivered by the external system (e.g. also custom metadata).
-
-Each type of object is represented by one `EntityModel`. Sharepoint is rather simple in that regard, because it only has one type of object which is the `File` (similar to a desktop file system). As a resulting
-there is only one `EntityModel`. Columns (i.e. custom fields) affect all files equally. For example, if we were to add a custom choice field "Mood", that indicates the mood prevalent in an image, it would also be 
-possible for `*.docx` file to have a "Mood" field. 
+Each type of object in the external system is represented by one `EntityModel`. Sharepoint is rather simple in that
+regard, because it only has one type of object, the `File` (similar to a desktop file system), so there is only one
+`EntityModel`. Columns (i.e. custom fields) affect all files equally: if we were to add a custom choice field "Mood",
+indicating the mood prevalent in an image, it would also be possible for a `*.docx` file to have a "Mood" field.
 
 ###  Meta-model structure
 
@@ -165,7 +166,7 @@ spf.AddProperty("Owner", DataType.DataObject, userEntityModel.Key, ...);
 ```
 By passing `userEntityModel.Key` as third parameter we specify that the model for `"Owner"` is defined in another entity model, namely `userEntityModel`.  
 
-Similarily to the `MetamodelMessages` examples from [Connector description & flow](#user-content-connector-description--flow)
+Similarily to the `MetamodelMessages` examples from [Connector description & flow](../../README.md#user-content-connector-description--flow)
 
 `EntityModel`, `EnumEntityModel` and their properties support resource localized translations by using `ResourceLocalizedStringsModel` instance instead of `LocalizedStringsModel`.
 

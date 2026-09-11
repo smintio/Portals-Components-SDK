@@ -5,8 +5,9 @@ The Portals-DevServer
 1. [Download](#download)
 1. [App settings](#app-settings)
 1. [Usage](#usage)
+1. [When nothing is served](#user-content-when-nothing-is-served)
 
-Current version of this document is: 1.0.0 (as of 30th of November, 2022)
+Current version of this document is: 1.1.0 (as of 11th of September, 2026)
 
 ## Description
 
@@ -23,6 +24,16 @@ to refresh the browser (*do not forget to turn off the browser cache!*) for the 
 For this to work, *the portal you are using to test your frontend components needs to be configured* to look up frontend components
 from the dev server before loading them from our CDN. We can do that for you. Please get in touch with [support@smint.io](mailto:support@smint.io)
 to start the process.
+
+**Two conditions have to be met on the portal side before any request reaches your dev server**, and neither of them is
+visible from the dev server itself:
+
+1. the portal must have *development mode* switched on in its basic settings, and
+2. the user looking at the portal must be signed in as a user that Smint.io has cleared for component development.
+
+The second one is easy to overlook: the clearance sits on the signed-in portal user, so an anonymous visitor never
+qualifies, however correct everything else is. With either condition unmet, the portal renders normally, loads the
+published component from the CDN, and your dev server sits there with an empty log.
 
 *Please note, that this only works for frontend component JavaScript changes!* If you want to change the *configuration options* of
 your frontend component, you need to build, package and publish the frontend component to the Smint.io servers for the change to take
@@ -61,7 +72,23 @@ When a change is made to the `appsettings.json` file and the dev server is runni
 
 The DevServer tool can be started by executing the binary for the target operating system.
 
-During initialization the server with list all known frontend component configuration mappings.
+During initialization the server will list all known frontend component configuration mappings.
+
+## When nothing is served
+
+If the portal shows the published version of your component and the dev server log stays empty, work through this order —
+it is almost always one of the first two:
+
+| Check | How it looks |
+|---|---|
+| Is *development mode* on for this portal, and are you signed in as a developer-cleared user? | The dev server log is completely empty — not a single request arrives |
+| Did you restart the dev server after editing `appsettings.json`? | The mapping you just added is missing from the list printed at startup |
+| Is the component on this page at all? | The browser's network tab shows a different component bundle being fetched — the page is not using yours |
+| Is the browser cache off? | The same old bundle is served repeatedly although the file on disk has changed |
+| Did you build at least once? | The mapped directory holds no build output to serve |
+
+The component bundle's URL carries the *registered* version number, so the browser's network tab is also the quickest way
+to confirm which version a portal has registered — worth checking after a publish.
 
 Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) for any questions regarding the dev server.
 

@@ -331,11 +331,20 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets
         }
 
         /// <summary>
-        /// A Smint.Io hook that queries an external system for asset-related permissions
+        /// Tells Smint.Io which of the read features this data adapter supports.
+        /// Always answer this truthfully: reporting a feature the external system cannot really
+        /// provide produces a control in the portal that misbehaves under the user's hands.
+        /// Hello World serves artificial in-memory data and has no bulk read optimization, so it
+        /// reports no fast get assets support.
         /// </summary>
-        public override Task<GetAssetsPermissionsResult> GetAssetsPermissionsAsync(GetAssetsPermissionsParameters parameters)
+        public override Task<GetAssetsReadFeatureSupportResult> GetAssetsReadFeatureSupportAsync(GetAssetsReadFeatureSupportParameters parameters)
         {
-            return Task.FromResult<GetAssetsPermissionsResult>(null);
+            var featureSupport = new GetAssetsReadFeatureSupportResult
+            {
+                IsFastGetAssetsSupported = false
+            };
+
+            return Task.FromResult(featureSupport);
         }
 
         public override Task<FolderDownloadStreamModel> GetFolderThumbnailDownloadStreamAsync(FolderIdentifier assetId, FolderThumbnailSize size, string thumbnailSpec)

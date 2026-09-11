@@ -24,7 +24,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Frontend reference: services, filters, property mixins, providers, CSS](docs/smintio-frontend-reference.md)
 1. [Data adapter reference: every public API interface and model](docs/smintio-data-adapter-reference.md)
 1. [Page type contracts: what a page hands to the components it hosts](docs/smintio-page-type-contracts.md)
-1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
+1. [How to develop your own custom component](#user-content-how-to-develop-your-own-frontend-component)
 1. [Before you start: the questions to answer](#user-content-before-you-start-the-questions-to-answer)
 1. [Crafting a page template instead](#user-content-crafting-a-page-template-instead)
 1. [Building a section component](#user-content-building-a-section-component)
@@ -176,7 +176,7 @@ can consume the page templates. You can locally develop Smint.io Portals page te
 production system by running our very simple *Smint.io Portals dev server*.
 
 The differences of a page template to a UI component are small and are described under
-[How develop your own frontend component](#user-content-how-develop-your-own-frontend-component) below.
+[How to develop your own frontend component](#user-content-how-to-develop-your-own-frontend-component) below.
 
 ## Portal templates
 
@@ -266,7 +266,7 @@ in your Smint.io Portals UI component.
 
 Learn more about how to do that [here](https://github.com/smintio/Portals-Components-SDK/tree/main/Examples/Backend#custom-public-api-interfaces).
 
-## How develop your own frontend component
+## How to develop your own frontend component
 
 ### Before you start: the questions to answer
 
@@ -433,6 +433,8 @@ The full list of supported Smint.io Portals annotations can be found [here](docs
 
 `ILocalizedStringsModel` is a custom object type defined by Smint.io that can return the correct text value of a component according to the selected language by the user.
 
+By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
+
 #### Is your component an existing one plus something? Extend it, do not copy it
 
 Starting from the closest existing component is good advice, and it splits into two very different moves.
@@ -478,12 +480,19 @@ Five things worth knowing before you do it:
 
 #### Do not hand write settings the shared props mixins already give you
 
-Text, link, colour, image, effect and layout settings are not yours to invent. `@smintio/portals-components`
-ships them as `S...Props` mixins — `STextsProps`, `SBackgroundProps`, `SImageProps`, `SEffectsProps`,
-`SBottomGapProps` and others — and mixing one in gives your component the same settings, the same wording and
-the same form group as every Smint.io component. A portal editor then finds your component's settings exactly
-where they expect them. Declaring your own equivalents produces a component that looks subtly foreign in the
-editor, and the property names you pin are permanent.
+Text, link, colour and layout settings are not yours to invent. `@smintio/portals-components`
+ships them as `S...Props` mixins — `STextProps`, `SLinkButtonProps`, `SUiComponentColorsProps`,
+`SBottomGapProps`, `SHtmlProps` and others — and mixing one in gives your component the same settings, the same
+wording and the same form group as every Smint.io component. A portal editor then finds your component's
+settings exactly where they expect them. Declaring your own equivalents produces a component that looks subtly
+foreign in the editor, and the property names you pin are permanent.
+
+**Not every `S...Props` mixin carries properties.** Roughly half of them — `STextsProps` (plural),
+`SBackgroundProps`, `SImageProps`, `SEffectsProps`, `SLinkProps` and the rest of that group — declare *only a
+form group*, so that several components can put their own properties into one consistently named tab. Mixing
+one of those in and expecting settings to appear gives you an empty tab. The
+[frontend reference](docs/smintio-frontend-reference.md) splits the two lists; check which kind you are reaching
+for before you mix it in.
 
 **Include the layout ones even when your component does not read them.** `SBottomGapProps` is the one most
 easily forgotten: it declares a single `bottomGap` property — the editor's *Gap bottom* — and your template
@@ -493,7 +502,7 @@ test in your own markup; mixing the class in *is* the entire implementation:
 
 ```javascript
 export default class PortalsUiComponentImplementation extends Mixins(
-    STextsProps,
+    STextProps,
     SBottomGapProps
 ) {
 ```
@@ -742,9 +751,7 @@ list takes on the active styling at once — which reads as a rendering bug. `ex
 comparison include the query, so only the link you actually followed is active. It looks like a
 prop you could drop; it is not, so leave a comment next to it.
 
-By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
-
-# Crafting a page template instead
+## Crafting a page template instead
 
 A page template is the same kind of npm package, built with the same SDK. Start from the same
 `ui-example-hello-world-1` directory and change the following:
@@ -785,7 +792,19 @@ public headerSlot: IUIComponentInfo[] = [];
 public contentSlot: IUIComponentInfo[] = [];
 ```
 
-and renders them with the slot components from `@smintio/portals-components`:
+and renders them with the slot components from `@smintio/portals-components`. **Those components have to be
+registered before you can use their tags**, and the easiest way is to mix in `SPageMixin`, which registers
+`SHeaderSlot`, `SFooterSlot`, `SGenericSlot` and `SGenericMultiSlot` for you (and brings `SCssProps` along):
+
+```javascript
+import { SPageMixin } from "@smintio/portals-components";
+
+export default class PortalsPage extends Mixins(SPageMixin) {
+```
+
+`SSideSlot`, `SSideMenuSlot` and `SBannerSlot` are *not* covered by it — import those and list them under
+`components` in your `@PortalsPageTemplateComponent` metadata when you use them. Without the registration the
+tag renders nothing and Vue warns about an unknown custom element.
 
 ```vue
 <s-header-slot :ui-slot="headerSlot" />
@@ -819,7 +838,7 @@ To hand data and event handlers to the components in a slot, use `ui-slot-data`,
 
 This is how a page fulfils the contract that the UI components of its page type expect.
 
-# Building a section component
+## Building a section component
 
 A *section* is the one sanctioned way for a UI component to wrap other UI components. The
 portal editor adds your *section start* component, then any number of components, and finally
@@ -1044,8 +1063,11 @@ the portal is actually registered against, read it out of the request that loads
 — the version is part of the URL:
 
 ```
-https://<dev server host>:8443/components/js/js/uic-<type>-<key>-1.2.3.js
+https://development-host.smint.io:8443/components/js/js/uic-<type>-<key>-1.2.3.js
 ```
+
+(The doubled `js/js/` is not a typo — the portal appends `js/` to a base path that already ends
+in one.)
 
 That same request answers a question that otherwise costs a lot of guessing: if it is not there
 at all, your component is not on the page you are looking at — check the page rather than the
@@ -1092,7 +1114,9 @@ these two switches, and changing the mapping will not help.
    the dev server reads `appsettings.json` when it starts, so restart it after you add a mapping.
 
 1. Start the dev server — `SmintIo.Portals.DevServer.exe` on Windows, `dotnet Portals-DevServer.dll` on Mac or Linux.
-   It listens on `https://development-host.smint.io:8000` and logs every request it serves
+   It listens on `development-host.smint.io`, HTTPS on port **8443** and HTTP on port 8000, and logs every
+   request it serves. The portal always asks for the HTTPS one, so 8443 is the port that matters — note that
+   the dev server's own startup banner prints `https://…:8000`, which is wrong and can be ignored
 1. Build and publish your component once, so that Smint.io knows it and the portal editor can offer it
 1. Run `npm run watch` for continuous building of your frontend component
 1. Turn off your browser's cache
@@ -1145,11 +1169,11 @@ as a reference for you to solve your requirements. In this case, we recommend yo
 
 1. Check out the `page-templates` directory to find the implementations of our page templates
 
-	- Here you can find a list of our page template components (not up-to-date, but helpful): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-page-templates.md
+	- Here you can find a list of our page template components (generated from our source, and kept current): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-page-templates.md
 	
 2. Check out the `ui-components` directory to find the implementations of our UI components
 
-	- Here you can find a list of our UI components (not up-to-date, but helpful): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-ui-components.md
+	- Here you can find a list of our UI components (generated from our source, and kept current): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-ui-components.md
 	
 3. Check out the `portals-components` directory to find the implementation of our shared component library
 4. Please do not forget to pull this repository regularily, as we constantly update our codebase
@@ -1164,5 +1188,4 @@ Contributors
 ============
 
 - Reinhard Holzner, Smint.io GmbH
-- Yanko Belov, Smint.io GmbH
 - Yosif Velev, Smint.io GmbH

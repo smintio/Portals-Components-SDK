@@ -32,7 +32,7 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
 
         protected IDictionary<string, HelloWorldCustomFieldResponse> CustomFieldById { get; }
 
-        protected override string GetStringDataType(string propertyKey, object value, string semanticHint)
+        protected override string GetStringDataType(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
@@ -43,10 +43,10 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 return stringValue;
             }
 
-            return base.GetStringDataType(propertyKey, value, semanticHint);
+            return base.GetStringDataType(propertyKey, value, semanticType, semanticHint);
         }
 
-        protected override string[] GetStringArrayDataType(string propertyKey, object value, string semanticHint)
+        protected override string[] GetStringArrayDataType(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
@@ -57,10 +57,10 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 return stringArrayValue;
             }
 
-            return base.GetStringArrayDataType(propertyKey, value, semanticHint);
+            return base.GetStringArrayDataType(propertyKey, value, semanticType, semanticHint);
         }
 
-        protected override LocalizedStringsModel GetLocalizedStringsModelDataType(string propertyKey, object value, string semanticHint)
+        protected override LocalizedStringsModel GetLocalizedStringsModelDataType(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: true);
 
@@ -76,10 +76,10 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 }
             }
 
-            return base.GetLocalizedStringsModelDataType(propertyKey, value, semanticHint);
+            return base.GetLocalizedStringsModelDataType(propertyKey, value, semanticType, semanticHint);
         }
 
-        protected override LocalizedStringsArrayModel GetLocalizedStringsArrayModelDataType(string propertyKey, object value, string semanticHint)
+        protected override LocalizedStringsArrayModel GetLocalizedStringsArrayModelDataType(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
@@ -95,10 +95,10 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 }
             }
 
-            return base.GetLocalizedStringsArrayModelDataType(propertyKey, value, semanticHint);
+            return base.GetLocalizedStringsArrayModelDataType(propertyKey, value, semanticType, semanticHint);
         }
 
-        protected override DateTimeOffset? GetDateTimeDataType(string propertyKey, object value, string semanticHint)
+        protected override DateTimeOffset? GetDateTimeDataType(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
@@ -109,10 +109,10 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 return dateTimeValue;
             }
 
-            return base.GetDateTimeDataType(propertyKey, value, semanticHint);
+            return base.GetDateTimeDataType(propertyKey, value, semanticType, semanticHint);
         }
 
-        protected override decimal? GetDecimalDataType(string propertyKey, object value, string semanticHint)
+        protected override decimal? GetDecimalDataType(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
@@ -123,10 +123,10 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 return decimalValue;
             }
 
-            return base.GetDecimalDataType(propertyKey, value, semanticHint);
+            return base.GetDecimalDataType(propertyKey, value, semanticType, semanticHint);
         }
 
-        protected override IDictionary<string, object> GetEnumObject(string propertyKey, object value, string semanticHint)
+        protected override IDictionary<string, object> GetEnumObject(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             var customFieldValue = GetTypedValue<HelloWorldCustomFieldValueResponse>(propertyKey, value, logWarning: false);
 
@@ -148,17 +148,17 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
                 }
             }
 
-            var baseEnumObject = base.GetEnumObject(propertyKey, value, semanticHint);
+            var baseEnumObject = base.GetEnumObject(propertyKey, value, semanticType, semanticHint);
 
             return baseEnumObject;
         }
 
-        protected override IDictionary<string, object> GetObject(string propertyKey, object value, string semanticHint)
+        protected override IDictionary<string, object> GetObject(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             throw new NotImplementedException();
         }
 
-        protected override IDictionary<string, object>[] GetObjects(string propertyKey, object value, string semanticHint)
+        protected override IDictionary<string, object>[] GetObjects(string propertyKey, object value, SemanticType? semanticType, string semanticHint)
         {
             throw new NotImplementedException();
         }

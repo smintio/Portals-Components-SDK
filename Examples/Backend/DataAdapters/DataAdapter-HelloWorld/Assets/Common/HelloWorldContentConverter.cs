@@ -210,9 +210,9 @@ namespace SmintIo.Portals.DataAdapter.HelloWorld.Assets.Common
             objectsByKey[HelloWorldMetamodelBuilder.ContentTypeId] = helloWorldAssetResponse.ContentType switch
             {
                 HelloWorldContentType.Image => ContentTypeEnumDataObject.Image.ListDisplayName,
-                HelloWorldContentType.Video => ContentTypeEnumDataObject.Image.ListDisplayName,
-                HelloWorldContentType.Audio => ContentTypeEnumDataObject.Image.ListDisplayName,
-                HelloWorldContentType.Document => ContentTypeEnumDataObject.Image.ListDisplayName,
+                HelloWorldContentType.Video => ContentTypeEnumDataObject.Video.ListDisplayName,
+                HelloWorldContentType.Audio => ContentTypeEnumDataObject.Audio.ListDisplayName,
+                HelloWorldContentType.Document => ContentTypeEnumDataObject.Document.ListDisplayName,
                 _ => ContentTypeEnumDataObject.Other.ListDisplayName
             };
 

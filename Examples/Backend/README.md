@@ -1,11 +1,11 @@
 Developing Smint.io Portals backend components
 ==============================================
 
-Current version of this document is: 1.0.1 (as of 23rd of January, 2024)
+Current version of this document is: 2.3.0 (as of 11th of September, 2026)
 
-This repository contains examples for Smint.io Portals backend components, which is connectors, data adapters, task handlers, portal templates and identity providers.
+This repository contains examples for Smint.io Portals backend components, which is connectors, data adapters, data processors, task handlers, portal templates and identity providers.
 
-Documentation on portal templates, task handlers and identity providers will follow. Please get in touch if you want to leverage that functionality.
+Documentation on data processors, portal templates, task handlers and identity providers will follow. Please get in touch if you want to leverage that functionality.
 
 Please note that at any time you can build your own connector or data adapter components based
 on our *Smint.io Portals SDKs*. Access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io)
@@ -18,9 +18,9 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Connector description & flow](#user-content-connector-description--flow)
 1. [Data adapter public API interfaces](#user-content-data-adapter-public-api-interfaces)
 1. [Custom public API interfaces](#user-content-custom-public-api-interfaces)
+1. [The connector meta-model: describing the external system's schema](docs/smintio-connector-metamodel.md)
+1. [The asset data model: what a data adapter returns](docs/smintio-asset-data-model.md)
 1. [Overview of Smint.io annotations](../Frontend/docs/smintio-annotations.md)
-
-Current version of this document is: 2.2.2 (as of 8th of March, 2023)
 
 ## Examples
 
@@ -287,14 +287,32 @@ Generally speaking the meta-model describes what types of *objects* exist in the
 
 This meta-model is then used throughout Smint.io Portals to interpret the external metadata delivered by the external provider (e.g. also custom metadata).
 
-Each type of object is represented by one `EntityModel`. 
-As a resulting there is only one `EntityModel`. Columns (i.e. custom fields) affect all files equally. For example, if we were to add a custom choice field "Mood", that indicates the mood prevalent in an image, it would also be possible for `*.docx` file to have a "Mood" field. 
+Each type of object in the external system is represented by one `EntityModel`, and each of its fields by one
+`PropertyModel` on that entity. How many entities you end up with depends entirely on the system you are integrating: a
+simple file store may need only one, while a system that distinguishes images, videos and products will have one per
+type. Entities and their properties are fully translatable.
 
-The `EntityModel` acts as a schema definition that allows the user interface to know in what format the data will came from the data adapter. 
+You build one in an `IMetamodelBuilder` and return it from `GetConnectorMetamodelAsync`, as `HelloWorldMetamodelBuilder`
+does.
 
-- [Example](Connectors/Connector-SharePoint/README.md#meta-model-structure)
+Four things about it are worth knowing before you start, because each of them produces a portal that renders nothing
+rather than an error message:
 
-Naturally EntityModel is completely translatable, as are its properties.
+- **The meta-model is a filter, not just a description.** A value whose property was never declared is dropped on
+  conversion. If a field does not appear in the portal, check the declaration before you debug the conversion.
+- **It is a snapshot, taken when the connector configuration is set up** — not per request. A schema change in the
+  external system does not appear until the configuration is set up again.
+- **Your entity keys are rewritten** to be unique per connector configuration, so the same connector configured twice
+  yields two different key sets. Never hard-code an entity key.
+- **Every entity automatically gets three properties**, an id and a list and a detail display name.
+
+**The full reference is [the connector meta-model](docs/smintio-connector-metamodel.md)**: the data types, the
+`EntityModel` and `PropertyModel` members, entity types and inheritance, enum entities, full-text indexing, semantic
+types, form groups, translation, the converter that applies the meta-model to a source payload, and the lifecycle in
+detail.
+
+For a worked example against a real system, read the
+[SharePoint meta-model walkthrough](Connectors/Connector-SharePoint/README.md#meta-model-structure).
 
 ## Data adapter public API interfaces
 

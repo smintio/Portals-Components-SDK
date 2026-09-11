@@ -85,7 +85,7 @@ namespace SmintIo.Portals.Connector.HelloWorld.Metamodel
                 .ForEach(formGroupDefinitionModel =>
                 {
                     var formItemModels = formGroupDefinitionModel.FormItemDefinitions
-                        .Select(formItemDefinition => new FormItemModel(formItemDefinition.Id, formItemDefinition.Name))
+                        .Select(formItemDefinition => new FormItemModel(formItemDefinition.Id, formItemDefinition.Name, formItemDefinition.DataType))
                         .ToList();
 
                     _metamodel.AddFormGroup(formGroupDefinitionModel.Id, formGroupDefinitionModel.Name, formItemModels);

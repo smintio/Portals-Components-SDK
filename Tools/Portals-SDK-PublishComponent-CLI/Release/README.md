@@ -19,7 +19,7 @@ Get in touch with [Smint.io](https://www.smint.io) or [support@smint.io](mailto:
 Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals.
 Enterprise plan customers.
 
-Current version of this document is: 1.0.1 (as of 12th of January, 2024)
+Current version of this document is: 1.1.0 (as of 11th of September, 2026)
 
 ## Download
 
@@ -110,9 +110,35 @@ In the component folder, issue a single command to push your component to a npm 
 npm run smint-io-pc:development
 ```
 
-*Please note that the NPM repository needs to be publicly available, so that Smint.io can retrieve your component.*
+*Please note that Smint.io must be able to retrieve your component from the npm repository you publish it to. A public
+registry needs no further setup; for a private feed, the `AuthorizationHeader` setting described above is what lets the
+tool authenticate against it.*
 
 *Please note that the examples target a Windows environment. For Linux, the correct environment variable syntax must be used.*
+
+#### The two halves fail independently
+
+That one command is two steps: `npm publish` pushes the package to the registry, and the CLI then registers it with
+Smint.io. They can fail separately, and the recovery is not the same.
+
+**If `npm publish` succeeded and the registration failed, do not run the whole command again.** The version number has
+already been consumed in the registry, and republishing it will fail on the version alone. Rerun only the second half:
+
+```console
+npm info --json | %SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development
+```
+
+Two failures worth recognising:
+
+- *No permissions to publish the component*, immediately after a successful `npm publish`, can simply mean the registry
+  has not made the new version visible yet. Give the identical command one retry before treating it as a permissions
+  problem.
+- *Missing component name*, or an `E404` reporting that your package is not in the npm registry, usually means the
+  package folder has no `.npmrc`. The registration step runs `npm info`, which resolves the registry from the folder it
+  runs in — not from `publishConfig` in `package.json`. Without an `.npmrc` pointing at the right registry, `npm info`
+  asks the public registry, finds nothing, and the CLI stops with nothing to register — while `npm publish` has already
+  succeeded. The `ui-example-hello-world-1` starter ships an `.npmrc` for exactly this reason; copy it when you scaffold
+  a new component. It holds no credentials — those belong in your user-level `.npmrc`.
 
 ### Backend components
 
