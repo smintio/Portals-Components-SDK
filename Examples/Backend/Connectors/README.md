@@ -1,7 +1,7 @@
 How-to implement the `Connector`
 ================================
 
-Current version of this document is: 1.0.0 (as of 8th of March, 2023)
+Current version of this document is: 1.1.0 (as of 11th of September, 2026)
 
 ## `Connector` Basics
 
@@ -24,10 +24,10 @@ system. While a text document has a `ModifiedDate`, a `Creator` and so on, an im
 Regarding authorization a connector class can inherit from one the prefabricated flows that we support `OAuth2AuthenticationCodeFlowWithPKCEConnector` and `OAuth2Connector`.
 An alternative to that would be to implement `IConnector`. This is in case the external system is using another flow or custom authorization.
 
-For `OAuth2AuthenticationCodeFlowWithPKCEConnector` examples see [here](Connectors/Connector-Picturepark/PictureparkConnector.cs) and [here](Connectors/Connector-SharePoint/SharepointConnector.cs).
-A more detailed description of the OAuth2 authentication code flow with PKCE (pixy) can be found [here](Connectors/Connector-SharePoint/README.md#authentication-process).
+For `OAuth2AuthenticationCodeFlowWithPKCEConnector` examples see [here](Connector-Picturepark/PictureparkConnector.cs) and [here](Connector-SharePoint/SharepointConnector.cs).
+A more detailed description of the OAuth2 authentication code flow with PKCE (pixy) can be found [here](Connector-SharePoint/README.md#authentication-process).
 
-For custom `IConnector` implementation click [here](Connectors/Connector-HelloWorld/HelloWorldConnector.cs).
+For custom `IConnector` implementation click [here](Connector-HelloWorld/HelloWorldConnector.cs).
 
 ## The connector meta-model
 
@@ -35,7 +35,7 @@ Generally speaking the meta-model describes what types of *objects* exist in the
 
 This meta-model is then used throughout Smint.io Portals to interpret the external metadata delivered by the external system (e.g. also custom metadata).
 
-A more detailed explanation of the connector meta-model is available [here](Connectors/Connector-SharePoint/README.md#meta-model-structure)
+A more detailed explanation of the connector meta-model is available [here](Connector-SharePoint/README.md#meta-model-structure)
 
 Contributors
 ============

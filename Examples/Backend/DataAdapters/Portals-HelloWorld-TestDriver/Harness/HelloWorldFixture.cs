@@ -14,7 +14,7 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.HelloWorld.Test.Harness
     /// <summary>
     /// Setup of the HelloWorld fixture harness
     /// </summary>
-    public class HelloWorldFixture : BaseDataAdapterFixture<OAuthOptions, HelloWorldConnector>
+    public class HelloWorldFixture : BaseDataAdapterFixture<OAuthOptions, HelloWorldConnector, HelloWorldAssetsDataAdapterConfiguration, HelloWorldAssetsDataAdapter>
     {
         protected override void BindSections(IConfiguration configuration)
         {
@@ -62,6 +62,8 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.HelloWorld.Test.Harness
             {
                 MultiSelectItemCount = 15
             };
+
+            DataAdapterConfiguration = config;
 
             var dataAdapterTestDriver = new DataAdapterTestDriver(Connector, Metamodel);
 

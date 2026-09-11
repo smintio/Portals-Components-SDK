@@ -1,7 +1,7 @@
 How-to implement the `DataAdapter`
 ==================================
  
-Current version of this document is: 1.0.1 (as of 8th of March, 2023)
+Current version of this document is: 1.1.0 (as of 11th of September, 2026)
 
 ## `DataAdapter` basics
 
@@ -17,13 +17,19 @@ public override void ConfigureServicesForDataAdapter(ServiceCollection services)
 this enables the `DataAdapter` to inject the `ISharepointClient`, which is a wrapper around the Microsoft Graph API.
 
 ## Compartmentalized features
-There are several interfaces, each of which provides the front end with a set of method calls. In most cases you'll ned `IAssetsRead`, `IAssetsSearch` and `IAssetsInternalApiProvider`.
+There are several interfaces, each of which provides the front end with a set of method calls. In most cases you'll need `IAssetsRead` and `IAssetsSearch`.
 
 Even though using `partial` classes is not required to separate the different implementations, it is a good way to structure your implementation. You could then have one `partial class`
 for every interface and separate the implementation concerns accordingly.
 
-Note: some of the interfaces have overlapping signatures, for example both the `IAssetsRead` and `IAssetsInternalProvider` both define the `GetAssetsDownloadItemMappingsAsync` method, 
-and of course it only needs to be implemented once. It is, however, still advisable to declare all interfaces in the `DataAdapter`'s signature due to Reflection reasons.
+Note that these interfaces inherit from one another, so implementing one brings in the methods of another: `IAssetsSearch`
+extends `IAssetsRead`, which in turn extends `IAssetsInternalApiProvider` — the interface that declares
+`GetAssetsDownloadItemMappingsAsync`. A method that arrives by more than one route is of course only implemented once.
+It is, however, still advisable to declare every interface you support in the `DataAdapter`'s signature, because the
+component framework discovers them by reflection.
+
+Which methods you have to fill, what the objects you return have to look like, and which of them you may leave out, is
+described in [the asset data model](../docs/smintio-asset-data-model.md).
 
 Smint.io offers two different integration modes. Based on the functionality supported by the external system.
 

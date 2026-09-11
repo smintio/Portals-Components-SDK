@@ -7,6 +7,7 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets.Models;
 using SmintIo.Portals.DataAdapterSDK.TestDriver.Harness;
 using SmintIo.Portals.DataAdapterSDK.TestDriver.Models;
 using SmintIo.Portals.DataAdapterSDK.TestDriver.Tests;
+using SmintIo.Portals.SDK.Core.Components;
 using SmintIo.Portals.SDK.Core.Models.Metamodel.Data;
 using Xunit;
 
@@ -48,6 +49,8 @@ namespace SmintIo.Portals.ConnectorSDK.TestDriver.HelloWorld.Test.Integration
         protected override AssetIdentifier ValidButNotFoundAssetIdentifier => new(_fixture.AssetOptions.ValidButNotFoundAssetIdentifier);
 
         protected override ConnectorMetamodel GetConnectorMetamodel() => _fixture.Metamodel;
+
+        protected override IComponentConfiguration GetDataAdapterComponentConfiguration() => _fixture.DataAdapterConfiguration;
 
         protected override AssetsDataAdapterBaseImpl GetDataAdapter(Type componentImplementation) => _fixture.DataAdapter;
 
