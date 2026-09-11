@@ -79,26 +79,118 @@ on `productMetadata`.
 
 ## Binaries: thumbnails, playback and previews
 
-Smint.io never proxies asset bytes through the portal API. What an asset carries are URLs, plus a
-flag per rendition saying whether that rendition exists:
+**You do not produce the rendition URLs. You declare which renditions exist, and Smint.io calls you
+back for the bytes.**
 
-| Renditions | Availability flag |
-|---|---|
-| `largeThumbnailUrl`, `mediumThumbnailUrl`, `smallThumbnailUrl`, `previewThumbnailUrl` | `isThumbnailLargeAvailable`, `isThumbnailMediumAvailable`, `isThumbnailSmallAvailable`, `isThumbnailPreviewAvailable` |
-| `playbackLargeUrl`, `playbackSmallUrl`, `playbackStreamingUrl` | `isPlaybackLargeAvailable`, `isPlaybackSmallAvailable`, `isPlaybackStreamingAvailable`, plus `playbackStreamingMediaType` |
-| `pdfPreviewUrl` | `isPdfPreviewAvailable` |
+This is the part of the model most often misunderstood, so it is worth being precise about the
+sequence:
 
-`thumbnailAspectRatio` and `thumbnailAlignment` tell the frontend how to lay the thumbnail out
-before it has loaded, which is what keeps a result grid from jumping around. Fill the aspect ratio
-whenever the external system knows it.
+1. Your data adapter sets an **availability flag** for each rendition it can serve —
+   `isThumbnailLargeAvailable`, `isPlaybackSmallAvailable`, `isPdfPreviewAvailable` and so on. It
+   does *not* set `largeThumbnailUrl` and its siblings.
+2. For every flag that is `true`, the Smint.io backend generates a URL pointing at the Smint.io
+   CDN, carrying the asset identifier, the asset `version`, the rendition size, and a spec (below).
+   It writes that URL into the corresponding `*Url` property. A rendition whose flag is not `true`
+   gets no URL at all.
+3. The browser requests that CDN URL, and the request **loops back into your data adapter**:
+   Smint.io calls `GetAssetThumbnailDownloadStreamAsync` on
+   `IAssetsInternalApiProvider` — which `IAssetsRead` already inherits, so every data adapter that
+   can read assets has it — handing you the asset identifier, the content type, the requested
+   `AssetThumbnailSize`, the spec, and a maximum file size. You return the stream.
 
-The availability flags are what the frontend actually tests. A URL without its flag is treated as
-not available.
+So a rendition is served by *your* code, on demand, for as long as the portal asks for it. That is
+why the flags matter: a flag set to `true` for a rendition you cannot actually produce becomes a
+broken image in the portal, not a missing one.
 
-Actual downloads are a separate, three-step flow on `IAssetsDownload`: the frontend asks which
-download options exist for a set of assets, the user picks, the data adapter initiates the download
-and returns a URL, and the client follows that URL. The file itself never travels through the
-portal API.
+One method serves every rendition. `AssetThumbnailSize` covers `Preview`, `Large`, `Medium`,
+`Small`, `PlaybackLarge`, `PlaybackSmall`, `PlaybackStreaming`, `PdfPreview` and `Custom` — despite
+the name, playback and PDF previews come through the same call. Switch on `size`.
+
+| Availability flag | Fills | Loop-back arrives as |
+|---|---|---|
+| `isThumbnailLargeAvailable` | `largeThumbnailUrl` | `AssetThumbnailSize.Large` |
+| `isThumbnailMediumAvailable` | `mediumThumbnailUrl` | `Medium` |
+| `isThumbnailSmallAvailable` | `smallThumbnailUrl` | `Small` |
+| `isThumbnailPreviewAvailable` | `previewThumbnailUrl` | `Preview` |
+| `isPlaybackLargeAvailable` | `playbackLargeUrl` | `PlaybackLarge` |
+| `isPlaybackSmallAvailable` | `playbackSmallUrl` | `PlaybackSmall` |
+| `isPlaybackStreamingAvailable` | `playbackStreamingUrl` | `PlaybackStreaming` |
+| `isPdfPreviewAvailable` | `pdfPreviewUrl` | `PdfPreview` |
+
+`playbackStreamingMediaType` goes alongside the streaming flag. `thumbnailAspectRatio` and
+`thumbnailAlignment` tell the frontend how to lay the thumbnail out before it has loaded, which is
+what keeps a result grid from jumping around — fill the aspect ratio whenever the external system
+knows it.
+
+### `InternalMetadata` — the escape hatch
+
+`AssetDataObject.InternalMetadata` (a `DataObjectInternalMetadata`) is **not part of the
+metamodel**: it never reaches the frontend, and it is not a place to put business data. It is where
+you influence the rendition mechanism above. Two of its fields matter most.
+
+**Set a URL there and it is used verbatim.** If `InternalMetadata.LargeThumbnailUrl` is set, the
+backend takes it as-is instead of generating a CDN URL — no loop-back, no call to your data adapter
+for those bytes. Use this when the external system already publishes a directly usable URL, and the
+portal may link straight to it. There is one such field per rendition, named after it
+(`LargeThumbnailUrl`, `PreviewThumbnailUrl`, `PlaybackSmallUrl`, `PdfPreviewUrl`, …).
+
+The availability flag still governs. A URL in `InternalMetadata` with the matching flag unset
+produces nothing at all.
+
+**Set a spec there and you get it back.** `InternalMetadata.LargeThumbnailSpec` and its siblings are
+**opaque to Smint.io**: whatever you put in is carried through the generated URL and handed back to
+`GetAssetThumbnailDownloadStreamAsync` as its `thumbnailSpec` argument. It is the way to remember,
+per asset and per rendition, what your data adapter will need in order to produce that rendition —
+a rendition key from the source system, a format name, a derivative id — without looking it up
+again on every request.
+
+Two constraints on a spec, both of which fail silently:
+
+- It is sanitized before use. It must consist only of word characters, whitespace, and
+  `. @ _ - + = ( ) : / & , ' |`. Anything else and the spec is dropped — your loop-back gets `null`.
+- A spec that is empty, or exactly `-`, means "no spec".
+
+So keep specs short and plain. If you need to carry something structured, keep the structure out of
+the spec — use a short key and resolve it on your side.
+
+The Hello World data adapter shows the whole round trip in about thirty lines. `SetThumbnails` in
+`Assets/Common/HelloWorldContentConverter.cs` sets four availability flags and four specs — the
+pixel widths `2048`, `1024`, `640` and `320` — and no URLs at all:
+
+```C#
+assetDataObject.IsThumbnailPreviewAvailable = true;
+assetDataObject.IsThumbnailLargeAvailable = true;
+// ...
+assetDataObject.InternalMetadata = new DataObjectInternalMetadata
+{
+    PreviewThumbnailSpec = "2048",
+    LargeThumbnailSpec = "1024",
+    // ...
+};
+```
+
+`GetAssetThumbnailDownloadStreamAsync` in `Assets/Read/HelloWorldAssetsRead.cs` is the other half:
+it switches on `assetThumbnailSize` and, for the four thumbnail sizes, passes the spec it gets back
+into the source system's own resizing URL. Read the two together before writing your own.
+
+The remaining fields are for data adapters that feed the Smint.io index rather than serving a live
+connection: a `*ETag` per rendition, which lets the indexer tell whether a rendition has changed and
+needs regenerating, and a `DoNotGenerate*` flag per rendition, which tells it not to generate that
+one at all.
+
+### Downloads are a different path
+
+None of the above is how an asset is *downloaded*. Downloads are a separate, three-step flow on
+`IAssetsDownload`: the frontend asks which download options exist for a set of assets, the user
+picks, the data adapter initiates the download and returns a URL, and the client follows that URL.
+Those bytes never travel through the portal API at all.
+
+### Folders work the same way, with less
+
+`FolderDataObject` carries the same availability flags and gets the same treatment: Smint.io
+generates the URL and calls `GetFolderThumbnailDownloadStreamAsync` for the bytes. But a folder has
+no `InternalMetadata`, so there is no way to supply a URL directly, and the spec it is called with
+is always `null`.
 
 ## Identifiers are scoped for you
 
@@ -190,14 +282,16 @@ An asset with `contentType = composite` is one that **references other assets**,
 A composite **may carry a binary of its own, but usually does not.** The common pattern is that it
 has a `hero_representation` reference, and Smint.io serves *that* asset's binary as the composite's
 own: the availability flags, the streaming media type and the thumbnail aspect ratio are copied
-across from the hero asset, and the composite's thumbnails are generated from it.
+across from the hero asset, and `InternalMetadata.ThumbnailAssetIdentifier` and `ThumbnailContentType`
+are stamped on the composite so that the rendition loop-back is answered for the hero asset instead.
 
 Three things follow:
 
 - A composite with no `hero_representation` group and no thumbnails of its own simply has no
   thumbnail. That is a legitimate design — some product catalogues work this way — but it is also
   exactly what a forgotten hero reference looks like.
-- A composite is free to set its own thumbnail properties directly instead.
+- A composite is free to declare its own availability flags instead and answer the loop-back itself,
+  exactly like any other asset.
 - **Downloading a composite is separate from displaying it.** When a composite is downloaded, it is
   replaced by the assets in its `download` relationship group, and the composite itself drops out of
   the request. A composite with no `download` group is not downloadable, however good its thumbnail.
@@ -312,8 +406,9 @@ Before you consider a data adapter finished, check that:
 
 - [ ] every asset has a `contentType`, even if it is `other`
 - [ ] the matching per-content-type metadata object is filled, and the others are absent
-- [ ] thumbnail and playback URLs are paired with their availability flags, and the aspect ratio is
-      set where it is known
+- [ ] you set the rendition **availability flags**, not the `*Url` properties, and
+      `GetAssetThumbnailDownloadStreamAsync` can actually serve every size you flagged
+- [ ] the thumbnail aspect ratio is set where the external system knows it
 - [ ] you return the external system's own IDs, never a scoped one
 - [ ] both feature-support methods answer truthfully, and unsupported methods throw
       `NotImplementedException`
@@ -321,7 +416,7 @@ Before you consider a data adapter finished, check that:
 - [ ] your configuration implements `IPreserveMetadataDataAdapterConfiguration` if the assets carry
       raw metadata worth searching on
 - [ ] relationships use `relatedAssets` with a type that describes them, and composites either have
-      a `hero_representation` or their own thumbnails
+      a `hero_representation` or declare their own renditions
 - [ ] a composite that should be downloadable has a `download` relationship group
 - [ ] every property you emit in `rawData` is declared in the connector's meta-model — anything else
       is dropped
