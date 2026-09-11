@@ -433,10 +433,27 @@ The full list of supported Smint.io Portals annotations can be found [here](docs
 
 `ILocalizedStringsModel` is a custom object type defined by Smint.io that can return the correct text value of a component according to the selected language by the user.
 
+#### Is your text a resource, or just a text field?
+
+Answer this before anything else, because a resource is the more involved of the two and you
+often do not need one. A property typed `ILocalizedStringsModel` is **not** automatically a
+resource. What makes it one is a provider:
+
+| Your property has | What the portal editor sees | Right when |
+|---|---|---|
+| no `DynamicAllowedValuesProvider` | a plain localized text field they type into | the text is used only by your component — it is local to it |
+| `StringResourceAllowedValuesProvider` or `TextResourceAllowedValuesProvider` | a dropdown of the portal's resources | the text should be **reusable across several components** and maintained in one place |
+
+Both are ordinary `ILocalizedStringsModel` properties and both are fully localized — only the
+provider differs. A heading that belongs to one component instance is a plain field. Wording
+that has to read identically wherever it appears is a resource.
+
+The rest of this section is about the resource case.
+
 #### Shipping your own string resources
 
-A text property can be given a **string resource id** as its default, so the component is not
-blank the moment it is dropped onto a page. The example does this in
+A resource backed text property can be given a **string resource id** as its default, so the
+component is not blank the moment it is dropped onto a page. The example does this in
 [resources/definition.ts](ui-example-hello-world-1/resources/definition.ts), pointing
 `componentText` at the resource id `component_text`:
 
@@ -498,11 +515,17 @@ await uiComponentBuilder.defineResources(async (resourceBuilder) => {
 });
 ```
 
-You can then reference it from the property itself:
+You can then reference it from the property itself. The provider is what makes this a resource
+reference — without it the property is just a text field and the id will not resolve to
+anything the editor can pick:
 
 ```javascript
     @Implements("ILocalizedStringsModel")
     @ComponentProperty({ name: "componentText" })
+    @DynamicAllowedValuesProvider(
+        PortalsGlobalServices.PortalsContext.toString(),
+        "StringResourceAllowedValuesProvider"
+    )
     @DefaultValue("text_hello_world_greeting")
     public readonly componentText!: ILocalizedStringsModel;
 ```
@@ -517,7 +540,21 @@ Things worth knowing before you write one:
 | `name` versus the value | `name` is the label an editor sees when picking a resource from a list. The text itself is the `formFieldValues` entry with `id: "Text"` |
 | id naming | prefix with `text_` and keep it unique to your component, for example `text_<yourcompany>_<what>` |
 | languages | `"x-default"` is the fallback, then one key per further language |
-| `DefaultValue` versus `setFormFieldValues` | `DefaultValue` is the property's default and applies wherever the component is used. `setFormFieldValues` pre-fills the field the moment an editor drops the component onto a page |
+| `DefaultValue` versus `setFormFieldValues` | see the table below — the difference is whether the value is written to the database, and therefore whether you can change it later |
+
+#### Two ways to point a property at a resource, and only one is reversible
+
+`DefaultValue` and `setFormFieldValues` both give a property a resource id to start from, but
+they are not interchangeable:
+
+| | `DefaultValue("<id>")` on the property | `setFormFieldValues` in `resources/definition.ts` |
+|---|---|---|
+| What it is | the property's declared default. **Nothing is written to the database** | a **real database write**, applied when the property is instantiated |
+| Changing it later | **works** — publish a new version with a different id and portals follow it | **does not reach existing instances** — the value is already persisted against each one |
+| Use it for | the normal case | a value that genuinely has to be materialised into the instance's saved configuration |
+
+Prefer `DefaultValue` unless you specifically need the persisted write. A `setFormFieldValues`
+entry is effectively permanent for every component instance created while it was in place.
 
 Adding or changing a resource is an **annotation level change** — see the table under
 [What the dev server covers, and what still needs publishing](#what-the-dev-server-covers-and-what-still-needs-publishing).

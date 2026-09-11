@@ -290,6 +290,15 @@ long form body copy carrying markup, the kind paired with `IsRichText` and rende
 `v-html`. Each is offered to the editor by its own provider, so match the property's provider
 to the kind of resource you ship.
 
+An `ILocalizedStringsModel` property is a resource reference **only** when it carries
+`StringResourceAllowedValuesProvider` or `TextResourceAllowedValuesProvider`. Without one it is
+an ordinary localized text field the editor types into, which is what you want for text used
+only by your own component. Resources are for text that has to be **reusable across
+components**. A property points at one either with `DefaultValue("<id>")` (nothing is written
+to the database, so it can be changed later) or through `setFormFieldValues` in
+`resources/definition.ts` (a real database write at instantiation, which later changes do not
+reach).
+
 ---
 
 ## Global CSS classes

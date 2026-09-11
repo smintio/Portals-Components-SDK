@@ -91,16 +91,21 @@ A property marked `IsRichText` carries *sanitized, validated* HTML. Render it wi
 <p v-html="$options.filters.resolve_localized(continuousText)"></p>
 ```
 
-Such a property is backed by a **text** resource — a rich text — rather than a **string**
-resource, which is a plain text such as a label, a button caption or a heading. Pair it with
-`TextResourceAllowedValuesProvider`, and see
-[Shipping your own string resources](../README.md#shipping-your-own-string-resources).
+If such a property is meant to draw on a **resource**, that resource is a **text** resource — a
+rich text — rather than a **string** resource, which is a plain text such as a label, a button
+caption or a heading. Pair it with `TextResourceAllowedValuesProvider` in that case.
+
+A property only becomes a resource reference through one of those providers. Without one it is
+an ordinary localized text field the editor types into, which is the right choice when the text
+is used solely by your component; resources are for text that has to be reusable across several
+of them. See
+[Is your text a resource, or just a text field?](../README.md#is-your-text-a-resource-or-just-a-text-field)
 
 ## Property annotations — values and validation
 
 | Annotation                         | Description                                                                                                     |
 |------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| `DefaultValue`                     | **Specifies the default value of a form item.** On an `ILocalizedStringsModel` property the value is a string resource id — see [Shipping your own string resources](../README.md#shipping-your-own-string-resources) |
+| `DefaultValue`                     | **Specifies the default value of a form item.** Nothing is written to the database, so it can be changed in a later version — unlike `setFormFieldValues`. On a resource backed `ILocalizedStringsModel` property the value is a resource id — see [Shipping your own string resources](../README.md#shipping-your-own-string-resources) |
 | `InitializationValue`              | **Specifies the value a form item is initialized with**                                                         |
 | `AllowedValues`                    | **Gives multiple allowed values of a form item**                                                                |
 | `AllowedDateTime`                  | **Gives an allowed date time value of a form item**                                                             |
