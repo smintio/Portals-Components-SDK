@@ -1979,5 +1979,4 @@ Contributors
 ============
 
 - Reinhard Holzner, Smint.io GmbH
-- Yanko Belov, Smint.io GmbH
 - Yosif Velev, Smint.io GmbH

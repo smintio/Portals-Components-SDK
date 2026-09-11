@@ -1,8 +1,10 @@
 Page type contracts
 ===================
 
+Current version of this document is: 1.0.0 (as of 11th of September, 2026)
+
 What a UI component receives from the page that hosts it, per page type — generated from
-the `ui-slot-data` bindings in every page template in this repository.
+the `ui-slot-data` bindings in every Smint.io page template.
 
 A UI component whose `type` belongs to a page (a search result, a search bar, an asset
 details viewer) is handed data by its page template as ordinary Vue props, and reports back
@@ -565,3 +567,9 @@ difference between them in the tables below is worth treating as a bug in one of
 | `footer` (0–1) | `ui-type-footer` | — | — |
 
 ---
+
+Contributors
+============
+
+- Reinhard Holzner, Smint.io GmbH
+- Yosif Velev, Smint.io GmbH

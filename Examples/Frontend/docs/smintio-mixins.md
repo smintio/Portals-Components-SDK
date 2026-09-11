@@ -211,7 +211,7 @@ export default class PortalsUiComponentImplementation extends Mixins(
 | `AuthMixin` | `isLoggedIn`, `user`, `loginAvailable`, `shareAvailable`, `ratingAvailable`, `commentingAvailable` and the related feature flags |
 | `AssetPermissionsMixin` | `hasViewPermission`, `hasHiResPermission`, `hasLoResPermission`, `hasDownloadPermission` |
 | `RoutingMixin` | `generateRouterLocation()`, `generateRouterLocationForAssetDataObject()` |
-| `AssetsReferenceMixin` | resolves an `IAssetsReferenceModel` configuration property into actual assets |
+| `AssetsReferenceMixin` | resolves an `IAssetsReferenceModel` configuration property into actual assets — `getAssets()`, `getAssetByIds()`, `getAssetsByFolderId()`, `getAssetsBySearch()`, plus `getAssetReferenceByRelationshipType(asset, "<relationship type>")`, which pulls the search or asset reference an asset carries in its own `relatedAssets` |
 | `MetadataMixin` | `getLocalizedTags()`, `getLocalizedAttributeValue()`, `getLocalizedAttributeValues()`, `getLinks()` |
 | `GalleryAssetConverterMixin` | converts assets into gallery items for the gallery components |
 | `AssetDetailsPageNavigationMixin` | previous/next navigation through search results on an asset details page |
@@ -225,5 +225,4 @@ rather than declaring the same properties again.
 Contributors
 ============
 
-- Yanko Belov, Smint.io. GmbH
 - Reinhard Holzner, Smint.io GmbH
