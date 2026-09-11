@@ -91,11 +91,16 @@ A property marked `IsRichText` carries *sanitized, validated* HTML. Render it wi
 <p v-html="$options.filters.resolve_localized(continuousText)"></p>
 ```
 
+Such a property is backed by a **text** resource — a rich text — rather than a **string**
+resource, which is a plain text such as a label, a button caption or a heading. Pair it with
+`TextResourceAllowedValuesProvider`, and see
+[Shipping your own string resources](../README.md#shipping-your-own-string-resources).
+
 ## Property annotations — values and validation
 
 | Annotation                         | Description                                                                                                     |
 |------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| `DefaultValue`                     | **Specifies the default value of a form item**                                                                  |
+| `DefaultValue`                     | **Specifies the default value of a form item.** On an `ILocalizedStringsModel` property the value is a string resource id — see [Shipping your own string resources](../README.md#shipping-your-own-string-resources) |
 | `InitializationValue`              | **Specifies the value a form item is initialized with**                                                         |
 | `AllowedValues`                    | **Gives multiple allowed values of a form item**                                                                |
 | `AllowedDateTime`                  | **Gives an allowed date time value of a form item**                                                             |

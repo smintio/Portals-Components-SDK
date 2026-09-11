@@ -433,6 +433,99 @@ The full list of supported Smint.io Portals annotations can be found [here](docs
 
 `ILocalizedStringsModel` is a custom object type defined by Smint.io that can return the correct text value of a component according to the selected language by the user.
 
+#### Shipping your own string resources
+
+A text property can be given a **string resource id** as its default, so the component is not
+blank the moment it is dropped onto a page. The example does this in
+[resources/definition.ts](ui-example-hello-world-1/resources/definition.ts), pointing
+`componentText` at the resource id `component_text`:
+
+```javascript
+uiComponentBuilder.setFormFieldValues({
+    values: [
+        {
+            id: "componentText",
+            dataType: "resource_id",
+            resourceIdValue: "component_text",
+        },
+    ],
+} as IFormFieldValuesModel);
+```
+
+The id has to resolve to a resource that actually exists, and there are two sources:
+
+- **resources that already exist in the portal**, maintained on the Smint.io side. You can
+  reference these but you cannot add to them.
+- **resources your component ships itself.** This is the route for any text of your own, and
+  it is easy to miss — your `resources` folder looks empty because only *file* resources
+  (images, videos, audio, documents) live there as files.
+
+Declare one with `addEmbeddedResource`, inside `defineResources` and **before** the
+`loadFileResources` call:
+
+```javascript
+import type { IResourceDefinitionBuilder } from "@smintio/portals-resource-builder-cli";
+import { IEmbeddedResourceModel, IFormFieldValuesModel } from "@smintio/portals-resource-builder-cli";
+
+// ...
+await uiComponentBuilder.defineResources(async (resourceBuilder) => {
+    resourceBuilder.addEmbeddedResource({
+        id: "text_hello_world_greeting",
+        resource: "string",
+        name: {
+            "x-default": "Greeting text",          // the label shown in the page editor
+        },
+        formFieldValues: {
+            values: [
+                {
+                    id: "Text",                     // always "Text" for a string resource
+                    dataType: "localized_strings_model",
+                    localizedStringsModelValue: {
+                        "x-default": "Hello world", // the text itself
+                        de: "Hallo Welt",           // one key per further language
+                    },
+                },
+            ],
+        } as IFormFieldValuesModel,
+        localizedResourceAssets: undefined,         // required, and always undefined here
+    } as IEmbeddedResourceModel);
+
+    await resourceBuilder.loadFileResources(async (fileResources) => {
+        await fileResources.verifyLoadedResources(async (resource) => {
+            return resource;
+        });
+    });
+});
+```
+
+You can then reference it from the property itself:
+
+```javascript
+    @Implements("ILocalizedStringsModel")
+    @ComponentProperty({ name: "componentText" })
+    @DefaultValue("text_hello_world_greeting")
+    public readonly componentText!: ILocalizedStringsModel;
+```
+
+Things worth knowing before you write one:
+
+| | |
+|---|---|
+| `IEmbeddedResourceModel` and `IFormFieldValuesModel` | import them as values, **not** with `import type` — the `as` casts need them at runtime |
+| `resource` | `string` for a **plain text** — a label, a button caption, a heading. `text` for a **rich text** — long form body copy carrying markup, the kind you pair with `IsRichText` and render with `v-html`. `image`, `video`, `audio` and `document` are file based and come from your `resources` folder instead |
+| matching the provider | the dropdown an editor sees comes from the **property**, not from the resource. `StringResourceAllowedValuesProvider` lists string resources, `TextResourceAllowedValuesProvider` lists rich text ones. If they do not match, the resource you shipped will not appear in the list |
+| `name` versus the value | `name` is the label an editor sees when picking a resource from a list. The text itself is the `formFieldValues` entry with `id: "Text"` |
+| id naming | prefix with `text_` and keep it unique to your component, for example `text_<yourcompany>_<what>` |
+| languages | `"x-default"` is the fallback, then one key per further language |
+| `DefaultValue` versus `setFormFieldValues` | `DefaultValue` is the property's default and applies wherever the component is used. `setFormFieldValues` pre-fills the field the moment an editor drops the component onto a page |
+
+Adding or changing a resource is an **annotation level change** — see the table under
+[What the dev server covers, and what still needs publishing](#what-the-dev-server-covers-and-what-still-needs-publishing).
+It will not show up in the page editor until you publish your component.
+
+Page templates ship string resources in exactly the same way, through
+`buildPageTemplateResourceDefinition`.
+
 By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
 
 # Crafting a page template instead

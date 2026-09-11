@@ -221,8 +221,8 @@ choose from something that exists in their portal, rather than typing a value.
 
 | Provider | Offers the portal editor |
 |---|---|
-| `StringResourceAllowedValuesProvider` | the portal's string resources |
-| `TextResourceAllowedValuesProvider` | the portal's long text resources |
+| `StringResourceAllowedValuesProvider` | the portal's string resources — plain texts: labels, button captions, headings |
+| `TextResourceAllowedValuesProvider` | the portal's text resources — rich texts: long form body copy carrying markup |
 | `ImageResourceAllowedValuesProvider` | image resources |
 | `VideoResourceAllowedValuesProvider` | video resources |
 | `CategoryResourceAllowedValuesProvider` | category resources |
@@ -279,8 +279,16 @@ The `ValueType` values, used with `@ImplementsPrimitiveType` and as the `dataTyp
 `enumeration`, `enumeration_array`, `currency_model`, `geo_location_model`,
 `localized_enums_array_model`.
 
-The resource types you can place in your component's `resources` folder are `image`, `video`,
-`audio` and `document` (file based), and `string` and `text` (not file based).
+The resource types are `image`, `video`, `audio` and `document` (file based — place the files
+in your component's `resources` folder, where `loadFileResources` picks them up), and `string`
+and `text` (not file based — declare these in `resources/definition.ts` with
+`addEmbeddedResource`, see
+[Shipping your own string resources](../README.md#shipping-your-own-string-resources)).
+
+`string` is a **plain text** — a label, a button caption, a heading. `text` is a **rich text**,
+long form body copy carrying markup, the kind paired with `IsRichText` and rendered with
+`v-html`. Each is offered to the editor by its own provider, so match the property's provider
+to the kind of resource you ship.
 
 ---
 
