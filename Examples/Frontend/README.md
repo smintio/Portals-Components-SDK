@@ -563,6 +563,93 @@ It will not show up in the page editor until you publish your component.
 Page templates ship string resources in exactly the same way, through
 `buildPageTemplateResourceDefinition`.
 
+#### Before you point a property at a resource the portal already has
+
+A portal carries resources of its own, and their ids are tempting to reuse — they are already
+there, already translated, and they cost you nothing to ship. The catch is that **the id tells
+you nothing about the wording**, which was written for whichever component introduced it. A
+generic browse button resource may well read *"Browse all related assets"*, which is fine on the
+component it was written for and wrong next to your own button.
+
+So: reach for an existing portal resource only when the text genuinely has to read identically
+across components — and when you do, look at its value on a live portal first. Otherwise ship
+your own resource, as described above. It is a few lines in `resources/definition.ts` and it is
+yours to change.
+
+#### Linking to a search page from your component
+
+A button that opens a pre-filtered search is a common requirement — "show me all assets in this
+category". It is tempting to assemble the URL by hand from an id and a query parameter. Do not:
+the filter is data, it already exists, and hand-built URLs go stale the moment the data side
+changes.
+
+**Take the search that is already attached to the asset.** An `IAssetDataObject` carries its
+related searches in `relatedAssets`, one entry per relationship type, each with a complete
+search spec — filters, data adapter instance, query string. `AssetsReferenceMixin` hands it to
+you:
+
+```ts
+const assetsReference = this.getAssetReferenceByRelationshipType(asset, "<relationship type>");
+
+if (!assetsReference || assetsReference.type !== AssetsReferenceType.SearchAssetsSpec) {
+    return undefined;       // no such relationship - render no button at all
+}
+
+const query = this.searchAssetsSpecQuery(assetsReference.searchAssetsSpecModel);
+
+return this.generateRouterLocation(this.searchPage, { query });
+```
+
+**A search page restores a search from the query string** in a fixed shape: one parameter per
+filter, named after the search field, plus the same name prefixed with `dt-` carrying the
+field's data type, and the free text as `query`:
+
+```ts
+for (const formFieldValueModel of searchAssetsSpecModel.currentFilters.values) {
+    const id = formFieldValueModel.id;
+
+    switch (formFieldValueModel.dataType) {
+        case ValueType.String:
+            if (formFieldValueModel.stringValue === undefined) {
+                continue;
+            }
+
+            query[id] = formFieldValueModel.stringValue;
+            break;
+
+        // ... one case per ValueType you support: StringArray, Int32, Int64, Decimal,
+        // Boolean, DateTime. Anything else cannot be expressed in a query string
+
+        default:
+            continue;
+    }
+
+    query[`dt-${id}`] = formFieldValueModel.dataType;
+}
+
+if (searchAssetsSpecModel.queryString) {
+    query.query = searchAssetsSpecModel.queryString;
+}
+```
+
+Take the data type from the spec, never from a sample URL you copied out of a browser — the two
+can disagree, and the spec is the one the search page agrees with.
+
+#### Many links to the same search page: use `exact`
+
+If your component renders a list and every entry links to the same search page, differing only
+in the query, add `exact` to the link or button:
+
+```html
+<v-btn :to="searchLocationFor(item)" exact outlined small color="primary">…</v-btn>
+```
+
+Vue-router's default active matching compares the path and **ignores the query string**. Without
+`exact`, following one entry's link marks every entry's link as the current route, and the whole
+list takes on the active styling at once — which reads as a rendering bug. `exact` makes the
+comparison include the query, so only the link you actually followed is active. It looks like a
+prop you could drop; it is not, so leave a comment next to it.
+
 By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
 
 # Crafting a page template instead
@@ -911,6 +998,10 @@ form, that is the publishing boundary described above — build and publish, and
 | Your local change does not show up **and the dev server log stays empty** | the portal never asked for your local build: *Basic settings > Development mode* is off for that portal, or the logged-in user has not been cleared as a developer by Smint.io — anonymous visitors never are |
 | A setting you added is not in the configuration form, or your new component is not offered in the editor | the component has not been published since you changed its annotations — the configuration form lives on the Smint.io server, not in your bundle |
 | Publishing fails right away | the `version` in `package.json` was not increased, or `SMINT_IO_SDK_HOME` is not set |
+| `npm publish` succeeded but the component was not registered | publishing is two steps and they fail independently. **Do not raise the version and publish again** — that version is already on the feed. Rerun only the registration: `npm info --json \| %SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env <environment>` |
+| Registration fails with a permissions error seconds after a successful `npm publish` | the feed may not have made the new version visible yet. Retry the registration step once before treating it as a permissions problem |
+| Every link in your list highlights after you follow one of them | they all resolve to the same route and differ only in the query — add `exact` to the link, see [Many links to the same search page](#many-links-to-the-same-search-page-use-exact) |
+| A filtered search link opens the search page but finds nothing | check the filter *value*, not your code: compare the value your link sends with the values the search page offers in its own facet list for that field |
 | Your component does not appear in the page editor of the portal you expected | it was published against a different `SmintIo.ApiUrl` — the tenant comes from the CLI's `appsettings.<Env>.json`, not from the component |
 | Unexpected rollup or babel errors when building | the wrong node version — see the build chapter above |
 | Two identical `CSS class` fields in the configuration form | `SCssProps` and `SHtmlProps` were mixed in together; use only one of them |
