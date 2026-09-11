@@ -837,7 +837,30 @@ So: publish once when you create the component and whenever you change its setti
 iterate freely on markup and behaviour without publishing. When you are finished, publish once
 more, so that what is registered with Smint.io matches your final result.
 
-1. Get in touch with [support@smint.io](mailto:support@smint.io) so that we can set up a development portal for you
+#### Two switches decide whether your local build is asked for at all
+
+The rerouting is a decision of the **portal**, not of the dev server. The portal only offers a
+local URL for a component's JavaScript when **both** of these are true:
+
+1. **The portal has development mode enabled** — *Basic settings > Development mode* in the
+   portal's settings. Without it, the portal always uses the published component and never
+   looks at your machine.
+1. **A user is logged in whom Smint.io has cleared as a developer.** The clearance belongs to
+   the logged-in frontend user, not to the portal, so an anonymous visitor never gets it — not
+   even on a development portal. Please ask us to clear the login you develop with.
+
+Both are things we set up for you, so please mention them when you get in touch.
+
+If either one is missing, the symptom is easy to misread: the portal renders perfectly
+normally, and the dev server's request log stays **empty**, because your local listener is
+never contacted. So read the log this way — requests that arrive but are served from the
+published package mean a wrong or missing mapping, whereas **no requests at all** mean one of
+these two switches, and changing the mapping will not help.
+
+1. Get in touch with [support@smint.io](mailto:support@smint.io) so that we can set up a development portal for you,
+   enable *Basic settings > Development mode* on it, and clear your login as a developer —
+   see [the two switches above](#user-content-two-switches-decide-whether-your-local-build-is-asked-for-at-all).
+   Stay logged in with that user while you develop
 1. Download the [Portals Dev-Server](../../Tools/Portals-DevServer/Release/) and install the .NET 8 runtime
 1. Trust the `rootCA.pem` shipped with the dev server, so that your browser accepts its local HTTPS listener
 1. In the dev server's `appsettings.json`, set `RootDirectory` to the folder that contains your component folders
@@ -869,6 +892,10 @@ it will show whether the request was rerouted to your file or served from the pu
 package. The usual causes are a mapping that does not match, a bundle that has not been built
 yet, or a dev server that was not restarted after the mapping was added.
 
+If the log shows **no requests at all**, the portal never asked for your local build: either
+*Basic settings > Development mode* is off for that portal, or the user you are logged in with
+has not been cleared as a developer by us (see above).
+
 If instead your component shows up but a *setting* you added is missing from the configuration
 form, that is the publishing boundary described above — build and publish, and it will appear.
 
@@ -881,6 +908,7 @@ form, that is the publishing boundary described above — build and publish, and
 | Settings that portals had already saved are suddenly empty | the TypeScript property was renamed without keeping the same `ComponentProperty` name |
 | `portals-ui-component.json` or `portals-page-template.json` is out of date | `npm run watch` does not run the resource builder — run `npm run build:resources` |
 | Your local change does not show up in the portal | the dev server mapping is missing or points at the wrong bundle path, the dev server was not restarted after the mapping was added, or the browser cache is on |
+| Your local change does not show up **and the dev server log stays empty** | the portal never asked for your local build: *Basic settings > Development mode* is off for that portal, or the logged-in user has not been cleared as a developer by Smint.io — anonymous visitors never are |
 | A setting you added is not in the configuration form, or your new component is not offered in the editor | the component has not been published since you changed its annotations — the configuration form lives on the Smint.io server, not in your bundle |
 | Publishing fails right away | the `version` in `package.json` was not increased, or `SMINT_IO_SDK_HOME` is not set |
 | Your component does not appear in the page editor of the portal you expected | it was published against a different `SmintIo.ApiUrl` — the tenant comes from the CLI's `appsettings.<Env>.json`, not from the component |
