@@ -433,6 +433,32 @@ The full list of supported Smint.io Portals annotations can be found [here](docs
 
 `ILocalizedStringsModel` is a custom object type defined by Smint.io that can return the correct text value of a component according to the selected language by the user.
 
+#### Do not hand write settings the shared props mixins already give you
+
+Text, link, colour, image, effect and layout settings are not yours to invent. `@smintio/portals-components`
+ships them as `S...Props` mixins — `STextsProps`, `SBackgroundProps`, `SImageProps`, `SEffectsProps`,
+`SBottomGapProps` and others — and mixing one in gives your component the same settings, the same wording and
+the same form group as every Smint.io component. A portal editor then finds your component's settings exactly
+where they expect them. Declaring your own equivalents produces a component that looks subtly foreign in the
+editor, and the property names you pin are permanent.
+
+**Include the layout ones even when your component does not read them.** `SBottomGapProps` is the one most
+easily forgotten: it declares a single `bottomGap` property — the editor's *Gap bottom* — and your template
+never touches it. The **page slot** reads the configured value and puts the matching
+`s-mb-space-between-components-*` class on the component's wrapper. So there is nothing to apply and nothing to
+test in your own markup; mixing the class in *is* the entire implementation:
+
+```javascript
+export default class PortalsUiComponentImplementation extends Mixins(
+    STextsProps,
+    SBottomGapProps
+) {
+```
+
+A component without it simply has no spacing setting, and the omission only surfaces when an editor goes
+looking for the gap control that every other component on the page has. Check the
+[mixin reference](docs/smintio-frontend-reference.md) when you start a component, not after.
+
 #### Is your text a resource, or just a text field?
 
 Answer this before anything else, because a resource is the more involved of the two and you
