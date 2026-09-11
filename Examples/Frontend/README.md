@@ -25,12 +25,13 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Data adapter reference: every public API interface and model](docs/smintio-data-adapter-reference.md)
 1. [Page type contracts: what a page hands to the components it hosts](docs/smintio-page-type-contracts.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
+1. [Before you start: the questions to answer](#user-content-before-you-start-the-questions-to-answer)
 1. [Crafting a page template instead](#user-content-crafting-a-page-template-instead)
 1. [Building a section component](#user-content-building-a-section-component)
 1. [Extras for Smint.io Certified partners](#user-content-extras-for-smintio-certified-partners)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.1.0 (as of 10th of September, 2026)
+Current version of this document is: 1.2.0 (as of 11th of September, 2026)
 
 ## UI components
 
@@ -266,6 +267,53 @@ in your Smint.io Portals UI component.
 Learn more about how to do that [here](https://github.com/smintio/Portals-Components-SDK/tree/main/Examples/Backend#custom-public-api-interfaces).
 
 ## How develop your own frontend component
+
+### Before you start: the questions to answer
+
+A custom frontend component is quick to write and expensive to change once it is out. The
+component `key`, its `type`, the persisted names of its configuration properties and the tenant
+it is published for are all effectively permanent as soon as a portal has been configured
+against it.
+
+So please settle the following before you create the first file. If you are building the
+component for a customer, for a colleague or for a project team, ask them all of it in one go —
+it is a short conversation, and it saves a rewrite.
+
+*Identity and placement*
+
+| Question | What it decides | If it is wrong |
+|---|---|---|
+| Who is the component for, and what does it do — in one sentence? | the directory name, and with it the package name and the component `key` | the `key` is what portals store in their page configuration. It cannot be changed after release |
+| Is this a new component, or a variation of one you already have? | whether you start a fresh `-1`, or add a `-2` package next to the existing one | never renumber a released component. Portals in the field are configured against the old name |
+| Which frontend component type does it have? | which page template slots will accept it, and which page contract it can rely on — see [the frontend component types](docs/smintio-frontend-component-types.md) | a type that does not exist cannot be invented on your side. If none of them fits, get in touch at [support@smint.io](mailto:support@smint.io) |
+
+*Where it sits, and where its content comes from*
+
+| Question | What it decides |
+|---|---|
+| Which portal types is it for, and which page does it go on? | whether you restrict it with `allowedPortalTypes`, and which contract applies — [what a page hands to the components it hosts](docs/smintio-page-type-contracts.md) |
+| Where does the content come from: the component's own configuration, a Smint.io data adapter, or a system of your own? | whether you work against the [data adapter public API interfaces](docs/smintio-data-adapter-reference.md), or declare your own interface |
+| Which existing component is the closest starting point? | how much you have to write. `ui-example-hello-world-1` is the minimal skeleton; the [overview of Smint.io UI components](docs/smintio-ui-components.md) shows what already exists |
+| Which settings must the portal user be able to change, and which of them are advanced? | your configuration properties. Start with few — you can add options later, you cannot take them away. Text, link, colour and layout settings already exist as [mixins](docs/smintio-mixins.md), so only ask for what those do not cover |
+
+*Content and language*
+
+| Question | What it decides |
+|---|---|
+| Which languages does the component have to offer? | the `@DisplayName` and `@Description` annotations, and whether user-editable text is a localized string rather than a plain one |
+| Is anything pre-filled or shipped with the component — default values, string resources, images, an icon for the page editor? | the resource definition and the contents of your `resources` folder. A component that arrives blank in the page editor looks broken |
+| What should it look like: a design, a screenshot, an existing page to match, or your own judgement? | there is no other source for this, and it is the question most often left unasked |
+
+*Delivery*
+
+| Question | What it decides |
+|---|---|
+| Which tenant is the component published for? | who can actually use it. Nothing in the component's source decides this — see [Which tenant your component is published for](#user-content-which-tenant-your-component-is-published-for). Agree it up front, because it is the one thing that cannot be checked by looking at the code |
+| Which environment: development, staging or production? | which `appsettings` file the publish uses, and therefore which `smint-io-pc` script you run. Each environment has its own tenant URL, so confirm the tenant per environment |
+
+If the component should be available more widely than a single tenant, that is something we
+arrange on our side — please get in touch at [support@smint.io](mailto:support@smint.io) rather
+than trying to configure it in the component.
 
 ### Getting started
 
@@ -608,6 +656,35 @@ Please note that calling the command repeatedly with the same package version wi
 
 With each code change, the version number must be increased in the `package.json` file.
 
+#### Which tenant your component is published for
+
+Nothing in your component's source decides this, and there is nothing you need to add to it.
+The tenant comes from the configuration of the *Portals-SDK-PublishComponent-CLI tool*.
+
+Next to the CLI executable sits an `appsettings.json` as a template, plus one file per
+environment — `appsettings.Development.json`, `appsettings.Staging.json` and
+`appsettings.Production.json`. The `-env` argument in the `smint-io-pc` scripts chooses which
+one is used. Each file holds:
+
+| Setting | What it does |
+|---|---|
+| `SmintIo.ApiUrl` | the **tenanted** Smint.io API URL the component is registered with — this is what decides which tenant receives it |
+| `SmintIo.Auth.Authority`, `ClientId`, `ClientSecret` | the OAuth client the publish authenticates with |
+| `SmintIo.AuthorizationHeader` | the authorization header for your npm repository, where one is required |
+| `RedirectUrl` | the local callback the authentication returns to — this is the browser window that opens during the publish and closes itself again |
+
+**Your component is published for your own tenant only.** It becomes available in the page
+editor of that tenant's portals, and nowhere else. This is exactly what you want for a
+component you built for one customer or one portal: there is no additional step needed to keep
+it private, and no setting in the component to get wrong.
+
+If a component of yours should become available more widely, please get in touch at
+[support@smint.io](mailto:support@smint.io) — that is something we arrange on our side.
+
+> Please treat these settings files as secrets. They contain an OAuth client secret and your
+> npm repository authorization header. Do not commit them, and do not paste their contents into
+> a support request — tell us what you see, not what is in the file.
+
 More information about the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
 
 ### Local development
@@ -676,6 +753,7 @@ form, that is the publishing boundary described above — build and publish, and
 | Your local change does not show up in the portal | the dev server mapping is missing or points at the wrong bundle path, the dev server was not restarted after the mapping was added, or the browser cache is on |
 | A setting you added is not in the configuration form, or your new component is not offered in the editor | the component has not been published since you changed its annotations — the configuration form lives on the Smint.io server, not in your bundle |
 | Publishing fails right away | the `version` in `package.json` was not increased, or `SMINT_IO_SDK_HOME` is not set |
+| Your component does not appear in the page editor of the portal you expected | it was published against a different `SmintIo.ApiUrl` — the tenant comes from the CLI's `appsettings.<Env>.json`, not from the component |
 | Unexpected rollup or babel errors when building | the wrong node version — see the build chapter above |
 | Two identical `CSS class` fields in the configuration form | `SCssProps` and `SHtmlProps` were mixed in together; use only one of them |
 
