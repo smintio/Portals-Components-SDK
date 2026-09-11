@@ -293,7 +293,7 @@ it is a short conversation, and it saves a rewrite.
 |---|---|
 | Which portal types is it for, and which page does it go on? | whether you restrict it with `allowedPortalTypes`, and which contract applies — [what a page hands to the components it hosts](docs/smintio-page-type-contracts.md) |
 | Where does the content come from: the component's own configuration, a Smint.io data adapter, or a system of your own? | whether you work against the [data adapter public API interfaces](docs/smintio-data-adapter-reference.md), or declare your own interface |
-| Which existing component is the closest starting point? | how much you have to write. `ui-example-hello-world-1` is the minimal skeleton; the [overview of Smint.io UI components](docs/smintio-ui-components.md) shows what already exists |
+| Which existing component is the closest starting point — and is yours *that component plus something*, or something new? | how much you have to write, and whether you copy it or extend it. `ui-example-hello-world-1` is the minimal skeleton; the [overview of Smint.io UI components](docs/smintio-ui-components.md) shows what already exists. An addition to an existing component should [extend it](#user-content-is-your-component-an-existing-one-plus-something-extend-it-do-not-copy-it) — a copy is a fork, and forks stop receiving later improvements to the component they came from |
 | Which settings must the portal user be able to change, and which of them are advanced? | your configuration properties. Start with few — you can add options later, you cannot take them away. Text, link, colour and layout settings already exist as [mixins](docs/smintio-mixins.md), so only ask for what those do not cover |
 
 *Content and language*
@@ -432,6 +432,49 @@ In this case, an example would be a text input field or a color picker.
 The full list of supported Smint.io Portals annotations can be found [here](docs/smintio-annotations.md).
 
 `ILocalizedStringsModel` is a custom object type defined by Smint.io that can return the correct text value of a component according to the selected language by the user.
+
+#### Is your component an existing one plus something? Extend it, do not copy it
+
+Starting from the closest existing component is good advice, and it splits into two very different moves.
+If your component is genuinely new, copy a similar one and change it. But if it is **an existing component
+plus an addition** — the standard header with extra menu items, the standard search result with one more
+badge — then take the published component as a dependency and extend it. A copy is a fork: it is large, and
+it silently opts out of every later fix and feature of the component you copied from.
+
+Add the component you are extending to your `dependencies`, then mix it in:
+
+```javascript
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import SmintIoPortalsUiComponentImplementation from "@smintio/ui-generic-header-1";
+
+@PortalsUiComponent({
+    type: "ui-type-header",
+    key: "smintio-ui-<yours>-1",
+    // ...
+})
+export default class PortalsUiComponentImplementation extends Mixins(
+    SmintIoPortalsUiComponentImplementation,
+    Mixins<AssetsReferenceMixin, RoutingMixin>(AssetsReferenceMixin, RoutingMixin)
+) {
+```
+
+Your component then has the base's markup, its sub components, its props and all of its configuration
+properties, and you declare only your own additions and override only what differs.
+
+Five things worth knowing before you do it:
+
+- **Leave out the `<template>` block entirely** when you are not changing the markup. Vue's mixin merge then
+  keeps the base's compiled render function. A `.vue` file containing only a `<script>` block is valid.
+- **Override the smallest thing that expresses your change** — usually one computed property. `super` is not
+  available (vue-class-component moves getters into the component options), so if you need the base's result
+  first, call the base's own helper methods to reproduce it, then add to it.
+- **The base ships type definitions.** Do not re-declare inherited members to satisfy TypeScript: declaring an
+  inherited *getter* as a property fails the build with `TS2610: ... is defined as an accessor ... but is
+  overridden here as an instance property`.
+- **Lifecycle hooks merge.** Your `created()` runs in addition to the base's, not instead of it.
+- **The base's annotations come along**, including its display names and descriptions in every language it
+  ships. Your own language choices apply only to the properties you declare yourself.
 
 #### Do not hand write settings the shared props mixins already give you
 
@@ -660,6 +703,29 @@ if (searchAssetsSpecModel.queryString) {
 
 Take the data type from the spec, never from a sample URL you copied out of a browser — the two
 can disagree, and the spec is the one the search page agrees with.
+
+#### A page reference resolves to a named route, so it has no path
+
+`generateRouterLocation(page, { query })` gives you a router location that looks like this:
+
+```javascript
+{ name: "pgt:34987", query: { … }, hash: "" }        // note: no path, and no fullPath
+```
+
+Bind that object to a `:to` and everything works. But some renderings want a URL **string** rather than a
+location object — menu items are the common case — and there is nothing to build that string from. Do not
+assemble it out of `location.path`; it is `undefined`, and the result is a link that quietly does not exist.
+Ask the router:
+
+```javascript
+const url = this.$router.resolve(location).href;
+```
+
+This failure mode is worth recognising because it is silent: no URL means no link, and if your component then
+skips items that have nothing to link to, it renders **nothing at all** with no error in the console. Which
+leads to a general rule — **when your component decides to render nothing, log why**. An empty component is
+otherwise indistinguishable from a wrong configuration, a stale bundle or a component that never loaded, and
+you will spend that debugging time in a browser rather than in your editor.
 
 #### Many links to the same search page: use `exact`
 
@@ -899,6 +965,28 @@ Please note that calling the command repeatedly with the same package version wi
 
 With each code change, the version number must be increased in the `package.json` file.
 
+#### The two steps fail independently — and the second one needs your `.npmrc`
+
+`npm run smint-io-pc*` is `npm publish` **and then** the registration call, and they can fail apart. If the
+publish succeeded and only the registration failed, do **not** run the whole script again: that version number
+is already taken and `npm publish` alone will fail. Rerun just the registration, which is the piped command
+shown above.
+
+The failure to expect on a **brand new component** looks like this:
+
+```
++ @your-scope/ui-your-component-1@1.0.0
+npm ERR! code E404
+npm ERR! 404 '@your-scope/ui-your-component-1' is not in the npm registry.
+info: Missing component name
+```
+
+The publish worked; the registration did not, because the registration step pipes `npm info --json` into the
+CLI and `npm info` resolves the registry from the **component folder's `.npmrc`**, not from `publishConfig` in
+`package.json`. A new component folder without an `.npmrc` therefore asks the public npm registry, which has
+never heard of your package, and the CLI receives nothing to register. Make sure the folder has the `.npmrc`
+described in *Getting started*, then rerun the registration on its own.
+
 #### Which tenant your component is published for
 
 Nothing in your component's source decides this, and there is nothing you need to add to it.
@@ -949,6 +1037,19 @@ Please read this before you start, it saves a lot of confusion:
 So: publish once when you create the component and whenever you change its settings, then
 iterate freely on markup and behaviour without publishing. When you are finished, publish once
 more, so that what is registered with Smint.io matches your final result.
+
+The flip side is worth stating plainly: while the rerouting is active, **a working page proves
+your working folder works, not that anything is published**. If you need to know which version
+the portal is actually registered against, read it out of the request that loads your component
+— the version is part of the URL:
+
+```
+https://<dev server host>:8443/components/js/js/uic-<type>-<key>-1.2.3.js
+```
+
+That same request answers a question that otherwise costs a lot of guessing: if it is not there
+at all, your component is not on the page you are looking at — check the page rather than the
+component.
 
 #### Two switches decide whether your local build is asked for at all
 
@@ -1031,6 +1132,11 @@ form, that is the publishing boundary described above — build and publish, and
 | Your component does not appear in the page editor of the portal you expected | it was published against a different `SmintIo.ApiUrl` — the tenant comes from the CLI's `appsettings.<Env>.json`, not from the component |
 | Unexpected rollup or babel errors when building | the wrong node version — see the build chapter above |
 | Two identical `CSS class` fields in the configuration form | `SCssProps` and `SHtmlProps` were mixed in together; use only one of them |
+| Your component renders **nothing at all**, with no error in the console | it decided to render nothing. A link that could not be built, a lookup that returned empty, a guard that skipped every item — log the reason at the point where your component gives up, then read the console |
+| A link built from a page reference goes nowhere | a page reference resolves to a *named* route with no `path`; use `this.$router.resolve(location).href` when you need a URL string, see [A page reference resolves to a named route](#a-page-reference-resolves-to-a-named-route-so-it-has-no-path) |
+| `TS2610: ... is defined as an accessor ... but is overridden here as an instance property` | you extended another component and re-declared one of its members. The base ships its own type definitions — use the member, do not declare it again |
+| `E404 ... is not in the npm registry` followed by `info: Missing component name` | the registration step read the wrong registry: your component folder has no `.npmrc`. Add it, then rerun only the registration |
+| A page shows your latest change although you never published | that is the dev server serving your working folder. It says nothing about what is registered — read the version out of the component's script URL |
 
 ## Extras for Smint.io Certified partners
 
