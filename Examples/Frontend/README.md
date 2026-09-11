@@ -608,6 +608,35 @@ Please note that calling the command repeatedly with the same package version wi
 
 With each code change, the version number must be increased in the `package.json` file.
 
+#### Which tenant your component is published for
+
+Nothing in your component's source decides this, and there is nothing you need to add to it.
+The tenant comes from the configuration of the *Portals-SDK-PublishComponent-CLI tool*.
+
+Next to the CLI executable sits an `appsettings.json` as a template, plus one file per
+environment — `appsettings.Development.json`, `appsettings.Staging.json` and
+`appsettings.Production.json`. The `-env` argument in the `smint-io-pc` scripts chooses which
+one is used. Each file holds:
+
+| Setting | What it does |
+|---|---|
+| `SmintIo.ApiUrl` | the **tenanted** Smint.io API URL the component is registered with — this is what decides which tenant receives it |
+| `SmintIo.Auth.Authority`, `ClientId`, `ClientSecret` | the OAuth client the publish authenticates with |
+| `SmintIo.AuthorizationHeader` | the authorization header for your npm repository, where one is required |
+| `RedirectUrl` | the local callback the authentication returns to — this is the browser window that opens during the publish and closes itself again |
+
+**Your component is published for your own tenant only.** It becomes available in the page
+editor of that tenant's portals, and nowhere else. This is exactly what you want for a
+component you built for one customer or one portal: there is no additional step needed to keep
+it private, and no setting in the component to get wrong.
+
+If a component of yours should become available more widely, please get in touch at
+[support@smint.io](mailto:support@smint.io) — that is something we arrange on our side.
+
+> Please treat these settings files as secrets. They contain an OAuth client secret and your
+> npm repository authorization header. Do not commit them, and do not paste their contents into
+> a support request — tell us what you see, not what is in the file.
+
 More information about the *Portals-SDK-PublishComponent-CLI tool* can be found [here](../../Tools/Portals-SDK-PublishComponent-CLI/Release/).
 
 ### Local development
@@ -676,6 +705,7 @@ form, that is the publishing boundary described above — build and publish, and
 | Your local change does not show up in the portal | the dev server mapping is missing or points at the wrong bundle path, the dev server was not restarted after the mapping was added, or the browser cache is on |
 | A setting you added is not in the configuration form, or your new component is not offered in the editor | the component has not been published since you changed its annotations — the configuration form lives on the Smint.io server, not in your bundle |
 | Publishing fails right away | the `version` in `package.json` was not increased, or `SMINT_IO_SDK_HOME` is not set |
+| Your component does not appear in the page editor of the portal you expected | it was published against a different `SmintIo.ApiUrl` — the tenant comes from the CLI's `appsettings.<Env>.json`, not from the component |
 | Unexpected rollup or babel errors when building | the wrong node version — see the build chapter above |
 | Two identical `CSS class` fields in the configuration form | `SCssProps` and `SHtmlProps` were mixed in together; use only one of them |
 
