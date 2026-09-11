@@ -25,12 +25,13 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Data adapter reference: every public API interface and model](docs/smintio-data-adapter-reference.md)
 1. [Page type contracts: what a page hands to the components it hosts](docs/smintio-page-type-contracts.md)
 1. [How to develop your own custom component](#user-content-how-develop-your-own-frontend-component)
+1. [Before you start: the questions to answer](#user-content-before-you-start-the-questions-to-answer)
 1. [Crafting a page template instead](#user-content-crafting-a-page-template-instead)
 1. [Building a section component](#user-content-building-a-section-component)
 1. [Extras for Smint.io Certified partners](#user-content-extras-for-smintio-certified-partners)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.1.0 (as of 10th of September, 2026)
+Current version of this document is: 1.2.0 (as of 11th of September, 2026)
 
 ## UI components
 
@@ -266,6 +267,53 @@ in your Smint.io Portals UI component.
 Learn more about how to do that [here](https://github.com/smintio/Portals-Components-SDK/tree/main/Examples/Backend#custom-public-api-interfaces).
 
 ## How develop your own frontend component
+
+### Before you start: the questions to answer
+
+A custom frontend component is quick to write and expensive to change once it is out. The
+component `key`, its `type`, the persisted names of its configuration properties and the tenant
+it is published for are all effectively permanent as soon as a portal has been configured
+against it.
+
+So please settle the following before you create the first file. If you are building the
+component for a customer, for a colleague or for a project team, ask them all of it in one go —
+it is a short conversation, and it saves a rewrite.
+
+*Identity and placement*
+
+| Question | What it decides | If it is wrong |
+|---|---|---|
+| Who is the component for, and what does it do — in one sentence? | the directory name, and with it the package name and the component `key` | the `key` is what portals store in their page configuration. It cannot be changed after release |
+| Is this a new component, or a variation of one you already have? | whether you start a fresh `-1`, or add a `-2` package next to the existing one | never renumber a released component. Portals in the field are configured against the old name |
+| Which frontend component type does it have? | which page template slots will accept it, and which page contract it can rely on — see [the frontend component types](docs/smintio-frontend-component-types.md) | a type that does not exist cannot be invented on your side. If none of them fits, get in touch at [support@smint.io](mailto:support@smint.io) |
+
+*Where it sits, and where its content comes from*
+
+| Question | What it decides |
+|---|---|
+| Which portal types is it for, and which page does it go on? | whether you restrict it with `allowedPortalTypes`, and which contract applies — [what a page hands to the components it hosts](docs/smintio-page-type-contracts.md) |
+| Where does the content come from: the component's own configuration, a Smint.io data adapter, or a system of your own? | whether you work against the [data adapter public API interfaces](docs/smintio-data-adapter-reference.md), or declare your own interface |
+| Which existing component is the closest starting point? | how much you have to write. `ui-example-hello-world-1` is the minimal skeleton; the [overview of Smint.io UI components](docs/smintio-ui-components.md) shows what already exists |
+| Which settings must the portal user be able to change, and which of them are advanced? | your configuration properties. Start with few — you can add options later, you cannot take them away. Text, link, colour and layout settings already exist as [mixins](docs/smintio-mixins.md), so only ask for what those do not cover |
+
+*Content and language*
+
+| Question | What it decides |
+|---|---|
+| Which languages does the component have to offer? | the `@DisplayName` and `@Description` annotations, and whether user-editable text is a localized string rather than a plain one |
+| Is anything pre-filled or shipped with the component — default values, string resources, images, an icon for the page editor? | the resource definition and the contents of your `resources` folder. A component that arrives blank in the page editor looks broken |
+| What should it look like: a design, a screenshot, an existing page to match, or your own judgement? | there is no other source for this, and it is the question most often left unasked |
+
+*Delivery*
+
+| Question | What it decides |
+|---|---|
+| Which tenant is the component published for? | who can actually use it. Nothing in the component's source decides this — see [Which tenant your component is published for](#user-content-which-tenant-your-component-is-published-for). Agree it up front, because it is the one thing that cannot be checked by looking at the code |
+| Which environment: development, staging or production? | which `appsettings` file the publish uses, and therefore which `smint-io-pc` script you run. Each environment has its own tenant URL, so confirm the tenant per environment |
+
+If the component should be available more widely than a single tenant, that is something we
+arrange on our side — please get in touch at [support@smint.io](mailto:support@smint.io) rather
+than trying to configure it in the component.
 
 ### Getting started
 
