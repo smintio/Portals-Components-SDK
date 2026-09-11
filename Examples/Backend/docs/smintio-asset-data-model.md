@@ -12,6 +12,10 @@ the shape of the data is the shape of these C# types. This document describes th
 authoring side, so that you know what to fill in, what you may leave out, and which of your choices
 the portal will act on.
 
+This document covers the objects and the interfaces. Its companion,
+[the connector meta-model](smintio-connector-metamodel.md), covers the schema that gives those
+objects meaning — which is what you need for anything under `rawData`.
+
 If you are writing a *UI component* rather than a data adapter, you want the consuming side instead:
 [the frontend data adapter reference](../../Frontend/docs/smintio-data-adapter-reference.md), which
 lists every interface and model as TypeScript.
@@ -300,7 +304,9 @@ Three things follow:
 
 `AssetDataObject.rawData` is where the external system's own metadata goes — the custom fields, the
 metadata layers, the schema that is specific to that customer. Each entry is a data object whose
-entity is one your connector declared in its meta-model.
+entity is one your connector declared in
+[its meta-model](smintio-connector-metamodel.md) — and anything you emit that the meta-model does
+not declare is dropped on conversion.
 
 **Search results and detail results differ in exactly one respect: raw data.** The property keys and
 values are otherwise identical. A detail call returns the raw data as you produced it. A search
@@ -363,7 +369,9 @@ guessing, and use `HasMoreResults` to say that there is more.
 
 ## Filters are opaque tokens
 
-Which facets exist is declared by the connector meta-model, as form groups and form items. What a
+Which facets exist is declared by the
+[connector meta-model](smintio-connector-metamodel.md#user-content-form-groups--declaring-search-facets),
+as form groups and form items. What a
 search returns is the live instance of those: each form item definition comes back with its allowed
 values, each value carrying a display name, a result count, and a **string value that is a filter
 token**.

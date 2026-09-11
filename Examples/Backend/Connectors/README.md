@@ -31,11 +31,16 @@ For custom `IConnector` implementation click [here](Connector-HelloWorld/HelloWo
 
 ## The connector meta-model
 
-Generally speaking the meta-model describes what types of *objects* exist in the external system and what properties they have. In other words: the meta-model describes the _data_ that is delivered. 
+Building the meta-model is the `Connector`'s second job, alongside authorization. It describes what types of *objects*
+exist in the external system and what properties they have, so that Smint.io Portals can interpret the data your data
+adapter delivers.
 
-This meta-model is then used throughout Smint.io Portals to interpret the external metadata delivered by the external system (e.g. also custom metadata).
+This is documented in full in **[the connector meta-model](../docs/smintio-connector-metamodel.md)** — the data types,
+entity and property members, enum entities, indexing, semantic types, form groups, the converter that applies it, and
+the lifecycle.
 
-A more detailed explanation of the connector meta-model is available [here](Connector-SharePoint/README.md#meta-model-structure)
+For a worked example against a real system, see the
+[SharePoint meta-model walkthrough](Connector-SharePoint/README.md#meta-model-structure).
 
 Contributors
 ============

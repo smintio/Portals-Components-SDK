@@ -21,6 +21,7 @@ Please find guides about Smint.io Portals component development here:
 	- Portal templates
 	- Identity providers
 
+	- [The connector meta-model](Examples/Backend/docs/smintio-connector-metamodel.md) — describing the external system's schema
 	- [The asset data model](Examples/Backend/docs/smintio-asset-data-model.md) — what a data adapter returns
 
 This is the tools you need for developing Smint.io Portals components:

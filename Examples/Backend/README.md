@@ -18,6 +18,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Connector description & flow](#user-content-connector-description--flow)
 1. [Data adapter public API interfaces](#user-content-data-adapter-public-api-interfaces)
 1. [Custom public API interfaces](#user-content-custom-public-api-interfaces)
+1. [The connector meta-model: describing the external system's schema](docs/smintio-connector-metamodel.md)
 1. [The asset data model: what a data adapter returns](docs/smintio-asset-data-model.md)
 1. [Overview of Smint.io annotations](../Frontend/docs/smintio-annotations.md)
 
@@ -286,47 +287,32 @@ Generally speaking the meta-model describes what types of *objects* exist in the
 
 This meta-model is then used throughout Smint.io Portals to interpret the external metadata delivered by the external provider (e.g. also custom metadata).
 
-Each type of object in the external system is represented by one `EntityModel`, and each of its fields by one `PropertyModel`
-on that entity. How many entities you end up with depends entirely on the system you are integrating: a simple file store may
-need only one, while a system that distinguishes images, videos and products will have one per type. The
-[SharePoint example](Connectors/Connector-SharePoint/README.md#meta-model-structure) walks through a single-entity
-meta-model in detail, including the case where one entity points at another.
+Each type of object in the external system is represented by one `EntityModel`, and each of its fields by one
+`PropertyModel` on that entity. How many entities you end up with depends entirely on the system you are integrating: a
+simple file store may need only one, while a system that distinguishes images, videos and products will have one per
+type. Entities and their properties are fully translatable.
 
-The `EntityModel` acts as a schema definition that allows the user interface to know in what format the data will come from the data adapter.
+You build one in an `IMetamodelBuilder` and return it from `GetConnectorMetamodelAsync`, as `HelloWorldMetamodelBuilder`
+does.
 
-Naturally `EntityModel` is completely translatable, as are its properties.
+Four things about it are worth knowing before you start, because each of them produces a portal that renders nothing
+rather than an error message:
 
-There are four things about the meta-model that are easy to get wrong, and all four are cheaper to know up front than to
-discover from a portal that renders nothing:
+- **The meta-model is a filter, not just a description.** A value whose property was never declared is dropped on
+  conversion. If a field does not appear in the portal, check the declaration before you debug the conversion.
+- **It is a snapshot, taken when the connector configuration is set up** — not per request. A schema change in the
+  external system does not appear until the configuration is set up again.
+- **Your entity keys are rewritten** to be unique per connector configuration, so the same connector configured twice
+  yields two different key sets. Never hard-code an entity key.
+- **Every entity automatically gets three properties**, an id and a list and a detail display name.
 
-- **The meta-model is a filter, not just a description.** When the data adapter converts a payload from the external
-  system, a value whose property was never declared is dropped, and a property that was declared but has no value simply
-  produces no entry. If a field does not appear in the portal, check the meta-model before you check the conversion.
-- **It is a snapshot, taken when the connector configuration is set up.** `GetConnectorMetamodelAsync` is not called per
-  request. If the schema in the external system changes — a new column, a renamed field — the change does not appear in
-  Smint.io until the connector configuration is set up again.
-- **Your entity keys are rewritten before anything else sees them.** You write plain keys such as `HelloWorldAsset`, and
-  Smint.io prefixes them per connector configuration, so the same connector configured twice yields two different key
-  sets. Keys of Smint.io's own entities carry a reserved prefix of their own. Never hard-code an entity key anywhere —
-  neither in a component nor in a portal configuration — and never put a colon in one.
-- **Every entity automatically gets three properties**, an id and a list and a detail display name. You do not declare
-  them, and you will see them on every object, including the ones describing your custom data.
+**The full reference is [the connector meta-model](docs/smintio-connector-metamodel.md)**: the data types, the
+`EntityModel` and `PropertyModel` members, entity types and inheritance, enum entities, full-text indexing, semantic
+types, form groups, translation, the converter that applies the meta-model to a source payload, and the lifecycle in
+detail.
 
-Beyond the data type, a property can declare a *semantic type* that says how the value should be interpreted rather than
-how it is encoded — a URL, an e-mail address, a phone number, HTML rather than plain text, a date without a time, and so
-on. One of them changes the data rather than its presentation: a property marked as a **relationship** holds the ID of
-another asset, and the data adapter's converter is expected to turn the raw foreign key into an asset identifier the
-portal can follow. Declaring the semantic type without doing that conversion produces an ID that nothing can resolve, so
-the declaration and the conversion always have to be added together. See
-[the asset data model](docs/smintio-asset-data-model.md#user-content-references-between-assets) for how this fits with the other way
-assets reference each other.
-
-The meta-model also declares which **search fragments (facets)** the connector offers, as form groups and form items —
-see `HelloWorldFormGroupsModelBuilder` for a worked example. Note that the meta-model only declares that a facet exists;
-the live values and counts come back per search, in the search result. And it declares three **feature flags** —
-whether the source supports random access (page jumping), full-text search proposals, and folder navigation. A data
-adapter reports the effective values of those to the frontend, which is what the portal actually asks before offering
-the feature.
+For a worked example against a real system, read the
+[SharePoint meta-model walkthrough](Connectors/Connector-SharePoint/README.md#meta-model-structure).
 
 ## Data adapter public API interfaces
 

@@ -106,13 +106,14 @@ var postResponse = await restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenRe
 
 ## The connector meta-model
 
-Generally speaking the meta-model describes what types of *objects* exist in the external system and what properties they have. In other words: the meta-model describes the _data_ that is delivered by Sharepoint. 
+This section is a **worked example**: how the meta-model concepts apply to one real system. The reference — data types,
+entity and property members, enum entities, indexing, semantic types, form groups, the lifecycle — is
+[the connector meta-model](../../docs/smintio-connector-metamodel.md).
 
-This meta-model is then used throughout Smint.io Portals to interpret the external metadata delivered by the external system (e.g. also custom metadata).
-
-Each type of object is represented by one `EntityModel`. Sharepoint is rather simple in that regard, because it only has one type of object which is the `File` (similar to a desktop file system). As a resulting
-there is only one `EntityModel`. Columns (i.e. custom fields) affect all files equally. For example, if we were to add a custom choice field "Mood", that indicates the mood prevalent in an image, it would also be 
-possible for `*.docx` file to have a "Mood" field. 
+Each type of object in the external system is represented by one `EntityModel`. Sharepoint is rather simple in that
+regard, because it only has one type of object, the `File` (similar to a desktop file system), so there is only one
+`EntityModel`. Columns (i.e. custom fields) affect all files equally: if we were to add a custom choice field "Mood",
+indicating the mood prevalent in an image, it would also be possible for a `*.docx` file to have a "Mood" field.
 
 ###  Meta-model structure
 
