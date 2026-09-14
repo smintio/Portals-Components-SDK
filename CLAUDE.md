@@ -15,12 +15,14 @@ the front door for Smint.io Solution Partners and Enterprise-plan customers writ
 components. That governs everything written here — see "Writing for this repo" below before editing
 a single file. It also governs this file: keep it free of internal repository names and paths.
 
-Two things live here, and the second is now the larger:
+Four things live here:
 
 | | |
 |---|---|
 | **Reference implementations** (~158 `.cs`) | `Backend/` — paired connectors and data adapters: `Connector-HelloWorld` + `DataAdapter-HelloWorld` as the minimal skeleton, plus `Picturepark` (live connection) and `SharePoint` (indexed through the integration layer) as realistic ones, each with a test driver. `Frontend/Legacy/Example/ui-example-hello-world-1` is the UI component starter, and `Frontend/Legacy/config/` holds the shared rollup and TypeScript config it extends. |
-| **Partner-facing documentation** (~500 KB of Markdown) | `Overview/`, `Backend/README.md` + `Backend/docs/`, `Frontend/Legacy/README.md` + `Frontend/Legacy/docs/` (eight reference documents), and a README per tool under `Tools/`. |
+| **Frontend reference sources** (`Frontend/Legacy/Reference/`) | **not in this repository.** The sources behind the components Smint.io ships — 64 UI components, 34 page templates, the shared `portals-components` library and the gallery view — are made available to Smint.io Certified Partners on request, and copied into this directory by the partner. The directory ships with a README and a `.gitignore` that hides anything copied in, so the sources can never be committed here by accident. Never describe them as part of this repository, and never link into `Reference/<folder>` from another document — refer to a package by name instead, because the path does not exist for most readers. |
+| **Partner-facing documentation** (~500 KB of Markdown) | `Overview/`, `Backend/README.md` + `Backend/docs/`, `Frontend/Legacy/README.md` + `Frontend/Legacy/docs/` (nine reference documents), and a README per tool under `Tools/`. |
+| **Agent guidance** | `Frontend/Legacy/CLAUDE.md` carries the partner-facing working rules for building a frontend component — the four-round interview for a new component, extend-don't-copy, resources, search links, verification and publishing. It is the public counterpart of the UI component library's own CLAUDE.md. |
 
 `Tools/` ships three tools as release zips: `Portals-SDK-PublishComponent-CLI` (publish and register
 a component), `Legacy/Portals-DevServer` (serve local frontend component builds to a development portal),
@@ -58,32 +60,36 @@ Conventions every document here follows — match them:
 
 - Setext-style title (`=====` underline), then a `Current version of this document is: X.Y.Z (as of
   <date>)` line, and a `Contributors` block at the end. **Bump the version line when you change a
-  document**, and make sure there is only one of it — `Backend/README.md` carried two
-  contradictory stamps for years.
+  document**, and make sure there is exactly one of it.
 - A numbered link list as the table of contents, with `#user-content-`-prefixed anchors for
   in-document links (GitHub's rendering of README files inside a directory listing needs the
   prefix).
-- Relative links, resolved from the file's own directory. This has been got wrong before: every
-  link in `Backend/Connectors/README.md` was once written as if from `Backend/`,
-  and an anchor in the SharePoint connector README pointed at a heading that lives two levels up.
-  Check links after editing.
+- Relative links, resolved from the file's own directory — not from the directory the document
+  talks about. **Check every link and anchor after editing**; both are easy to get wrong and
+  nothing fails loudly when they are. A heading with a stray double space silently changes its
+  own anchor.
 
-## The documentation here mirrors documentation kept internally
+## This repository is the home of the frontend component documentation
 
-`Frontend/Legacy/docs/smintio-*.md` are partner-facing counterparts of internal documents. Some
-are byte-identical; others are the internal document with a version line, a Contributors block, and
-internal phrasing rewritten. **A change to one side usually belongs on the other.**
+`Frontend/Legacy/` — the README, `docs/`, `CLAUDE.md` and `Example/` — is the single description
+of how a Smint.io Portals frontend component is built, for Smint.io and for partners alike. It
+has to stand on its own: most readers do not have the reference sources, so a document that only
+works if you can open a component's source is not finished.
 
-Three pairs are deliberately kept in step and drift the fastest:
+The internal UI component repositories keep only what is specific to them: their monorepo layout
+and lerna globs, their dev server mapping prefixes, their tenants and customers, and the worked
+examples behind the anonymised lessons told here. Their own CLAUDE.md files delegate everything
+else to this repository.
 
-| Here | Internal counterpart |
-|---|---|
-| `Frontend/Legacy/README.md` — "Before you start: the questions to answer" | `building-ui-components.md` §3.1, and the interview protocol in the UI component library's own CLAUDE.md |
-| `Frontend/Legacy/docs/smintio-data-adapter-reference.md` | `data-adapter-reference.md` |
-| `Frontend/Legacy/docs/smintio-page-type-contracts.md` | `page-type-contracts.md` |
+So: **when you learn something about building a frontend component, write it down here**, and
+add a pointer on the internal side only if the internal specifics change it. A rule that applies
+to any component belongs in this repository, anonymised. Never move a customer name, a tenant
+name, a portal URL or an internal path in the other direction.
 
-Where the two disagree, the internal documents are the working detail and take precedence — but
-that is a signal to fix the partner-facing copy, not to leave it wrong.
+The two generated documents — `Frontend/Legacy/docs/smintio-data-adapter-reference.md` and
+`smintio-page-type-contracts.md` — are produced from the SDK source and from the page templates
+of the component library, which are not in this repository. Regenerate them here, from those
+sources, rather than copying a second copy in.
 
 The backend material has internal authorities too: the connector SDK's and data adapter SDK's own
 CLAUDE.md files describe the metamodel and the asset data model in full, and the SDK core types

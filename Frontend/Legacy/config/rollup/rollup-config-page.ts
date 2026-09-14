@@ -92,7 +92,7 @@ return exports;
                 exclude: "node_modules/**",
                 extensions: [...DEFAULT_EXTENSIONS, ".ts", ".tsx"],
 
-                ignore: ["./node_modules/@smintio/", "../../ui-components/", "./node_modules/@babel/"],
+                ignore: ["./node_modules/@smintio/", "./node_modules/@babel/"],
                 plugins: [
                     [
                         "@babel/plugin-transform-runtime",

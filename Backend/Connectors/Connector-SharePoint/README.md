@@ -1,7 +1,7 @@
 How-to implement the `Connector`
 ================================
 
-Current version of this document is: 1.0.2 (as of 11th of September, 2026)
+Current version of this document is: 1.0.3 (as of 14th of September, 2026)
 
 ## SharePoint `Connector` Basics
 
@@ -115,7 +115,7 @@ regard, because it only has one type of object, the `File` (similar to a desktop
 `EntityModel`. Columns (i.e. custom fields) affect all files equally: if we were to add a custom choice field "Mood",
 indicating the mood prevalent in an image, it would also be possible for a `*.docx` file to have a "Mood" field.
 
-###  Meta-model structure
+### Meta-model structure
 
 The meta-model consists of a collection of `EntityModel` objects, and each `EntityModel` has a list of `Properties`. It could be compared to a C# class definition where each `EntityModel` would be one 
 class, each `Property` a class member. So if we were to model a Sharepoint file in C#, we could write it as

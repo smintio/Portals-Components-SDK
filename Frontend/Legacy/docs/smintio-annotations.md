@@ -1,7 +1,7 @@
 Smint.io Portals frontend component annotations
 ===============================================
 
-Current version of this document is: 2.0.0 (as of 10th of September, 2026)
+Current version of this document is: 2.1.0 (as of 14th of September, 2026)
 
 Annotations describe a frontend component's configuration to Smint.io Portals: what fields
 the portal editor sees, what they are called in each language, what values they accept and
@@ -149,14 +149,25 @@ computed property that reads the slot's components from the page context, and de
 
 ## Recommended annotation order
 
-The Smint.io component library writes annotations in this order. Following it keeps large
-components readable:
+Property annotation order does not change behaviour — the order below is the one the Smint.io
+component library uses, and following it keeps a component with fifty properties readable:
 
 1. `DisplayName` — default culture first
 2. `Description`
 3. `Implements` (when the type is not primitive)
 4. `ComponentProperty`
 5. type and constraint annotations (`Is...`, `MaxLength`, `AllowedValues`, `AllowedValueDisplayName`, `DynamicAllowedValuesProvider`)
-6. `DefaultValue`
-7. `VisibleIf` / `FormItemVisibility`
-8. `FormGroup`
+6. `FormItemVisibility`
+7. `FormGroup`
+8. `VisibleIf`
+9. `DefaultValue` — last, so the value a field starts with is easy to find
+
+Class annotation order **does** matter in one place: `FormGroupDeclaration` and its
+`FormGroupDisplayName` / `FormGroupDescription` are class decorators, and class decorators are
+applied bottom-up, so the group declared last in the source appears first in the configuration
+form. Declare your groups in reverse of the order you want the tabs.
+
+Contributors
+============
+
+- Reinhard Holzner, Smint.io GmbH

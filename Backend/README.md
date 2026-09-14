@@ -1,7 +1,7 @@
 Developing Smint.io Portals backend components
 ==============================================
 
-Current version of this document is: 2.3.1 (as of 14th of September, 2026)
+Current version of this document is: 2.3.2 (as of 14th of September, 2026)
 
 This repository contains examples for Smint.io Portals backend components, which is connectors, data adapters, data processors, task handlers, portal templates and identity providers.
 
@@ -394,7 +394,7 @@ Portals component framework and runtime.
 However, for use of your custom public API interfaces in a Smint.io Portals UI component you'll need its Typescript 
 public API interface definition.
 
-Use the [Smint.io Portals Data Adapter Exporter CLI tool](https://github.com/smintio/Portals-Components-SDK/tree/main/Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release) 
+Use the [Smint.io Portals Data Adapter Exporter CLI tool](../Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/) 
 to generate the Typescript public API interface definition directly from your Smint.io Portals data adapter assembly. 
 
 You can then simple use that Typescript public API interface definition file in your Smint.io Portals UI component.

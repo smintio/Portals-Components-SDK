@@ -1,12 +1,14 @@
 The Portals-SDK-PublishComponent-CLI tool
 =========================================
 
-1. [Description](#description)
-1. [Download](#download)
-1. [Environment variable](#environment-variable)
-1. [App settings](#app-settings)
-1. [Parameters](#parameters)
-1. [Publish and deploy](#publish-and-deploy)
+1. [Description](#user-content-description)
+1. [Download](#user-content-download)
+1. [Environment variable](#user-content-environment-variable)
+1. [App settings](#user-content-app-settings)
+1. [Parameters](#user-content-parameters)
+1. [Publish and deploy](#user-content-publish-and-deploy)
+
+Current version of this document is: 1.2.0 (as of 14th of September, 2026)
 
 ## Description
 
@@ -19,7 +21,6 @@ Get in touch with [Smint.io](https://www.smint.io) or [support@smint.io](mailto:
 Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals.
 Enterprise plan customers.
 
-Current version of this document is: 1.1.0 (as of 11th of September, 2026)
 
 ## Download
 
@@ -39,9 +40,13 @@ Doing so will allow the publishing tool to be invoked from different locations.
 You can manage three different environments for your component development efforts (`Development`, `Staging` and `Production`).
 For each of those environments, you can specify different connection data:
 
-- appsettings.json contains production settings for publishing of components
+- appsettings.json is the template, and holds the settings the environment files have in common
 - appsettings.Development.json contains settings for local development (inherits from appsettings.json, if a setting is not given)
 - appsettings.Staging.json contains settings for staging developed components (inherits from appsettings.json, if a setting is not given)
+- appsettings.Production.json contains settings for publishing to production (inherits from appsettings.json, if a setting is not given)
+
+The `-env` argument described under [Parameters](#user-content-parameters) picks which of the
+three environment files applies.
 
 Sample `appsettings.Staging.json`
 
@@ -95,10 +100,13 @@ The target component's npm "package.json" file can be extended with additional "
 ```json
 "scripts": {
     "smint-io-pc:development": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development",
-    "smint-io-pc:staging": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging",
-    ...
+    "smint-io-pc": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env staging",
+    "smint-io-pc:production": "npm publish && npm info --json | %SMINT_IO_SDK_HOME%\\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env production"
 }
 ```
+
+Those three are exactly what the `ui-example-hello-world-1` starter ships, so copying the starter
+gets you them already — note that the unsuffixed `smint-io-pc` is the **staging** one.
 
 The CLI executable requires the value of `npm info --json` as standard input so that it can determine the component name, version, and npm repository.
 
@@ -172,7 +180,7 @@ Optionally, backend developers can register the tool as a global CLI tool:
 	- For Linux, go to `$HOME/.dotnet/tools`
 1. Go to folder `.store\smintio.portals.sdk.publishcomponent.cli\2.0.0.0\smintio.portals.sdk.publishcomponent.cli\2.0.0.0\tools\net8.0\any`
 	- The version number may vary
-1. Edit the applicable development, staging, and/or production app settings files similarly to [App Settings](#app-settings)
+1. Edit the applicable development, staging, and/or production app settings files similarly to [App settings](#user-content-app-settings)
 1. Useful links
 	- [Install and use a .NET global tool using the .NET CLI](https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools-how-to-use)
 	- [dotnet tool install](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install)
