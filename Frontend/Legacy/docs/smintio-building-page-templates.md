@@ -11,7 +11,7 @@ Building a Smint.io Portals page template
 1. [Build, run, publish](#user-content-build-run-publish)
 1. [Checklist](#user-content-checklist)
 
-Current version of this document is: 1.0.0 (as of 14th of September, 2026)
+Current version of this document is: 1.0.1 (as of 14th of September, 2026)
 
 A **page template** is the second level of structure in a Smint.io Portal. It defines the
 *slots* of a page — header, left, content, right, footer — decides which UI component types each
@@ -154,7 +154,9 @@ export default class PortalsPage extends Mixins(
 </script>
 ```
 
-`Reference/page-templates/page-generic-1` is that file almost verbatim — a good place to start.
+Smint.io's own `page-generic-1` page template is that file almost verbatim — a good place to
+start if you have the [reference sources](../Reference/README.md).
+
 Note that the template binds `contentGap`, so the property has to be declared: a page template
 whose markup reads a setting it never declares renders with `undefined` and no error.
 
@@ -253,7 +255,7 @@ hosts.
 />
 ```
 
-`Reference/page-templates/page-media-gallery-assets-search-1` is the fullest example.
+`page-media-gallery-assets-search-1` is the fullest example.
 
 **This binding block *is* the contract** — there is no separate declaration of it anywhere. If
 you are writing a page template for an existing page type, copy the prop and event names from
@@ -301,7 +303,7 @@ public readonly dialogData!: IPageDialogData;
 
 `PortalsPageTemplateComponent` also accepts `isDialog` and `dialogAlignment` (`center`, `left`,
 `right`, `top` or `bottom`) for finer control.
-`Reference/page-templates/page-generic-dialog-1` is the working example.
+`page-generic-dialog-1` is the working example.
 
 ## Configuration properties
 

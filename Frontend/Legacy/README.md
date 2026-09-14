@@ -25,7 +25,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Data adapter reference: every public API interface and model](docs/smintio-data-adapter-reference.md)
 1. [Page type contracts: what a page hands to the components it hosts](docs/smintio-page-type-contracts.md)
 1. [Building a page template: slots, contracts and the page skeleton](docs/smintio-building-page-templates.md)
-1. [Reference sources: the sources of the components Smint.io ships](Reference/)
+1. [Reference sources: the components Smint.io ships, for Certified Partners](Reference/)
 1. [How to develop your own custom component](#user-content-how-to-develop-your-own-frontend-component)
 1. [Before you start: the questions to answer](#user-content-before-you-start-the-questions-to-answer)
 1. [Anatomy of a component package](#user-content-anatomy-of-a-component-package)
@@ -35,7 +35,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [How we built our own components](#user-content-how-we-built-our-own-components)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.4.0 (as of 14th of September, 2026)
+Current version of this document is: 1.5.0 (as of 14th of September, 2026)
 
 ## UI components
 
@@ -1258,27 +1258,28 @@ form, that is the publishing boundary described above — build and publish, and
 
 ## How we built our own components
 
-The sources of the components Smint.io builds and ships are in this repository, under
-[Frontend/Legacy/Reference](Reference/): 64 UI components, 34 page templates, the shared
+**For Smint.io Certified Partners**, the full sources of the components we build and ship are
+available on request: 64 UI components, 34 page templates, the shared
 `@smintio/portals-components` library and the gallery view library. Read them to see how we
 solved something before you solve it yourself, and copy from them rather than starting from
 scratch.
 
-- [`Reference/ui-components/`](Reference/ui-components) — the UI components. The generated
-  overview of what each one is, with its key, type and configuration properties, is in
-  [the UI component list](docs/smintio-ui-components.md)
-- [`Reference/page-templates/`](Reference/page-templates) — the page templates, with their slots
-  listed in [the page template list](docs/smintio-page-templates.md)
-- [`Reference/portals-components/`](Reference/portals-components) — the shared component library:
-  the `S...Props` configuration mixins, the behaviour mixins, the slot renderers, the dialogs
-- [`Reference/README.md`](Reference/) — what is where, which package to start from for a given
-  kind of component, and how to build the tree
+They are not part of this repository. Once we have granted you access to the reference
+repository, copy its contents into [Frontend/Legacy/Reference](Reference/) — that directory
+carries [a README](Reference/README.md) explaining the layout, which package to start from for a
+given kind of component, and how to bootstrap and build the tree. Please get in touch at
+[support@smint.io](mailto:support@smint.io) to request access.
 
-That directory is an export and is refreshed from time to time, so treat it as read-only and
-work on a copy. Please pull this repository regularly — we update the components constantly.
+Without the sources you are not missing the essentials. Everything you need to build a component
+is in this guide and in [docs](docs), and two generated overviews describe every component we
+ship — its key, its type, its configuration properties and the mixins it uses:
 
-If your own component is an existing Smint.io component *plus something*, do not copy it at all:
-take it as a dependency and
+- [the UI component list](docs/smintio-ui-components.md)
+- [the page template list](docs/smintio-page-templates.md), including the slots each page
+  template declares and the UI component types they accept
+
+If your own component is an existing Smint.io component *plus something*, you do not need the
+sources at all: take the published package as a dependency and
 [extend it](#user-content-is-your-component-an-existing-one-plus-something-extend-it-do-not-copy-it).
 
 If you have any questions about the code, on how to build those components, or whatever else,

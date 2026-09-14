@@ -20,7 +20,7 @@ Four things live here:
 | | |
 |---|---|
 | **Reference implementations** (~158 `.cs`) | `Backend/` — paired connectors and data adapters: `Connector-HelloWorld` + `DataAdapter-HelloWorld` as the minimal skeleton, plus `Picturepark` (live connection) and `SharePoint` (indexed through the integration layer) as realistic ones, each with a test driver. `Frontend/Legacy/Example/ui-example-hello-world-1` is the UI component starter, and `Frontend/Legacy/config/` holds the shared rollup and TypeScript config it extends. |
-| **Frontend reference sources** (`Frontend/Legacy/Reference/`) | an export of the sources behind the components Smint.io ships — 64 UI components, 34 page templates, the shared `portals-components` library, the gallery view, and the monorepo root files needed to build them. **The export is a mirror: anything written into that tree that the export does not produce is deleted on the next run.** `Reference/README.md` is the one exception, and it is preserved by name — if you add another file there, add it to the export script's preserved list too. |
+| **Frontend reference sources** (`Frontend/Legacy/Reference/`) | **not in this repository.** The sources behind the components Smint.io ships — 64 UI components, 34 page templates, the shared `portals-components` library and the gallery view — are made available to Smint.io Certified Partners on request, and copied into this directory by the partner. The directory ships with a README and a `.gitignore` that hides anything copied in, so the sources can never be committed here by accident. Never describe them as part of this repository, and never link into `Reference/<folder>` from another document — refer to a package by name instead, because the path does not exist for most readers. |
 | **Partner-facing documentation** (~500 KB of Markdown) | `Overview/`, `Backend/README.md` + `Backend/docs/`, `Frontend/Legacy/README.md` + `Frontend/Legacy/docs/` (nine reference documents), and a README per tool under `Tools/`. |
 | **Agent guidance** | `Frontend/Legacy/CLAUDE.md` carries the partner-facing working rules for building a frontend component — the four-round interview for a new component, extend-don't-copy, resources, search links, verification and publishing. It is the public counterpart of the UI component library's own CLAUDE.md. |
 
@@ -71,9 +71,10 @@ Conventions every document here follows — match them:
 
 ## This repository is the home of the frontend component documentation
 
-`Frontend/Legacy/` — the README, `docs/`, `CLAUDE.md`, `Example/` and `Reference/` — is the
-single description of how a Smint.io Portals frontend component is built, for Smint.io and for
-partners alike.
+`Frontend/Legacy/` — the README, `docs/`, `CLAUDE.md` and `Example/` — is the single description
+of how a Smint.io Portals frontend component is built, for Smint.io and for partners alike. It
+has to stand on its own: most readers do not have the reference sources, so a document that only
+works if you can open a component's source is not finished.
 
 The internal UI component repositories keep only what is specific to them: their monorepo layout
 and lerna globs, their dev server mapping prefixes, their tenants and customers, and the worked
@@ -87,7 +88,8 @@ name, a portal URL or an internal path in the other direction.
 
 The two generated documents — `Frontend/Legacy/docs/smintio-data-adapter-reference.md` and
 `smintio-page-type-contracts.md` — are produced from the SDK source and from the page templates
-in `Frontend/Legacy/Reference/`. Regenerate them here rather than copying them in.
+of the component library, which are not in this repository. Regenerate them here, from those
+sources, rather than copying a second copy in.
 
 The backend material has internal authorities too: the connector SDK's and data adapter SDK's own
 CLAUDE.md files describe the metamodel and the asset data model in full, and the SDK core types

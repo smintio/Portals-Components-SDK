@@ -1,0 +1,7 @@
+# The frontend component reference sources are made available to Smint.io Certified
+# Partners separately and copied into this directory -- see README.md. They are not
+# part of this repository, so everything here is ignored apart from this file and
+# the README.
+*
+!.gitignore
+!README.md
