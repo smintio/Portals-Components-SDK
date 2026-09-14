@@ -6,7 +6,7 @@ The Portals-DataAdapter-SDK-DataAdapterExporter-CLI tool
 1. [Parameters](#parameters)
 1. [Usage](#usage)
 
-Current version of this document is: 1.0.0 (as of 11th of September, 2026)
+Current version of this document is: 1.0.1 (as of 14th of September, 2026)
 
 ## Description
 
@@ -20,14 +20,14 @@ This tool produces it: point it at your compiled data adapter assembly, and it w
 TypeScript interface definitions, including the parameter and result types they refer to.
 
 The concept, and a worked example of the generated output, is described under
-[custom public API interfaces](../../../Examples/Backend/#user-content-custom-public-api-interfaces).
+[custom public API interfaces](../../../Backend/#user-content-custom-public-api-interfaces).
 
 ## Download
 
 Download the ZIP archive to a convenient location and extract it.
 
 *Please note that this tool is currently published for Windows (x64) only,* unlike the
-[Portals-DevServer](../../Portals-DevServer/Release/) and the
+[Portals-DevServer](../../Legacy/Portals-DevServer/Release/) and the
 [Portals-SDK-PublishComponent-CLI](../../Portals-SDK-PublishComponent-CLI/Release/), which also ship
 Linux and macOS builds. If you need it on another platform, please get in touch with
 [support@smint.io](mailto:support@smint.io).

@@ -1,7 +1,7 @@
 Developing Smint.io Portals backend components
 ==============================================
 
-Current version of this document is: 2.3.0 (as of 11th of September, 2026)
+Current version of this document is: 2.3.1 (as of 14th of September, 2026)
 
 This repository contains examples for Smint.io Portals backend components, which is connectors, data adapters, data processors, task handlers, portal templates and identity providers.
 
@@ -20,7 +20,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Custom public API interfaces](#user-content-custom-public-api-interfaces)
 1. [The connector meta-model: describing the external system's schema](docs/smintio-connector-metamodel.md)
 1. [The asset data model: what a data adapter returns](docs/smintio-asset-data-model.md)
-1. [Overview of Smint.io annotations](../Frontend/docs/smintio-annotations.md)
+1. [Overview of Smint.io annotations](../Frontend/Legacy/docs/smintio-annotations.md)
 
 ## Examples
 
@@ -164,7 +164,7 @@ This is done because before the execution of SearchAssetsAsync, the correct cult
 
 In this case the `Name` property of `ValueForJson` does not have to be fully localized.
 
-The full list of supported Smint.io Portals annotations can be found [here](../Frontend/docs/smintio-annotations.md).
+The full list of supported Smint.io Portals annotations can be found [here](../Frontend/Legacy/docs/smintio-annotations.md).
 
 The `IConnector` implementation should specify the authentication mechanism. Smint.io supports `OAuth2Connector` and `OAuth2AuthenticationCodeFlowWithPKCEConnector`, which should serve as a starting point in the form of a base class.
 However, it is also possible to implement your own authentication mechanism at any time.
