@@ -1,0 +1,19 @@
+.idea
+.vs
+
+obj
+bin
+
+
+.DS_Store
+*~
+*.tmp
+*.rej
+*.orig
+*.local.json
+
+# Tools are distributed as release archives only. An extracted copy carries
+# appsettings.<Env>.json files holding OAuth secrets and feed authorization
+# headers — never commit them.
+tools/*/Release/*/
+!tools/*/Release/*.zip

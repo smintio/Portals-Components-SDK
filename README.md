@@ -1,38 +1,72 @@
-Description
-===========
+Smint.io Portals Components SDK
+===============================
 
-This repository contains examples and tools for rapid developing of custom components targeting the Smint.io Portals solution.
+Examples, reference documentation and tools for building your own components for the
+Smint.io Portals solution.
 
-Please find guides about Smint.io Portals component development here:
+Current version of this document is: 2.0.0 (as of 14th of September, 2026)
 
-- [What are Smint.io Portals components?](Overview/)
+New here? Read [What are Smint.io Portals components?](OVERVIEW.md) first — it explains how a
+portal is assembled from components, and which component type does what.
 
-- [Developing frontend components](Examples/Frontend/)
+## What do you want to build?
 
-	- Page templates
-	- UI components
-	
-- [Developing backend components](Examples/Backend/)
+| I want to… | Go to |
+|---|---|
+| Build a **frontend component** — a UI component or a page template | [sminted-ui/](sminted-ui/) *(current, Vue 3)* |
+| Maintain a frontend component written on the **previous generation** | [smintio-components/](smintio-components/) *(Vue 2)* |
+| Connect Smint.io Portals to an **external system** | [connectors/](connectors/) |
+| Expose data from a connected system to components | [data-adapters/](data-adapters/) |
+| Build a data processor, task handler, portal template or identity provider | [BACKEND-COMPONENTS.md](BACKEND-COMPONENTS.md) |
 
-	- Connectors
-	- Data adapters
-	- Data processors
-	- Task handlers
-	- Portal templates
-	- Identity providers
+## The repository
 
-	- [The connector meta-model](Examples/Backend/docs/smintio-connector-metamodel.md) — describing the external system's schema
-	- [The asset data model](Examples/Backend/docs/smintio-asset-data-model.md) — what a data adapter returns
+```text
+.
+├── OVERVIEW.md              what Smint.io Portals components are, and how they fit together
+├── TOOLS.md                 the command line tools you will need
+├── BACKEND-COMPONENTS.md    the guide to all backend component types
+│
+├── sminted-ui/              frontend components — Sminted UI (Vue 3), current
+├── smintio-components/      frontend components — Smint.io components (Vue 2), previous generation
+├── connectors/              connector guide, meta-model reference and three worked examples
+├── data-adapters/           data adapter guide, asset data model reference and three worked examples
+└── tools/                   released command line tools
+```
 
-This is the tools you need for developing Smint.io Portals components:
+Every folder holds its own guide in `README.md`, its reference documents next to it, and its
+worked examples as sub-folders.
 
-- The [Data Adapter Exporter CLI tool](Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/) is used to generate TypeScript public API interface definitions from backend component assemblies
-- The [Portals-SDK-PublishComponent-CLI tool](Tools/Portals-SDK-PublishComponent-CLI/Release/) is used to compile, package and deploy components
-- The [Portals-DevServer](Tools/Portals-DevServer/Release/) is used for local distribution of frontend components
+## Two generations of frontend components
 
-Please note that future tools may be added or existing ones may be updated based on user feedback.
+Smint.io Portals is moving its frontend from **Smint.io components** (Vue 2) to
+**Sminted UI** (Vue 3).
 
-Current version of this document is: 1.1.0 (as of 11th of September, 2026)
+|  | Smint.io components | Sminted UI |
+|---|---|---|
+| Technology | Vue 2, TypeScript decorators, rollup | Vue 3, Composition API, Vite |
+| Settings declared with | annotations on a class | a `*.smintio.config.ts` configuration file |
+| Status | supported, maintenance | **current — build new components here** |
+
+The two generations describe the *same system*: the same component type ids, the same page type
+contracts, the same data adapter model, the same asset shapes. Only the authoring technology
+differs. That is why the Vue 2 reference documentation remains useful even when you are writing a
+Vue 3 component — it is the most complete description of what a component of a given type is
+expected to do.
+
+## Getting access
+
+Access to the Smint.io Portals SDKs is restricted. Get in contact with
+[Smint.io](https://www.smint.io) to request it. Access is granted to Smint.io Solution Partners
+and to Smint.io Portals Enterprise plan customers.
+
+You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs
+are hosted there.
+
+## Questions
+
+Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) if you run
+into any issues.
 
 Contributors
 ============
