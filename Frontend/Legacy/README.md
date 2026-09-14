@@ -31,7 +31,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Extras for Smint.io Certified partners](#user-content-extras-for-smintio-certified-partners)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.2.0 (as of 11th of September, 2026)
+Current version of this document is: 1.2.1 (as of 14th of September, 2026)
 
 ## UI components
 
@@ -264,7 +264,7 @@ in your Smint.io Portals UI component.
 
 *All the wiring from frontend to backend is done for you, without any further work involved.*
 
-Learn more about how to do that [here](https://github.com/smintio/Portals-Components-SDK/tree/main/Examples/Backend#custom-public-api-interfaces).
+Learn more about how to do that [here](https://github.com/smintio/Portals-Components-SDK/tree/main/Backend#custom-public-api-interfaces).
 
 ## How to develop your own frontend component
 
@@ -376,7 +376,7 @@ For Mac or Linux users, you have to change your `package.json`. Please change th
 
 ### The example frontend component
 
-The [example Vue.js component itself](ui-example-hello-world-1//src//PortalsUiComponent.vue) is pretty basic. 
+The [example Vue.js component itself](Example/ui-example-hello-world-1/src/PortalsUiComponent.vue) is pretty basic. 
 It can display colored static text once added to a page.
 
 The source follows established Vue.js structure practices by containing a template, typescript, and css sections.
@@ -433,7 +433,7 @@ The full list of supported Smint.io Portals annotations can be found [here](docs
 
 `ILocalizedStringsModel` is a custom object type defined by Smint.io that can return the correct text value of a component according to the selected language by the user.
 
-By default, [package.json](ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
+By default, [package.json](Example/ui-example-hello-world-1/package.json) is used by the npm CLI (and others) to identify the component and how to handle its relevant dependencies.
 
 #### Is your component an existing one plus something? Extend it, do not copy it
 
@@ -532,7 +532,7 @@ The rest of this section is about the resource case.
 
 A resource backed text property can be given a **string resource id** as its default, so the
 component is not blank the moment it is dropped onto a page. The example does this in
-[resources/definition.ts](ui-example-hello-world-1/resources/definition.ts), pointing
+[resources/definition.ts](Example/ui-example-hello-world-1/resources/definition.ts), pointing
 `componentText` at the resource id `component_text`:
 
 ```javascript
@@ -762,7 +762,7 @@ A page template is the same kind of npm package, built with the same SDK. Start 
 | Source file | `src/PortalsUiComponent.vue` | `src/PortalsPage.vue` |
 | Class decorator | `@PortalsUiComponent` | `@PortalsPageTemplateComponent` |
 | `type` | a UI component type | a page type |
-| Shared rollup config imported by your `rollup.config.js` | `../config/rollup/rollup-config.ts` | `../config/rollup/rollup-config-page.ts` |
+| Shared rollup config imported by your `rollup.config.js` | `../../config/rollup/rollup-config.ts` | `../../config/rollup/rollup-config-page.ts` |
 | `main` in `package.json` | `./lib/portals-ui-component.umd.min.js` | `./lib/portals-page.umd.js` |
 | Resource builder call in `resources/definition.ts` | `buildUIComponentResourceDefinition` | `buildPageTemplateResourceDefinition` |
 | Generated resource file | `portals-ui-component.json` | `portals-page-template.json` |
@@ -771,7 +771,7 @@ The shared rollup config for page templates is already part of this repository, 
 change to your `rollup.config.js` is the import:
 
 ```javascript
-import rollupConfig from "../config/rollup/rollup-config-page.ts";
+import rollupConfig from "../../config/rollup/rollup-config-page.ts";
 ```
 
 Instead of configuration properties alone, a page template declares its *slots*:
@@ -1097,7 +1097,7 @@ these two switches, and changing the mapping will not help.
    enable *Basic settings > Development mode* on it, and clear your login as a developer —
    see [the two switches above](#user-content-two-switches-decide-whether-your-local-build-is-asked-for-at-all).
    Stay logged in with that user while you develop
-1. Download the [Portals Dev-Server](../../Tools/Portals-DevServer/Release/) and install the .NET 8 runtime
+1. Download the [Portals Dev-Server](../../Tools/Legacy/Portals-DevServer/Release/) and install the .NET 8 runtime
 1. Trust the `rootCA.pem` shipped with the dev server, so that your browser accepts its local HTTPS listener
 1. In the dev server's `appsettings.json`, set `RootDirectory` to the folder that contains your component folders
 1. In the same file, add one entry under `ComponentMappings` for each component you want to
@@ -1169,11 +1169,11 @@ as a reference for you to solve your requirements. In this case, we recommend yo
 
 1. Check out the `page-templates` directory to find the implementations of our page templates
 
-	- Here you can find a list of our page template components (generated from our source, and kept current): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-page-templates.md
+	- Here you can find a list of our page template components (generated from our source, and kept current): https://github.com/smintio/Portals-Components-SDK/blob/main/Frontend/Legacy/docs/smintio-page-templates.md
 	
 2. Check out the `ui-components` directory to find the implementations of our UI components
 
-	- Here you can find a list of our UI components (generated from our source, and kept current): https://github.com/smintio/Portals-Components-SDK/blob/main/Examples/Frontend/docs/smintio-ui-components.md
+	- Here you can find a list of our UI components (generated from our source, and kept current): https://github.com/smintio/Portals-Components-SDK/blob/main/Frontend/Legacy/docs/smintio-ui-components.md
 	
 3. Check out the `portals-components` directory to find the implementation of our shared component library
 4. Please do not forget to pull this repository regularily, as we constantly update our codebase

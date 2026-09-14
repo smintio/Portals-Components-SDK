@@ -7,13 +7,13 @@ The Portals-DevServer
 1. [Usage](#usage)
 1. [When nothing is served](#user-content-when-nothing-is-served)
 
-Current version of this document is: 1.1.0 (as of 11th of September, 2026)
+Current version of this document is: 1.1.1 (as of 14th of September, 2026)
 
 ## Description
 
 By default, Smint.io distributes frontend components through a CDN. This means, that you cannot change a frontend component easily
 and quickly update them in your browser without building, packaging and publishing the frontend component to the Smint.io servers
-using the [Portals-SDK-PublishComponent-CLI tool](../../Portals-SDK-PublishComponent-CLI/Release/).
+using the [Portals-SDK-PublishComponent-CLI tool](../../../Portals-SDK-PublishComponent-CLI/Release/).
 
 The Portals-DevServer fixes that problem. Once you point the dev server to your local frontend component build directory, it is able to
 serve the JavaScript of the frontend component to your browser directly, without going through the CDN.

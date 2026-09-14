@@ -7,12 +7,12 @@ Please find guides about Smint.io Portals component development here:
 
 - [What are Smint.io Portals components?](Overview/)
 
-- [Developing frontend components](Examples/Frontend/)
+- [Developing frontend components](Frontend/Legacy/)
 
 	- Page templates
 	- UI components
 	
-- [Developing backend components](Examples/Backend/)
+- [Developing backend components](Backend/)
 
 	- Connectors
 	- Data adapters
@@ -21,18 +21,18 @@ Please find guides about Smint.io Portals component development here:
 	- Portal templates
 	- Identity providers
 
-	- [The connector meta-model](Examples/Backend/docs/smintio-connector-metamodel.md) — describing the external system's schema
-	- [The asset data model](Examples/Backend/docs/smintio-asset-data-model.md) — what a data adapter returns
+	- [The connector meta-model](Backend/docs/smintio-connector-metamodel.md) — describing the external system's schema
+	- [The asset data model](Backend/docs/smintio-asset-data-model.md) — what a data adapter returns
 
 This is the tools you need for developing Smint.io Portals components:
 
 - The [Data Adapter Exporter CLI tool](Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/) is used to generate TypeScript public API interface definitions from backend component assemblies
 - The [Portals-SDK-PublishComponent-CLI tool](Tools/Portals-SDK-PublishComponent-CLI/Release/) is used to compile, package and deploy components
-- The [Portals-DevServer](Tools/Portals-DevServer/Release/) is used for local distribution of frontend components
+- The [Portals-DevServer](Tools/Legacy/Portals-DevServer/Release/) is used for local distribution of frontend components
 
 Please note that future tools may be added or existing ones may be updated based on user feedback.
 
-Current version of this document is: 1.1.0 (as of 11th of September, 2026)
+Current version of this document is: 1.1.1 (as of 14th of September, 2026)
 
 Contributors
 ============

@@ -3,7 +3,7 @@ What are Smint.io Portals components?
 
 This README.md serves to clarify the general concept of Smint.io Portals components.
 
-Current version of this document is: 1.0.0 (as of 8th of July, 2025)
+Current version of this document is: 1.0.1 (as of 14th of September, 2026)
 
 ## Overview
 
@@ -29,7 +29,7 @@ The *Startup* class of a Smint.io Portals component provides a static entry poin
 
 Please note that there is no separate *Startup* class for Smint.io Portals frontend components. Smint.io Portals frontend components contain all the necessary information directly in the component's source code, added as annotations. When a Smint.io Portals frontend component is loaded, the system then generates the frontend component's *Startup* class on the fly.
 
-[Here](../Examples/Backend/Connectors/Connector-SharePoint/SharepointConnectorStartup.cs) you find an example of a component's *Startup* class (this one is part of our *Microsoft SharePoint* connector)
+[Here](../Backend/Connectors/Connector-SharePoint/SharepointConnectorStartup.cs) you find an example of a component's *Startup* class (this one is part of our *Microsoft SharePoint* connector)
 
 ### The *Configuration* class
 
@@ -39,7 +39,7 @@ When Smint.io Portals instantiates a component, it reads the user provided compo
 
 Please note that there is no separate *Configuration* class for Smint.io Portals frontend components. Smint.io Portals frontend components contain all the necessary information directly in the component's source code, added as annotations. When a Smint.io Portals frontend component is loaded, the system then generates the frontend component's *Configuration* class on the fly.
 
-[Here](../Examples/Backend/Connectors/Connector-Picturepark/PictureparkConnectorConfiguration.cs) you find an example of a component's *Configuration* class (this one is part of our *Picturepark connector)
+[Here](../Backend/Connectors/Connector-Picturepark/PictureparkConnectorConfiguration.cs) you find an example of a component's *Configuration* class (this one is part of our *Picturepark connector)
 
 ## SDKs
 
@@ -54,7 +54,7 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 
 ![Visual representationC](./images/components-overview.png "Visual representation")
 
-## [Frontend components](../Examples/Frontend/)
+## [Frontend components](../Frontend/Legacy/)
 
 ### UI components
 
@@ -80,7 +80,7 @@ be:
 - Content slot
 - Footer slot
 
-## [Backend components](../Examples/Backend/)
+## [Backend components](../Backend/)
 
 ### Connectors
 
