@@ -1,7 +1,7 @@
 Smint.io Portals frontend reference
 ==================================
 
-Current version of this document is: 1.0.0 (as of 10th of September, 2026)
+Current version of this document is: 1.1.0 (as of 14th of September, 2026)
 
 Lookup tables for building Smint.io Portals frontend components: the services you can inject,
 the template filters and CSS classes the runtime provides, the shared property mixins you
@@ -64,8 +64,8 @@ public readonly pageContext!: IPortalsPageContext;
 
 `portalsContext.services` groups the data adapter backed services the portal has configured:
 `assets` (`read` / `search` / `folderNavigation` / `download`), `resourceAssets`,
-`productAssets`, `collections`, `collectionsAndAssets`, `collectionsAndUsers`, `shares` and
-`permissions`.
+`productAssets`, `collections`, `collectionsAndAssets`, `collectionsAndUsers`, `shares`,
+`files` (`upload`) and `permissions`.
 
 `portalsContext.services.permissions` answers the questions you should ask before offering an
 action to the visitor:
@@ -76,6 +76,7 @@ hasDownloadAssetHiResPermission(asset)
 hasDownloadAssetLayoutFilePermission(asset)
 hasDownloadPermission(asset)
 hasAssetPermission(asset, permissionUuid)
+hasSomewherePermission(permissionUuid)
 ```
 
 Please note that permissions are always enforced on the backend as well. Checking them in the
@@ -169,14 +170,20 @@ group:
 
 ## Shared components
 
-Also from `@smintio/portals-components`. The dialogs are registered globally by the runtime,
-so use their kebab-case tags directly without importing them. The rest you import and list
-under `components` in your component metadata.
+Also from `@smintio/portals-components`. Import them and list them under `components` in your
+component metadata, the same as any other Vue component.
+
+**Three of the dialogs are the exception**: `SDownloadDialog`, `SShareDialog` and
+`SRememberDialog` come registered with the mixin that drives them. Mixing in `SDownloadProps`,
+`SShareProps` or `SRememberProps` brings the matching dialog's registration along — Vue merges a
+mixin's `components` option into yours — so `<s-download-dialog>`, `<s-share-dialog>` and
+`<s-remember-dialog>` work in your template with no import of your own. Every other component
+below, dialogs included, you register yourself.
 
 | Group | Components |
 |---|---|
 | Slots — for page templates | `SHeaderSlot`, `SFooterSlot`, `SSideSlot`, `SSideMenuSlot`, `SBannerSlot`, `SGenericSlot`, `SGenericMultiSlot` |
-| Dialogs | `SDownloadDialog`, `SRememberDialog`, `SCreateCollectionDialog`, `SCollectionUsersDialog`, `SDialogWrapper` |
+| Dialogs | `SDownloadDialog`, `SShareDialog`, `SRememberDialog` (all three brought in by their mixins), plus `SCreateCollectionDialog`, `SCollectionUsersDialog`, `SDialogWrapper`, which you register yourself |
 | Text | `SText`, `SImageWithText` |
 | Asset preview | `SImagePreview`, `SVideoPreview`, `SVideoPlayer`, `VideoPlayer`, `SAudioPreview`, `SAudioPlayer`, `SPdfPreview`, `SQuickViewPdfModal` |
 | Assets | `STags` |
@@ -203,6 +210,10 @@ and `bottom-ui-slot`, each with its own `*-ui-slot-data`.
 
 `SSideMenuSlot` adds `v-model`, `right`, `width`, `activator-text`, `activator`,
 `collapse-on-outside-click`, `force-on-desktop` and `wrapper-tag`.
+
+All of them also accept `slot-data`, which is applied to the slot's own wrapper element. Do not
+confuse it with `ui-slot-data`, which is what reaches the UI components inside the slot — that is
+the one you want in almost every case.
 
 ---
 
@@ -313,6 +324,7 @@ up in.
 | `s-page-title` | page titles |
 | `s-section-title` | section headings — also styles an `h1` inside it |
 | `s-standard-text` | body copy |
+| `s-standard-text-color-light` | body copy in the portal's lighter, secondary text colour — for captions, counts and other subordinate text |
 | `s-header-text` | header bar text |
 | `s-footer-text` | footer text |
 

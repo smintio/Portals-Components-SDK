@@ -10,7 +10,7 @@ They are all exported from `@smintio/portals-components`.
 * [Share asset(s)](#share-assets)
 * [Other useful mixins](#other-useful-mixins)
 
-Current version of this document is: 2.0.0 (as of 10th of September, 2026)
+Current version of this document is: 2.2.0 (as of 14th of September, 2026)
 
 ## How the mixins are built
 
@@ -23,8 +23,13 @@ Each of the three asset action mixins comes as a pair, already combined for you:
 
 You only mix in the `S...Props` one — it already mixes in the behaviour.
 
-The dialog components themselves are registered globally by the Smint.io Portals runtime.
-Use the kebab-case tags directly in your template; do **not** import or register them.
+The dialog component comes with the mixin. Vue merges a mixin's `components` option into your
+own, so mixing in `SDownloadProps`, `SShareProps` or `SRememberProps` registers
+`SDownloadDialog`, `SShareDialog` or `SRememberDialog` for you. Use the kebab-case tag directly
+in your template; do **not** import or register it yourself.
+
+This applies to these three dialogs only. Every other shared component — `SCreateCollectionDialog`
+and `SCollectionUsersDialog` included — you import and list under `components` as usual.
 
 > **Note:** in earlier SDK versions you had to add the dialog texts by hand to
 > `resources/definition.ts` via `setFormFieldValues`. That is no longer necessary — the
@@ -211,12 +216,14 @@ export default class PortalsUiComponentImplementation extends Mixins(
 | `AuthMixin` | `isLoggedIn`, `user`, `loginAvailable`, `shareAvailable`, `ratingAvailable`, `commentingAvailable` and the related feature flags |
 | `AssetPermissionsMixin` | `hasViewPermission`, `hasHiResPermission`, `hasLoResPermission`, `hasDownloadPermission` |
 | `RoutingMixin` | `generateRouterLocation()`, `generateRouterLocationForAssetDataObject()` |
-| `AssetsReferenceMixin` | resolves an `IAssetsReferenceModel` configuration property into actual assets — `getAssets()`, `getAssetByIds()`, `getAssetsByFolderId()`, `getAssetsBySearch()`, plus `getAssetReferenceByRelationshipType(asset, "<relationship type>")`, which pulls the search or asset reference an asset carries in its own `relatedAssets` |
+| `AssetsReferenceMixin` | resolves an `IAssetsReferenceModel` configuration property into actual assets — `getAssets()`, `getAssetByIds()`, `getAssetsByFolderId()`, `getAssetsBySearch()`, `getAssetsReferenceByRelatedAssets()`, `getAssetsReferenceByMetadataAttributes()`, plus `getAssetReferenceByRelationshipType(asset, "<relationship type>")`, which pulls the search or asset reference an asset carries in its own `relatedAssets` |
 | `MetadataMixin` | `getLocalizedTags()`, `getLocalizedAttributeValue()`, `getLocalizedAttributeValues()`, `getLinks()` |
-| `GalleryAssetConverterMixin` | converts assets into gallery items for the gallery components |
-| `AssetDetailsPageNavigationMixin` | previous/next navigation through search results on an asset details page |
+| `GalleryAssetConverterMixin` | converts assets into gallery items for the gallery components — `convertToItemAsset()`, `convertToImageAsset()`, `convertToVideoAsset()`, `convertToAudioAsset()`, `isVideoAsset()`, `isAudioAsset()` |
+| `AssetDetailsPageNavigationMixin` | previous/next navigation through search results on an asset details page, plus `assetId` and `buttonBackToSearchTarget` |
 | `MenuItemMixin` | builds effective menu items and their image URLs |
 | `QuickViewModalMixin` | quick view modal wiring |
+| `SPageMixin` | **page templates only**: registers the common slot renderers — `SHeaderSlot`, `SFooterSlot`, `SGenericSlot`, `SGenericMultiSlot` — and mixes in `SCssProps`. `SSideSlot`, `SSideMenuSlot` and `SBannerSlot` are not covered; register those yourself |
+| `SLocalizedStringsModelProvider` / `SLocalizedStringsModelInjector` | provide and consume localized strings down a tree of ordinary Vue sub-components |
 
 The `S...Props` configuration mixins (text, links, images, colors, layout gaps, content
 width, custom CSS class and anchor) are documented alongside the UI components — mix them in

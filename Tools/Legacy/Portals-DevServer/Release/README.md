@@ -1,13 +1,13 @@
 The Portals-DevServer
 =====================
 
-1. [Description](#description)
-1. [Download](#download)
-1. [App settings](#app-settings)
-1. [Usage](#usage)
+1. [Description](#user-content-description)
+1. [Download](#user-content-download)
+1. [App settings](#user-content-app-settings)
+1. [Usage](#user-content-usage)
 1. [When nothing is served](#user-content-when-nothing-is-served)
 
-Current version of this document is: 1.1.1 (as of 14th of September, 2026)
+Current version of this document is: 1.2.0 (as of 14th of September, 2026)
 
 ## Description
 
@@ -43,7 +43,9 @@ Please note, that you need to build, package and publish the frontend component 
 
 ## Download
 
-Download the ZIP archive suitable for your operating system to a convenient location.
+Download the ZIP archive suitable for your operating system to a convenient location — builds are
+provided for Windows (`win-x64`), Linux (`linux-x64`), macOS on Intel (`osx-x64`) and macOS on
+Apple Silicon (`osx-arm64`). Each one is self-contained, so there is no .NET runtime to install.
 
 Extract the archive.
 
@@ -70,9 +72,14 @@ When a change is made to the `appsettings.json` file and the dev server is runni
 
 ## Usage
 
-The DevServer tool can be started by executing the binary for the target operating system.
+The DevServer tool can be started by executing the binary for the target operating system —
+`SmintIo.Portals.DevServer.exe` on Windows, `./SmintIo.Portals.DevServer` on Linux and macOS.
 
 During initialization the server will list all known frontend component configuration mappings.
+
+It listens on `development-host.smint.io`, on **HTTPS port 8443** and HTTP port 8000. The portal
+always asks for the HTTPS one, so 8443 is the port that matters. Please note that the startup
+banner prints an `https://…:8000` URL, which is wrong — ignore it.
 
 ## When nothing is served
 

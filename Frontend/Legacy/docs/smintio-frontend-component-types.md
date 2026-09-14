@@ -6,7 +6,7 @@ Smint.io Portals frontend component types
 * [Page types](#page-types)
 * [Page types for the login system](#page-types-for-the-login-system)
 
-Current version of this document is: 1.1.0 (as of 10th of September, 2026)
+Current version of this document is: 1.1.1 (as of 14th of September, 2026)
 
 ## UI component types
 
@@ -120,3 +120,9 @@ Current version of this document is: 1.1.0 (as of 10th of September, 2026)
 ---
 
 Please note that if a new type is required, you can contact us at [support@smint.io](mailto:support@smint.io).
+
+Contributors
+============
+
+- Reinhard Holzner, Smint.io GmbH
+- Yosif Velev, Smint.io GmbH

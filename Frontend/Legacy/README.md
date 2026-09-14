@@ -12,10 +12,10 @@ Access will be granted to either Smint.io Solution Partners or to all our Smint.
 
 You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
 
-1. [UI components](#ui-components)
-1. [Page templates](#page-templates)
-1. [Portal templates](#portal-templates)
-1. [Data adapter public API interfaces](#data-adapter-public-api-interfaces)
+1. [UI components](#user-content-ui-components)
+1. [Page templates](#user-content-page-templates)
+1. [Portal templates](#user-content-portal-templates)
+1. [Data adapter public API interfaces](#user-content-data-adapter-public-api-interfaces)
 1. [Overview of Smint.io UI components](docs/smintio-ui-components.md)
 1. [Overview of Smint.io page templates](docs/smintio-page-templates.md)
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
@@ -24,14 +24,18 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [Frontend reference: services, filters, property mixins, providers, CSS](docs/smintio-frontend-reference.md)
 1. [Data adapter reference: every public API interface and model](docs/smintio-data-adapter-reference.md)
 1. [Page type contracts: what a page hands to the components it hosts](docs/smintio-page-type-contracts.md)
+1. [Building a page template: slots, contracts and the page skeleton](docs/smintio-building-page-templates.md)
+1. [Reference sources: the sources of the components Smint.io ships](Reference/)
 1. [How to develop your own custom component](#user-content-how-to-develop-your-own-frontend-component)
 1. [Before you start: the questions to answer](#user-content-before-you-start-the-questions-to-answer)
+1. [Anatomy of a component package](#user-content-anatomy-of-a-component-package)
 1. [Crafting a page template instead](#user-content-crafting-a-page-template-instead)
 1. [Building a section component](#user-content-building-a-section-component)
-1. [Extras for Smint.io Certified partners](#user-content-extras-for-smintio-certified-partners)
+1. [Checklist before you ship](#user-content-checklist-before-you-ship)
+1. [How we built our own components](#user-content-how-we-built-our-own-components)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.2.1 (as of 14th of September, 2026)
+Current version of this document is: 1.4.0 (as of 14th of September, 2026)
 
 ## UI components
 
@@ -256,7 +260,7 @@ Portals component framework and runtime.
 However, for use of your custom public API interfaces in a Smint.io Portals UI component you'll need its Typescript 
 public API interface definition.
 
-Use the [Smint.io Portals Data Adapter Exporter CLI tool](https://github.com/smintio/Portals-Components-SDK/tree/main/Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release) 
+Use the [Smint.io Portals Data Adapter Exporter CLI tool](../../Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/) 
 to generate the Typescript public API interface definition directly from your Smint.io Portals data adapter assembly. 
 
 You can then simple use that Typescript public API interface definition file
@@ -264,7 +268,7 @@ in your Smint.io Portals UI component.
 
 *All the wiring from frontend to backend is done for you, without any further work involved.*
 
-Learn more about how to do that [here](https://github.com/smintio/Portals-Components-SDK/tree/main/Backend#custom-public-api-interfaces).
+Learn more about how to do that [here](../../Backend/README.md#user-content-custom-public-api-interfaces).
 
 ## How to develop your own frontend component
 
@@ -326,7 +330,18 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 Steps to follow:
 
 1. Navigate to a folder where the components should be physically present. We will call it the root folder
-2. Copy the `ui-example-hello-world-1` directory from this repository to the root folder as a starting point
+2. Copy **both** [`Example/ui-example-hello-world-1`](Example/ui-example-hello-world-1) and the shared [`config`](config) directory out of this repository, keeping the same two-level distance between them
+
+	```
+	<root folder>/
+	├── config/                           <- copied from Frontend/Legacy/config
+	└── components/
+	    └── ui-example-hello-world-1/     <- copied from Frontend/Legacy/Example
+	```
+
+	- The component's `rollup.config.js` and `tsconfig.json` are two-line stubs that resolve `../../config/…`, so the depth matters. Put the component one directory below the root folder, not directly in it
+	- If you get `Could not resolve '../../config/rollup/rollup-config.ts'` on your first build, this is why
+
 3. Rename the `ui-example-hello-world-1` directory to your desired frontend component name
 
 	- Start the directory name with `ui-` for UI components, and `page-` for page templates
@@ -361,6 +376,45 @@ always-auth=true
 	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
 	
 11. Please adjust `src/PortalsUiComponent.vue` accordingly
+
+### Anatomy of a component package
+
+Every frontend component is a self-contained npm package with the same small set of files:
+
+```
+ui-my-thing-1/
+├── .npmrc                       # points the @smintio scope at our npm SDK feed
+├── package.json                 # name, version, scripts, dependencies
+├── tsconfig.json                # extends ../../config/tsconfig.json
+├── rollup.config.js             # stub that loads ../../config/rollup/rollup-config.ts
+├── licenses.json                # third-party license roll-up for this package
+├── resources/definition.ts      # resource and default settings definition (input)
+├── portals-ui-component.json    # GENERATED from definition.ts — do not hand-edit
+└── src/PortalsUiComponent.vue   # the component itself — the filename is fixed
+```
+
+Three things about that layout are not obvious:
+
+- **The entry filename is fixed.** `src/PortalsUiComponent.vue` for a UI component and
+  `src/PortalsPage.vue` for a page template — the shared rollup config hard-codes them. Ordinary
+  Vue sub-components go in `src/components/` and are imported normally; they are invisible to the
+  page editor, which is exactly right.
+- **`portals-ui-component.json` and `portals-page-template.json` are build output.** They are
+  generated from `resources/definition.ts` by `npm run build:resources`. Commit them, never edit
+  them, and remember that `npm run watch` does not regenerate them.
+- **The shared config in [`config/`](config) is shared on purpose.** Your `rollup.config.js` and
+  `tsconfig.json` are two-line stubs that extend it, so every component builds identically. Do
+  not fork it per component.
+
+The build produces a **UMD bundle** in `lib/` with the SDK, the Smint.io Portals runtime, Vue,
+Vuetify and `@smintio/portals-components` marked *external*. Those are provided by the portal
+application at runtime rather than bundled, which is why the versions in your `package.json` have
+to stay aligned with the ones the SDK expects — leave the dependency versions of the example
+component alone unless you have a reason not to.
+
+`licenses.json` is a roll-up of the licences in the package's production dependency tree. Nothing
+in the build reads it and it is not published, but please regenerate it for your own component
+rather than shipping the one you copied, which describes someone else's dependencies.
 
 ### Things to do for Mac or Linux users
 
@@ -753,6 +807,11 @@ prop you could drop; it is not, so leave a comment next to it.
 
 ## Crafting a page template instead
 
+> The full guide — the page skeleton, the slot options, the layout props on the slot renderers,
+> dialog pages, the page template resource builder and a checklist — is in
+> [Building a page template](docs/smintio-building-page-templates.md). This section is the
+> summary.
+
 A page template is the same kind of npm package, built with the same SDK. Start from the same
 `ui-example-hello-world-1` directory and change the following:
 
@@ -836,7 +895,11 @@ To hand data and event handlers to the components in a slot, use `ui-slot-data`,
 />
 ```
 
-This is how a page fulfils the contract that the UI components of its page type expect.
+This is how a page fulfils the contract that the UI components of its page type expect. **The
+binding block *is* the contract** — there is no separate declaration of it anywhere. If you are
+writing a page template for a page type that already exists, copy the prop and event names
+exactly from [the page type contracts](docs/smintio-page-type-contracts.md), or the components
+built against that page type will silently receive nothing.
 
 ## Building a section component
 
@@ -1097,11 +1160,16 @@ these two switches, and changing the mapping will not help.
    enable *Basic settings > Development mode* on it, and clear your login as a developer —
    see [the two switches above](#user-content-two-switches-decide-whether-your-local-build-is-asked-for-at-all).
    Stay logged in with that user while you develop
-1. Download the [Portals Dev-Server](../../Tools/Legacy/Portals-DevServer/Release/) and install the .NET 8 runtime
+1. Download the [Portals Dev-Server](../../Tools/Legacy/Portals-DevServer/Release/) for your platform —
+   Windows, Linux, macOS Intel and macOS Apple Silicon builds are provided, and each one is
+   self-contained, so no .NET runtime has to be installed
 1. Trust the `rootCA.pem` shipped with the dev server, so that your browser accepts its local HTTPS listener
-1. In the dev server's `appsettings.json`, set `RootDirectory` to the folder that contains your component folders
+1. In the dev server's `appsettings.json`, set `RootDirectory` to the folder that contains your component
+   folders. It is optional — leave it out and every mapping below has to carry a full path instead
 1. In the same file, add one entry under `ComponentMappings` for each component you want to
-   develop locally, mapping the component id to its built bundle, relative to `RootDirectory`:
+   develop locally, mapping the component id to its built bundle, relative to `RootDirectory`. The key is
+   matched as a **substring** of your component's npm package name, so it does not have to be the full id —
+   `ui-example-hello-world` matches `ui-example-hello-world-1-1.0.0.tgz`:
 
 ```
 "ComponentMappings": {
@@ -1113,7 +1181,7 @@ these two switches, and changing the mapping will not help.
    The path must match the `main` entry of your component's `package.json`. Please note that
    the dev server reads `appsettings.json` when it starts, so restart it after you add a mapping.
 
-1. Start the dev server — `SmintIo.Portals.DevServer.exe` on Windows, `dotnet Portals-DevServer.dll` on Mac or Linux.
+1. Start the dev server — `SmintIo.Portals.DevServer.exe` on Windows, `./SmintIo.Portals.DevServer` on Mac or Linux.
    It listens on `development-host.smint.io`, HTTPS on port **8443** and HTTP on port 8000, and logs every
    request it serves. The portal always asks for the HTTPS one, so 8443 is the port that matters — note that
    the dev server's own startup banner prints `https://…:8000`, which is wrong and can be ignored
@@ -1162,23 +1230,59 @@ form, that is the publishing boundary described above — build and publish, and
 | `E404 ... is not in the npm registry` followed by `info: Missing component name` | the registration step read the wrong registry: your component folder has no `.npmrc`. Add it, then rerun only the registration |
 | A page shows your latest change although you never published | that is the dev server serving your working folder. It says nothing about what is registered — read the version out of the component's script URL |
 
-## Extras for Smint.io Certified partners
+## Checklist before you ship
 
-If you are one of our `Smint.io Certified` partners, you will also get access to the source code of our own Smint.io Portals components. You can then check how we did things, and you can use our code
-as a reference for you to solve your requirements. In this case, we recommend you to check out that source code from [here](https://smintio.visualstudio.com/SmintIo-UIComponents/_git/SmintIo-UIComponents).
+- [ ] `key` is your partner id plus the directory name, and unchanged from the released version
+- [ ] `type` is a real component type from [the list](docs/smintio-frontend-component-types.md)
+- [ ] `displayName` and `description` are present, with one language marked as the default culture
+- [ ] every configuration property has a type annotation (`Is...` or `Implements`) and a pinned
+      `ComponentProperty` name
+- [ ] every configuration property actually does something — no dead settings
+- [ ] the shared `S...Props` mixins are used instead of re-declared text, link, colour and layout
+      properties, and `SBottomGapProps` (or the asset detail equivalent) is among them
+- [ ] `SCssProps` **or** `SHtmlProps`, never both
+- [ ] the component fills its layout box: no outer margin, no overflow, no nested Smint.io UI
+      component
+- [ ] `npm run build` clean — both `build:dist` and `build:resources` — and `npm run lint` clean
+- [ ] `portals-ui-component.json` / `portals-page-template.json` committed as regenerated, not
+      hand-edited
+- [ ] `version` bumped in `package.json`
+- [ ] `licenses.json` regenerated for your component rather than inherited from the one you
+      copied
+- [ ] the `.npmrc` is present in the component directory, or the registration half of the publish
+      will fail
+- [ ] the dev server mapping added, the dev server restarted, and the component verified in a
+      real portal with *Development mode* on and a developer-cleared login
+- [ ] published against the intended tenant, that is, the `SmintIo.ApiUrl` of the right
+      `appsettings.<Env>.json`
 
-1. Check out the `page-templates` directory to find the implementations of our page templates
+## How we built our own components
 
-	- Here you can find a list of our page template components (generated from our source, and kept current): https://github.com/smintio/Portals-Components-SDK/blob/main/Frontend/Legacy/docs/smintio-page-templates.md
-	
-2. Check out the `ui-components` directory to find the implementations of our UI components
+The sources of the components Smint.io builds and ships are in this repository, under
+[Frontend/Legacy/Reference](Reference/): 64 UI components, 34 page templates, the shared
+`@smintio/portals-components` library and the gallery view library. Read them to see how we
+solved something before you solve it yourself, and copy from them rather than starting from
+scratch.
 
-	- Here you can find a list of our UI components (generated from our source, and kept current): https://github.com/smintio/Portals-Components-SDK/blob/main/Frontend/Legacy/docs/smintio-ui-components.md
-	
-3. Check out the `portals-components` directory to find the implementation of our shared component library
-4. Please do not forget to pull this repository regularily, as we constantly update our codebase
+- [`Reference/ui-components/`](Reference/ui-components) — the UI components. The generated
+  overview of what each one is, with its key, type and configuration properties, is in
+  [the UI component list](docs/smintio-ui-components.md)
+- [`Reference/page-templates/`](Reference/page-templates) — the page templates, with their slots
+  listed in [the page template list](docs/smintio-page-templates.md)
+- [`Reference/portals-components/`](Reference/portals-components) — the shared component library:
+  the `S...Props` configuration mixins, the behaviour mixins, the slot renderers, the dialogs
+- [`Reference/README.md`](Reference/) — what is where, which package to start from for a given
+  kind of component, and how to build the tree
 
-If you have any questions about the code, on how to build those components, or whatever else, please do not hesitate to get in touch at [support@smint.io](mailto:support@smint.io)!
+That directory is an export and is refreshed from time to time, so treat it as read-only and
+work on a copy. Please pull this repository regularly — we update the components constantly.
+
+If your own component is an existing Smint.io component *plus something*, do not copy it at all:
+take it as a dependency and
+[extend it](#user-content-is-your-component-an-existing-one-plus-something-extend-it-do-not-copy-it).
+
+If you have any questions about the code, on how to build those components, or whatever else,
+please do not hesitate to get in touch at [support@smint.io](mailto:support@smint.io)!
 
 ## Problems
 
