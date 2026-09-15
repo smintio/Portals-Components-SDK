@@ -1,7 +1,7 @@
 Smint.io Portals backend component recipes
 ==========================================
 
-Current version of this document is: 2.0.0 (as of 15th of September, 2026)
+Current version of this document is: 2.1.0 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other backend documents describe *what exists*; this one shows *how it is used*.
@@ -24,6 +24,7 @@ in.
 1. [How do I accept uploads?](#user-content-how-do-i-accept-uploads) — advanced
 1. [How do I feed the Smint.io integration layer?](#user-content-how-do-i-feed-the-smintio-integration-layer) — advanced
 1. [How do I keep state the external system cannot hold?](#user-content-how-do-i-keep-state-the-external-system-cannot-hold) — advanced
+1. [How do I stop two requests from colliding?](#user-content-how-do-i-stop-two-requests-from-colliding) — advanced
 1. [How do I resolve a meta-model entity key at runtime?](#user-content-how-do-i-resolve-a-meta-model-entity-key-at-runtime) — advanced
 1. [How do I publish my own public API interface?](#user-content-how-do-i-publish-my-own-public-api-interface) — advanced
 1. [How do I declare a custom permission?](#user-content-how-do-i-declare-a-custom-permission) — advanced
@@ -998,6 +999,135 @@ Pitfalls:
   guard every use.
 - **Neither is a cache.** They persist; use [the cache](#user-content-how-do-i-cache-an-expensive-lookup)
   for anything you can recompute.
+- **Neither serialises anything.** Two requests can read the same record, both decide to act, and
+  both write. When that matters, take a lock — see
+  [stopping two requests from colliding](#user-content-how-do-i-stop-two-requests-from-colliding).
+
+## How do I stop two requests from colliding?
+
+*advanced.* Two visitors act on the same objects at the same moment, and both writes reach the
+external system interleaved — one overwrites the other's status, or both pass a "is it still
+free?" check that only one of them should have passed. A `lock` statement does nothing about
+this: your component is short-lived, there are many instances of it, and they do not share a
+process. `IStorageBackedLock` is a mutual exclusion that holds **across every server running your
+component**.
+
+```C#
+private readonly IStorageBackedLock _storageBackedLock;
+
+/// One name per thing being protected. Everything that must not run concurrently uses the
+/// same one, and nothing else uses it.
+private const string LockUuid = nameof(MyReservationDataAdapter);
+
+public MyReservationDataAdapter(IServiceProvider serviceProvider, /* … */)
+    : base(serviceProvider)
+{
+    _storageBackedLock = serviceProvider.GetService<IStorageBackedLock>();
+}
+
+public async Task<ReserveAssetsResult> ReserveAssetsAsync(ReserveAssetsParameters parameters)
+{
+    if (_storageBackedLock == null)
+    {
+        throw new ExternalDependencyException(
+            ExternalDependencyStatusEnum.NotAvailable,
+            "The storage backed lock service is not available",
+            MyReservationDataAdapterStartup.MyReservationDataAdapter);
+    }
+
+    // The key is yours, it is secret, and it is what proves later calls are the same holder.
+    var lockKey = Guid.NewGuid().ToString();
+
+    // Keep the duration short — it is the time the lock survives if your component dies
+    // holding it. Prolong instead of asking for a long one up front.
+    var lockAcquired = await _storageBackedLock
+        .LockAsync(LockUuid, TimeSpan.FromMinutes(1), lockKey)
+        .ConfigureAwait(false);
+
+    if (!lockAcquired)
+    {
+        // It does not wait. Tell the visitor to come back, in their own language.
+        throw new ExternalDependencyException(
+            ExternalDependencyStatusEnum.CustomError,
+            "Someone else is currently changing these assets. Please try again in a moment",
+            "reservation_in_progress");
+    }
+
+    try
+    {
+        // Everything between here and the finally is protected: read the current state,
+        // decide, and write it back.
+        var current = await _client.GetReservationStateAsync(parameters.AssetIds).ConfigureAwait(false);
+
+        if (current.Any(state => state.IsReserved))
+        {
+            throw new ExternalDependencyException(
+                ExternalDependencyStatusEnum.CustomError,
+                "One of the assets has just been reserved by someone else",
+                "already_reserved");
+        }
+
+        await _client.SetReservedAsync(parameters.AssetIds, parameters.RequesterName).ConfigureAwait(false);
+
+        return new ReserveAssetsResult { ReservedAssetIds = parameters.AssetIds };
+    }
+    finally
+    {
+        // Always, on every path. The expiry is the safety net, not the release mechanism.
+        await _storageBackedLock.ClearLockAsync(LockUuid, lockKey).ConfigureAwait(false);
+    }
+}
+```
+
+**Prolonging a lock you already hold.** When the protected work is a loop over many objects, ask
+for a short duration and extend it as you go, rather than asking for the ten minutes the worst
+case might need. Calling `LockAsync` again with the **same uuid and the same lock key** extends
+the expiry; the lock key is what proves you are the holder, so a caller without it gets `false`.
+
+```C#
+var processed = 0;
+
+foreach (var chunk in assetIds.Chunk(10))
+{
+    await _client.UpdateAsync(chunk).ConfigureAwait(false);
+
+    processed += chunk.Length;
+
+    // Roughly every minute of work, buy another minute.
+    if (processed % 100 == 0)
+    {
+        await _storageBackedLock
+            .LockAsync(LockUuid, TimeSpan.FromMinutes(1), lockKey)
+            .ConfigureAwait(false);
+    }
+}
+```
+
+Pitfalls:
+
+- **It does not queue.** `LockAsync` returns `false` immediately when someone else holds the
+  lock — it never waits. Decide what that means for the caller: usually "try again shortly",
+  occasionally "we have queued your request". Do not loop on it in a tight retry.
+- **Release in a `finally`.** The duration is there for the case where your component is killed
+  mid-operation; relying on it for ordinary release means every other caller waits out the full
+  expiry for nothing.
+- **Keep the duration short and prolong.** A ten-minute lock taken by a request that dies after
+  one second blocks the feature for ten minutes.
+- **Keep the lock key private and unique per acquisition.** A fresh `Guid` per call is right. It
+  is the only thing that distinguishes the holder from everyone else, so never derive it from
+  something a caller supplies, and never reuse one.
+- **Lock around the decision *and* the write.** Reading the state before the lock and writing
+  after it protects nothing — the check and the change have to be inside.
+- **One uuid per protected resource.** Naming it after the component (`nameof(MyDataAdapter)`)
+  serialises every protected operation of that adapter against each other, which is the safe
+  default; a finer uuid — per folder, per collection — gets more throughput, and is only correct
+  when operations on different ones genuinely cannot interfere.
+- **The service can be `null`.** Like the other storage services it comes off the service
+  provider with `GetService`, so decide deliberately whether "no lock available" means fail or
+  proceed — for anything that can double-book, it means fail.
+- **Do not hold it across a call that can hang.** An external system with no timeout inside a
+  lock turns one slow request into an outage for the feature; set a timeout on the client and
+  let the lock expire rather than pinning it.
 
 ## How do I resolve a meta-model entity key at runtime?
 

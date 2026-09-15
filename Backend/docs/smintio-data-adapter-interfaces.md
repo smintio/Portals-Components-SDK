@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.5.1 (as of 15th of September, 2026)
+Current version of this document is: 1.6.0 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -482,16 +482,23 @@ with nothing to see at compile time.
 
 Some interactions need to remember something the external system has no field for — that a
 one-time action has already been performed, that a step was completed, what a caller was shown
-last time. Two services off the injected `IServiceProvider` cover this:
+last time. Three services off the injected `IServiceProvider` cover this:
 
 | | |
 |---|---|
 | `IIdPersistentStorage` | keyed records. `GetAsync(uuid)`, `AddOrUpdateAsync(uuid, data, groupUuid)`, `GetGroupAsync`, `RemoveAsync` and their bulk forms, over an `IdPersistentStorageData { Uuid, GroupUuid, Data }` |
 | `ITemporalPersistentStorage` | an append-ordered log. `AddAsync` returns the identifier, `GetRangeAsync(lastKnownId, pageSize)` reads forward from one |
+| `IStorageBackedLock` | a mutual exclusion that holds **across every server running your component**. `LockAsync(uuid, lockDuration, lockKey)` returns `false` rather than waiting; `ClearLockAsync(uuid, lockKey)` releases it |
 
 Use the keyed store when you have an identifier from the external system to key on, and the
 temporal one when you need to replay a sequence in order. Neither is a cache — the cache is for
 that, and persistent storage is not the way to avoid a call you could simply make.
+
+The lock is for the case where two portal requests would otherwise write to the external system
+at the same time and interleave. It is **not** a `lock` statement: a component instance is
+short-lived and there are many of them, on more than one machine, so an in-process lock protects
+nothing. See
+[stopping two requests from colliding](smintio-backend-recipes.md#user-content-how-do-i-stop-two-requests-from-colliding).
 
 Do not keep this state in a field of the external system instead. A status text, a comment or a
 description field belongs to that system's own processes: a workflow there reads it, a user edits

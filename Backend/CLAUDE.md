@@ -327,11 +327,15 @@ too if the component is productized.
 **Both:** take the connector's client as a constructor parameter; pull the platform's own
 services off the injected `IServiceProvider`; and never hold a credential.
 
-Two things partners reach for and get wrong, both covered in the data adapter document:
+Three things partners reach for and get wrong, all covered in the data adapter document:
 
 - State the external system has no field for — that a one-time action already happened, say —
   goes in `IIdPersistentStorage` or `ITemporalPersistentStorage`, **not** in a status or comment
   field of the external system, where that system's own processes will overwrite it.
+- A `lock` statement protects nothing. Component instances are short-lived and spread over more
+  than one machine, so when two requests must not write to the external system at once, take an
+  `IStorageBackedLock` — a short duration, prolonged as you go, a fresh lock key per acquisition,
+  and `ClearLockAsync` in a `finally`. It returns `false` rather than waiting.
 - "Never hold a credential" is about authenticating to the external system. It does **not** mean a
   data adapter has no security to write: when your component is reached by a signed, time-limited
   link handed to someone outside the portal, verifying that link is yours to do and nothing else
