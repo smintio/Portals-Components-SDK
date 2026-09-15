@@ -1,13 +1,14 @@
 The Smint.io Portals asset data model
 =====================================
 
-Current version of this document is: 1.1.1 (as of 15th of September, 2026)
+Current version of this document is: 1.2.0 (as of 15th of September, 2026)
 
 What a Smint.io Portals data adapter has to return, and what the frontend does with it.
 
-The data adapter public API interfaces — `IAssetsRead`, `IAssetsSearch`, `IAssetsFolderNavigation`,
-`IAssetsDownload` and their neighbours — *are* the contract for asset search, asset detail, folder
-navigation and downloads. There is no separate REST specification that describes a search result:
+The data adapter public API interfaces — `IAssetsRead`, `IAssetsSearch`, `IAssetsReadRandom` and
+their neighbours — *are* the contract for asset search and asset detail. Folder navigation and
+downloads are portal-facing interfaces that Smint.io implements across data adapters; your adapter
+feeds them, as described below. There is no separate REST specification that describes a search result:
 the shape of the data is the shape of these C# types. This document describes that shape from the
 authoring side, so that you know what to fill in, what you may leave out, and which of your choices
 the portal will act on.
@@ -135,7 +136,7 @@ knows it.
 ### `InternalMetadata` — the escape hatch
 
 `AssetDataObject.InternalMetadata` (a `DataObjectInternalMetadata`) is **not part of the
-metamodel**: it never reaches the frontend, and it is not a place to put business data. It is where
+meta-model**: it never reaches the frontend, and it is not a place to put business data. It is where
 you influence the rendition mechanism above. Two of its fields matter most.
 
 **Set a URL there and it is used verbatim.** If `InternalMetadata.LargeThumbnailUrl` is set, the
@@ -190,10 +191,15 @@ one at all.
 
 ### Downloads are a different path
 
-None of the above is how an asset is *downloaded*. Downloads are a separate, three-step flow on
-`IAssetsDownload`: the frontend asks which download options exist for a set of assets, the user
-picks, the data adapter initiates the download and returns a URL, and the client follows that URL.
-Those bytes never travel through the portal API at all.
+None of the above is how an asset is *downloaded*. A download is a separate, two-step flow, and
+**the platform owns it** — a visitor's selection routinely spans several data adapters, so
+Smint.io collects the options, applies the permission gates and delivers the file. The bytes
+never travel through the portal API at all.
+
+Your data adapter contributes two things to that flow: the download **options** for its own
+assets, from `GetCustomAssetDownloadItemMappingsAsync`, and the **bytes** for a chosen option,
+from `GetAssetDownloadStreamAsync`. It does not implement `IAssetsDownload` — see
+[offering downloads](smintio-backend-recipes.md#user-content-how-do-i-offer-downloads).
 
 ### Folders work the same way, with less
 
@@ -235,8 +241,11 @@ the asset:
 - asset → folders: the same `parentFolderIds` and `parentFolderPaths`, on the asset
 
 Note what is missing: **a folder does not list the assets it contains.** To get them, either search
-with `SearchAssetsParameters.ParentFolderIds`, or implement `GetFolderContentsAsync`. Both are only
-offered by the portal when you report folder navigation as supported.
+with `SearchAssetsParameters.ParentFolderIds`, or return them from
+`GetFolderContentsForIntegrationLayerAsync` — the folder navigation interface itself is
+portal-facing, so a connector serves its folder structure from the integration layer provider and
+its converter. Either way, folders are only offered by the portal when you report folder
+navigation as supported.
 
 Folders carry their own thumbnails, tags, raw data and timestamps, in the same style as assets.
 

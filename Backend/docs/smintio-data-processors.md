@@ -1,7 +1,7 @@
 Smint.io Portals data processors
 ===============================
 
-Current version of this document is: 1.0.1 (as of 15th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 A data processor hooks into a data adapter's operations and changes what goes in or what comes
 out. It is the component type to reach for when the data is right but its *shape*, its *naming*
@@ -101,7 +101,8 @@ A processor opts into a point in the pipeline by implementing the matching inter
 The general pattern is a **`Prepare…` phase that receives the parameters** before the data
 adapter method runs, and a **`Post…` phase that receives the parameters and the result**
 afterwards. `Prepare` is where you change what is asked for; `Post` is where you change what
-came back. Both mutate the object handed to them.
+came back. A `Prepare` phase mutates the parameters object it is handed and returns nothing; a
+`Post` phase either mutates the result or, where the result is immutable, returns the replacement.
 
 **The generic pair — any method**
 
@@ -190,7 +191,8 @@ public class MyDownloadNamingDataProcessor : DataProcessorBaseImpl,
         AssetDownloadStreamModel assetDownloadStreamModel,
         string outputFormatId)
     {
-        // change assetDownloadStreamModel.FileName, or return it unchanged
+        // AssetDownloadStreamModel is immutable — to rename, return a new one over the same
+        // stream; otherwise hand back what you were given. Never return null.
         return Task.FromResult(assetDownloadStreamModel);
     }
 }
@@ -214,7 +216,7 @@ public class MyDownloadNamingDataProcessorStartup : IDataProcessorStartup
     public string LogoUrl => null;
     public string IconUrl => null;
     public string IllustrationUrl => null;
-    public string MdiIcon => "mdiFileDocumentEdit";
+    public string MdiIcon => "mdi-file-document-edit";
 
     public bool IntegrationLayerOnly => false;
 

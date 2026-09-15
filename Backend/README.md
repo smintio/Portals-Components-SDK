@@ -1,7 +1,7 @@
 Developing Smint.io Portals backend components
 ==============================================
 
-Current version of this document is: 3.4.0 (as of 15th of September, 2026)
+Current version of this document is: 3.5.1 (as of 15th of September, 2026)
 
 This is the guide to building the server-side half of Smint.io Portals: connectors, data
 adapters, data processors, task handlers, portal templates, resources and identity providers.
@@ -61,7 +61,9 @@ answer. Work down this list and stop at the first that fits:
 1. **Nothing.** The external system speaks a protocol one of the shipped connectors already
    handles, and what you need is configuration. Ask before you build.
 2. **A data processor.** The data already reaches the portal, and something about its shape, its
-   naming or its reachability is wrong. A data processor is one class and one interface.
+   naming or its reachability is wrong. A data processor is a small project — a startup, a
+   configuration, the processor itself and a resource file — and by far the cheapest of these
+   options.
 3. **A second data adapter on an existing connector.** The external system is already integrated
    and you need a different view of it — upload, collections, products, a different mapping. The
    connector is reused unchanged and hands you its API client by injection.
@@ -115,13 +117,13 @@ Ask which of the two it is at the start, in those words.
 
 ## Every component has the same three parts
 
-Whatever the type, a backend component is three classes:
+Whatever the type, a backend component is up to three classes:
 
 | | |
 |---|---|
 | **The startup** | a stateless, long-lived singleton implementing `IComponentStartup` (or the type-specific interface deriving from it). It carries the component's key, its localized name and description, its logo and icon, and the types of the other two classes. The platform reads it without instantiating anything |
 | **The configuration** | a plain settings class implementing `IComponentConfiguration`, whose properties become the form a Smint.io Portals administrator fills in. See [the annotations](docs/smintio-backend-annotations.md) |
-| **The component** | the short-lived, stateful thing that actually does the work, constructed by dependency injection with the configuration injected |
+| **The component** | the short-lived, stateful thing that actually does the work, constructed by dependency injection with the configuration injected. A purely declarative component — a plain resource, for instance — has none, and its startup leaves `ComponentImplementation` `null` |
 
 Plus **translatable resources** — a `ConfigurationMessages.resx` per culture, and a
 `MetamodelMessages.resx` when the component describes a schema, which a
@@ -153,6 +155,7 @@ See [getting a component into a Smint.io Portals system](../Overview/README.md#u
 
 | Document | What it covers |
 |---|---|
+| [Recipes: how do I …?](docs/smintio-backend-recipes.md) | worked answers to the common tasks — validating credentials, dropdowns, rate limiting, paging, the integration layer, persistent state, custom interfaces, permissions, signed links, data processors |
 | [The connector contract](docs/smintio-connector-reference.md) | every member of `IConnectorStartup` and `IConnector`, the setup methods, the call order, the authentication flows, the API client, the project layout |
 | [The connector meta-model](docs/smintio-connector-metamodel.md) | describing the external system's schema: data types, entities, properties, enums, indexing, semantic types, form groups, translation, the converter, the lifecycle |
 | [The data adapter public API interfaces](docs/smintio-data-adapter-interfaces.md) | the full catalogue, the base classes and what they leave abstract, parameters and results, long-running methods, permissions, configuration marker interfaces, custom interfaces |

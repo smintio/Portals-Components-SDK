@@ -1,7 +1,7 @@
 Smint.io Portals backend component annotations
 =============================================
 
-Current version of this document is: 1.2.0 (as of 15th of September, 2026)
+Current version of this document is: 1.4.1 (as of 15th of September, 2026)
 
 Annotations describe a backend component's configuration to Smint.io Portals: what fields the
 portal administrator sees when configuring your connector, data adapter, data processor,
@@ -30,6 +30,7 @@ annotation, or if you need a new one.
 1. [Values and validation](#user-content-values-and-validation)
 1. [Editor hints on string properties](#user-content-editor-hints-on-string-properties)
 1. [Form layout and visibility](#user-content-form-layout-and-visibility)
+1. [Visibility and the component setup wizard](#user-content-visibility-and-the-component-setup-wizard)
 1. [Dynamic allowed values](#user-content-dynamic-allowed-values)
 1. [Permissions on a public API interface method](#user-content-permissions-on-a-public-api-interface-method)
 1. [Recommended annotation order](#user-content-recommended-annotation-order)
@@ -71,10 +72,12 @@ A **data adapter's** configuration is the right home for:
   [the configuration marker interfaces](smintio-data-adapter-interfaces.md#user-content-configuration-marker-interfaces);
 - **customer- or deployment-specific settings** that only this adapter interprets — a limit, a
   naming scheme, a behaviour one customer wants and another does not;
-- **secrets the adapter itself needs**, most commonly the key it verifies a signed, time-limited
-  link with. That is not a contradiction of "a data adapter never holds a credential": that rule
-  is about authenticating to the *external system*, which stays inside the connector. See
-  [two kinds of security](smintio-data-adapter-interfaces.md#user-content-two-kinds-of-security-and-which-one-is-yours).
+- **secrets the adapter itself needs**, most commonly the key it verifies an inbound callback
+  with, or the key it signs a time-limited link with. That is not a contradiction of "a data
+  adapter never holds a credential": that rule is about authenticating to the *external system*,
+  which stays inside the connector. See
+  [two kinds of security](smintio-data-adapter-interfaces.md#user-content-two-kinds-of-security-and-which-one-is-yours)
+  and [accepting a callback](smintio-backend-recipes.md#user-content-how-do-i-accept-a-callback-from-the-external-system).
 
 The practical test is **one connector, several data adapters**. A property on the connector
 forces the same value on every data adapter configured against it, and changing it can trigger a
@@ -147,6 +150,12 @@ missing, get in touch rather than working around it.
 
 Nullable and non-nullable are both accepted for the value types; use the nullable form when
 "not set" is meaningful and different from zero or `false`.
+
+**A non-nullable value type is implicitly required**, because it has no way to express "not
+answered" — so give it a `DefaultValue`. Without one, a `bool` the administrator never touches
+counts as unanswered, and the failure is at its most confusing on a property marked `Advanced` or
+`Expert`: those are not shown in the component setup wizard, so the wizard fails on a field nobody
+was offered. Either carry a `DefaultValue`, or make the property nullable and mean it.
 
 ```C#
 [Serializable]
@@ -239,7 +248,7 @@ separate files. Use `ResourceLocalizedStringsModel` to reference one from a meta
 var rootEntityLabels = new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_myconnector_root_entity));
 ```
 
-A data adapter can also resolve a metamodel message to a plain localized string at request time,
+A data adapter can also resolve a meta-model message to a plain localized string at request time,
 which is what you want for a value that is displayed but does not have to be fully translatable
 in the meta-model:
 
@@ -344,6 +353,35 @@ public class MyConnectorConfiguration : IComponentConfiguration
 Use `FormItemVisibility` rather than leaving a rarely needed setting in the basic form. An
 administrator who never opens the advanced section is the intended reader of the basic one.
 
+### Visibility and the component setup wizard
+
+**The setup wizard shows `Basic` items only.** It is the short form an administrator fills in
+when first creating the component; `Advanced`, `Expert` and `Hidden` items are reached afterwards,
+in the component's full configuration form. A visibility level is therefore also a statement about
+*when* a value can first be supplied, and that has one consequence:
+
+**A required property that the wizard does not show must be able to supply its own value.** The
+requirement is still enforced there, on a field the administrator never sees, so without a value
+the component cannot be created at all and the error names a property nobody was offered. A
+`DefaultValue` settles it: **`Required` together with `Advanced` or `Expert` is fine as long as
+the property has a default**, which is why that combination appears throughout the shipped
+components.
+
+There are two ways for a property to be required, and only one of them is visible in the code:
+
+- **explicitly**, with `Required`;
+- **implicitly**, because
+  [a non-nullable value type](#user-content-the-property-type-is-the-data-type) has no way to
+  express "not answered". This is the one that gets missed — the word `Required` appears nowhere,
+  and an `Advanced` `bool` without a `DefaultValue` breaks the wizard exactly as an explicit
+  `Required` would.
+
+The fix is the same either way: give the property a `DefaultValue`. Where no default is safe — a
+signing key or a password has no sensible one, and inventing a default secret would be worse than
+the problem — drop `Required`, make the property optional, and give its absence a defined,
+safe behaviour that the component logs clearly. Refusing to serve is usually that behaviour; say
+so in the property's description, because it is the administrator who has to act on it.
+
 ## Dynamic allowed values
 
 When the permitted values are not known until the external system is asked — a channel, a site,
@@ -419,6 +457,15 @@ the order you want the administrator to see them.
 - **`Required` is not the same as a check against the external system.** It only proves the
   administrator typed something. Whether that access token works belongs in
   `PerformPostConfigurationChecksAsync`.
+- **A required property the setup wizard does not show needs a `DefaultValue`.** The wizard shows
+  `Basic` items only but still enforces the requirement, so without a default the component cannot
+  be created and the error names a field nobody was offered. `Required` plus `Advanced` is fine
+  *with* a default; where no default is safe, make the property optional instead. See
+  [visibility and the component setup wizard](#user-content-visibility-and-the-component-setup-wizard).
+- **A non-nullable value type is already required, so give it a `DefaultValue`.** A `bool` with
+  neither a default nor a nullable type cannot express "not answered", and on an `Advanced` or
+  `Expert` property the setup wizard then fails on a field it never showed. See
+  [the property type is the data type](#user-content-the-property-type-is-the-data-type).
 - **Do not reach for a `string` with a hand-rolled format when a typed property exists.**
   `AssetIdentifier`, `FolderIdentifier`, `IResourceReference`, `IPageReference` and
   `MetadataAttributeModel` all give the administrator a picker instead of asking them to paste

@@ -24,6 +24,7 @@ Do not infer the conventions from a single file — they are written down.
 | Document | Read it when |
 |---|---|
 | `README.md` | always, first — it is the full guide |
+| `docs/smintio-backend-recipes.md` | you know *what* to build and need *how*: worked, copy-able answers to the common tasks. Check it before writing a mechanism from scratch |
 | `docs/smintio-connector-reference.md` | you are writing a **connector**: the contract, the setup methods, the authentication flows, the API client, the call order |
 | `docs/smintio-connector-metamodel.md` | you are describing the external system's schema — which every connector does |
 | `docs/smintio-data-adapter-interfaces.md` | you are writing a **data adapter**: which interface to implement, the base classes, permissions, custom interfaces |
@@ -81,6 +82,13 @@ Do not infer the conventions from a single file — they are written down.
   client in the wrong one fails at runtime with nothing at compile time.
 - **`PublicApiInterfaces` on the data adapter startup is the boundary.** A method not declared
   on one of the interfaces listed there is unreachable from a portal, with no error anywhere.
+- **Downloads and folder navigation are not yours to implement.** `IAssetsDownload` and
+  `IAssetsFolderNavigation` are portal-facing, and Smint.io implements them across data adapters.
+  A connector's adapter contributes download options from
+  `GetCustomAssetDownloadItemMappingsAsync`, serves the bytes from `GetAssetDownloadStreamAsync`,
+  and serves folders from `GetFolderContentsForIntegrationLayerAsync`. For upload it is the
+  reverse trap: implement `HandleAssetUploadsAsync` and **do not** override
+  `GetAssetUploadSettingsAsync`, which the base class projects from your configuration.
 - **The meta-model is a filter.** A value whose property was never declared is dropped on
   conversion, silently. If data is missing in the portal, check the declaration before debugging
   the conversion.
@@ -99,6 +107,15 @@ Do not infer the conventions from a single file — they are written down.
 - **Renaming a configuration property orphans every saved configuration.** The C# property name
   *is* the persisted name, and there is no annotation that decouples them. Start with few
   properties: you can add, you cannot remove.
+- **A required property the setup wizard does not show needs a `DefaultValue`.** The wizard shows
+  `Basic` items only yet still enforces what is required, so a required `Advanced` or `Expert`
+  property with no default makes the component impossible to create, and the error names a field
+  nobody was offered. `Required` plus `Advanced` is fine *with* a default. A non-nullable value
+  type reaches the same wall with the word `Required` nowhere in the code — it is implicitly
+  required, so an `Advanced` `bool` needs a `DefaultValue` too. Where no default is safe, such as
+  a signing key, make the property optional and give its absence a defined, safe behaviour
+  instead — see
+  [visibility and the setup wizard](docs/smintio-backend-annotations.md#user-content-visibility-and-the-component-setup-wizard).
 - **Validate against the external system in `PerformPostConfigurationChecksAsync`** and throw
   `ExternalDependencyException`. It is the one moment where a wrong credential reaches the person
   who can fix it.
@@ -157,7 +174,7 @@ Ask these of both kinds:
 | Ask | Offer | Why |
 |---|---|---|
 | **Live connection or indexed through the integration layer?** | recommend **live** when the external system has faceted search and translated metadata and is fast enough to sit in front of a portal; recommend **indexed** when it does not, or when renditions have to be generated | it decides which configuration marker interfaces the data adapter implements, whether you write an `IAssetsIntegrationLayerApiProvider`, and how synchronisation works. It is the single most structural decision after the component type |
-| Which standard public API interfaces does the data adapter publish? | recommend `IAssets`; add `IAssetsFolderNavigation` only if folders are genuinely browsable, `IAssetsDownload` for downloads, `IAssetsUpload` for upload, `ICollections…`, `IShares…`, `IResourceAssets…`, `IProductAssets…` as they apply | this is the reachable surface. Declaring more than you implement means the portal calls methods you have not written |
+| Which standard public API interfaces does the data adapter publish? | recommend `IAssets`; add `IAssetsUpload` for upload, `ICollections…`, `IShares…`, `IResourceAssets…`, `IProductAssets…` as they apply. **Do not offer `IAssetsDownload` or `IAssetsFolderNavigation`** — both are portal-facing and Smint.io implements them across data adapters | this is the reachable surface. Declaring more than you implement means the portal calls methods you have not written |
 | What does the external system's schema look like, and how do you read it? | ask whether the schema is discoverable through an API, and whether metadata is translated on that side | the meta-model builder is a substantial part of a productized connector, and whether the schema can be read at all decides whether the connector is even viable |
 
 **If custom**, additionally:
@@ -310,11 +327,20 @@ too if the component is productized.
 **Both:** take the connector's client as a constructor parameter; pull the platform's own
 services off the injected `IServiceProvider`; and never hold a credential.
 
-Two things partners reach for and get wrong, both covered in the data adapter document:
+Four things partners reach for and get wrong, all covered in the data adapter document:
 
 - State the external system has no field for — that a one-time action already happened, say —
   goes in `IIdPersistentStorage` or `ITemporalPersistentStorage`, **not** in a status or comment
   field of the external system, where that system's own processes will overwrite it.
+- **Never scope a key yourself.** `ICache`, `IIdPersistentStorage`, `ITemporalPersistentStorage`,
+  `IStorageBackedLock` and the other component-scoped services are already partitioned by tenant
+  and by configured component instance. A tenant id, portal id, connector key or configuration id
+  in a key is redundant and makes the entry harder to find. Uniqueness within your own component
+  is the only part that is yours.
+- A `lock` statement protects nothing. Component instances are short-lived and spread over more
+  than one machine, so when two requests must not write to the external system at once, take an
+  `IStorageBackedLock` — a short duration, prolonged as you go, a fresh lock key per acquisition,
+  and `ClearLockAsync` in a `finally`. It returns `false` rather than waiting.
 - "Never hold a credential" is about authenticating to the external system. It does **not** mean a
   data adapter has no security to write: when your component is reached by a signed, time-limited
   link handed to someone outside the portal, verifying that link is yours to do and nothing else
@@ -351,6 +377,31 @@ connector that fails there would have failed in the platform. The full setup is 
   — and the next move is always to suppress them, which defeats the point. Use the test drivers
   directly and assert the happy path, the shape of the result, identifier round-tripping, the
   failure paths and the authentication lifecycle.
+
+**Inheriting the shared suite couples your test project to the SDK's test surface**, which is a
+cost worth knowing before you opt in. Its base classes are abstract, and a later SDK version can
+add a member to them; when that happens your test project stops compiling, in a repository nobody
+has touched. Expect it on an SDK upgrade, and read it as one more reason a custom component
+should not inherit the suite.
+
+Where a component does inherit it for the checks that *do* apply, the ones that do not are
+`virtual` — that is the intended escape hatch. Override them and assert the absence deliberately
+("this component serves no assets, so it has no output-format configuration"), so that the day it
+gains one of those markers the override fails and gets reconsidered. An override with an empty
+body passes while asserting nothing, which is worse than the failure it replaced.
+
+**A component's tests live with the component.** A second data adapter — a customer-specific
+variant, say — gets its own test project beside it, with its own fixture and its own settings
+section, rather than extending the fixture of the component it was modelled on. A shared fixture
+makes two components depend on each other at build time and hands one of them a base class it can
+break for the other; the twenty lines of connector setup you duplicate are much the cheaper half
+of that trade.
+
+**Write a round-trip test for every value your component writes back.** Reads are easy to eyeball;
+writes are not, because the external system may normalise, truncate or reinterpret what you sent.
+Dates are the classic: a value standing for a month, converted to UTC on the way out, lands in the
+*previous* month for any positive offset — and that passes on a developer machine running UTC and
+is wrong everywhere else. Assert the value you read back, not that the call succeeded.
 
 **Then look at it in a real portal**, if there is a development environment for it. Two things
 only a portal shows you: whether the configuration form is usable, and whether the data renders.

@@ -56,7 +56,9 @@ Everything here is read by people outside Smint.io. Before committing anything:
   platform implements it. "Smint.io prefixes entity keys per connector configuration, so never
   hard-code one" is right; naming the literal prefix and the class that applies it is not.
 
-Conventions every document here follows — match them:
+Conventions every partner-facing document here follows — match them. The `CLAUDE.md` files are
+agent guidance rather than partner documents, and deliberately carry no version line, no table of
+contents and no `Contributors` block.
 
 - Setext-style title (`=====` underline), then a `Current version of this document is: X.Y.Z (as of
   <date>)` line, and a `Contributors` block at the end. **Bump the version line when you change a

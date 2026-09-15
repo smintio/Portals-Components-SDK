@@ -1,7 +1,7 @@
 Smint.io Portals frontend reference
 ==================================
 
-Current version of this document is: 1.1.0 (as of 14th of September, 2026)
+Current version of this document is: 1.2.2 (as of 15th of September, 2026)
 
 Lookup tables for building Smint.io Portals frontend components: the services you can inject,
 the template filters and CSS classes the runtime provides, the shared property mixins you
@@ -13,14 +13,15 @@ component and page types see
 [smintio-frontend-component-types.md](smintio-frontend-component-types.md); for the asset
 action mixins see [smintio-mixins.md](smintio-mixins.md).
 
-- [Global services](#global-services)
-- [Global filters](#global-filters)
-- [Configuration property mixins](#configuration-property-mixins)
-- [Shared components](#shared-components)
-- [Dynamic allowed values providers](#dynamic-allowed-values-providers)
-- [`Implements` type names](#implements-type-names)
-- [Data types](#data-types)
-- [Global CSS classes](#global-css-classes)
+1. [Global services](#user-content-global-services)
+1. [Events a component can emit](#user-content-events-a-component-can-emit)
+1. [Global filters](#user-content-global-filters)
+1. [Configuration property mixins](#user-content-configuration-property-mixins)
+1. [Shared components](#user-content-shared-components)
+1. [Dynamic allowed values providers](#user-content-dynamic-allowed-values-providers)
+1. [`Implements` type names](#user-content-implements-type-names)
+1. [Data types](#user-content-data-types)
+1. [Global CSS classes](#user-content-global-css-classes)
 
 ---
 
@@ -81,6 +82,39 @@ hasSomewherePermission(permissionUuid)
 
 Please note that permissions are always enforced on the backend as well. Checking them in the
 frontend is for the user experience, not for security.
+
+---
+
+## Events a component can emit
+
+Beyond the events of the page type contract your component targets, the runtime listens for one
+event on **every** UI component, whatever its type.
+
+| Event | Payload | Effect |
+|---|---|---|
+| `component:hide` | the component instance — `this` | the page drops this component from its slot entirely: no column, no content gap, no background band. On a `ui-type-section` component the whole section is dropped, including everything placed inside it and its matching section end |
+
+```javascript
+this.$emit("component:hide", this);
+```
+
+This is the sanctioned way for a component to remove itself when it has nothing to show —
+rendering an empty element still leaves the slot element, and therefore a visible gap, in the
+page. The page identifies the slot element from the instance you pass, so the payload is not
+optional.
+
+Three things to know before using it:
+
+- **It is one-way for that page render.** There is no counterpart event, so a component hidden
+  while its data was still loading stays hidden. Emit only when the answer is final.
+- **Guard your template as well.** The page acts on its next render pass; an unguarded template
+  renders once before disappearing.
+- **The slot renderers implement this**, so a page template built on `SPageMixin` and the
+  standard `s-…-slot` components gets it for free. A page template that renders components
+  itself, without those renderers, does not.
+
+A worked example is in
+[the recipes](smintio-frontend-recipes.md#user-content-how-do-i-hide-my-component-completely-leaving-no-gap-behind).
 
 ---
 
@@ -145,9 +179,9 @@ same group:
 | `SContentWidthProps` | `s-layout-props` | `slotWidthPixelsDesktop`, `slotWidthPixelsMobile`, `contentWidthDesktop`, `contentWidthMobile` — for page templates |
 | `SHtmlProps` | `s-html-props` | `className`, `anchorName` |
 | `SCssProps` | `s-html-props` | `className` only |
-| `SDownloadProps` | `s-download-props` | 15 download dialog texts, plus the download behaviour |
-| `SRememberProps` | `s-remember-props` | 7 collect dialog texts, plus the collect behaviour |
-| `SShareProps` | `s-share-props` | 27 share dialog texts, plus the share behaviour |
+| `SDownloadProps` | `s-download-props` | 15 download dialog texts. The methods, the `downloadDialogProps` getter and the `<s-download-dialog>` registration come from the dialog mixin it mixes in |
+| `SRememberProps` | `s-remember-props` | 7 collect dialog texts, plus the dialog mixin it mixes in |
+| `SShareProps` | `s-share-props` | 27 share dialog texts, plus the dialog mixin it mixes in |
 | `SQuickViewProps` | `s-quick-view-props` | large file warning texts and the size limit |
 | `SCiHubProps` | `s-ci-hub-props` | CI Hub publishing settings |
 

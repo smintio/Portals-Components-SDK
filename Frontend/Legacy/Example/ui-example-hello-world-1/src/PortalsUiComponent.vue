@@ -44,7 +44,7 @@ import { SCssProps } from "@smintio/portals-components";
     },
     description: {
         [DefaultCulture]: "This component displays a message with an optional color.",
-        de: "Diese Komponente dient zur Darstellung eines Banners mit optionalem Titel und einer Suchleiste.",
+        de: "Diese Komponente zeigt einen Text mit optionaler Farbe an.",
     },
 })
 @FormGroupDeclaration("hw-text")

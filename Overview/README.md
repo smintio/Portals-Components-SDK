@@ -3,7 +3,14 @@ What are Smint.io Portals components?
 
 This README.md serves to clarify the general concept of Smint.io Portals components.
 
-Current version of this document is: 2.1.0 (as of 15th of September, 2026)
+Current version of this document is: 2.2.0 (as of 15th of September, 2026)
+
+1. [Overview](#user-content-overview)
+1. [Getting access to the SDKs](#user-content-getting-access-to-the-sdks)
+1. [Getting a component into a Smint.io Portals system](#user-content-getting-a-component-into-a-smintio-portals-system)
+1. [Smint.io Portals component diagram](#user-content-smintio-portals-component-diagram)
+1. [Frontend components](#user-content-frontend-components)
+1. [Backend components](#user-content-backend-components)
 
 ## Overview
 

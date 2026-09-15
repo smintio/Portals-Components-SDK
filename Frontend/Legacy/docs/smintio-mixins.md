@@ -1,16 +1,18 @@
 Smint.io Portals frontend component mixins
 ==========================================
 
+Current version of this document is: 2.3.0 (as of 15th of September, 2026)
+
 We have prepared several Vue.js mixins that help you to perform common tasks more quickly in your Smint.io Portals frontend components.
 
 They are all exported from `@smintio/portals-components`.
 
-* [Download asset(s)](#download-assets)
-* [Remember (collect) asset(s)](#remember-collect-assets)
-* [Share asset(s)](#share-assets)
-* [Other useful mixins](#other-useful-mixins)
-
-Current version of this document is: 2.2.0 (as of 14th of September, 2026)
+1. [How the mixins are built](#user-content-how-the-mixins-are-built)
+1. [Download asset(s)](#user-content-download-assets)
+1. [Remember (collect) asset(s)](#user-content-remember-collect-assets)
+1. [Share asset(s)](#user-content-share-assets)
+1. [All three at once](#user-content-all-three-at-once)
+1. [Other useful mixins](#user-content-other-useful-mixins)
 
 ## How the mixins are built
 
@@ -161,7 +163,8 @@ public shareCollection(collectionId: string): void;
 public editShare(shareId: string): void;
 ```
 
-Sharing is not available in every portal. Guard the UI with `AuthMixin`:
+Sharing is not permitted in every portal. Guard the UI with `AuthMixin`, whose `shareAvailable`
+is a portal-wide permission check:
 
 ```ts
 import { AuthMixin } from "@smintio/portals-components";
@@ -213,13 +216,13 @@ export default class PortalsUiComponentImplementation extends Mixins(
 
 | Mixin | What it gives you |
 |---|---|
-| `AuthMixin` | `isLoggedIn`, `user`, `loginAvailable`, `shareAvailable`, `ratingAvailable`, `commentingAvailable` and the related feature flags |
-| `AssetPermissionsMixin` | `hasViewPermission`, `hasHiResPermission`, `hasLoResPermission`, `hasDownloadPermission` |
+| `AuthMixin` | `isLoggedIn`, `user`, `loginAvailable`, and the portal-wide permission checks `shareAvailable`, `ratingAvailable`, `commentingAvailable` and their `…SettingAvailable` companions. They answer "may anyone in this portal do this?", not "does the portal have the feature" |
+| `AssetPermissionsMixin` | `hasReadAssetDetailsPermission(asset)`, `hasDownloadPermission(asset)`, `hasDownloadAssetHiResPermission(asset)`, `hasDownloadAssetLayoutFilePermission(asset)`, `hasAssetPermission(asset, permissionUuid)`, `hasSomewherePermission(permissionUuid)` |
 | `RoutingMixin` | `generateRouterLocation()`, `generateRouterLocationForAssetDataObject()` |
 | `AssetsReferenceMixin` | resolves an `IAssetsReferenceModel` configuration property into actual assets — `getAssets()`, `getAssetByIds()`, `getAssetsByFolderId()`, `getAssetsBySearch()`, `getAssetsReferenceByRelatedAssets()`, `getAssetsReferenceByMetadataAttributes()`, plus `getAssetReferenceByRelationshipType(asset, "<relationship type>")`, which pulls the search or asset reference an asset carries in its own `relatedAssets` |
 | `MetadataMixin` | `getLocalizedTags()`, `getLocalizedAttributeValue()`, `getLocalizedAttributeValues()`, `getLinks()` |
 | `GalleryAssetConverterMixin` | converts assets into gallery items for the gallery components — `convertToItemAsset()`, `convertToImageAsset()`, `convertToVideoAsset()`, `convertToAudioAsset()`, `isVideoAsset()`, `isAudioAsset()` |
-| `AssetDetailsPageNavigationMixin` | previous/next navigation through search results on an asset details page, plus `assetId` and `buttonBackToSearchTarget` |
+| `AssetDetailsPageNavigationMixin` | **page templates only**: previous/next navigation through the search result on an asset details page, plus the asset itself, `assetId` and `buttonBackToSearchTarget`. A UI component on that page receives these as props and emits `previous-item` / `next-item` — mixing this in there runs a second, competing navigation |
 | `MenuItemMixin` | builds effective menu items and their image URLs |
 | `QuickViewModalMixin` | quick view modal wiring |
 | `SPageMixin` | **page templates only**: registers the common slot renderers — `SHeaderSlot`, `SFooterSlot`, `SGenericSlot`, `SGenericMultiSlot` — and mixes in `SCssProps`. `SSideSlot`, `SSideMenuSlot` and `SBannerSlot` are not covered; register those yourself |

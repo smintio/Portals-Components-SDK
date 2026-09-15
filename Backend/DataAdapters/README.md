@@ -1,7 +1,7 @@
 How-to implement the `DataAdapter`
 ==================================
  
-Current version of this document is: 1.4.0 (as of 15th of September, 2026)
+Current version of this document is: 1.4.1 (as of 15th of September, 2026)
 
 This is the short orientation. **The full catalogue of public API interfaces, the base classes
 and what they leave abstract, parameters and results, long-running methods, permissions, the
@@ -11,7 +11,7 @@ configuration marker interfaces and how to publish an interface of your own are 
 ## `DataAdapter` basics
 
 The `DataAdapter` can be understood as a _facade_ for the external system. It is used to read, search (and potentially write) data from (and to) an external system.
-It uses the `Connector` to establish a connection to the external system such as Sharepoint. The connecting point between those two is the `ConfigureServicesForDataAdapter` method:
+It uses the `Connector` to establish a connection to the external system such as SharePoint. The connecting point between those two is the `ConfigureServicesForDataAdapter` method:
 ```c#
 //in SharepointConnector.cs
 public override void ConfigureServicesForDataAdapter(ServiceCollection services)

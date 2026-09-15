@@ -1,7 +1,7 @@
 How-to implement the `Connector`
 ================================
 
-Current version of this document is: 1.3.1 (as of 15th of September, 2026)
+Current version of this document is: 1.3.2 (as of 15th of September, 2026)
 
 This is the short orientation. **The full contract — every member of `IConnectorStartup` and
 `IConnector`, the setup methods, the call order, the four authentication flows with worked code,
@@ -11,7 +11,7 @@ the API client base classes and the project layout — is in
 ## `Connector` Basics
 
 A `Connector` in the context of Smint.io Portals is an object that contains information about the external
-system's metamodel and handles authorization.
+system's meta-model and handles authorization.
 
 One of the `Connector's` main tasks is to establish and maintain a trust context to the external system, e.g. by
 obtaining access and refresh tokens. It should not keep any network connections alive. The connector also should provide a

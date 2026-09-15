@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.3.0 (as of 15th of September, 2026)
+Current version of this document is: 1.7.0 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -165,6 +165,11 @@ The family nearly every data adapter implements. `IAssets` composes `IAssetsRead
 | `SearchFoldersAsync` | search within folders |
 | `GetFolderContentsAsync` | the assets in a folder |
 
+Like the download interface, this is the **portal-facing** contract and Smint.io implements it
+across data adapters. A connector serves its folders by returning them from
+`GetFolderContentsForIntegrationLayerAsync`, by producing `FolderDataObject`s in its converter,
+and by reporting folder navigation in its search feature support.
+
 **`IAssetsReadRandom`** (: `IAssetsRead`) — `GetRandomAssetsAsync`, `GetRandomResourceAssetsAsync`.
 What a "surprise me" or rotating-hero component calls.
 
@@ -179,7 +184,17 @@ What a "surprise me" or rotating-hero component calls.
 The bytes never pass through the Smint.io API: the second step returns a signed delivery URL
 that the client follows directly.
 
-**`IAssetsUpload`** — `GetAssetUploadSettingsAsync`. Requires the upload permission.
+**You almost certainly do not implement this one.** A download normally spans several data
+adapters — the visitor selected assets from more than one source — so Smint.io composes the two
+steps itself, applies the permission gates and delivers the file. A connector's data adapter
+contributes the *options* for its own assets through `GetAssetsDownloadItemMappingsAsync`, and
+serves the bytes through `GetAssetDownloadStreamAsync`. See
+[offering downloads](smintio-backend-recipes.md#user-content-how-do-i-offer-downloads).
+
+**`IAssetsUpload`** — `GetAssetUploadSettingsAsync`. Requires the upload permission. The settings
+come from your configuration class through the base implementation; the method you actually write
+is `HandleAssetUploadsAsync`, which receives the uploaded files as references and puts them into
+the source system. See [accepting uploads](smintio-backend-recipes.md#user-content-how-do-i-accept-uploads).
 
 **`IAssetsInternalApiProvider`**, brought in by `IAssetsRead` and therefore implemented by every
 asset adapter, is where the binaries are actually served:
@@ -206,7 +221,7 @@ of their own except, for products, `IProductAssetsSearchRelated.SearchProductAss
 | `IAiSemanticAnalysis` | `GetFileAnalysisAsync`, `GetSemanticAnalysisAsync` |
 | `IAiEmbeddings` | vector embeddings for semantic and natural-language search |
 | `IExternalUsersRead` | `GetUserGroupMembershipAsync` — resolves a portal user's groups in the external system, which is how external group membership drives portal permissions |
-| `IWebhooksApiProvider` | `ValidateWebhookAsync` — validates an inbound callback before the platform acts on it |
+| `IWebhooksApiProvider` | `ValidateWebhookAsync` — decide whether to believe an inbound callback — and `ProcessWebhookAsync` — queue the payload. Validate cheaply, then queue; never do the work in the callback |
 
 Search-shaped interfaces follow one convention throughout: a `Search…Async` paired with
 `Get…FilterValuesAsync` and `Get…SortValuesAsync`, so the client can build the filter and sort
@@ -467,16 +482,33 @@ with nothing to see at compile time.
 
 Some interactions need to remember something the external system has no field for — that a
 one-time action has already been performed, that a step was completed, what a caller was shown
-last time. Two services off the injected `IServiceProvider` cover this:
+last time. Three services off the injected `IServiceProvider` cover this:
 
 | | |
 |---|---|
 | `IIdPersistentStorage` | keyed records. `GetAsync(uuid)`, `AddOrUpdateAsync(uuid, data, groupUuid)`, `GetGroupAsync`, `RemoveAsync` and their bulk forms, over an `IdPersistentStorageData { Uuid, GroupUuid, Data }` |
 | `ITemporalPersistentStorage` | an append-ordered log. `AddAsync` returns the identifier, `GetRangeAsync(lastKnownId, pageSize)` reads forward from one |
+| `IStorageBackedLock` | a mutual exclusion that holds **across every server running your component**. `LockAsync(uuid, lockDuration, lockKey)` returns `false` rather than waiting; `ClearLockAsync(uuid, lockKey)` releases it |
+
+**Every one of these is scoped to your component for you** — as is `ICache`, and the other
+component-scoped services the platform injects. The key, uuid or lock uuid you pass is only the
+last part of the real one: the platform prefixes it with the tenant and with the *configured
+component instance*, so two portals, or two configurations of the same data adapter, never see
+or overwrite each other's entries. You never put a tenant id, a portal id, a connector key or a
+configuration id into a key, and doing so only makes the entry harder to find later.
+
+What remains yours is uniqueness **within one configured component**: two different lookups in
+your own code that both key on a bare external identifier will serve each other's values.
 
 Use the keyed store when you have an identifier from the external system to key on, and the
 temporal one when you need to replay a sequence in order. Neither is a cache — the cache is for
 that, and persistent storage is not the way to avoid a call you could simply make.
+
+The lock is for the case where two portal requests would otherwise write to the external system
+at the same time and interleave. It is **not** a `lock` statement: a component instance is
+short-lived and there are many of them, on more than one machine, so an in-process lock protects
+nothing. See
+[stopping two requests from colliding](smintio-backend-recipes.md#user-content-how-do-i-stop-two-requests-from-colliding).
 
 Do not keep this state in a field of the external system instead. A status text, a comment or a
 description field belongs to that system's own processes: a workflow there reads it, a user edits
@@ -488,12 +520,17 @@ The data adapter never authenticates to the external system — that is the conn
 the client it hands you must not expose a credential. It is easy to read that as "security does
 not belong in a data adapter". There is a second kind that does.
 
-When your component is reached through a **link handed to someone outside the portal** — a
-tokenised URL granting one person one action on one object for a limited time — validating that
-link is the *data adapter's* responsibility, and nothing else validates it for you. Verify the
-signature before anything else, reject an expired link, and treat every value carried in it as
-untrusted until the signature has checked out. In particular, never read an object identifier out
-of a link and fetch it before verifying the signature over it.
+When something reaches your component **from outside the portal**, validating it is the *data
+adapter's* responsibility and nothing else does it for you. The everyday case is a **callback from
+the external system**: it arrives with a signature over its own body, and your adapter decides
+whether to believe it — see
+[accepting a callback](smintio-backend-recipes.md#user-content-how-do-i-accept-a-callback-from-the-external-system).
+The same applies to a tokenised link granting one person one action for a limited time.
+
+The discipline is identical either way. Verify the signature before anything else, reject anything
+outside the accepted time window, and treat every value carried in the request as untrusted until
+the signature has checked out. In particular, never read an object identifier out of such a
+request and fetch it before verifying the signature over it.
 
 Keep signing and verification together even when only the verifier ships: you need the signer to
 test the verifier, and a test that mints its links through the same code is the only way to know
@@ -503,8 +540,8 @@ the two halves agree.
 connector's — it is this adapter's secret, it has nothing to do with authenticating to the
 external system, and it is often different per customer. Configurations are stored encrypted at
 rest and a saved secret is never displayed back to the administrator, so putting it there is
-safe — **provided you name the property so that it is recognised as a secret**, which a name
-containing `key`, `secret` or `password` is. See
+safe — **provided you name the property so that it is recognised as a secret**, which depends on
+the name containing one of a fixed set of words. See
 [configuration is stored encrypted](smintio-backend-annotations.md#user-content-configuration-is-stored-encrypted)
 and [the data adapter's own configuration](#user-content-the-data-adapters-own-configuration).
 

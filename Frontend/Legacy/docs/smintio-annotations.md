@@ -1,7 +1,7 @@
 Smint.io Portals frontend component annotations
 ===============================================
 
-Current version of this document is: 2.1.0 (as of 14th of September, 2026)
+Current version of this document is: 2.2.0 (as of 15th of September, 2026)
 
 Annotations describe a frontend component's configuration to Smint.io Portals: what fields
 the portal editor sees, what they are called in each language, what values they accept and
@@ -13,6 +13,15 @@ noted otherwise.
 
 Please get in touch at [support@smint.io](mailto:support@smint.io) if you are missing an
 annotation, or if you need a new one.
+
+1. [Component (class) annotations](#user-content-component-class-annotations)
+1. [Property annotations — labels and help text](#user-content-property-annotations--labels-and-help-text)
+1. [Property annotations — data type](#user-content-property-annotations--data-type)
+1. [Property annotations — editor hints on string form items](#user-content-property-annotations--editor-hints-on-string-form-items)
+1. [Property annotations — values and validation](#user-content-property-annotations--values-and-validation)
+1. [Property annotations — form layout and visibility](#user-content-property-annotations--form-layout-and-visibility)
+1. [Page template only](#user-content-page-template-only)
+1. [Recommended annotation order](#user-content-recommended-annotation-order)
 
 ## Component (class) annotations
 
