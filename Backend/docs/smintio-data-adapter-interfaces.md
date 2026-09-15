@@ -165,6 +165,11 @@ The family nearly every data adapter implements. `IAssets` composes `IAssetsRead
 | `SearchFoldersAsync` | search within folders |
 | `GetFolderContentsAsync` | the assets in a folder |
 
+Like the download interface, this is the **portal-facing** contract and Smint.io implements it
+across data adapters. A connector serves its folders by returning them from
+`GetFolderContentsForIntegrationLayerAsync`, by producing `FolderDataObject`s in its converter,
+and by reporting folder navigation in its search feature support.
+
 **`IAssetsReadRandom`** (: `IAssetsRead`) — `GetRandomAssetsAsync`, `GetRandomResourceAssetsAsync`.
 What a "surprise me" or rotating-hero component calls.
 
@@ -179,7 +184,17 @@ What a "surprise me" or rotating-hero component calls.
 The bytes never pass through the Smint.io API: the second step returns a signed delivery URL
 that the client follows directly.
 
-**`IAssetsUpload`** — `GetAssetUploadSettingsAsync`. Requires the upload permission.
+**You almost certainly do not implement this one.** A download normally spans several data
+adapters — the visitor selected assets from more than one source — so Smint.io composes the two
+steps itself, applies the permission gates and delivers the file. A connector's data adapter
+contributes the *options* for its own assets through `GetAssetsDownloadItemMappingsAsync`, and
+serves the bytes through `GetAssetDownloadStreamAsync`. See
+[offering downloads](smintio-backend-recipes.md#user-content-how-do-i-offer-downloads).
+
+**`IAssetsUpload`** — `GetAssetUploadSettingsAsync`. Requires the upload permission. The settings
+come from your configuration class through the base implementation; the method you actually write
+is `HandleAssetUploadsAsync`, which receives the uploaded files as references and puts them into
+the source system. See [accepting uploads](smintio-backend-recipes.md#user-content-how-do-i-accept-uploads).
 
 **`IAssetsInternalApiProvider`**, brought in by `IAssetsRead` and therefore implemented by every
 asset adapter, is where the binaries are actually served:

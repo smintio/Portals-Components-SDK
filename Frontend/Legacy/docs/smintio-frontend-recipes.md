@@ -1,7 +1,7 @@
 Smint.io Portals frontend component recipes
 ===========================================
 
-Current version of this document is: 1.1.0 (as of 15th of September, 2026)
+Current version of this document is: 1.2.0 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other frontend documents describe *what exists*; this one shows *how it is used*.
@@ -882,9 +882,15 @@ export default class PortalsUiComponentImplementation extends Mixins(AuthMixin) 
 </script>
 ```
 
-`AuthMixin` gives `isLoggedIn`, `user`, `loginAvailable`, `shareAvailable`, `ratingAvailable`
-and `commentingAvailable` — the last three are *portal capabilities*, not permissions: they say
-whether the portal has the feature at all. `portalsContext.user` carries `uuid`, `isAnonymous`,
+`AuthMixin` is a set of getters over the portals context. `isLoggedIn` is "there is a user and
+they are not anonymous", `user` is that user, and `loginAvailable` comes from the tenant. The
+rest — `shareAvailable`, `ratingAvailable`, `commentingAvailable`, and the finer
+`…SettingAvailable` ones for what a share may offer — are **portal-wide permission checks**,
+each one a `hasSomewherePermission(…)` against the portal's permission service. So they answer
+"may anyone here do this?", not "does this portal have the feature compiled in", and like every
+frontend permission check they are about the experience, not security.
+
+`portalsContext.user` carries `uuid`, `isAnonymous`,
 `emailAddress`, `isEmailAddressConfirmed`, `firstName`, `lastName`, `displayName`,
 `notificationCulture`, `currency` and the custom form field values collected at registration.
 
@@ -932,7 +938,10 @@ export default class PortalsUiComponentImplementation extends Mixins(SDownloadPr
 </script>
 ```
 
-The four methods, from `SDownloadProps`:
+`SDownloadProps` itself contributes only the configuration properties — every dialog text, as a
+localized string. The methods, the `downloadDialogProps` getter and the registration of
+`<s-download-dialog>` come from the download dialog mixin that it mixes in for you, which is why
+one `Mixins(SDownloadProps)` is the whole setup. The four methods:
 
 | Method | For |
 |---|---|
@@ -999,9 +1008,15 @@ Pitfalls:
 
 ## How do I write a component for the search page?
 
-*advanced.* A search page is a page template that runs the search and hands the state to
-whichever components sit in its slots. Your component declares the matching `ui-type-…`, takes
-the state as **props**, and asks for changes by **emitting events**. It does not search.
+*advanced.* A search page is a page template that owns the search and hands the state to whichever
+components sit in its slots. Your component declares the matching `ui-type-…`, takes the state as
+**props**, and asks for changes by **emitting events**. It does not search.
+
+Nor, in fact, does the page template call a data adapter directly. It registers the search with
+the search cache provider, gets a **cursor** back, and pages through that — which is what lets the
+visitor open an asset, come back, and find the same result set at the same scroll position. The
+filters live in the **URL query**: changing a filter pushes a new route, and the route change
+drives the next search.
 
 ```vue
 <template>
@@ -1035,20 +1050,27 @@ export default class PortalsUiComponentImplementation extends Mixins(SCssProps) 
     @Prop({ default: () => [] })
     public readonly results!: IAssetDataObject[];
 
-    @Prop({ default: false })
-    public readonly isSearching!: boolean;
+    // The result set
+    @Prop() public readonly totalResults!: number;
+    @Prop() public readonly currentPage!: number;
+    @Prop() public readonly currentItemsPerPage!: number;
+    @Prop({ default: false }) public readonly hasMoreResults!: boolean;
+    @Prop({ default: "" }) public readonly searchUuid!: string;
 
-    @Prop({ default: false })
-    public readonly initialLoading!: boolean;
+    // The three loading states, and they are not interchangeable
+    @Prop({ default: false }) public readonly initialLoading!: boolean;
+    @Prop({ default: false }) public readonly isSearching!: boolean;
+    @Prop({ default: false }) public readonly isLoadingResults!: boolean;
 
-    @Prop({ default: false })
-    public readonly isLoadingResults!: boolean;
+    // What was searched for
+    @Prop({ default: "" }) public readonly currentQueryString!: string;
+    @Prop() public readonly currentSearch!: IFormFieldValuesModel;
+    @Prop() public readonly formGroupsDefinitionModel!: IFormGroupsDefinitionModel;
 
-    @Prop()
-    public readonly currentSearch!: IFormFieldValuesModel;
-
-    @Prop({ default: false })
-    public readonly hasMoreResults!: boolean;
+    // Folder navigation, when the data source offers it
+    @Prop({ default: false }) public readonly folderNavigationEnabled!: boolean;
+    @Prop({ default: null }) public readonly parentFolderId!: IFolderIdentifier | null;
+    @Prop({ default: null }) public readonly parentFolderName!: ILocalizedStringsModel | null;
 }
 </script>
 ```
@@ -1058,17 +1080,27 @@ fails at compile time if you get a prop name wrong; the prop simply stays `undef
 for each page type are listed in
 [the page type contracts](smintio-page-type-contracts.md). The events go the other way:
 
-| Event | Means |
-|---|---|
-| `next-search-page` | the visitor wants the next page |
-| `query-string-changed` | the visitor typed a new query |
-| `remove-search-value` | the visitor removed one active filter |
-| `clear-query` | the visitor cleared the search |
+| Event | Emitted by | Means |
+|---|---|---|
+| `next-search-page` | the search **result** | the visitor wants the next page |
+| `remove-search-value` | the search **result** or **form** | the visitor removed one active filter |
+| `clear-query` | the search **result** or **form** | the visitor cleared the search |
+| `search-changed` | the search **form** | the filter selection changed |
+| `query-string-changed` | the search **bar** | the visitor typed a new query |
+
+The three loading flags mean different things and a good component uses all of them:
+`initialLoading` is the very first load, when there is nothing to show yet; `isSearching` is a new
+search replacing the results, which is when the list should be cleared and scrolled to the top;
+`isLoadingResults` is another page arriving under the results already on screen.
 
 Pitfalls:
 
 - **Do not run your own search on a search page.** Two searches on one page disagree, and the
-  visitor sees the filter chips of one and the results of the other.
+  visitor sees the filter chips of one and the results of the other. It also throws away the
+  cursor, so returning from an asset's detail page restarts the search.
+- **The filter definition prop has two names.** A search *result* component receives
+  `formGroupsDefinitionModel`; a search *form* component receives `form-groups-definition`. They
+  are the same data and the wrong name silently yields `undefined`.
 - **`currentSearch` is the *current filter state*, not a query string.** Pass it on to anything
   that needs to stay in sync — a search bar asking for proposals takes it as `currentFilters`.
 - **Declare the type that matches the slot.** A `ui-type-generic` component cannot be placed in
@@ -1076,8 +1108,10 @@ Pitfalls:
 
 ## How do I write a component for the asset details page?
 
-*advanced.* The asset details page hands your component the asset, and
-`AssetDetailsPageNavigationMixin` supplies the navigation around it.
+*advanced.* The asset details **page template** owns the asset and the navigation through the
+search result — that is what `AssetDetailsPageNavigationMixin` is for, and it belongs in the page,
+not in your component. Your component receives the state as props and asks for a move by emitting
+an event, exactly as on the search page.
 
 ```vue
 <template>
@@ -1104,14 +1138,23 @@ import {
     Implements,
     PortalsGlobalServices,
 } from "@smintio/portals-component-sdk";
-import { AssetDetailsPageNavigationMixin, MetadataMixin } from "@smintio/portals-components";
+import { MetadataMixin } from "@smintio/portals-components";
 
-export default class PortalsUiComponentImplementation extends Mixins(
-    AssetDetailsPageNavigationMixin,
-    MetadataMixin
-) {
-    @Prop()
+export default class PortalsUiComponentImplementation extends Mixins(MetadataMixin) {
+    @Prop({ required: true })
     public readonly asset!: IAssetDataObject;
+
+    // Navigation state, all of it from the page.
+    @Prop({ default: false }) public readonly canNavigatePreviousResultItem!: boolean;
+    @Prop({ default: false }) public readonly canNavigateNextResultItem!: boolean;
+    @Prop({ default: false }) public readonly previousIsLoading!: boolean;
+    @Prop({ default: false }) public readonly nextIsLoading!: boolean;
+    @Prop({ default: "" }) public readonly buttonBackToSearchTarget!: VueRouterLocation;
+
+    // Present when the page was opened through a share link — pass them on to anything
+    // that acts on the asset, or the action is refused.
+    @Prop({ default: "" }) public readonly shareId!: string;
+    @Prop({ default: "" }) public readonly shareSecret!: string;
 
     @DisplayName("en", "Tag attributes", true)
     @Implements("IMetadataAttributeModel")
@@ -1155,6 +1198,11 @@ Pitfalls:
 
 - **The asset arrives after the first render.** Guard the template with `v-if="asset"` and watch
   the prop rather than reading it in `created()`.
+- **Do not mix in the page navigation mixin.** It provides the asset, the cursor and the
+  navigation for the *page template*; in a UI component it would run a second, competing
+  navigation. Take the props.
+- **Carry the share id and secret through.** On a page opened from a share link, every action on
+  the asset needs them, and forgetting them turns into "works for me, forbidden for the customer".
 - **Check the availability flag, not the URL.** A URL can be present and the rendition not ready.
 - **Never hard-code a raw metadata key.** Keys are unique per connector configuration, so the
   same source configured twice produces different keys — take the attribute as a configuration
@@ -1326,21 +1374,35 @@ public get columns(): number {
 }
 
 public get effectiveWidth(): number {
-    // The convention the shipped components follow: a mobile setting of -1 means
-    // "use the desktop value", so an administrator only fills it in when it differs.
-    if (this.$vuetify.breakpoint.smAndDown && this.contentWidthMobile !== -1) {
-        return this.contentWidthMobile;
-    }
-
-    return this.contentWidth;
+    // The convention the shipped components follow for their own width settings: the mobile
+    // value -1 is shown as "Default" and means "use the desktop value", so an administrator
+    // fills it in only when it differs. Each component resolves it itself — nothing central
+    // does it for you.
+    return this.assetsWidthMobile !== -1 ? this.assetsWidthMobile : this.assetsWidth;
 }
 </script>
+```
+
+Declare the pair like this, so the administrator sees "Default" rather than a magic number:
+
+```typescript
+@DisplayName("en", "Width (mobile)", true)
+@ComponentProperty({ name: "assetsWidthMobile" })
+@AllowedValues([-1, 50, 66, 75, 100, 120])
+@AllowedValueDisplayName(-1, "en", "Default", true)
+@IsInt32()
+@DefaultValue(-1)
+@FormGroup(SBottomGapProps.FormGroupId)
+public readonly assetsWidthMobile!: number;
 ```
 
 - `$vuetify.breakpoint` is available in every component: `xsOnly`, `smAndDown`, `mdAndUp` and
   the rest.
 - Where a setting genuinely differs between phone and desktop, ship **two settings** and follow
   the `-1` convention above, rather than guessing from the viewport alone.
+- **The page template's content width is a different convention.** There the "Default" value is
+  `0`, and it falls back to the default the slot renderer was given — not to the desktop value.
+  Do not carry the `-1` idiom across to it.
 - Test at 360 px wide. A component that needs a horizontal scrollbar there will be reported as
   broken.
 

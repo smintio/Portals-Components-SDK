@@ -1,7 +1,7 @@
 Smint.io Portals backend component annotations
 =============================================
 
-Current version of this document is: 1.2.0 (as of 15th of September, 2026)
+Current version of this document is: 1.3.0 (as of 15th of September, 2026)
 
 Annotations describe a backend component's configuration to Smint.io Portals: what fields the
 portal administrator sees when configuring your connector, data adapter, data processor,
@@ -147,6 +147,12 @@ missing, get in touch rather than working around it.
 
 Nullable and non-nullable are both accepted for the value types; use the nullable form when
 "not set" is meaningful and different from zero or `false`.
+
+**A non-nullable value type is implicitly required**, because it has no way to express "not
+answered" — so give it a `DefaultValue`. Without one, a `bool` the administrator never touches
+counts as unanswered, and the failure is at its most confusing on a property marked `Advanced` or
+`Expert`: those are not shown in the component setup wizard, so the wizard fails on a field nobody
+was offered. Either carry a `DefaultValue`, or make the property nullable and mean it.
 
 ```C#
 [Serializable]
@@ -419,6 +425,10 @@ the order you want the administrator to see them.
 - **`Required` is not the same as a check against the external system.** It only proves the
   administrator typed something. Whether that access token works belongs in
   `PerformPostConfigurationChecksAsync`.
+- **A non-nullable value type is already required, so give it a `DefaultValue`.** A `bool` with
+  neither a default nor a nullable type cannot express "not answered", and on an `Advanced` or
+  `Expert` property the setup wizard then fails on a field it never showed. See
+  [the property type is the data type](#user-content-the-property-type-is-the-data-type).
 - **Do not reach for a `string` with a hand-rolled format when a typed property exists.**
   `AssetIdentifier`, `FolderIdentifier`, `IResourceReference`, `IPageReference` and
   `MetadataAttributeModel` all give the administrator a picker instead of asking them to paste
