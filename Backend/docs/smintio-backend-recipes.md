@@ -1,7 +1,7 @@
 Smint.io Portals backend component recipes
 ==========================================
 
-Current version of this document is: 1.0.0 (as of 15th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other backend documents describe *what exists*; this one shows *how it is used*.
@@ -212,8 +212,12 @@ the SharePoint connector's `AllowedValues/` folder for providers that support se
 
 ## How do I make one dropdown depend on another?
 
-*basic.* A site has lists, a list has folders. The dependent dropdown receives the parent's
-selected value as `parentValue`, and the attribute names the property it comes from.
+*basic.* A site has lists, a list has folders. There are two different situations here, and they
+are solved differently.
+
+**The parent is another configuration property** — site, then the lists *of that site*. The
+provider reads the parent from the client it was given, because the client is constructed from
+the configuration the administrator is filling in:
 
 ```C#
 [DisplayName("en", "Site", IsDefault = true)]
@@ -221,27 +225,31 @@ selected value as `parentValue`, and the attribute names the property it comes f
 public string SiteId { get; set; }
 
 [DisplayName("en", "List", IsDefault = true)]
-[DynamicAllowedValuesProvider(typeof(ListIdProvider), nameof(SiteId))]
+[DynamicAllowedValuesProvider(typeof(ListIdProvider))]
 public string ListId { get; set; }
 ```
 
 ```C#
 public class ListIdProvider : IDynamicValueListProvider<string>
 {
+    private readonly IMyClient _client;
+
     public bool SupportsSearch => true;
     public bool SupportsPagination => true;
+
+    public IDynamicAllowedValuesParametersProvider ParametersProvider => null;
 
     public async Task<PagingResult<UiDetailsModel<string>>> GetDynamicValueListAsync(
         string searchTerm, int? offset, int? limit, string parentValue)
     {
         // No site chosen yet — offer nothing rather than everything.
-        if (string.IsNullOrEmpty(parentValue))
+        if (_client == null || string.IsNullOrEmpty(_client.SiteId))
         {
             return new PagingResult<UiDetailsModel<string>> { Result = Array.Empty<UiDetailsModel<string>>() };
         }
 
         var lists = await _client
-            .GetListsAsync(siteId: parentValue, search: searchTerm, offset: offset ?? 0, limit: limit ?? 50)
+            .GetListsAsync(siteId: _client.SiteId, search: searchTerm, offset: offset ?? 0, limit: limit ?? 50)
             .ConfigureAwait(false);
 
         return new PagingResult<UiDetailsModel<string>>
@@ -253,9 +261,37 @@ public class ListIdProvider : IDynamicValueListProvider<string>
 }
 ```
 
-Pitfall: **an empty parent means "nothing yet", not "everything"**. Returning the full list makes
-the administrator pick a list that does not belong to the site they chose, and the failure shows
-up much later.
+**The parent is a value in the same list** — a folder inside a folder. That is what `parentValue`
+is for: the administrator opens a node and the platform asks you for its children.
+
+```C#
+public async Task<PagingResult<UiDetailsModel<string>>> GetDynamicValueListAsync(
+    string searchTerm, int? offset, int? limit, string parentValue)
+{
+    // parentValue is null at the root, and the opened folder's id below it.
+    var folders = await _client
+        .GetFoldersAsync(parentFolderId: parentValue, search: searchTerm)
+        .ConfigureAwait(false);
+
+    return new PagingResult<UiDetailsModel<string>>
+    {
+        TotalResults = folders.TotalCount,
+        Result = folders.Items.Select(ToUiDetails).ToArray()
+    };
+}
+```
+
+Pitfalls:
+
+- **An empty parent means "nothing yet", not "everything".** Returning the full list lets the
+  administrator pick a list that does not belong to the site they chose, and the failure shows up
+  much later.
+- **Say what you support.** With `SupportsSearch => false` the `searchTerm` is always `null`, and
+  with `SupportsPagination => false` so are `offset` and `limit` — a provider that ignores its own
+  flags returns the first page forever.
+
+A working example: the SharePoint connector's `AllowedValues/` folder, which chains site → drive →
+list → folder this way.
 
 ## How do I turn the external system's errors into something usable?
 
@@ -951,7 +987,7 @@ public class DownloadNamingDataProcessor : DataProcessorBaseImpl,
         _entityModelProvider = serviceProvider.GetService<IEntityModelProvider>();
     }
 
-    public Task ProcessAsync(
+    public Task<AssetDownloadStreamModel> ProcessAsync(
         IDataAdapterContextModel dataAdapterContextModel,
         Type publicApiInterface,
         string methodName,
@@ -962,7 +998,7 @@ public class DownloadNamingDataProcessor : DataProcessorBaseImpl,
     {
         if (assetDownloadStreamModel == null || assetDataObject == null)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(assetDownloadStreamModel);
         }
 
         var extension = Path.GetExtension(assetDownloadStreamModel.FileName);
@@ -975,12 +1011,19 @@ public class DownloadNamingDataProcessor : DataProcessorBaseImpl,
 
         if (string.IsNullOrWhiteSpace(namePart))
         {
-            return Task.CompletedTask;          // nothing to rename with — leave it alone
+            // Nothing to rename with — hand back what you were given, unchanged.
+            return Task.FromResult(assetDownloadStreamModel);
         }
 
-        assetDownloadStreamModel.FileName = $"{prefix}{Sanitize(namePart)}{extension}";
+        // AssetDownloadStreamModel is immutable: its FileName, FileSizeInBytes, MediaType and
+        // Stream are all get-only, so a rename means returning a new model over the same stream.
+        var renamed = new AssetDownloadStreamModel(
+            $"{prefix}{Sanitize(namePart)}{extension}",
+            assetDownloadStreamModel.FileSizeInBytes,
+            assetDownloadStreamModel.MediaType,
+            assetDownloadStreamModel.Stream);
 
-        return Task.CompletedTask;
+        return Task.FromResult(renamed);
     }
 
     private static string Sanitize(string value) =>
@@ -994,6 +1037,8 @@ Pitfalls:
   `Post`; narrowing a search is a `Prepare`.
 - **A `Post` phase does not reach the search index.** If the change has to be *searchable*, it
   belongs in the integration-layer ingestion phase instead.
+- **Always return a model, never `null`.** The phase returns the download that carries on down
+  the chain; returning nothing when you decide not to act drops the download.
 - **Leave it alone when you cannot improve it.** A processor that produces `_.pdf` because the
   metadata was empty is worse than one that does nothing.
 - **Sanitize.** The value came from an external system and ends up as a file name on someone's
