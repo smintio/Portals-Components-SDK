@@ -2,7 +2,7 @@ Developing Smint.io Portals frontend components
 ===============================================
 
 This README.md serves to clarify the general concept of Smint.io Portals frontend components, which is page templates and UI components.
-Also it contains an overview of a lot of currently existing default Smint.io Portals frontend componennts that are delivered and maintained directly by us.
+Also it contains an overview of a lot of currently existing default Smint.io Portals frontend components that are delivered and maintained directly by us.
 
 Finally, it will shed some light on how you can get started with developing your own custom Smint.io Portals frontend components.
 
@@ -41,7 +41,7 @@ Access to them is restricted and is arranged with Smint.io — see
 1. [How we built our own components](#user-content-how-we-built-our-own-components)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.10.0 (as of 15th of September, 2026)
+Current version of this document is: 1.11.0 (as of 15th of September, 2026)
 
 ## UI components
 
@@ -86,16 +86,16 @@ provided by the page itself. UI components should always be able to work standal
 with other UI components or with the page using props or events, but please keep this rule in mind.
 
 *There is one exception*: the UI component can enforce through its settings to only be allowed to be added to a certain
-page type (see below). E.g. a search page or an asset details page usually coordinates it's UI components and provides
+page type (see below). E.g. a search page or an asset details page usually coordinates its UI components and provides
 certain functionality. In this case, the UI component may rely on the page to behave as it is being specified by the
 page type interface specification.
 
 *Layout*
 
-The most important layout rule for UI components is, that the UI component content always *MUST* fill it's layout box.
-The UI component is *NOT* responsible for padding and margin management outside of it's own layout box.
+The most important layout rule for UI components is, that the UI component content always *MUST* fill its layout box.
+The UI component is *NOT* responsible for padding and margin management outside of its own layout box.
 
-This means that the UI component *MUST NOT HAVE* any white space around it's content. This also means, that the
+This means that the UI component *MUST NOT HAVE* any white space around its content. This also means, that the
 content *MUST NOT* exceed the UI component's layout box. This is to make sure that paddings and margins on the overall
 page stay regular and look good (I am sure you know of situations where padding and margin management quickly became a
 nightmare because of not following this rule).
@@ -222,7 +222,7 @@ import type {
 public readonly searchBarAutoCompletion!: IAssetsSearch;
 ```
 
-Once the Smint.io Portals UI component is instanciated, you can easily call methods of that public API interface.
+Once the Smint.io Portals UI component is instantiated, you can easily call methods of that public API interface.
 
 ```javascript
 this.searchBarAutoCompletion.getFullTextSearchProposalsAsync({ searchQueryString: this.searchQuery })
@@ -260,7 +260,7 @@ public API interface definition.
 Use the [Smint.io Portals Data Adapter Exporter CLI tool](../../Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/)
 to generate the Typescript public API interface definition directly from your Smint.io Portals data adapter assembly.
 
-You can then simple use that Typescript public API interface definition file
+You can then simply use that TypeScript public API interface definition file
 in your Smint.io Portals UI component.
 
 *All the wiring from frontend to backend is done for you, without any further work involved.*
@@ -332,7 +332,7 @@ Steps to follow:
 	    └── ui-example-hello-world-1/     <- copied from Frontend/Legacy/Example
 	```
 
-	- The component's `rollup.config.js` and `tsconfig.json` are two-line stubs that resolve `../../config/…`, so the depth matters. Put the component one directory below the root folder, not directly in it
+	- The component's `rollup.config.js` and `tsconfig.json` are small stubs that resolve `../../config/…`, so the depth matters. Put the component one directory below the root folder, not directly in it
 	- If you get `Could not resolve '../../config/rollup/rollup-config.ts'` on your first build, this is why
 
 3. Rename the `ui-example-hello-world-1` directory to your desired frontend component name
@@ -340,10 +340,11 @@ Steps to follow:
 	- Start the directory name with `ui-` for UI components, and `page-` for page templates
 	- End the directory name with `-1` so that later on, if desired, you can potentially create different variations of the frontend component
 
-4. Edit the `package.json` file in the new directory, and change `name`, `description`, `version` and `author` of your new frontend component
+4. Edit the `package.json` file in the new directory, and change `name`, `description`, `version`, `author` and `publishConfig` of your new frontend component
 
 	- Prefix the package `name` with your partner ID e.g. `@smintio/`
 	- Then simply add the directory name from the previous step as the package name
+	- Point `publishConfig.registry` at **the registry you publish to**. The example carries the Smint.io SDK feed, which is read-only for you — leaving it there makes `npm publish` fail, or publish to the wrong place. See [where your own components are published](#user-content-where-your-own-components-are-published)
 
 5. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
 6. Make sure that your component .npmrc file contains the proper reference to our NPM SDK repo:
@@ -353,15 +354,15 @@ Steps to follow:
 always-auth=true
 ```
 
-7. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our NPM SDK repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
-8. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
+7. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our NPM SDK repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions
+8. Add a second registry line to the same `.npmrc`, for the registry **your own components** are published to. Which one that is depends on who you are — see [where your own components are published](#user-content-where-your-own-components-are-published). If Smint.io hosts a partner feed for you, it is the one below (replace `partner-id` by your partner ID); otherwise point the line at your own registry and skip step 9:
 
 ```
 @[partner-id]:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Partners-[partner-id]/npm/registry/
 always-auth=true
 ```
 
-9. If applicable, authorize your NPM for use of your partner NPM repo. You will find more info by accessing the Azure DevOps location of your partner repo (https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Partners-[partner-id]) and by then clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
+9. If Smint.io hosts the feed for you, authorize your NPM for use of your partner NPM repo. You will find more info by accessing the Azure DevOps location of your partner repo (https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Partners-[partner-id]) and by then clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
 
 10. Run `npm i` at the first time, or when you update dependencies
 
@@ -415,7 +416,7 @@ ui-my-thing-1/
 ├── package.json                 # name, version, scripts, dependencies
 ├── tsconfig.json                # extends ../../config/tsconfig.json
 ├── rollup.config.js             # stub that loads ../../config/rollup/rollup-config.ts
-├── licenses.json                # third-party license roll-up for this package
+├── licenses.json                # third-party license roll-up (generate it; the example has none)
 ├── resources/definition.ts      # resource and default settings definition (input)
 ├── portals-ui-component.json    # GENERATED from definition.ts — do not hand-edit
 └── src/PortalsUiComponent.vue   # the component itself — the filename is fixed
@@ -431,7 +432,7 @@ Three things about that layout are not obvious:
   generated from `resources/definition.ts` by `npm run build:resources`. Commit them, never edit
   them, and remember that `npm run watch` does not regenerate them.
 - **The shared config in [`config/`](config) is shared on purpose.** Your `rollup.config.js` and
-  `tsconfig.json` are two-line stubs that extend it, so every component builds identically. Do
+  `tsconfig.json` are small stubs that extend it, so every component builds identically. Do
   not fork it per component.
 
 The build produces a **UMD bundle** in `lib/` with the SDK, the Smint.io Portals runtime, Vue,
@@ -441,8 +442,10 @@ to stay aligned with the ones the SDK expects — leave the dependency versions 
 component alone unless you have a reason not to.
 
 `licenses.json` is a roll-up of the licences in the package's production dependency tree. Nothing
-in the build reads it and it is not published, but please regenerate it for your own component
-rather than shipping the one you copied, which describes someone else's dependencies.
+in the build reads it and it is not published, but please generate one for your own component
+rather than shipping the one you copied, which describes someone else's dependencies. The example
+component in this repository deliberately ships without one, so there is nothing stale to inherit;
+generate yours once the dependency tree is settled.
 
 ### Things to do for Mac or Linux users
 
@@ -748,7 +751,7 @@ related searches in `relatedAssets`, one entry per relationship type, each with 
 search spec — filters, data adapter instance, query string. `AssetsReferenceMixin` hands it to
 you:
 
-```ts
+```typescript
 const assetsReference = this.getAssetReferenceByRelationshipType(asset, "<relationship type>");
 
 if (!assetsReference || assetsReference.type !== AssetsReferenceType.SearchAssetsSpec) {
@@ -764,7 +767,7 @@ return this.generateRouterLocation(this.searchPage, { query });
 filter, named after the search field, plus the same name prefixed with `dt-` carrying the
 field's data type, and the free text as `query`:
 
-```ts
+```typescript
 for (const formFieldValueModel of searchAssetsSpecModel.currentFilters.values) {
     const id = formFieldValueModel.id;
 
@@ -1295,10 +1298,12 @@ form, that is the publishing boundary described above — build and publish, and
 - [ ] `portals-ui-component.json` / `portals-page-template.json` committed as regenerated, not
       hand-edited
 - [ ] `version` bumped in `package.json`
-- [ ] `licenses.json` regenerated for your component rather than inherited from the one you
+- [ ] `licenses.json` generated for your component rather than inherited from the one you
       copied
 - [ ] the `.npmrc` is present in the component directory, or the registration half of the publish
       will fail
+- [ ] `publishConfig.registry` in `package.json` names **your** registry, not the Smint.io SDK feed
+      the example carries
 - [ ] the dev server mapping added, the dev server restarted, and the component verified in a
       real portal with *Development mode* on and a developer-cleared login
 - [ ] published against the intended tenant, that is, the `SmintIo.ApiUrl` of the right

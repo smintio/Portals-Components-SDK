@@ -1,7 +1,7 @@
 Page type contracts
 ===================
 
-Current version of this document is: 1.0.1 (as of 15th of September, 2026)
+Current version of this document is: 1.0.2 (as of 15th of September, 2026)
 
 What a UI component receives from the page that hosts it, per page type — generated from
 the `ui-slot-data` bindings in every Smint.io page template.
@@ -13,14 +13,14 @@ template's bindings are the contract, which is why this file is generated from t
 
 Declare what you consume:
 
-```ts
+```typescript
 @Prop()
 public readonly currentSearch!: IFormFieldValuesModel;
 ```
 
 and emit what you produce:
 
-```ts
+```typescript
 this.$emit("query-string-changed", this.searchQuery);
 ```
 

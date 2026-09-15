@@ -1,7 +1,7 @@
 Smint.io Portals backend component recipes
 ==========================================
 
-Current version of this document is: 2.3.0 (as of 15th of September, 2026)
+Current version of this document is: 2.4.0 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other backend documents describe *what exists*; this one shows *how it is used*.
@@ -616,6 +616,13 @@ delivers the file. Your data adapter contributes the *options* for its own asset
 bytes when one is chosen.
 
 The extension point is `GetCustomAssetDownloadItemMappingsAsync` on `AssetsDataAdapterBaseImpl`.
+
+The Picturepark example in this repository overrides the whole `GetAssetsDownloadItemMappingsAsync`
+instead — it has to, because it builds its options from the vendor SDK rather than from the base
+class's built-ins. That is the exception; unless you are in the same position, override the
+custom hook and let the base class keep contributing the original, the PDF preview and the
+playback renditions.
+
 The base class already offers the original, the PDF preview, the playback rendition and the
 preview thumbnail where the asset has them; you add whatever your source system has beyond that
 — named renditions, transformations, derivations.
@@ -729,6 +736,9 @@ override the settings method and the two drift apart, so the form accepts what t
 The one method you write receives the uploaded files *by reference*, not as streams:
 
 ```C#
+private readonly IFilePersistentStorage _filePersistentStorage;   // off the service provider
+private readonly IPortalsContextModel _portalsContextModel;       // likewise
+
 public override async Task HandleAssetUploadsAsync(
     long taskUuid,
     ICollection<AssetUploadModel> assetUploadModels,
@@ -751,7 +761,7 @@ public override async Task HandleAssetUploadsAsync(
     {
         var fileMonitor = progressMonitor?.CreateSubmonitor(transferShare);
 
-        // The bytes live in the platform's file storage until you fetch them.
+        // The bytes live in IFilePersistentStorage until you fetch them.
         var uploadedFile = await _filePersistentStorage
             .GetUploadedFileAsync(_portalsContextModel, assetUploadModel.FileUuid)
             .ConfigureAwait(false);
@@ -794,14 +804,14 @@ public override async Task HandleAssetUploadsAsync(
 }
 ```
 
-When the source system would rather fetch the file itself, ask the platform's file storage for a
+When the source system would rather fetch the file itself, ask `IFilePersistentStorage` for a
 **time-limited URL** instead of a stream, and hand that over — that is the one place in the
 upload path where a signed URL is produced.
 
 Pitfalls:
 
 - **`AssetUploadModel` carries no bytes.** It is a reference — the file id, the original file
-  name, the size and the media type. Fetch the content from the platform's file storage, and
+  name, the size and the media type. Fetch the content from `IFilePersistentStorage`, and
   dispose what you fetched.
 - **Custom form values are namespaced.** Each value's id is the connector key, a separator and the
   remote field id; strip the prefix before you use it, and apply your own allow-list — a form
@@ -1278,16 +1288,20 @@ nothing reports it.
 // 1. Declare the permission.
 public static class MyPermissions
 {
-    public const string ViewWholesalePricesPermissionUuid = "8e2f…";   // ask Smint.io for the uuid
+    // A readable, stable slug of your own. It is persisted with every grant an administrator
+    // makes, so it cannot change after release — and it must not collide with a built-in
+    // (search_assets, read_asset_details, download_assets_hi_res, upload_assets, …) or with
+    // another component's.
+    public const string ViewWholesalePricesPermissionUuid = "view_wholesale_prices";
 
     // Resolve the labels once, here, into a model carrying every language you ship.
     public static readonly DataAdapterPermission ViewWholesalePrices = new DataAdapterPermission
     {
         Uuid = ViewWholesalePricesPermissionUuid,
         Name = ConfigurationMessages.ResourceManager
-            .FullyResolveToLocalizedStringsModel(nameof(ConfigurationMessages.da_perm_wholesale_name)),
+            .FullyResolveToLocalizedStringsModel(nameof(ConfigurationMessages.da_myadapter_perm_wholesale_name)),
         Description = ConfigurationMessages.ResourceManager
-            .FullyResolveToLocalizedStringsModel(nameof(ConfigurationMessages.da_perm_wholesale_description))
+            .FullyResolveToLocalizedStringsModel(nameof(ConfigurationMessages.da_myadapter_perm_wholesale_description))
     };
 }
 
@@ -1435,9 +1449,10 @@ Pitfalls:
 - **Some systems begin with a handshake.** A first request may carry a validation code that has to
   be echoed back — that is what the result's response string is for, so check for it before you
   start validating signatures.
-- **Put the signing secret on the data adapter**, name it so it is treated as a secret, and make
-  it `[Required]` when the callback mode is switched on. An unconfigured secret must mean "reject
-  everything", never "accept everything".
+- **Put the signing secret on the data adapter**, and name it so it is treated as a secret. Leave
+  it optional — there is no safe default for a key, and requiredness cannot be made conditional on
+  another setting — and give its absence a defined behaviour: an unconfigured secret must mean
+  "reject everything", never "accept everything".
 
 ### Signing a URL you hand out
 
@@ -1519,9 +1534,9 @@ public class DownloadNamingDataProcessorStartup : IDataProcessorStartup
     public string Key => DownloadNamingDataProcessor;
 
     public LocalizedStringsModel Name { get; } =
-        new ResourceLocalizedStringsModel(nameof(ConfigurationMessages.dp_download_naming_name));
+        new ResourceLocalizedStringsModel(nameof(ConfigurationMessages.dp_mypartner_download_naming_name));
     public LocalizedStringsModel Description { get; } =
-        new ResourceLocalizedStringsModel(nameof(ConfigurationMessages.dp_download_naming_description));
+        new ResourceLocalizedStringsModel(nameof(ConfigurationMessages.dp_mypartner_download_naming_description));
 
     public string LogoUrl => null;
     public string IconUrl => null;
@@ -1543,12 +1558,12 @@ public class DownloadNamingDataProcessorStartup : IDataProcessorStartup
 Liquid template and the metadata it can read is a picker:
 
 ```C#
-[DisplayName(translationKey: nameof(ConfigurationMessages.dp_download_naming_attributes_display_name))]
+[DisplayName(translationKey: nameof(ConfigurationMessages.dp_mypartner_download_naming_attributes_display_name))]
 [DynamicAllowedValuesProvider(typeof(MetadataAttributeAllowedValuesProvider))]
 [FormGroup("naming")]
 public MetadataAttributeModel[] NameAttributes { get; set; }
 
-[DisplayName(translationKey: nameof(ConfigurationMessages.dp_download_naming_template_display_name))]
+[DisplayName(translationKey: nameof(ConfigurationMessages.dp_mypartner_download_naming_template_display_name))]
 [IsLiquid]
 [DefaultValue("{{ assetDataObject.firstAvailableMetadataAttribute }}")]
 [FormItemVisibility(Visibility = FormItemVisibilityEnum.Advanced)]
@@ -1833,7 +1848,7 @@ public int ExternalUserLookupRetries { get; set; }
 The other half is an ordinary data adapter on your connector that publishes `IExternalUsersRead`:
 
 ```C#
-public Task<GetUserGroupMembershipResult> GetUserGroupMembershipAsync(
+public async Task<GetUserGroupMembershipResult> GetUserGroupMembershipAsync(
     GetUserGroupMembershipParameters parameters)
 {
     var groupIds = await _client.GetGroupsForCurrentUserAsync().ConfigureAwait(false);
@@ -1883,9 +1898,9 @@ public class ProductNoteResourceStartup : IResourceStartup
     public string Key => ProductNoteResource;
 
     public LocalizedStringsModel Name { get; } =
-        new ResourceLocalizedStringsModel(nameof(ConfigurationMessages.r_product_note_name));
+        new ResourceLocalizedStringsModel(nameof(ConfigurationMessages.r_mypartner_product_note_name));
     public LocalizedStringsModel Description { get; } =
-        new ResourceLocalizedStringsModel(nameof(ConfigurationMessages.r_product_note_description));
+        new ResourceLocalizedStringsModel(nameof(ConfigurationMessages.r_mypartner_product_note_description));
 
     public string LogoUrl => null;
     public string IconUrl => null;
@@ -1906,7 +1921,7 @@ public class ProductNoteResourceStartup : IResourceStartup
 [Serializable]
 public class ProductNoteResourceConfiguration : IComponentConfiguration
 {
-    [DisplayName(translationKey: nameof(ConfigurationMessages.r_product_note_text_display_name))]
+    [DisplayName(translationKey: nameof(ConfigurationMessages.r_mypartner_product_note_text_display_name))]
     [Required]
     [MaxLength(255)]
     public LocalizedStringsModel Text { get; set; }
@@ -1939,12 +1954,12 @@ public class CampaignResourceStartup : ResourceAssetStartup
             CampaignResource,
             EntityType.TopLevelObject,
             parentEntityModelKey: null,
-            new ResourceLocalizedStringsModel(nameof(MetamodelMessages.r_campaign_name)));
+            new ResourceLocalizedStringsModel(nameof(MetamodelMessages.r_mypartner_campaign_name)));
 
         entityModel.AddProperty(
             nameof(CampaignResourceConfiguration.Headline),
             DataType.LocalizedStringsModel,
-            new ResourceLocalizedStringsModel(nameof(MetamodelMessages.r_campaign_headline)));
+            new ResourceLocalizedStringsModel(nameof(MetamodelMessages.r_mypartner_campaign_headline)));
 
         return metamodel;
     }
@@ -2017,7 +2032,7 @@ request, a review. It does not store the tasks; a data adapter publishing the ta
 interfaces does that, and the handler names it.
 
 ```C#
-public class RequestApprovalTaskHandler : IRequestGenericTaskHandler
+public class RequestAccessApprovalTaskHandler : IRequestAccessTaskHandler
 {
     // The states this task can be in, and the actions it offers. Static, because the startup
     // reads them for task lists without constructing a handler.
@@ -2124,19 +2139,19 @@ The startup binds the handler to the connector and the task management data adap
 the same transition table synchronously:
 
 ```C#
-public class RequestApprovalTaskHandlerStartup : ITaskHandlerStartup
+public class RequestAccessApprovalTaskHandlerStartup : ITaskHandlerStartup
 {
-    public const string RequestApprovalTaskHandler = "mypartner-request-approval";
+    public const string TaskHandlerKey = "mypartner-request-access-approval";
 
-    public string Type => TaskType.RequestGeneric;
+    public string Type => TaskType.RequestAccess;
     public string ConnectorKey => MyConnectorStartup.MyConnector;
     public string DataAdapterKey => MyTasksDataAdapterStartup.MyTasksDataAdapter;
-    public string Key => RequestApprovalTaskHandler;
+    public string Key => TaskHandlerKey;
 
     public List<ITaskStateDescriptorModel> TaskStateDescriptors =>
-        RequestApprovalTaskHandler.TaskStateDescriptors;
+        RequestAccessApprovalTaskHandler.TaskStateDescriptors;
     public List<ITaskActionDescriptorModel> TaskActionDescriptors =>
-        RequestApprovalTaskHandler.TaskActionDescriptors;
+        RequestAccessApprovalTaskHandler.TaskActionDescriptors;
 
     /// The action the creation form binds to — separate from the actions above.
     public ITaskActionDescriptorModel CreateTaskActionDescriptor { get; } =
@@ -2146,9 +2161,9 @@ public class RequestApprovalTaskHandlerStartup : ITaskHandlerStartup
     public bool AllowsRegisteredUsers => true;
 
     public List<ITaskActionDescriptorModel> GetTaskActionDescriptors(string taskState) =>
-        RequestApprovalTaskHandler.GetTaskActionDescriptors(taskState);
+        RequestAccessApprovalTaskHandler.GetTaskActionDescriptors(taskState);
 
-    public Type ComponentImplementation => typeof(RequestApprovalTaskHandler);
+    public Type ComponentImplementation => typeof(RequestAccessApprovalTaskHandler);
     public Type ConfigurationImplementation => typeof(TaskInitialConfiguration);
     public Type ConfigurationMessages => typeof(ConfigurationMessages);
 }
@@ -2192,7 +2207,7 @@ public class MyPortalTemplate : BaseLivePortalTemplate
 ```C#
 [FormGroupDeclaration(SetupReservedFormGroupId)]
 [FormGroupDisplayName(SetupReservedFormGroupId,
-    nameof(ConfigurationMessages.pot_my_template_setup_form_group_display_name))]
+    nameof(ConfigurationMessages.pot_mypartner_media_gallery_setup_form_group_display_name))]
 public class MyPortalTemplateConfiguration : PortalTemplateConfiguration
 {
 }
@@ -2204,6 +2219,7 @@ has a different identity in each.
 
 ```C#
 public string Type => PortalType.MediaGallery;
+public const string MyPortalTemplate = "mypartner-media-gallery";
 public string Key => MyPortalTemplate;
 
 public string[] ScreenshotUrls { get; } = new[] { "https://cdn.example.com/my-template-main.png" };

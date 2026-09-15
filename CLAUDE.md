@@ -21,7 +21,7 @@ Four things live here:
 |---|---|
 | **Reference implementations** (~158 `.cs`) | `Backend/` — paired connectors and data adapters: `Connector-HelloWorld` + `DataAdapter-HelloWorld` as the minimal skeleton, plus `Picturepark` (live connection) and `SharePoint` (indexed through the integration layer) as realistic ones, each with a test driver. `Frontend/Legacy/Example/ui-example-hello-world-1` is the UI component starter, and `Frontend/Legacy/config/` holds the shared rollup and TypeScript config it extends. |
 | **Frontend reference sources** (`Frontend/Legacy/Reference/`) | **not in this repository.** The sources behind the components Smint.io ships — 64 UI components, 34 page templates, the shared `portals-components` library and the gallery view — are made available to Smint.io Certified Partners on request, and copied into this directory by the partner. The directory ships with a README and a `.gitignore` that hides anything copied in, so the sources can never be committed here by accident. Never describe them as part of this repository, and never link into `Reference/<folder>` from another document — refer to a package by name instead, because the path does not exist for most readers. |
-| **Partner-facing documentation** (~500 KB of Markdown) | `Overview/`, `Backend/README.md` + `Backend/docs/`, `Frontend/Legacy/README.md` + `Frontend/Legacy/docs/` (nine reference documents), and a README per tool under `Tools/`. |
+| **Partner-facing documentation** (~1.1 MB of Markdown) | `Overview/`, `Backend/README.md` + `Backend/docs/` (eleven documents, including the recipe cookbook), `Frontend/Legacy/README.md` + `Frontend/Legacy/docs/` (ten documents, including the recipe cookbook and four generated catalogues), and a README per tool under `Tools/`. |
 | **Agent guidance** | `Frontend/Legacy/CLAUDE.md` and `Backend/CLAUDE.md` carry the partner-facing working rules for building a component of each kind — the four-round interview, what is most often got wrong, verification and publishing. They are the public counterparts of the UI component library's and the backend SDKs' own CLAUDE.md files. |
 
 `Tools/` ships three tools as release zips: `Portals-SDK-PublishComponent-CLI` (publish and register
@@ -88,10 +88,19 @@ add a pointer on the internal side only if the internal specifics change it. A r
 to any component belongs in this repository, anonymised. Never move a customer name, a tenant
 name, a portal URL or an internal path in the other direction.
 
-The two generated documents — `Frontend/Legacy/docs/smintio-data-adapter-reference.md` and
-`smintio-page-type-contracts.md` — are produced from the SDK source and from the page templates
-of the component library, which are not in this repository. Regenerate them here, from those
-sources, rather than copying a second copy in.
+Where it goes: a **contract** — what exists, what it is called, what it returns — belongs in the
+reference document that owns that area. A **task** — how you actually do something, end to end —
+belongs in `docs/smintio-frontend-recipes.md`, as a `## How do I …?` recipe with a complete
+snippet and the mistakes it invites. Do not explain the same mechanism in both; the reference
+links to the recipe, and the recipe links back.
+
+Four documents under `Frontend/Legacy/docs/` are **generated**, not written:
+`smintio-data-adapter-reference.md` and `smintio-page-type-contracts.md` from the SDK source and
+the page templates, and `smintio-ui-components.md` and `smintio-page-templates.md` from the
+component sources — none of which are in this repository. Regenerate them here, from those
+sources, rather than copying a second copy in. **Never hand-edit one**: the next regeneration
+discards the edit, so anything wrong in them — a stale name, a customer name in a display name —
+has to be fixed in the component metadata upstream.
 
 ## This repository is also the home of the backend component documentation
 
@@ -101,7 +110,8 @@ alike, and it covers all seven backend component types: connectors, data adapter
 processors, task handlers, portal templates, resources and identity providers. The same rule
 applies as on the frontend side: **when you learn something about building one, write it down
 here**, anonymised, and add a pointer on the internal side only if the internal specifics change
-it.
+it. The same split holds: contracts in the reference document that owns the area, tasks as
+`## How do I …?` recipes in `docs/smintio-backend-recipes.md`.
 
 The backend material has internal authorities too: the connector SDK's and data adapter SDK's own
 CLAUDE.md files describe the metamodel and the asset data model in full, and the SDK core types

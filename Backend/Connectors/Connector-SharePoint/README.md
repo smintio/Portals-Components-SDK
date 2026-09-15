@@ -1,7 +1,7 @@
 The SharePoint connector, worked through
 ========================================
 
-Current version of this document is: 1.1.0 (as of 15th of September, 2026)
+Current version of this document is: 1.1.2 (as of 15th of September, 2026)
 
 ## SharePoint `Connector` Basics
 
@@ -34,20 +34,20 @@ specific external system you're integrating to.
 POST query parameter to the redirect url.
 
 If the system you're trying to connect to has special requirements, you'll need to override the `GetRedirectUrlAsync`
-method. For example Microsoft requires that the `/autorize` request be prefixed with the Azure-AD `tenant_id` :
+method. For example Microsoft requires that the `/authorize` request be prefixed with the Azure-AD `tenant_id` :
 
 ```http request
 https://login.microsoftonline.com/{tenant-id}/oauth2/v2.0/authorize...."
 ```
 
 ### Get the Access Token
-**Step 2** then uses the (short-lived) Autorization code and obtains an Access Token and a Refresh Token.
+**Step 2** then uses the (short-lived) Authorization code and obtains an Access Token and a Refresh Token.
 
 Again, if your external system requires something special to be configured, as is the case with Microsoft, override
 the `InitializeAuthorizationValuesAsync` method. Same as before, Microsoft requires the `tenant_id` to be included in
 the URL as well as the `redirect_uri` to be included as POST parameter:
 
-```c#
+```C#
 // the bootstrapAuthorizationValuesModel is populated by the Portals Framework
 var identityServerUrl = GetIdentityServerUrl(bootstrapAuthorizationValuesModel);
 var clientId = GetClientId(bootstrapAuthorizationValuesModel);
@@ -67,8 +67,10 @@ request.AddParameter("client_secret", GetClientIdAndSecret(bootstrapAuthorizatio
 
 request.AcceptApplicationJson();
 
-// Every call to the external system goes through a retry policy, with a hint that
-// identifies it in the logs.
+// The token exchange happens before the API client exists, so it cannot go through the
+// client's Execute…WithBackoffAsync helpers. It still goes through a retry policy, with a
+// hint that identifies it in the logs. Every call your client makes afterwards uses the
+// helpers instead — see the connector contract.
 var postResponse = await new RestSharpRetryPolicy(
         Key, "Get access token by authorization code", isGet: false,
         requestFailedHandler: null, portalsContextModel: null, _logger, maxRequestRetryCount: 0)
@@ -78,7 +80,7 @@ var postResponse = await new RestSharpRetryPolicy(
 
 Since the `ExecuteTaskAsync` is parameterized, the `response.Data` object will hold the model-bound token response. We simply need to populate the `bootstrapAuthorizationValuesModel`
 with that data and return it:
-```c#
+```C#
 // error handling omitted for legibility
 bootstrapAuthorizationValuesModel.AccessToken = postResponse.Data.AccessToken;
 bootstrapAuthorizationValuesModel.RefreshToken = postResponse.Data.RefreshToken;
@@ -90,7 +92,7 @@ return bootstrapAuthorizationValuesModel
 **Step 3** is only necessary once the access token has expired resulting in the GraphAPI returning HTTP 401 errors. If you need some custom handling, simply override the
 `RefreshAuthorizationValuesAsync` method:
 
-```c#
+```C#
 var refreshToken = GetRefreshToken(authorizationValuesModel);
 
 var request = new RestRequest($"/{tenantId}/oauth2/v2.0/token", Method.Post);
@@ -128,16 +130,16 @@ indicating the mood prevalent in an image, it would also be possible for a `*.do
 The meta-model consists of a collection of `EntityModel` objects, and each `EntityModel` has a list of `Properties`. It could be compared to a C# class definition where each `EntityModel` would be one
 class, each `Property` a class member. So if we were to model a SharePoint file in C#, we could write it as
 
-```c#
+```C#
 public class SharepointFile {
     public string DisplayName {get;set;}
-    public int LikeCount {get;set;}  
+    public int LikeCount {get;set;}
     public bool IsReadOnly {get;set;}
 }
 ```
 The above code would correspond to the following `EntityModel`:
 
-```c#
+```C#
 var spf = new EntityModel("SharepointFile",...);
 spf.AddProperty("DisplayName", DataType.String, ...);
 spf.AddProperty("LikeCount", DataType.Int32, ...);
@@ -147,7 +149,7 @@ _entityModel.AddEntity(spf);
 Note that all the "`...`" are placeholders for a `LocalizedStringsModel` and are omitted for legibility.
 
 The meta-model could also have more complex fields, for example, imagine it having an `Owner` field:
-```c#
+```C#
 public class SharepointFile {
     // ...
     public User Owner {get;set;}
@@ -161,9 +163,9 @@ public class User {
 }
 ```
 
-Then there would have to be a second `EntityModel`,  corresponding to the `User` field, which would have `Name`, `Email`, etc. as properties:
+Then there would have to be a second `EntityModel`, corresponding to the `User` field, which would have `Name`, `Email`, etc. as properties:
 
-```c#
+```C#
 var userEntityModel = new EntityModel("user",...);
 userEntityModel.AddProperty("Name", DataType.String, ...);
 userEntityModel.AddProperty("Email", DataType.String, ...);
@@ -172,13 +174,13 @@ userEntityModel.AddProperty("Age", DataType.Int32, ...);
 //add the "User" prop to the root entity model:
 spf.AddProperty("Owner", DataType.DataObject, userEntityModel.Key, ...);
 ```
-By passing `userEntityModel.Key` as third parameter we specify that the model for `"Owner"` is defined in another entity model, namely `userEntityModel`.  
+By passing `userEntityModel.Key` as third parameter we specify that the model for `"Owner"` is defined in another entity model, namely `userEntityModel`.
 
 Similarily to the `MetamodelMessages` examples from [translating with resource files](../../docs/smintio-backend-annotations.md#user-content-translating-with-resource-files)
 
 `EntityModel`, `EnumEntityModel` and their properties support resource localized translations by using `ResourceLocalizedStringsModel` instance instead of `LocalizedStringsModel`.
 
-```c#
+```C#
 var spf = new EntityModel("SharepointFile",..., labels: new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_sharepoint_root_entity)));
 spf.AddProperty("DisplayName", DataType.String, ..., labels: new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_sharepoint_root_entity_display_name)));
 spf.AddProperty("LikeCount", DataType.Int32, ..., labels: new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_sharepoint_root_entity_like_count)));
@@ -189,7 +191,7 @@ spf.AddProperty("LikeCount", DataType.Int32, ..., labels: new ResourceLocalizedS
 
 The SharePoint datatype for a metadata field is called `ColumnDefinition`, since all metadata fields are called columns:
 
-```c#
+```C#
 IEnumerable<ColumnDefinition> colDefs = await _sharepointClient.GetMetadataAsync(_siteId)
 ```
 

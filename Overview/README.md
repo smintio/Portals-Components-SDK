@@ -3,7 +3,7 @@ What are Smint.io Portals components?
 
 This README.md serves to clarify the general concept of Smint.io Portals components.
 
-Current version of this document is: 2.3.0 (as of 15th of September, 2026)
+Current version of this document is: 2.3.1 (as of 15th of September, 2026)
 
 1. [Overview](#user-content-overview)
 1. [Getting access to the SDKs](#user-content-getting-access-to-the-sdks)
@@ -50,7 +50,7 @@ All component configurations are stored *encrypted at rest* in the Smint.io data
 
 Please note that there is no separate *Configuration* class for Smint.io Portals frontend components. Smint.io Portals frontend components contain all the necessary information directly in the component's source code, added as annotations. When a Smint.io Portals frontend component is loaded, the system then generates the frontend component's *Configuration* class on the fly.
 
-[Here](../Backend/Connectors/Connector-Picturepark/PictureparkConnectorConfiguration.cs) you find an example of a component's *Configuration* class (this one is part of our *Picturepark connector)
+[Here](../Backend/Connectors/Connector-Picturepark/PictureparkConnectorConfiguration.cs) you find an example of a component's *Configuration* class (this one is part of our *Picturepark* connector)
 
 ## Getting access to the SDKs
 
@@ -81,7 +81,7 @@ What differs is who may deploy, and where:
 
 ## Smint.io Portals component diagram
 
-![Visual representationC](./images/components-overview.png "Visual representation")
+![Visual representation](./images/components-overview.png "Visual representation")
 
 ## [Frontend components](../Frontend/Legacy/)
 

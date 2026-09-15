@@ -1,7 +1,7 @@
 Smint.io Portals frontend component mixins
 ==========================================
 
-Current version of this document is: 2.3.0 (as of 15th of September, 2026)
+Current version of this document is: 2.3.1 (as of 15th of September, 2026)
 
 We have prepared several Vue.js mixins that help you to perform common tasks more quickly in your Smint.io Portals frontend components.
 
@@ -43,7 +43,7 @@ and `SCollectionUsersDialog` included — you import and list under `components`
 
 ### 1. Use the mixin in the Smint.io frontend component
 
-```ts
+```typescript
 import { Mixins } from "vue-property-decorator";
 import { SDownloadProps } from "@smintio/portals-components";
 
@@ -60,7 +60,7 @@ export default class PortalsUiComponentImplementation extends Mixins(SDownloadPr
 
 ### 3. Usage
 
-```ts
+```typescript
 public downloadAssets(assetIds: IAssetIdentifier[]): void;
 public downloadCollection(collectionId: string): void;
 
@@ -73,7 +73,7 @@ Call any of them to open the download dialog.
 
 Before you offer a download button, check the permission:
 
-```ts
+```typescript
 import { AssetPermissionsMixin } from "@smintio/portals-components";
 // ...
 this.hasDownloadPermission(asset)
@@ -88,7 +88,7 @@ collection or create a new one.
 
 ### 1. Use the mixin in the Smint.io frontend component
 
-```ts
+```typescript
 import { SRememberProps } from "@smintio/portals-components";
 
 export default class PortalsUiComponentImplementation extends Mixins(SRememberProps) {
@@ -111,7 +111,7 @@ export default class PortalsUiComponentImplementation extends Mixins(SRememberPr
 
 ### 3. Usage
 
-```ts
+```typescript
 // open the dialog; pass asset ids to collect them as soon as a collection is chosen or created
 public openRememberDialog(assetIds: IAssetIdentifier[] = []): void;
 
@@ -141,7 +141,7 @@ A typical wiring:
 
 ### 1. Use the mixin in the Smint.io frontend component
 
-```ts
+```typescript
 import { SShareProps } from "@smintio/portals-components";
 
 export default class PortalsUiComponentImplementation extends Mixins(SShareProps) {
@@ -157,7 +157,7 @@ export default class PortalsUiComponentImplementation extends Mixins(SShareProps
 
 ### 3. Usage
 
-```ts
+```typescript
 public shareAssets(assetIds: IAssetIdentifier[]): void;
 public shareCollection(collectionId: string): void;
 public editShare(shareId: string): void;
@@ -166,7 +166,7 @@ public editShare(shareId: string): void;
 Sharing is not permitted in every portal. Guard the UI with `AuthMixin`, whose `shareAvailable`
 is a portal-wide permission check:
 
-```ts
+```typescript
 import { AuthMixin } from "@smintio/portals-components";
 // ...
 v-if="shareAvailable"
@@ -179,7 +179,7 @@ v-if="shareAvailable"
 The three mixins compose. This is what a component offering download, share and collect
 looks like:
 
-```ts
+```typescript
 import { Mixins } from "vue-property-decorator";
 import {
     AssetPermissionsMixin,
