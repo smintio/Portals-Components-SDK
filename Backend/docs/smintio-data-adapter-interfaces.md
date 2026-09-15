@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.7.1 (as of 15th of September, 2026)
+Current version of this document is: 1.8.0 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -98,9 +98,9 @@ public Type[] PublicApiInterfaces => new[] { typeof(IAssets) };
 ```
 
 **This list is the boundary, not your class's interface list.** A method is callable only if it
-is declared on one of the interfaces named here. Implementing `IAssetsFolderNavigation` on the
-class but listing only `IAssetsSearch` means the folder methods exist in your assembly and are
-unreachable from a portal.
+is declared on one of the interfaces named here. Implementing `ICollectionsAssetsModify` on the
+class but listing only `ICollectionsAssetsRead` means the modify methods exist in your assembly
+and are unreachable from a portal.
 
 Declare the interface you actually support, not the widest one you can make compile.
 
@@ -187,8 +187,8 @@ that the client follows directly.
 **You almost certainly do not implement this one.** A download normally spans several data
 adapters — the visitor selected assets from more than one source — so Smint.io composes the two
 steps itself, applies the permission gates and delivers the file. A connector's data adapter
-contributes the *options* for its own assets through `GetAssetsDownloadItemMappingsAsync`, and
-serves the bytes through `GetAssetDownloadStreamAsync`. See
+contributes the *options* for its own assets by overriding `GetCustomAssetDownloadItemMappingsAsync`,
+and serves the bytes through `GetAssetDownloadStreamAsync`. See
 [offering downloads](smintio-backend-recipes.md#user-content-how-do-i-offer-downloads).
 
 **`IAssetsUpload`** — `GetAssetUploadSettingsAsync`. Requires the upload permission. The settings
@@ -482,13 +482,15 @@ with nothing to see at compile time.
 
 Some interactions need to remember something the external system has no field for — that a
 one-time action has already been performed, that a step was completed, what a caller was shown
-last time. Three services off the injected `IServiceProvider` cover this:
+last time — or to reach a file a visitor uploaded. Four services off the injected
+`IServiceProvider` cover this:
 
 | | |
 |---|---|
 | `IIdPersistentStorage` | keyed records. `GetAsync(uuid)`, `AddOrUpdateAsync(uuid, data, groupUuid)`, `GetGroupAsync`, `RemoveAsync` and their bulk forms, over an `IdPersistentStorageData { Uuid, GroupUuid, Data }` |
 | `ITemporalPersistentStorage` | an append-ordered log. `AddAsync` returns the identifier, `GetRangeAsync(lastKnownId, pageSize)` reads forward from one |
 | `IStorageBackedLock` | a mutual exclusion that holds **across every server running your component**. `LockAsync(uuid, lockDuration, lockKey)` returns `false` rather than waiting; `ClearLockAsync(uuid, lockKey)` releases it |
+| `IFilePersistentStorage` | can be used to store files, or to read files a visitor uploaded, until your component consumes them. `GetUploadedFileAsync(portalsContextModel, id)` gives you the stream, `GetUploadedFileUrlAsync(portalsContextModel, id, validityTimespan)` a time-limited URL for a source system that would rather fetch it itself |
 
 **Every one of these is scoped to your component for you** — as is `ICache`, and the other
 component-scoped services the platform injects. The key, uuid or lock uuid you pass is only the

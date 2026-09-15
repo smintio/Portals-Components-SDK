@@ -1,7 +1,7 @@
 Smint.io Portals frontend component recipes
 ===========================================
 
-Current version of this document is: 2.1.1 (as of 15th of September, 2026)
+Current version of this document is: 2.1.2 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other frontend documents describe *what exists*; this one shows *how it is used*.
@@ -421,22 +421,28 @@ Pitfalls:
 progress to the visitor, and lets them cancel.
 
 ```typescript
-import type { INotificationDialog, IProgressMonitor } from "@smintio/portals-component-sdk";
-import { DefaultCulture, PortalsGlobalServices, PortalsInject } from "@smintio/portals-component-sdk";
+import type { IInitiateAssetsDownloadResult, INotificationDialog } from "@smintio/portals-component-sdk";
+import {
+    DefaultCulture,
+    DialogCategoryEnum,
+    PortalsGlobalServices,
+    PortalsInject,
+} from "@smintio/portals-component-sdk";
 
 @PortalsInject(PortalsGlobalServices.NotificationDialog)
 public readonly notificationDialog!: INotificationDialog;
 
-public async prepareDownload(assetIds: { id: string }[]): Promise<void> {
+public async prepareDownload(assetIds: IAssetIdentifier[]): Promise<IInitiateAssetsDownloadResult | undefined> {
     const progress = this.notificationDialog.showProgress({
         title: { [DefaultCulture]: "Preparing your download" },
         message: { [DefaultCulture]: "Preparing… {progressPercentage}%" },
     });
 
     try {
+        // The progress handle IS a progress monitor — pass it straight in.
         const result = await this.dataSource.initiateAssetsDownloadForAssetsAsync(
             { assetIds },
-            progress as IProgressMonitor
+            progress
         );
 
         await progress.finishedAsync({ [DefaultCulture]: "Your download is ready." });
@@ -444,6 +450,8 @@ public async prepareDownload(assetIds: { id: string }[]): Promise<void> {
         return result;
     } catch (error) {
         this.errorHandler.captureExceptionAndDisplayMessage(error as Error, "The download failed.");
+
+        return undefined;
     }
 }
 ```
@@ -1322,7 +1330,14 @@ the runtime collects everything between them and hands it to you.
 <script lang="ts">
 import { Mixins, Prop } from "vue-property-decorator";
 import type { ILocalizedStringsModel, IUIComponentInfo } from "@smintio/portals-component-sdk";
-import { DefaultCulture, PortalsUiComponent } from "@smintio/portals-component-sdk";
+import {
+    ComponentProperty,
+    DefaultCulture,
+    DisplayName,
+    FormGroup,
+    Implements,
+    PortalsUiComponent,
+} from "@smintio/portals-component-sdk";
 import { SGenericSlot, SHtmlProps } from "@smintio/portals-components";
 
 @PortalsUiComponent({

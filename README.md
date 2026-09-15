@@ -1,6 +1,8 @@
 Description
 ===========
 
+Current version of this document is: 1.4.1 (as of 15th of September, 2026)
+
 This repository contains examples and tools for rapid developing of custom components targeting the Smint.io Portals solution.
 
 Please find guides about Smint.io Portals component development here:
@@ -32,10 +34,8 @@ This is the tools you need for developing Smint.io Portals components:
 
 Please note that future tools may be added or existing ones may be updated based on user feedback.
 
-Current version of this document is: 1.4.0 (as of 15th of September, 2026)
-
 Contributors
 ============
 
-- Yosif Velev, Smint.io GmbH
 - Reinhard Holzner, Smint.io GmbH
+- Yosif Velev, Smint.io GmbH

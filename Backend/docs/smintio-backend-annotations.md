@@ -1,7 +1,7 @@
 Smint.io Portals backend component annotations
 =============================================
 
-Current version of this document is: 1.6.0 (as of 15th of September, 2026)
+Current version of this document is: 1.6.1 (as of 15th of September, 2026)
 
 Annotations describe a backend component's configuration to Smint.io Portals: what fields the
 portal administrator sees when configuring your connector, data adapter, data processor,
@@ -302,8 +302,8 @@ of a label that shows up in one language only.
 | Form | What you get | Use it for |
 |---|---|---|
 | `new ResourceLocalizedStringsModel(nameof(X.key))` | a **reference** to the key; the platform resolves it when it needs it | anything the platform resolves on its own schedule: the startup's `Name` and `Description`, meta-model entity and property labels |
-| `X.ResourceManager.FullyResolveToLocalizedStringsModel(nameof(X.key))` | a **finished model carrying every language you ship** | anything you build yourself and hand over complete: allowed values, permissions, download item descriptions |
-| `X.key.Localize()` | a single-culture model, in the **current request's** culture | a value that only ever has to be right for the caller in front of you |
+| `X.ResourceManager.FullyResolveToLocalizedStringsModel(nameof(X.key))` | a **finished model carrying every language you ship** | anything you build yourself out of your own resource file and hand over complete: allowed values, permission names, labels on download options |
+| `X.key.Localize()` | a single-culture model, in the **current request's** culture | a value that only ever has to be right for the caller in front of you. `Localize()` is a string extension, so it is also how you wrap a name that came from the **external system** and has no resource key at all |
 
 The middle one is what you want whenever a translated label has to exist in full, and it is a
 single call:

@@ -152,7 +152,7 @@ was nothing more than the generic header plus dynamically resolved menu items wa
 as a copy — 1,349 lines plus six sub-component files — and had to be thrown away and rewritten
 as a 425-line extension with no template at all.
 
-```ts
+```typescript
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import SmintIoPortalsUiComponentImplementation from "@smintio/ui-generic-header-1";
@@ -251,7 +251,7 @@ unnecessary property is not a harmless extra.
 `path`, no `fullPath`. Bind that object to `:to` and it works. But some renderings want a URL
 *string*, and building one from `location.path` yields `undefined`. Let the router do it:
 
-```ts
+```typescript
 return this.$router.resolve(location).href;
 ```
 
@@ -325,7 +325,7 @@ request is also the quickest way to find out whether the page uses your componen
 Reach the live instance through its root element and work on the component object itself, which
 beats reading rendered markup:
 
-```js
+```javascript
 const vm = document.querySelector(".<your-root-class>").__vue__;
 vm.assets[0];                       // the resolved data, exactly as the component sees it
 vm.someButtonLocation(vm.assets[0]) // a computed router location, before it becomes a URL
