@@ -1,7 +1,7 @@
 Smint.io Portals frontend component recipes
 ===========================================
 
-Current version of this document is: 1.0.0 (as of 15th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other frontend documents describe *what exists*; this one shows *how it is used*.
@@ -29,6 +29,7 @@ Two imports appear throughout:
 1. [How do I make one setting depend on another?](#user-content-how-do-i-make-one-setting-depend-on-another) — basic
 1. [How do I restrict my component to certain portal types?](#user-content-how-do-i-restrict-my-component-to-certain-portal-types) — basic
 1. [How do I render nothing without leaving the editor guessing?](#user-content-how-do-i-render-nothing-without-leaving-the-editor-guessing) — basic
+1. [How do I hide my component completely, leaving no gap behind?](#user-content-how-do-i-hide-my-component-completely-leaving-no-gap-behind) — basic
 1. [How do I check a permission before offering an action?](#user-content-how-do-i-check-a-permission-before-offering-an-action) — basic
 1. [How do I react to the signed-in user?](#user-content-how-do-i-react-to-the-signed-in-user) — basic
 1. [How do I offer a download?](#user-content-how-do-i-offer-a-download) — basic
@@ -674,13 +675,127 @@ public get shouldRender(): boolean {
 }
 ```
 
-Two more rules that go with it:
+Three more rules that go with it:
 
 - **Fill your layout box and add no white space of your own.** The page decides the spacing; a
   component with its own outer margin cannot be laid out.
 - **Render the empty state when there is one to render.** "Nothing to show yet" with the
   administrator's own text beats an invisible component — take the text as a localized strings
   property so they can word it.
+- **Rendering an empty element is not the same as being absent.** The page still lays out a slot
+  element for it, gap and all. When the component should disappear entirely, say so — see the
+  next recipe.
+
+## How do I hide my component completely, leaving no gap behind?
+
+*basic.* Returning an empty template is not enough. The page has already laid out a slot element
+for your component — a column, its content gaps, possibly a background band — so an empty
+component leaves a visible hole in the page.
+
+**Emit `component:hide`, passing your component instance.** The slot renderer takes your
+component out of the slot altogether, and nothing is laid out for it at all.
+
+```vue
+<template>
+    <div v-if="hasSomethingToShow" class="my-quote">
+        <blockquote>{{ quoteText }}</blockquote>
+    </div>
+</template>
+
+<script lang="ts">
+import { Mixins, Prop } from "vue-property-decorator";
+import type { IAssetDataObject, IMetadataAttributeModel } from "@smintio/portals-component-sdk";
+import {
+    ComponentProperty,
+    DefaultCulture,
+    DisplayName,
+    DynamicAllowedValuesProvider,
+    FormGroup,
+    Implements,
+    PortalsGlobalServices,
+    PortalsUiComponent,
+} from "@smintio/portals-component-sdk";
+import { MetadataMixin, SCssProps } from "@smintio/portals-components";
+
+const MY_KEY = "mypartner-ui-asset-quote-1";
+
+@PortalsUiComponent({
+    type: "ui-type-asset-details-text",
+    key: MY_KEY,
+    displayName: { [DefaultCulture]: "Asset quote" },
+})
+export default class PortalsUiComponentImplementation extends Mixins(MetadataMixin, SCssProps) {
+    @Prop()
+    public readonly asset?: IAssetDataObject;
+
+    @DisplayName("en", "Quote attribute", true)
+    @Implements("IMetadataAttributeModel")
+    @ComponentProperty({ name: "quoteAttributes" })
+    @DynamicAllowedValuesProvider(
+        PortalsGlobalServices.PortalsContext.toString(),
+        "TextMetadataAttributeAllowedValuesProvider"
+    )
+    @FormGroup("my-quote")
+    public readonly quoteAttributes!: IMetadataAttributeModel[];
+
+    public get quoteText(): string {
+        if (!this.asset || !this.quoteAttributes?.length) {
+            return "";
+        }
+
+        return this.getLocalizedAttributeValue(this.asset, this.quoteAttributes, false, true);
+    }
+
+    public get hasSomethingToShow(): boolean {
+        // Still waiting for the asset — do not hide yet, this is a temporary state.
+        if (!this.asset) {
+            return false;
+        }
+
+        if (!this.quoteText) {
+            console.info(`${MY_KEY}: this asset carries no quote — hiding the component`);
+
+            // Take me out of the page entirely: no column, no content gap, no background band.
+            this.$emit("component:hide", this);
+
+            return false;
+        }
+
+        return true;
+    }
+}
+</script>
+```
+
+The payload is **the component instance itself** (`this`) — the page identifies which slot
+element to drop from it, so `this.$emit("component:hide")` with no argument does nothing.
+
+Where to emit it from: the natural place is the getter that already decides whether there is
+anything to render, as above — that is how the shipped components do it. Emitting from a method
+you call once loading has finished works just as well. What matters is *when*: emit only once you
+know the answer is final.
+
+**On a section start component it hides the whole section.** Emitting `component:hide` from a
+`ui-type-section` component removes the section start, everything the visitor placed inside it,
+and its matching section end — nested sections included. That is how a conditional section works:
+the component evaluates its condition and, if it does not hold, takes its whole block out of the
+page.
+
+Pitfalls:
+
+- **Hiding is one-way for that page render.** There is no "unhide" event: once the page has
+  dropped your component it stays dropped until the page renders again. Never emit while data is
+  still loading, or a slow response hides the component permanently — guard on "loading finished"
+  first, as the `!this.asset` branch above does.
+- **Emit it, and still render nothing.** The emit takes effect on the page's next render pass;
+  your own template must already be guarded, or the component flashes before it disappears.
+- **Do not use it for an error.** A failure the visitor caused should be
+  [reported](#user-content-how-do-i-report-an-error); silently vanishing makes a broken data
+  source indistinguishable from an empty one.
+- **Log why, first.** A hidden component is invisible in the page *and* in the editor; the
+  console line is all a support engineer has.
+- **It is a page-layout mechanism, not a permission check.** Hide the component *and* do not
+  fetch what the visitor may not see.
 
 ## How do I check a permission before offering an action?
 
@@ -980,7 +1095,15 @@ Pitfalls:
 
 <script lang="ts">
 import { Mixins, Prop } from "vue-property-decorator";
-import type { IAssetDataObject } from "@smintio/portals-component-sdk";
+import type { IAssetDataObject, IMetadataAttributeModel } from "@smintio/portals-component-sdk";
+import {
+    ComponentProperty,
+    DisplayName,
+    DynamicAllowedValuesProvider,
+    FormGroup,
+    Implements,
+    PortalsGlobalServices,
+} from "@smintio/portals-component-sdk";
 import { AssetDetailsPageNavigationMixin, MetadataMixin } from "@smintio/portals-components";
 
 export default class PortalsUiComponentImplementation extends Mixins(
@@ -990,8 +1113,25 @@ export default class PortalsUiComponentImplementation extends Mixins(
     @Prop()
     public readonly asset!: IAssetDataObject;
 
+    @DisplayName("en", "Tag attributes", true)
+    @Implements("IMetadataAttributeModel")
+    @ComponentProperty({ name: "tagAttributes" })
+    @DynamicAllowedValuesProvider(
+        PortalsGlobalServices.PortalsContext.toString(),
+        "MetadataAttributeAllowedValuesProvider"
+    )
+    @FormGroup("my-details")
+    public readonly tagAttributes!: IMetadataAttributeModel[];
+
+    // The attributes to read come from a configuration property with a metadata attribute
+    // picker — never from a hard-coded key. `true` splits multi-value attributes into
+    // separate tags.
     public get tags(): string[] {
-        return this.getLocalizedTags(this.asset) ?? [];
+        if (!this.asset || !this.tagAttributes?.length) {
+            return [];
+        }
+
+        return this.getLocalizedTags(this.asset, this.tagAttributes, true) ?? [];
     }
 }
 </script>

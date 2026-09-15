@@ -11,7 +11,7 @@ Building a Smint.io Portals page template
 1. [Build, run, publish](#user-content-build-run-publish)
 1. [Checklist](#user-content-checklist)
 
-Current version of this document is: 1.0.1 (as of 14th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 A **page template** is the second level of structure in a Smint.io Portal. It defines the
 *slots* of a page — header, left, content, right, footer — decides which UI component types each
@@ -207,6 +207,12 @@ renders nothing and Vue warns about an unknown custom element.
 | `<s-banner-slot>` | a banner area |
 | `<s-generic-slot>` | a single content area — the workhorse |
 | `<s-generic-multi-slot>` | three stacked areas in one renderer: `top-ui-slot`, `center-ui-slot`, `bottom-ui-slot`, each with its own `*-ui-slot-data` |
+
+The renderers also implement **`component:hide`**: a hosted UI component that emits it is dropped
+from the slot entirely — no column and no content gap are laid out for it — and a section start
+that emits it takes its whole section with it. Your page template gets this by using the
+renderers; a page that places components itself, without them, does not. See
+[the frontend reference](smintio-frontend-reference.md#events-a-component-can-emit).
 
 ### Layout props on the slot renderers
 

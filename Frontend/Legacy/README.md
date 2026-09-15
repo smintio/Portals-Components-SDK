@@ -34,7 +34,7 @@ Access to them is restricted and is arranged with Smint.io — see
 1. [How we built our own components](#user-content-how-we-built-our-own-components)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.7.0 (as of 15th of September, 2026)
+Current version of this document is: 1.8.0 (as of 15th of September, 2026)
 
 ## UI components
 
@@ -773,6 +773,31 @@ skips items that have nothing to link to, it renders **nothing at all** with no 
 leads to a general rule — **when your component decides to render nothing, log why**. An empty component is
 otherwise indistinguishable from a wrong configuration, a stale bundle or a component that never loaded, and
 you will spend that debugging time in a browser rather than in your editor.
+
+#### Rendering nothing still leaves a gap — emit `component:hide`
+
+An empty template is not the same as being absent. The page has already laid out a slot element for
+your component — a column, its content gaps, possibly a background band — so a component that renders
+nothing leaves a hole where it sits.
+
+To disappear completely, emit `component:hide` and pass your component instance:
+
+```javascript
+this.$emit("component:hide", this);
+```
+
+The page then drops your component from the slot altogether, and lays out nothing for it. On a
+`ui-type-section` component the whole section goes with it — everything placed inside it and its
+matching section end, nested sections included; that is exactly how a conditional section works.
+
+Two rules come with it. **Emit only when the answer is final**, because there is no counterpart event
+and a component hidden while its data was still loading stays hidden for that page render. And **guard
+your template as well**, because the page acts on its next render pass — an unguarded template renders
+once before it vanishes.
+
+See [the recipes](docs/smintio-frontend-recipes.md#user-content-how-do-i-hide-my-component-completely-leaving-no-gap-behind)
+for a worked example, and [the frontend reference](docs/smintio-frontend-reference.md#events-a-component-can-emit)
+for the contract.
 
 #### Many links to the same search page: use `exact`
 

@@ -257,6 +257,13 @@ that had already been published. **When your component decides to render nothing
 silent empty result is indistinguishable from a broken registration, a stale bundle or a wrong
 configuration, and you will pay for the ambiguity in browser sessions.
 
+**To disappear, emit `component:hide` — rendering an empty element is not enough.** The page has
+already laid out a slot element, so an empty component leaves a gap. `this.$emit("component:hide", this)`
+takes the component out of the slot entirely; on a `ui-type-section` component it takes the whole
+section with it. The payload is the instance, there is no counterpart event, and a component hidden
+while its data was still loading stays hidden — so emit only when the answer is final, log why first,
+and guard the template as well.
+
 **Several cards linking to the same search page need `exact` on the link.** Vue-router's
 default active matching compares the path and ignores the query, so every card's button points
 at the "current" route as soon as one of them is followed and the whole grid highlights at once.

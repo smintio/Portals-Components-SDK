@@ -1,7 +1,7 @@
 Smint.io Portals frontend reference
 ==================================
 
-Current version of this document is: 1.1.0 (as of 14th of September, 2026)
+Current version of this document is: 1.2.0 (as of 15th of September, 2026)
 
 Lookup tables for building Smint.io Portals frontend components: the services you can inject,
 the template filters and CSS classes the runtime provides, the shared property mixins you
@@ -14,6 +14,7 @@ component and page types see
 action mixins see [smintio-mixins.md](smintio-mixins.md).
 
 - [Global services](#global-services)
+- [Events a component can emit](#events-a-component-can-emit)
 - [Global filters](#global-filters)
 - [Configuration property mixins](#configuration-property-mixins)
 - [Shared components](#shared-components)
@@ -81,6 +82,39 @@ hasSomewherePermission(permissionUuid)
 
 Please note that permissions are always enforced on the backend as well. Checking them in the
 frontend is for the user experience, not for security.
+
+---
+
+## Events a component can emit
+
+Beyond the events of the page type contract your component targets, the runtime listens for one
+event on **every** UI component, whatever its type.
+
+| Event | Payload | Effect |
+|---|---|---|
+| `component:hide` | the component instance — `this` | the page drops this component from its slot entirely: no column, no content gap, no background band. On a `ui-type-section` component the whole section is dropped, including everything placed inside it and its matching section end |
+
+```javascript
+this.$emit("component:hide", this);
+```
+
+This is the sanctioned way for a component to remove itself when it has nothing to show —
+rendering an empty element still leaves the slot element, and therefore a visible gap, in the
+page. The page identifies the slot element from the instance you pass, so the payload is not
+optional.
+
+Three things to know before using it:
+
+- **It is one-way for that page render.** There is no counterpart event, so a component hidden
+  while its data was still loading stays hidden. Emit only when the answer is final.
+- **Guard your template as well.** The page acts on its next render pass; an unguarded template
+  renders once before disappearing.
+- **The slot renderers implement this**, so a page template built on `SPageMixin` and the
+  standard `s-…-slot` components gets it for free. A page template that renders components
+  itself, without those renderers, does not.
+
+A worked example is in
+[the recipes](smintio-frontend-recipes.md#user-content-how-do-i-hide-my-component-completely-leaving-no-gap-behind).
 
 ---
 
