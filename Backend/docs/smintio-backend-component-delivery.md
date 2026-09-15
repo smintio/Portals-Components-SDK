@@ -1,20 +1,28 @@
-Building, testing and publishing a backend component
+Building, testing and delivering a backend component
 ===================================================
 
-Current version of this document is: 1.0.0 (as of 15th of September, 2026)
+Current version of this document is: 2.0.0 (as of 15th of September, 2026)
 
 How a Smint.io Portals backend component gets from a C# project to something running in a
 portal: the project setup, the test drivers that let you run a connector and a data adapter
-without the platform, the shared test suite you inherit, and the publish and versioning rules.
+without the platform, which tests to write, and how the component reaches a Smint.io system.
+
+**Read [how a component reaches a Smint.io system](#user-content-how-a-component-reaches-a-smintio-system)
+before you plan the work.** A backend component runs as trusted server-side code inside the
+Smint.io platform, so it does not go live self-service — it goes through Smint.io and through a
+code review. That is a security requirement and it shapes the schedule.
 
 1. [The project](#user-content-the-project)
 1. [Getting the SDK packages](#user-content-getting-the-sdk-packages)
 1. [The test driver — running a component outside the platform](#user-content-the-test-driver--running-a-component-outside-the-platform)
+1. [Which tests to write](#user-content-which-tests-to-write)
 1. [The shared test suite](#user-content-the-shared-test-suite)
+1. [Testing a custom component](#user-content-testing-a-custom-component)
 1. [Generating TypeScript for a custom interface](#user-content-generating-typescript-for-a-custom-interface)
-1. [Publishing](#user-content-publishing)
-1. [Versioning and upgrades](#user-content-versioning-and-upgrades)
-1. [A checklist before you publish](#user-content-a-checklist-before-you-publish)
+1. [How a component reaches a Smint.io system](#user-content-how-a-component-reaches-a-smintio-system)
+1. [What the review looks at](#user-content-what-the-review-looks-at)
+1. [Versioning](#user-content-versioning)
+1. [A checklist before you hand it over](#user-content-a-checklist-before-you-hand-it-over)
 1. [Things that are easy to get wrong](#user-content-things-that-are-easy-to-get-wrong)
 
 ## The project
@@ -144,11 +152,29 @@ The test driver does **not** validate that your component would be accepted for 
 it does not exercise a portal. Use it to get the integration right, then publish to a
 development environment and look at a real portal.
 
+## Which tests to write
+
+This depends on whether the component is **productized** or **custom** — see
+[productized or custom](../README.md#user-content-productized-or-custom).
+
+| | Productized | Custom |
+|---|---|---|
+| The shared test suite | **inherit it in full** | **do not** |
+| Your own tests | the sample data the suite needs, plus anything specific | all of them, written directly against the test driver |
+
+The shared suite asserts that a component behaves correctly *as a general integration*: that the
+meta-model is well formed, that asset search honours its parameters, that download item mappings
+are produced, that feature support is declared truthfully. Almost none of that applies to a
+custom component, which implements its own interfaces and no meta-model. Inheriting the suite
+there produces a long list of failures that mean nothing, and the temptation is then to suppress
+them — which defeats the point for everyone who does need the suite.
+
 ## The shared test suite
 
-Do not write the basic tests yourself. `SmintIo.Portals.Connector.Test` and
-`SmintIo.Portals.DataAdapter.Test` ship abstract xUnit test classes that already assert what a
-correct component does; you inherit one and supply the sample data.
+**For a productized component**, do not write the basic tests yourself.
+`SmintIo.Portals.Connector.Test` and `SmintIo.Portals.DataAdapter.Test` ship abstract xUnit test
+classes that already assert what a correct component does; you inherit one and supply the sample
+data.
 
 | Base class | Asserts |
 |---|---|
@@ -210,6 +236,44 @@ driver's is a good model, because the Hello World connector is backed by artific
 needs no real credentials at all. That is also what makes it the one example whose tests run
 anywhere, immediately.
 
+## Testing a custom component
+
+A custom component publishes its own interfaces, so nothing generic can assert anything useful
+about it. Use the test drivers directly and write the tests the interface deserves:
+
+```C#
+var connectorTestDriver = new SetupTestDriver();
+
+await connectorTestDriver.InstantiateConnectorAsync(typeof(MyConnectorStartup), connectorConfiguration);
+
+var dataAdapterTestDriver = new DataAdapterTestDriver(
+    connectorTestDriver.Connector, connectorTestDriver.ConnectorMetamodel);
+
+await dataAdapterTestDriver.InstantiateDataAdapterAsync(
+    typeof(MyDataAdapterStartup), dataAdapterConfiguration);
+
+var dataAdapter = (IMyProductData)dataAdapterTestDriver.DataAdapter;
+
+var result = await dataAdapter.ReadProductAsync(new ReadProductParameters { ProductCode = "…" });
+```
+
+What is worth asserting, in rough order of value:
+
+- **the happy path against the real external system** — the thing the component exists for;
+- **the shape of the result**, because a UI component deserializes it against the generated
+  TypeScript declaration. A field you rename or retype is a breaking change to that component;
+- **identifier scoping**, if your parameters or results carry asset, folder or resource
+  identifiers — round-trip one through `UnscopeIdentifiers` and `ScopeIdentifiers`;
+- **the failure paths** — what the component does when the external system is down, returns an
+  error, or returns nothing. These reach a live portal, and a clean failure is the difference
+  between a support ticket and an outage;
+- **the authentication lifecycle**, at least once: that the connector sets up, authorizes, and
+  refreshes.
+
+Your connector is still exercised in full by the test driver, so a connector that would fail in
+the platform still fails here — the difference is only in what is asserted about the data
+adapter on top.
+
 ## Generating TypeScript for a custom interface
 
 If your data adapter publishes a [custom public API
@@ -224,79 +288,105 @@ SmintIo.Portals.DataAdapterSDK.DataAdapterExporter.CLI.exe -s MyDataAdapter.dll 
 The tool is **win-x64 only**. Re-run it whenever the interface changes; the output is generated
 and never hand-edited. Publish it as an npm package if more than one component uses it.
 
-## Publishing
+## How a component reaches a Smint.io system
 
-The [Portals-SDK-PublishComponent-CLI](../../Tools/Portals-SDK-PublishComponent-CLI/Release/)
-compiles, packages and deploys a backend component. Its README carries the full setup — the
-`SMINT_IO_SDK_HOME` environment variable, the per-environment `appsettings` files, and
-registering it as a .NET global tool.
+> **Publishing a backend component directly to a Smint.io production system is not supported for
+> third parties.** Every backend component reaches production through Smint.io, after a **code
+> review**.
 
-From the component folder:
+This is not an administrative preference. A backend component is **trusted server-side code**: it
+runs inside the Smint.io platform, in the same process as everything else, holding customer
+credentials and reading customer data. There is no sandbox that would make an unreviewed
+component safe, so the review is the control. It applies to components from Smint.io, from
+Solution Partners and from Enterprise customers alike.
 
-```console
-%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development
+So the path is:
+
+```
+   write the component
+        ↓
+   prove it with tests, against the real external system
+        ↓
+   hand it to Smint.io  →  code review  →  rollout
 ```
 
-or, with the tool installed globally:
+**Start the conversation when you start the component, not when you finish it.** Get in touch at
+[support@smint.io](mailto:support@smint.io). Two things come out of that conversation that you
+need early: the component `Key`, which is issued and permanent, and an understanding of what the
+review will look for — both of which are much cheaper to have before the code exists than after.
 
-```console
-smint-io-pc -env development
-```
+### What to hand over
 
-It finds the `*.csproj`, restores, builds, packages the build output and uploads it. The
-`Development` environment builds Debug; every other environment builds Release.
+- the **source**, in a repository Smint.io can review;
+- the **tests**, and a way to run them — which usually means saying what credentials or sandbox
+  tenant they need, never the credentials themselves;
+- a short note on **what the component does, what it talks to, and what it needs**: the external
+  system, the scopes or permissions it requires there, the configuration properties an
+  administrator fills in, and any dependency you added;
+- the **TypeScript interface declaration**, if it publishes a custom interface a UI component
+  consumes.
 
-Three things follow from *how* it packages:
+### About the publish CLI
 
-- **The package contains the whole build output**, your project references and external package
-  references included. A dependency you added is shipped with your component.
-- **Which environment and which Smint.io instance you publish to is decided entirely by the
-  `appsettings.<Env>.json` you point the tool at** — not by anything in your code. Confirm it
-  before you publish, every time. Those files carry OAuth credentials: never commit them and
-  never quote values out of them.
-- Publishing authorizes you interactively through a browser, which by default listens on port
-  `43450` on your machine. If that port is unavailable you can change the redirect URL in the
-  settings, but Smint.io has to whitelist the new one first — get in touch.
+The [Portals-SDK-PublishComponent-CLI](../../Tools/Portals-SDK-PublishComponent-CLI/Release/) can
+compile, package and upload a backend component, and its README documents how. **That route is
+for a development environment Smint.io has set up for you, not for production**, and it does not
+replace the review. If you have not been given an environment to publish to, you do not need the
+tool — build, test, and hand the component over.
 
-**The component key and the first registration come from Smint.io.** Component keys are globally
-unique and issued, much as port numbers are, and a brand new backend component has to be
-enabled on the Smint.io side before the CLI will accept its first upload. Publishing new
-*versions* of a component that has been onboarded is then self-service. Get in touch at
-[support@smint.io](mailto:support@smint.io) when you start a new component, not when you are
-ready to ship it.
+## What the review looks at
 
-Once uploaded, the component is loaded by the running Smint.io Portals instances without a
-platform deployment. There is nothing to schedule and nothing to restart.
+Knowing this in advance costs nothing and saves a round trip. In rough order of how often it
+comes up:
 
-## Versioning and upgrades
+- **Secrets.** No credential in the repository, in `appsettings`, in a test fixture or in a log
+  line. And **the client the connector hands to the data adapter must not expose tokens, secrets
+  or API keys** — see
+  [the API client](smintio-connector-reference.md#user-content-the-api-client).
+- **What the component talks to.** Every outbound host, and why. A backend component that calls
+  something other than the external system it is a connector for needs an explanation.
+- **Dependencies.** Every package you added ships with the component. Fewer is better, and an
+  unmaintained or unnecessary one is the most common thing sent back.
+- **Error handling.** Failures from the external system turned into `ExternalDependencyException`
+  rather than swallowed or allowed to escape raw. Unsupported methods throwing
+  `NotImplementedException` rather than returning empty.
+- **Permissions.** `PermissionUuids` set on the objects you emit; custom permissions declared in
+  all three places; nothing bypassing a permission check.
+- **Input handling.** Anything from a configuration property or a request parameter that reaches
+  a query, a URL or a file path.
+- **Resource use.** Unbounded result sets, requests without a timeout, work done per asset that
+  should be done per page.
+- **The configuration surface.** Property names you will not want to change later, and settings
+  that are actually used.
 
-The `<Version>` in your project file is the component's version. The publish is rejected if that
-version has already been published for that assembly name — so **bump it for every publish**, not
-only for every functional change.
+## Versioning
 
-On upgrade, the new version is loaded alongside the old one and the platform switches over, then
-releases the old one. Two consequences:
+The `<Version>` in your project file is the component's version, and it is read straight out of
+the project file — there is no separate manifest. **Bump it for every hand-over**, not only for
+every functional change: a version is how everyone involved refers to what was reviewed and what
+was rolled out.
 
-- **Both versions exist briefly.** Anything your component holds outside itself — a cache entry,
-  a file, a row — may be seen by both. Version such things or make them tolerant.
-- **There is no downgrade.** Publish a higher version with the fix rather than trying to go back.
-
-Use ordinary semantic versioning and treat these as breaking, because they are:
+Use ordinary semantic versioning, and treat these as breaking, because they are:
 
 - renaming or removing a configuration property — it orphans every saved configuration;
 - changing the component `Key`;
 - removing a public API interface from `PublicApiInterfaces`, or a method from a custom
-  interface;
+  interface — which also breaks the generated TypeScript a UI component was built against;
 - changing what a meta-model entity key means.
 
 Adding a configuration property, adding a method to a custom interface, and adding an interface
 to `PublicApiInterfaces` are all safe.
 
-**A connector meta-model is a snapshot taken when the connector configuration is set up.** A new
-version that changes the meta-model does not change anything for existing configurations until
-they are set up again. Say so when you hand over the release.
+Two things to say out loud when you hand over a new version:
 
-## A checklist before you publish
+- **A connector meta-model is a snapshot taken when the connector configuration is set up.** A
+  version that changes the meta-model changes nothing for existing configurations until they are
+  set up again.
+- **Anything your component keeps outside itself** — a cache entry, a stored cursor, a file —
+  may be read by both the old and the new version around a rollout. Version it, or make it
+  tolerant.
+
+## A checklist before you hand it over
 
 - [ ] the component `Key` is the one Smint.io issued, and unchanged from the released version
 - [ ] `<Version>` bumped
@@ -305,32 +395,42 @@ they are set up again. Say so when you hand over the release.
       `ExcludeAssets="runtime"`
 - [ ] `ConfigurationMessages` is declared and every configuration property has a `DisplayName`
       with exactly one default culture
-- [ ] `MetamodelMessages` is declared if you build a meta-model with translatable labels
 - [ ] `PublicApiInterfaces` lists every interface you want reachable — and nothing you have not
       implemented
-- [ ] both feature-support methods answer truthfully, and unsupported methods throw
-      `NotImplementedException`
-- [ ] the meta-model identifier varies with the configuration
+- [ ] the client exposes **no** tokens, secrets or API keys
+- [ ] **no credentials anywhere** in the repository, the test settings or the history
+- [ ] every dependency you added is one you can justify
+- [ ] failures from the external system become `ExternalDependencyException`; unsupported methods
+      throw `NotImplementedException`
 - [ ] the test driver runs green against the real external system
+- [ ] a note describing what the component does, what it talks to and what it needs
+
+*Additionally, for a productized component:*
+
+- [ ] `MetamodelMessages` is declared if you build a meta-model with translatable labels
+- [ ] the meta-model identifier varies with the configuration
+- [ ] both feature-support methods answer truthfully
+- [ ] `PermissionUuids` set on every asset and folder
 - [ ] the inherited shared test suite runs green
-- [ ] no credentials in anything you are committing, and nothing read out of an `appsettings`
-      file
-- [ ] you know which environment and which Smint.io instance the `appsettings.<Env>.json` you
-      are about to use points at
 
 ## Things that are easy to get wrong
 
-- **Publishing to the wrong environment.** Nothing in your code decides it. Read the `-env`
-  argument back before you press enter.
-- **Forgetting to bump the version.** The publish is rejected on the version alone, after the
-  build has run.
+- **Planning for a self-service production deployment.** There is not one. Build the review into
+  the schedule from the start.
+- **Leaving a credential in the repository or its history.** The most common reason a component
+  is sent back, and the most expensive to undo.
+- **Exposing a token on the client interface** so the data adapter can attach it itself. Keep
+  credentials inside the connector and inside the client's implementation.
 - **Committing an `appsettings.<Env>.json`.** They hold OAuth credentials.
-- **Shipping a dependency you did not mean to.** The package is the whole build output.
-- **Expecting a meta-model change to reach existing configurations.** It does not, until they
-  are set up again.
+- **Shipping a dependency you did not mean to.** Everything you reference ships with the
+  component.
+- **Inheriting the shared test suite for a custom component.** Most of what it asserts does not
+  apply, and the noise hides the failures that do matter.
+- **Skipping the shared test suite for a productized component.** It asserts things that are easy
+  to get wrong and hard to notice, and inheriting it costs a class.
+- **Expecting a meta-model change to reach existing configurations.** It does not, until they are
+  set up again.
 - **Treating a configuration property rename as cosmetic.** It is a breaking change, silently.
-- **Skipping the shared test suite.** It asserts things about a component that are easy to get
-  wrong and hard to notice, and inheriting it costs a class.
 
 ## Questions
 

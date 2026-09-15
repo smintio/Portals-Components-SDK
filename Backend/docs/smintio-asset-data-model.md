@@ -1,7 +1,7 @@
 The Smint.io Portals asset data model
 =====================================
 
-Current version of this document is: 1.0.1 (as of 14th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 What a Smint.io Portals data adapter has to return, and what the frontend does with it.
 
@@ -15,6 +15,12 @@ the portal will act on.
 This document covers the objects and the interfaces. Its companion,
 [the connector meta-model](smintio-connector-metamodel.md), covers the schema that gives those
 objects meaning — which is what you need for anything under `rawData`.
+
+**This is the contract for a *productized* data adapter** — one whose consumer is the standard
+portal experience. A **custom** data adapter, publishing its own interfaces for one custom UI
+component to call, defines its own data model in those interfaces and needs none of what follows
+unless it chooses to use it. See
+[productized or custom](../README.md#user-content-productized-or-custom).
 
 If you are writing a *UI component* rather than a data adapter, you want the consuming side instead:
 [the frontend data adapter reference](../../Frontend/Legacy/docs/smintio-data-adapter-reference.md), which

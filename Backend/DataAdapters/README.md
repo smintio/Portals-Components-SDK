@@ -1,7 +1,7 @@
 How-to implement the `DataAdapter`
 ==================================
  
-Current version of this document is: 1.2.0 (as of 15th of September, 2026)
+Current version of this document is: 1.3.0 (as of 15th of September, 2026)
 
 This is the short orientation. **The full catalogue of public API interfaces, the base classes
 and what they leave abstract, parameters and results, long-running methods, permissions, the
@@ -20,6 +20,12 @@ public override void ConfigureServicesForDataAdapter(ServiceCollection services)
 }
 ```
 this enables the `DataAdapter` to inject the `ISharepointClient`, which is a wrapper around the Microsoft Graph API.
+
+**That client is how the data adapter calls the external system, and it must expose no secrets.**
+Access tokens, refresh tokens, client secrets and API keys stay inside the connector and inside
+the client's implementation — never on the client interface, never returned from a method, never
+handed over as a prepared authorization header. A credential the data adapter never holds cannot
+end up in a log line, an exception or a response.
 
 ## Compartmentalized features
 There are several interfaces, each of which provides the front end with a set of method calls. In most cases you'll need `IAssetsRead` and `IAssetsSearch`.
@@ -40,6 +46,13 @@ Deriving from `AssetsDataAdapterBaseImpl` gives you the whole of `IAssets` with 
 left abstract — that list is the work. Everything else the base class supplies is `virtual`, so
 override the smallest thing that expresses your difference rather than reimplementing a method
 wholesale.
+
+All of this — the standard interfaces, the asset data model, the integration modes below — applies
+to a **productized** data adapter, one whose consumer is the standard portal experience. A
+**custom** data adapter publishes its own interfaces for one custom UI component to call, and
+needs none of it: the interface is the data model, and there is no meta-model, no integration
+mode and no `AssetDataObject` mapping. See
+[productized or custom](../README.md#user-content-productized-or-custom) before you start.
 
 Smint.io offers two different integration modes. Based on the functionality supported by the external system.
 

@@ -1,7 +1,7 @@
 The Smint.io Portals connector meta-model
 =========================================
 
-Current version of this document is: 1.0.0 (as of 11th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 How a connector describes the external system's own schema, so that Smint.io Portals can interpret
 the data your data adapter delivers.
@@ -13,6 +13,7 @@ against a real system, see the
 [SharePoint connector walkthrough](../Connectors/Connector-SharePoint/README.md#meta-model-structure).
 
 1. [Why there is a meta-model at all](#user-content-why-there-is-a-meta-model-at-all)
+1. [When you do not need one](#user-content-when-you-do-not-need-one)
 1. [Three layers](#user-content-three-layers)
 1. [`ConnectorMetamodel` — the container](#user-content-connectormetamodel--the-container)
 1. [`EntityModel` — an object type](#user-content-entitymodel--an-object-type)
@@ -40,6 +41,30 @@ typed, translatable, indexable field that a portal editor can point a component 
 Smint.io defines the meta-model for its own objects. **You define the meta-model for everything that
 comes out of the external system** — which in practice means everything that ends up in an asset's
 `rawData`.
+
+## When you do not need one
+
+The meta-model exists to serve **generic** consumers. It is what lets a portal administrator point
+a component at one of your metadata attributes in the editor, and what lets the platform then
+index, filter, format and translate that value without anyone having written code that knows your
+source system.
+
+So a meta-model is required for a **productized** connector — one whose data adapter implements
+the standard interfaces, above all `IAssets`, and whose data is consumed by the standard portal
+experience.
+
+**A custom connector does not need one.** If your data adapter publishes its own public API
+interfaces, and the only thing that calls them is your own custom UI component, then the
+interface itself publishes the data model: you generate its TypeScript declaration with the
+[Data Adapter Exporter CLI](../../Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/),
+and your component deserializes against that declaration. Both ends know the shape at compile
+time, nothing generic ever interprets the payload, and there is nothing left for a meta-model to
+describe.
+
+Building one anyway is a substantial piece of work serving consumers you do not have. Decide
+which of the two you are building first — see
+[productized or custom](../README.md#user-content-productized-or-custom) — and read the rest of
+this document only if the answer is productized.
 
 ## Three layers
 

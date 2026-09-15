@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.0.0 (as of 15th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -16,6 +16,7 @@ a data adapter that implements them, you want
 which lists the same surface as TypeScript.
 
 1. [What a public API interface is](#user-content-what-a-public-api-interface-is)
+1. [Two kinds of data adapter](#user-content-two-kinds-of-data-adapter)
 1. [Declaring the ones you support](#user-content-declaring-the-ones-you-support)
 1. [The catalogue](#user-content-the-catalogue)
 1. [Assets](#user-content-assets)
@@ -53,6 +54,37 @@ Two things consume them. A **Smint.io Portals frontend or backend component** de
 configuration property of the interface type, and the portal administrator points it at one of
 the configured data adapters that publishes it. And the **portal itself** calls a fixed set of
 them for the standard portal experience — asset search, asset detail, collections, downloads.
+
+## Two kinds of data adapter
+
+Which interfaces you implement is not really a menu choice — it follows from which of two things
+you are building. Settle this before anything else; see
+[productized or custom](../README.md#user-content-productized-or-custom).
+
+**A productized data adapter** implements the **standard** interfaces, above all `IAssets` — the
+main asset interaction interface. Its consumer is the generic portal: search pages, asset detail,
+folder navigation, download, collections. Because generic code has to interpret what it returns,
+everything in this document about `AssetDataObject`, permissions, feature support and paging
+applies, and so does the whole of
+[the connector meta-model](smintio-connector-metamodel.md).
+
+**A custom data adapter** implements **its own** interfaces, published for one custom UI
+component to call. Its consumer knows the data model at compile time, from the TypeScript
+declaration generated off your C# types. Nothing generic ever interprets the payload, so:
+
+- **no connector meta-model is needed** — the interface *is* the data model;
+- `AssetDataObject` and the asset data model do not apply unless you choose to use them;
+- there is no integration-layer decision, no feature support to declare, no `rawData`;
+- the [shared test suite](smintio-backend-component-delivery.md#user-content-which-tests-to-write)
+  does not apply either — write your own tests against the test driver.
+
+What stays the same for both: the startup and configuration contracts, dependency injection from
+the connector, the parameter and result contracts, identifier scoping, permissions, and the fact
+that `PublicApiInterfaces` is the boundary.
+
+Do not build the productized surface "in case". An `IAssets` implementation that exists so that
+the component looks complete is a large amount of code with no consumer, and every method of it
+is something a reviewer has to read.
 
 ## Declaring the ones you support
 
@@ -394,6 +426,13 @@ platform's own services — the entity model provider, the portals context, the 
 provider, persistent storage — are pulled off the injected `IServiceProvider` rather than taken
 as constructor parameters. That is the idiom throughout; follow it.
 
+**The client is how you call the external system, and it must not expose any secrets.** Tokens,
+refresh tokens, client secrets and API keys stay inside the connector and the client's own
+implementation — your data adapter should never hold one. If you find yourself wanting the
+client to hand you a token or an authorization header, add the operation you actually need to
+the client interface instead. See
+[the client must not expose secrets](smintio-connector-reference.md#user-content-the-client-must-not-expose-secrets).
+
 **`ConfigureServices` on the data adapter startup is not the place for this.** It exists, and in
 practice every shipped adapter leaves it empty. Registering your client there instead of in the
 connector's `ConfigureServicesForDataAdapter` produces a dependency injection failure at runtime
@@ -404,6 +443,13 @@ with nothing to see at compile time.
 If the standard interfaces do not describe what your component needs, publish your own. The
 platform treats it exactly like a standard one — including the permission check, the parameter
 and result handling, and the generated TypeScript for a UI component to call it.
+
+**Your interface is the data model.** The consumer is a UI component that deserializes against
+the TypeScript declaration generated from these C# types, so the parameter and result classes
+are a contract in both directions — and **no meta-model describes them, because none is needed**.
+Design them as you would any published API: name the fields for the consumer rather than for the
+source system, keep them stable, and treat renaming or retyping a field as the breaking change
+it is.
 
 You need four things:
 
@@ -479,6 +525,10 @@ generated for you, and you call the method on the injected interface.
   unreachable, with no error anywhere.
 - **Do not widen an interface to make one method reachable.** Declaring `IAssets` when you only
   support search means the portal will call methods you have not written.
+- **Do not implement the standard asset surface for a custom component.** If the only consumer is
+  your own UI component, `IAssets` and the meta-model behind it have no purpose.
+- **Never let a credential out through the client.** The data adapter calls the external system
+  through the client; it does not authenticate to it.
 - **Throw `NotImplementedException` for what you do not support**, and make the feature-support
   methods agree with it. A feature flagged `true` and then unimplemented is the worst of both.
 - **`Permissions => null` is right for standard interfaces.** Only a custom interface needs

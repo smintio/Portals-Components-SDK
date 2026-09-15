@@ -3,7 +3,7 @@ What are Smint.io Portals components?
 
 This README.md serves to clarify the general concept of Smint.io Portals components.
 
-Current version of this document is: 1.1.0 (as of 15th of September, 2026)
+Current version of this document is: 1.2.0 (as of 15th of September, 2026)
 
 ## Overview
 
@@ -96,6 +96,12 @@ This can be done by requesting a data adapter public API interface through the c
 UI component.
 
 Data adapters can also define *custom permissions* to facilitate fine-grained access management by the Smint.io Portals admin.
+
+There are two quite different things you can build here. A *productized* connector and data adapter integrate a source system for
+the standard portal experience: they implement the standard interfaces, above all `IAssets`, and the connector describes the source
+system's schema as a *meta-model* so that the portal can interpret the data generically. A *custom* connector and data adapter publish
+interfaces of their own that only a custom UI component consumes: there the interface itself is the data model, the component
+deserializes against a generated TypeScript declaration, and no meta-model is needed at all.
 
 ### Data processors
 

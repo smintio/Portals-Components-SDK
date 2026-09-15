@@ -1,7 +1,7 @@
 The Smint.io Portals connector contract
 =======================================
 
-Current version of this document is: 1.0.0 (as of 15th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 Every member a connector declares, the order in which the platform calls them, the
 authentication flows you can start from, and how the API client underneath is built.
@@ -10,6 +10,12 @@ A connector has exactly two jobs: **establish and maintain a trust context** to 
 system, and **describe that system's schema**. It does not read assets — that is the data
 adapter's job, and the two are separate components for a reason: several data adapters can share
 one connector, and one connector's credentials.
+
+The second job applies only to a **productized** connector. A **custom** connector — one whose
+data adapter publishes its own interfaces for one custom UI component to consume — does not need
+a meta-model at all, because nothing generic ever has to interpret its payload. Settle which of
+the two you are building before you start; see
+[productized or custom](../README.md#user-content-productized-or-custom).
 
 Its companion documents: [the connector meta-model](smintio-connector-metamodel.md) for the
 second job in full, [the data adapter public API interfaces](smintio-data-adapter-interfaces.md)
@@ -95,7 +101,7 @@ approve something in a browser.
 | `PerformPostAuthorizationChecksAsync(FormFieldValuesModel)` | now that you can actually call the external system, confirm it works, and correct configured values that turn out to need it. Frequently a `Task.CompletedTask` |
 | `RefreshAuthorizationValuesAsync(AuthorizationValuesModel)` | refresh the token. Called on a timer before expiry |
 | `ConfigureServicesForDataAdapter(ServiceCollection)` | register the API client so data adapters can take it by constructor injection |
-| `GetConnectorMetamodelAsync()` | build and return the [meta-model](smintio-connector-metamodel.md) |
+| `GetConnectorMetamodelAsync()` | build and return the [meta-model](smintio-connector-metamodel.md). A custom connector has no schema to describe |
 | `WarmCachesAsync(bool forceWarming = false)` | called on server restart and every fifteen minutes. Pre-fetch what is expensive and stable. A no-op is fine |
 
 `AuthorizationValuesModel` is the connector's own scratch space. The platform stores and returns
@@ -221,6 +227,32 @@ implementation deriving from one of the prefab base classes in
 adapter take a dependency on something testable, and it is where the retry and error handling
 live.
 
+### The client must not expose secrets
+
+The client is **the data adapter's way of calling the external system** — and that is all it is.
+Access tokens, refresh tokens, client secrets and API keys belong inside the connector and
+inside the client's own implementation, and nowhere else.
+
+Concretely, on the client interface:
+
+- **no property or method that returns a token, a secret or a key**, however convenient;
+- **no method that hands back a prepared authorization header** for the caller to attach;
+- **no "give me the raw HTTP client" escape hatch** that carries credentials with it.
+
+Design the interface in terms of what the data adapter wants — `GetAssetAsync`,
+`SearchAsync`, `GetDownloadStreamAsync` — never in terms of how you authenticate. The data
+adapter should be able to do its whole job without ever holding a credential.
+
+The reason is blunt: a value the data adapter holds can end up in a log line, in an exception
+message, in a serialized result, or in a payload a data processor appends to something. A value
+it never holds cannot. This is one of the things a
+[code review](smintio-backend-component-delivery.md#user-content-what-the-review-looks-at) checks
+for, and it is much cheaper to get right in the first version of the interface than to unpick
+later.
+
+The same applies inside the client: log the *operation* and the outcome, never the header you
+sent.
+
 | Base class | Use it for |
 |---|---|
 | `BaseRestSharpApiClient` | a REST/JSON API you call yourself. **The mainstream choice** |
@@ -326,6 +358,11 @@ they paste an id.
 
 - **The key is issued, not chosen.** It is globally unique across all of Smint.io Portals and
   cannot change after release. Ask for it.
+- **Never expose a credential on the client interface.** Not a token, not a key, not a prepared
+  authorization header. The data adapter calls the external system through the client; it does
+  not authenticate to it.
+- **Do not build a meta-model you have no consumer for.** A custom connector paired with a
+  custom UI component needs none.
 - **`IConnectorStartup.ConfigureServices` is not
   `IConnector.ConfigureServicesForDataAdapter`.** The first is empty everywhere; the second is
   the only way a data adapter reaches your client.

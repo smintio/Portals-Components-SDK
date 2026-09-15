@@ -1,12 +1,12 @@
 Developing Smint.io Portals backend components
 ==============================================
 
-Current version of this document is: 3.0.0 (as of 15th of September, 2026)
+Current version of this document is: 3.1.0 (as of 15th of September, 2026)
 
 This is the guide to building the server-side half of Smint.io Portals: connectors, data
 adapters, data processors, task handlers, portal templates, resources and identity providers.
 It explains what each component type is for, which one you actually need, the questions to
-settle before you write anything, and how a component is built, tested and published.
+settle before you write anything, and how a component is built, tested and delivered.
 
 The examples in this repository are working components you can copy. Start from
 [Hello World](Connectors/Connector-HelloWorld/) for the shape of a connector and a data adapter,
@@ -23,6 +23,7 @@ SDKs are hosted there.
 
 1. [The backend component types](#user-content-the-backend-component-types)
 1. [Which component do you actually need?](#user-content-which-component-do-you-actually-need)
+1. [Productized or custom?](#user-content-productized-or-custom)
 1. [Every component has the same three parts](#user-content-every-component-has-the-same-three-parts)
 1. [Reference documents](#user-content-reference-documents)
 1. [Examples in this repository](#user-content-examples-in-this-repository)
@@ -32,7 +33,7 @@ SDKs are hosted there.
 1. [Live connection or internal index](#user-content-live-connection-or-internal-index)
 1. [Data adapter public API interfaces](#user-content-data-adapter-public-api-interfaces)
 1. [Custom public API interfaces](#user-content-custom-public-api-interfaces)
-1. [Building, testing and publishing](#user-content-building-testing-and-publishing)
+1. [Building, testing and delivery](#user-content-building-testing-and-delivery)
 1. [Checklist before you ship](#user-content-checklist-before-you-ship)
 1. [Questions](#user-content-questions)
 
@@ -72,6 +73,50 @@ answer. Work down this list and stop at the first that fits:
    operation is missing.
 5. **A new connector and data adapter.** A source system nothing integrates yet.
 
+## Productized or custom?
+
+Once you know you are building a connector and a data adapter, there is a second question, and
+it decides how much work the whole thing is. **Settle it before you write anything.**
+
+| | **Productized** | **Custom** |
+|---|---|---|
+| What it is | a general integration with a source system, usable by any portal | a purpose-built interface that one custom frontend component consumes |
+| Public API interfaces | the standard ones, above all **`IAssets`** — the main asset interaction interface | **your own**, published only for your own UI component |
+| Who consumes it | the standard portal experience: search pages, asset detail, download, collections | your custom UI component, and nothing else |
+| Connector meta-model | **required** | **not required** |
+| Live connection or integration layer | a real decision you have to make | usually does not apply |
+| Shared test suite | **use it in full** | do not — write your own tests against the test driver |
+
+### Why the meta-model is only needed for a productized component
+
+The meta-model exists so that **a portal administrator can point a component at a metadata
+attribute in the editor**, and so that the platform can then interpret, index, filter, format
+and translate that value without knowing anything about your source system. It is the schema
+that turns an untyped bag of values into something the *generic* parts of the portal can work
+with.
+
+A custom interface consumed by a custom UI component has no such problem. **The interface
+itself publishes the data model.** You generate its TypeScript declaration with the
+[Data Adapter Exporter CLI](../Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/),
+your component deserializes against that declaration, and both ends know the shape at compile
+time. Nothing generic ever has to interpret the payload, so there is nothing for a meta-model
+to describe.
+
+So: **custom to custom needs no meta-model.** Do not build one out of a sense of completeness —
+it is a substantial piece of work whose only purpose is to serve consumers you do not have.
+
+### What a custom connector still has to do
+
+A custom connector is a real connector: it still authenticates, still refreshes its
+authorization, still hands a client to its data adapter, and still declares its key, name and
+configuration. What it can skip is `GetConnectorMetamodelAsync` returning a described schema,
+the `MetamodelMessages` resource file, the integration-layer decision, and the whole
+`AssetDataObject` mapping surface.
+
+If your component later has to serve the standard portal experience as well, that is a
+productized component — and retrofitting a meta-model onto a custom one is not a small change.
+Ask which of the two it is at the start, in those words.
+
 ## Every component has the same three parts
 
 Whatever the type, a backend component is three classes:
@@ -83,14 +128,13 @@ Whatever the type, a backend component is three classes:
 | **The component** | the short-lived, stateful thing that actually does the work, constructed by dependency injection with the configuration injected |
 
 Plus **translatable resources** — a `ConfigurationMessages.resx` per culture, and a
-`MetamodelMessages.resx` when the component describes a schema.
+`MetamodelMessages.resx` when the component describes a schema, which a
+[custom component](#user-content-productized-or-custom) does not.
 
 `IComponentStartup.Key` is worth its own paragraph. **Component keys are globally unique and
 issued by Smint.io**, much as port numbers are issued by IANA: they are how the platform finds
 your implementation, and they cannot be changed once a portal has been configured against your
-component. Ask for yours at the start of the work. A brand new backend component also has to be
-enabled on the Smint.io side before its first publish is accepted, so raise it early rather than
-when you are ready to ship.
+component. Ask for yours at the start of the work — not when you are ready to ship.
 
 ## Reference documents
 
@@ -153,16 +197,22 @@ it is a short conversation, and it saves a rewrite.
 | Question | What it decides | If it is wrong |
 |---|---|---|
 | Which component type is this, and what does it do in one sentence? | the SDK you reference, the contract you implement, and the document you work from | a different contract is a rewrite, not an edit. The most common error is building a connector where a data processor was the answer — see [which component do you actually need](#user-content-which-component-do-you-actually-need) |
-| Has Smint.io issued the component key? | the value of `IComponentStartup.Key` | it is globally unique and permanent, and a new component has to be enabled on the Smint.io side before its first publish. Ask for it at the start |
+| **Productized or custom?** | whether you need a meta-model, an integration mode, the standard interfaces and the shared test suite — or none of them. See [productized or custom](#user-content-productized-or-custom) | it is the difference between a large piece of work and a small one, and retrofitting a meta-model onto a custom component is not a small change |
+| Has Smint.io issued the component key? | the value of `IComponentStartup.Key` | it is globally unique and permanent. Ask for it at the start |
 | Is this a new component or a change to an existing one? | whether you start a fresh project or add to one | never rename a released component. Portals in the field are configured against the old key |
 
 *How the integration works* — for a connector and data adapter
 
 | Question | What it decides |
 |---|---|
-| Live connection, or indexed through the Smint.io integration layer? | which configuration marker interfaces your data adapter implements, whether you write an integration layer provider, and how the data stays current — see [live connection or internal index](#user-content-live-connection-or-internal-index) |
 | How does the external system authenticate? | the connector's base class and its setup method. Note that an OAuth2 connector usually still uses the `Setup` method, not `Redirect` — see [choosing an authentication flow](docs/smintio-connector-reference.md#user-content-choosing-an-authentication-flow) |
 | Which public API interfaces does the data adapter publish? | the reachable surface, and how much you have to implement. Declare what you support, not the widest interface that compiles — see [the catalogue](docs/smintio-data-adapter-interfaces.md#user-content-the-catalogue) |
+
+*Only for a productized component*
+
+| Question | What it decides |
+|---|---|
+| Live connection, or indexed through the Smint.io integration layer? | which configuration marker interfaces your data adapter implements, whether you write an integration layer provider, and how the data stays current — see [live connection or internal index](#user-content-live-connection-or-internal-index) |
 | Can the external system's schema be read through its API, and is its metadata translated? | how the [meta-model](docs/smintio-connector-metamodel.md) is built — and, occasionally, whether the integration is viable at all |
 
 *Configuration and language*
@@ -172,14 +222,14 @@ it is a short conversation, and it saves a rewrite.
 | Which settings must the administrator be able to change, and which are advanced? | your configuration properties. **The C# property name is the persisted name**, so a rename after release orphans every saved configuration. Start with few — you can add, you cannot remove |
 | Which of those should be a dropdown the component fills rather than a text field? | your dynamic allowed-values providers. A configuration where the administrator picks the channel or the site from a list is a different product from one where they paste an identifier |
 | Which languages? | whether labels stay on attributes or move into resource files. More than two languages means resource files from the start; retrofitting them touches every property |
-| Does the component describe a schema with translatable labels? | whether you ship a `MetamodelMessages.resx`. Leaving it out when you need it makes those translations fail silently |
+| Does the component describe a schema with translatable labels? | whether you ship a `MetamodelMessages.resx`. Leaving it out when you need it makes those translations fail silently. A custom component does not need one |
 
 *Delivery*
 
 | Question | What it decides |
 |---|---|
-| Which environment and which Smint.io instance? | where the component lands. **Nothing in the component's source decides this** — it is whatever the publish CLI's `appsettings.<Env>.json` points at. Agree it up front, because it is the one thing that cannot be checked by looking at the code |
 | How will it be tested against the real system? | whether the test drivers are useful. They need real credentials to be worth anything, and a redirect-flow connector needs its redirect URI registered on the external side |
+| Who is going to review it, and when? | **a backend component reaches a Smint.io production system only through Smint.io, after a code review.** Plan that in rather than discovering it at the end — see [delivery](#user-content-building-testing-and-delivery) |
 
 ## Connectors
 
@@ -288,6 +338,13 @@ public override void ConfigureServicesForDataAdapter(ServiceCollection services)
 ```
 
 which lets the data adapter take `IMyClient` as a constructor parameter.
+
+**The client is the data adapter's way of calling the external system — and it must not expose
+any secrets.** Access tokens, refresh tokens, client secrets and API keys stay inside the
+connector and inside the client's own implementation. Do not put them on the client interface,
+do not return them from a method, and do not hand out a raw authorization header for the caller
+to attach itself. The data adapter should be able to do its job without ever holding a
+credential, and anything it does hold can end up in a log line, an exception or a response.
 
 `IDataAdapterStartup` adds four members to the common startup contract: the `ConnectorKey` it
 belongs to, the `Permissions` it declares (normally `null`), the `PublicApiInterfaces` it
@@ -457,31 +514,42 @@ export interface IMarkAssetsAsDeletedResult extends IDataAdapterResult
 simple one) that you can directly use in your Smint.io Portals UI component. You may also publish
 the interface as an npm package for further comfort.*
 
-## Building, testing and publishing
+## Building, testing and delivery
 
 A backend component is an ordinary .NET 8 class library referencing the Smint.io SDK packages.
 
-**Test it outside the platform first.** The test drivers construct your real connector and data
+The path from source to a running portal has three steps, and the third is not self-service:
+
+**1. Write it.** Copy the example closest to what you are building.
+
+**2. Test it outside the platform.** The test drivers construct your real connector and data
 adapter against the real external system, with in-memory stand-ins for everything the platform
 normally provides — no server, no database, no portal. A connector that fails in the test driver
 would have failed in the platform.
 
-**Inherit the shared test suite** rather than writing the basic tests. `SmintIo.Portals.Connector.Test`
-and `SmintIo.Portals.DataAdapter.Test` ship abstract test classes that already assert what a
-correct component does; you supply a fixture and the sample data.
+For a **productized** component, inherit the shared test suite rather than writing the basic
+tests: `SmintIo.Portals.Connector.Test` and `SmintIo.Portals.DataAdapter.Test` ship abstract
+test classes that already assert what a correct component does, and you supply a fixture and the
+sample data. For a **custom** component, do not — most of what the suite asserts is about the
+standard asset surface you deliberately do not implement. Use the test drivers directly and
+write the tests your interface actually needs.
 
-**Publish with the CLI.** From the component folder:
+**3. Hand it to Smint.io.**
 
-```console
-%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development
-```
+> **Publishing a backend component directly to a Smint.io production system is not supported for
+> third parties.** A backend component runs as trusted server-side code inside the Smint.io
+> platform, so every component — from Smint.io, from a Solution Partner or from an Enterprise
+> customer — goes through Smint.io and through a **code review** before it reaches production.
+> That review is a security requirement, not a formality.
 
-It finds the project, builds it, packages the build output and uploads it. The running platform
-picks the component up without a deployment.
+So plan for it: build the component, prove it with tests, then get in touch at
+[support@smint.io](mailto:support@smint.io) to arrange the review and the rollout. Raise it when
+you *start* the component, not when you are ready to ship — the review is much cheaper against a
+component that was written knowing it was coming.
 
 **The full detail — the project file, getting the packages, the test drivers, the shared test
-suite, the publish CLI, versioning and upgrades — is in
-[building, testing and publishing](docs/smintio-backend-component-delivery.md).**
+suite, what the review looks at, and versioning — is in
+[building, testing and delivery](docs/smintio-backend-component-delivery.md).**
 
 ## Checklist before you ship
 
@@ -490,23 +558,29 @@ suite, the publish CLI, versioning and upgrades — is in
 - [ ] `TargetFramework` is `net8.0`, and the SDK package versions match across your projects
 - [ ] every configuration property has a `DisplayName` with exactly one default culture, and a
       `ConfigurationMessages` resource file backs them
-- [ ] `MetamodelMessages` declared if the component ships translatable meta-model labels
 - [ ] no configuration property renamed since the last release
+- [ ] `PublicApiInterfaces` lists exactly what you implement and want reachable
+- [ ] the client the connector hands to the data adapter **exposes no tokens, secrets or API
+      keys** — see [data adapters](#user-content-data-adapters)
+- [ ] the external client registered in the connector's `ConfigureServicesForDataAdapter`, not in
+      the startup's `ConfigureServices`
+- [ ] custom permissions, if any, declared in all three places: the constant, the interface
+      method, the startup
+- [ ] no credentials committed anywhere in the project or its test settings
+- [ ] the solution builds and the test driver runs green against the real system
+
+*Additionally, for a productized component:*
+
+- [ ] `MetamodelMessages` declared if the component ships translatable meta-model labels
 - [ ] the meta-model identifier varies with everything that changes the schema
 - [ ] every property emitted into `rawData` is declared in the meta-model — anything else is
       dropped
-- [ ] `PublicApiInterfaces` lists exactly what you implement and want reachable
 - [ ] both feature-support methods answer truthfully, and unsupported methods throw
       `NotImplementedException`
 - [ ] `PermissionUuids` set on every asset and folder
-- [ ] custom permissions, if any, declared in all three places: the constant, the interface
-      method, the startup
-- [ ] the external client registered in the connector's `ConfigureServicesForDataAdapter`, not in
-      the startup's `ConfigureServices`
-- [ ] the solution builds, the test driver runs green against the real system, and the inherited
-      test suite passes
-- [ ] no credentials committed, and nothing read out of an `appsettings.<Env>.json`
-- [ ] you know which environment and which Smint.io instance you are publishing to
+- [ ] the inherited shared test suite passes
+
+Then get in touch at [support@smint.io](mailto:support@smint.io) for the review and the rollout.
 
 ## Questions
 

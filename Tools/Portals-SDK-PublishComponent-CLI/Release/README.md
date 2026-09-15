@@ -8,7 +8,7 @@ The Portals-SDK-PublishComponent-CLI tool
 1. [Parameters](#user-content-parameters)
 1. [Publish and deploy](#user-content-publish-and-deploy)
 
-Current version of this document is: 1.2.0 (as of 14th of September, 2026)
+Current version of this document is: 1.3.0 (as of 15th of September, 2026)
 
 ## Description
 
@@ -149,6 +149,17 @@ Two failures worth recognising:
   a new component. It holds no credentials — those belong in your user-level `.npmrc`.
 
 ### Backend components
+
+> **Publishing a backend component directly to a Smint.io production system is not supported for
+> third parties.** A backend component is trusted server-side code running inside the Smint.io
+> platform, so every backend component reaches production through Smint.io, after a **code
+> review**. This applies to components from Smint.io, from Solution Partners and from Enterprise
+> customers alike.
+>
+> The commands below are for a development environment that Smint.io has set up for you. They do
+> not replace the review. Please get in touch at [support@smint.io](mailto:support@smint.io) when
+> you *start* a backend component — see
+> [how a component reaches a Smint.io system](../../../Backend/docs/smintio-backend-component-delivery.md#user-content-how-a-component-reaches-a-smintio-system).
 
 Like for frontend components, a single command can be used to publish and deploy your backend component to Smint.io.
 
