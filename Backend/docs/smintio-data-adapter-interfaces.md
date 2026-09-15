@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.7.0 (as of 15th of September, 2026)
+Current version of this document is: 1.7.1 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -653,7 +653,9 @@ generated for you, and you call the method on the injected interface.
   `ConfigureServices`.
 - **Keep the partial class signature identical in every file.**
 - **Ship a `ConfigurationMessages.resx`.** Your startup's `Name` and `Description` come from it.
-  `MetamodelMessages` is the opposite — add it only when you actually ship one.
+  `MetamodelMessages` is the opposite — add it only when you actually ship one. Prefix every key
+  in both with `da_<your adapter key>_`, or it can collide with another component's: see
+  [how a resource key has to be named](smintio-backend-annotations.md#user-content-how-a-resource-key-has-to-be-named).
 - **Well-known fields go on `AssetDataObject` directly; only source-specific metadata goes
   through the converter into `rawData`.** Pushing a name or a date through the converter is a
   common and confusing mistake.

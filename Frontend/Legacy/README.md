@@ -41,7 +41,7 @@ Access to them is restricted and is arranged with Smint.io — see
 1. [How we built our own components](#user-content-how-we-built-our-own-components)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.9.0 (as of 15th of September, 2026)
+Current version of this document is: 1.10.0 (as of 15th of September, 2026)
 
 ## UI components
 
@@ -370,13 +370,48 @@ always-auth=true
 	
 11. Please adjust `src/PortalsUiComponent.vue` accordingly
 
+#### Where your own components are published
+
+The two feeds above are not the same thing, and only one of them is ours to give you:
+
+| Feed | What it is | Who has one |
+|---|---|---|
+| `Portals-Components-Public` | the **SDK packages** you build against — `@smintio/portals-component-sdk`, `@smintio/portals-components` and their siblings. Read-only | everyone with SDK access |
+| `Portals-Components-Partners-<partner-id>` | where **your own** built components are published, and where a Smint.io system installs them from | Smint.io itself, and the Solution Partners Smint.io works with |
+
+**Smint.io hosts a partner feed for Smint.io and for its Solution Partners only.** If you are
+neither — you are building components for **one customer of your own**, or you run your own
+**VPC deployment** of Smint.io Portals — then you host the npm repository for your components
+yourself. Any npm registry that supports scoped packages and authentication will do: Azure
+Artifacts, GitHub Packages, JFrog Artifactory, Nexus, a private npm organization.
+
+Nothing in a component changes because of it. You still consume the SDK from
+`Portals-Components-Public`, and the only difference is the second `@scope:registry` line in
+`.npmrc` and the `publishConfig` in `package.json`, both of which point at your registry instead
+of a Smint.io one:
+
+```
+@smintio:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Public/npm/registry/
+@[your-scope]:registry=https://your-registry.example.com/npm/registry/
+always-auth=true
+```
+
+Two things to settle with Smint.io when you host your own:
+
+- **The Smint.io system has to be able to read it.** Registering a component points the platform
+  at a package, so the registry has to be reachable from the environment you publish to, with
+  credentials it can use. Arrange that before the first publish, not after.
+- **Your scope is part of every package name**, and a package name — like a component key — is
+  not something you change afterwards. Pick the scope once, with the deployment it will live in
+  in mind.
+
 ### Anatomy of a component package
 
 Every frontend component is a self-contained npm package with the same small set of files:
 
 ```
 ui-my-thing-1/
-├── .npmrc                       # points the @smintio scope at our npm SDK feed
+├── .npmrc                       # the @smintio scope -> our SDK feed, your scope -> your registry
 ├── package.json                 # name, version, scripts, dependencies
 ├── tsconfig.json                # extends ../../config/tsconfig.json
 ├── rollup.config.js             # stub that loads ../../config/rollup/rollup-config.ts
@@ -1028,6 +1063,10 @@ you are set up for, and there is no Smint.io review step in between. That is spe
 Smint.io, after a code review. See
 [getting a component into a Smint.io Portals system](../../Overview/README.md#user-content-getting-a-component-into-a-smintio-portals-system).
 
+Self-service assumes you have an npm registry to publish into. Smint.io hosts one for itself and for its Solution
+Partners; for a customer-specific project or your own VPC deployment you host it yourself — see
+[where your own components are published](#user-content-where-your-own-components-are-published).
+
 1. In the component folder open a command prompt or terminal window
 1. Run `npm run build` to ensure the latest version will be published
 1. Run `npm run smint-io-pc` to publish to the Smint.io `Staging` environment
@@ -1074,7 +1113,9 @@ The publish worked; the registration did not, because the registration step pipe
 CLI and `npm info` resolves the registry from the **component folder's `.npmrc`**, not from `publishConfig` in
 `package.json`. A new component folder without an `.npmrc` therefore asks the public npm registry, which has
 never heard of your package, and the CLI receives nothing to register. Make sure the folder has the `.npmrc`
-described in *Getting started*, then rerun the registration on its own.
+described in *Getting started*, then rerun the registration on its own. The same applies when you
+[host the registry yourself](#user-content-where-your-own-components-are-published): it is the folder's
+`.npmrc` that has to name it.
 
 #### Which tenant your component is published for
 

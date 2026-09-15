@@ -1,7 +1,7 @@
 Smint.io Portals backend component recipes
 ==========================================
 
-Current version of this document is: 2.2.1 (as of 15th of September, 2026)
+Current version of this document is: 2.3.0 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other backend documents describe *what exists*; this one shows *how it is used*.
@@ -211,6 +211,19 @@ Pitfalls:
   every time the form opens. [Cache](#user-content-how-do-i-cache-an-expensive-lookup) it.
 - **Return the key, show the name.** `Value` is what gets persisted; changing what you put there
   orphans every configuration that selected it.
+- **A name of your own belongs in a resource file.** The names above come from the external
+  system, so they are built with `LocalizedStringsModel` directly. For a label your component
+  supplies — "All channels", "None", a grouping header — put it in `ConfigurationMessages` and
+  resolve it in one call:
+
+  ```C#
+  Name = ConfigurationMessages.ResourceManager
+      .FullyResolveToLocalizedStringsModel(nameof(ConfigurationMessages.c_myconnector_all_channels))
+  ```
+
+  That returns a model carrying every language you ship. Resolve it once into a `static readonly`
+  field rather than per row — see
+  [three ways to turn a resource key into a localized string](smintio-backend-annotations.md#user-content-three-ways-to-turn-a-resource-key-into-a-localized-string).
 - **Say what you support.** With `SupportsSearch => false`, `searchTerm` is always `null`; do not
   write code that depends on it.
 
@@ -1267,11 +1280,14 @@ public static class MyPermissions
 {
     public const string ViewWholesalePricesPermissionUuid = "8e2f…";   // ask Smint.io for the uuid
 
+    // Resolve the labels once, here, into a model carrying every language you ship.
     public static readonly DataAdapterPermission ViewWholesalePrices = new DataAdapterPermission
     {
         Uuid = ViewWholesalePricesPermissionUuid,
-        Name = new ResourceLocalizedStringsModel(nameof(ConfigurationMessages.da_perm_wholesale_name)),
-        Description = new ResourceLocalizedStringsModel(nameof(ConfigurationMessages.da_perm_wholesale_description))
+        Name = ConfigurationMessages.ResourceManager
+            .FullyResolveToLocalizedStringsModel(nameof(ConfigurationMessages.da_perm_wholesale_name)),
+        Description = ConfigurationMessages.ResourceManager
+            .FullyResolveToLocalizedStringsModel(nameof(ConfigurationMessages.da_perm_wholesale_description))
     };
 }
 

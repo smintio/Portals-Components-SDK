@@ -96,6 +96,14 @@ Do not infer the conventions from a single file — they are written down.
   afterwards, and on an administrator action. Ordinary schema evolution in the external system is picked
   up automatically, and the re-indexing it implies is scheduled for you. Do not tell anyone they
   have to set the connector configuration up again for a new field to appear.
+- **Three forms turn a resource key into a localized string, and they are not interchangeable.**
+  `new ResourceLocalizedStringsModel(nameof(X.key))` hands the platform a *reference* it resolves
+  later — right for startup metadata and meta-model labels.
+  `X.ResourceManager.FullyResolveToLocalizedStringsModel(nameof(X.key))` returns a *finished*
+  model carrying every language the component ships — right whenever you build the model yourself
+  (allowed values, permissions, download item descriptions); resolve it once into a
+  `static readonly` field, and note it returns `null` when the key has no `en-US` value.
+  `X.key.Localize()` gives a single-culture model for the current request only.
 - **Never hard-code a meta-model entity key.** Keys are rewritten to be unique per connector
   configuration, so the same connector configured twice yields two different key sets.
 - **The meta-model identifier is the index identity, and changing it triggers a full re-index.**
@@ -214,7 +222,11 @@ state the environment in the question.
 
 Target `net8.0`. Start `<Version>` at `1.0.0` for a new component, or at whatever the existing
 one is on. Follow the project layout and the partial-class split of the example you copied.
-Name the resource keys `c_<key>_…` for a connector and `da_<key>_…` for a data adapter. Put the
+Name every resource key — in `ConfigurationMessages` and in `MetamodelMessages` alike —
+`<kind>_<component key with hyphens as underscores>_…`, where the kind is `c` connector,
+`da` data adapter, `dp` data processor, `idp` identity provider, `th` task handler,
+`pot` portal template, `r` resource. Every component's resource file is loaded alongside every
+other one and the SDK's own, so the prefix is what stops two components' keys colliding. Put the
 `Private="false" ExcludeAssets="runtime"` flags on the data adapter's project reference to the
 connector. Structure the test project as `Harness/` and `Integration/`, and inherit the shared
 test suite rather than writing the basic tests.
