@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.6.0 (as of 15th of September, 2026)
+Current version of this document is: 1.7.0 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -489,6 +489,16 @@ last time. Three services off the injected `IServiceProvider` cover this:
 | `IIdPersistentStorage` | keyed records. `GetAsync(uuid)`, `AddOrUpdateAsync(uuid, data, groupUuid)`, `GetGroupAsync`, `RemoveAsync` and their bulk forms, over an `IdPersistentStorageData { Uuid, GroupUuid, Data }` |
 | `ITemporalPersistentStorage` | an append-ordered log. `AddAsync` returns the identifier, `GetRangeAsync(lastKnownId, pageSize)` reads forward from one |
 | `IStorageBackedLock` | a mutual exclusion that holds **across every server running your component**. `LockAsync(uuid, lockDuration, lockKey)` returns `false` rather than waiting; `ClearLockAsync(uuid, lockKey)` releases it |
+
+**Every one of these is scoped to your component for you** — as is `ICache`, and the other
+component-scoped services the platform injects. The key, uuid or lock uuid you pass is only the
+last part of the real one: the platform prefixes it with the tenant and with the *configured
+component instance*, so two portals, or two configurations of the same data adapter, never see
+or overwrite each other's entries. You never put a tenant id, a portal id, a connector key or a
+configuration id into a key, and doing so only makes the entry harder to find later.
+
+What remains yours is uniqueness **within one configured component**: two different lookups in
+your own code that both key on a bare external identifier will serve each other's values.
 
 Use the keyed store when you have an identifier from the external system to key on, and the
 temporal one when you need to replay a sequence in order. Neither is a cache — the cache is for

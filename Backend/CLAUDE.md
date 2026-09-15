@@ -327,11 +327,16 @@ too if the component is productized.
 **Both:** take the connector's client as a constructor parameter; pull the platform's own
 services off the injected `IServiceProvider`; and never hold a credential.
 
-Three things partners reach for and get wrong, all covered in the data adapter document:
+Four things partners reach for and get wrong, all covered in the data adapter document:
 
 - State the external system has no field for — that a one-time action already happened, say —
   goes in `IIdPersistentStorage` or `ITemporalPersistentStorage`, **not** in a status or comment
   field of the external system, where that system's own processes will overwrite it.
+- **Never scope a key yourself.** `ICache`, `IIdPersistentStorage`, `ITemporalPersistentStorage`,
+  `IStorageBackedLock` and the other component-scoped services are already partitioned by tenant
+  and by configured component instance. A tenant id, portal id, connector key or configuration id
+  in a key is redundant and makes the entry harder to find. Uniqueness within your own component
+  is the only part that is yours.
 - A `lock` statement protects nothing. Component instances are short-lived and spread over more
   than one machine, so when two requests must not write to the external system at once, take an
   `IStorageBackedLock` — a short duration, prolonged as you go, a fresh lock key per acquisition,

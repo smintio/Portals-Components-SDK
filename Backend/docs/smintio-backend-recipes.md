@@ -1,7 +1,7 @@
 Smint.io Portals backend component recipes
 ==========================================
 
-Current version of this document is: 2.1.0 (as of 15th of September, 2026)
+Current version of this document is: 2.2.0 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other backend documents describe *what exists*; this one shows *how it is used*.
@@ -411,9 +411,10 @@ private readonly ICache _cache;
 /// because something eventually has to be able to force a refresh.
 public async Task<Dictionary<string, FieldDefinition>> GetFieldDefinitionsAsync(bool getFreshData)
 {
-    // Scope the key by whatever makes the value different — the tenant, the credential, the
-    // language. The cache is already partitioned per component instance.
-    var cacheKey = $"field_definitions_{_clientId}";
+    // The key only has to be unique WITHIN this component: the platform already scopes every
+    // entry to the tenant and to this configured component. It only needs to say what the
+    // value is, and to carry anything that varies inside your own component — a language, say.
+    var cacheKey = "field_definitions";
 
     if (!getFreshData)
     {
@@ -461,9 +462,10 @@ Pitfalls:
 
 - **The cached type must be a `class` with a parameterless constructor.** Cache your own model,
   not a vendor SDK type that happens not to deserialize.
-- **Include everything that varies in the key** — the channel, the tenant, the language. A key
-  that is too coarse serves one administrator's data to another's portal, and two caches in one
-  client that share a key serve each other's values.
+- **You do not scope the key yourself.** The platform already separates entries by tenant and by
+  configured component, so no tenant id, portal id, connector key or configuration id belongs in
+  it. What is still yours is uniqueness *inside* your own component: two different lookups that
+  both key on a bare external id serve each other's values.
 - **Do not cache an empty or failed answer**, and do not cache an access token — tokens live in
   the authorization values, which the platform refreshes.
 - **A cached value outlives a deployment.** If its shape changes, change the key too: see
@@ -932,6 +934,8 @@ private async Task MarkAsAnnouncedAsync(string assetId)
         AnnouncedAt = DateTimeOffset.UtcNow
     });
 
+    // The uuid is scoped to this configured component for you — it only has to be unique
+    // within your own component, so the external system's own id is usually the whole key.
     await _idPersistentStorage
         .AddOrUpdateAsync(uuid: $"announced-{assetId}", data: record, groupUuid: "announcements")
         .ConfigureAwait(false);
@@ -993,6 +997,9 @@ Pitfalls:
 - **Both store strings.** Serialize deliberately, and put a version number in the payload —
   see [changing stored state](#user-content-how-do-i-change-stored-state-without-breaking-a-rollout).
   Never let a deserialization failure throw: log it, return nothing for that record, and move on.
+- **Do not scope the uuid yourself.** The platform separates records by tenant and by configured
+  component, so a tenant id, a portal id or the connector key in the uuid buys nothing and makes
+  the record harder to find. Uniqueness within your own component is what you owe.
 - **Use the group** when a set of records belongs together. It is the only way to get or remove
   them in one call later, and removing the group is how a full re-index starts from clean.
 - **Both services can be `null`.** They come off the injected service provider with `GetService`;
@@ -1011,6 +1018,12 @@ free?" check that only one of them should have passed. A `lock` statement does n
 this: your component is short-lived, there are many instances of it, and they do not share a
 process. `IStorageBackedLock` is a mutual exclusion that holds **across every server running your
 component**.
+
+Like the storage services, the lock is **scoped to your configured component for you**: the uuid
+you pass is only the last part of the real key. Two portals, or two configurations of the same
+data adapter, therefore never block each other — which is almost always what you want, since they
+usually point at different content. When they point at the *same* content and must be serialised
+across configurations, that is not something the uuid can express; raise it with Smint.io.
 
 ```C#
 private readonly IStorageBackedLock _storageBackedLock;
@@ -1118,10 +1131,12 @@ Pitfalls:
   something a caller supplies, and never reuse one.
 - **Lock around the decision *and* the write.** Reading the state before the lock and writing
   after it protects nothing — the check and the change have to be inside.
-- **One uuid per protected resource.** Naming it after the component (`nameof(MyDataAdapter)`)
-  serialises every protected operation of that adapter against each other, which is the safe
-  default; a finer uuid — per folder, per collection — gets more throughput, and is only correct
-  when operations on different ones genuinely cannot interfere.
+- **One uuid per protected resource, and do not scope it yourself.** Naming it after the component
+  (`nameof(MyDataAdapter)`) serialises every protected operation of that configured adapter
+  against each other, which is the safe default; a finer uuid — per folder, per collection — gets
+  more throughput, and is only correct when operations on different ones genuinely cannot
+  interfere. Putting the tenant or the configuration into the uuid adds nothing: it is already
+  there.
 - **The service can be `null`.** Like the other storage services it comes off the service
   provider with `GetService`, so decide deliberately whether "no lock available" means fail or
   proceed — for anything that can double-book, it means fail.
@@ -1698,9 +1713,11 @@ Pitfalls:
   original untouched — unless the result carries the default culture. Rendering once against the
   current culture produces a file name in whichever language happened to be active.
 - **Cache parsed metadata paths against the configuration version.** Parsing a meta-model path is
-  expensive and the result is only valid for one configuration version, so the cache key is your
+  expensive and the result is only valid for one configuration *version*, so the cache key is your
   own prefix plus `Context.ConfigurationVersion` — and give each distinct set of paths its own
-  prefix, or one lookup serves the other's result.
+  prefix, or one lookup serves the other's result. This is not scoping: the platform already
+  separates entries per configured component. The version is there so that an administrator's
+  edit invalidates what you parsed from the previous one.
 - **Both `IEntityModelProvider` and `ICache` can be `null`.** They are resolved with
   `GetService`, not `GetRequiredService`; guard every use.
 - **Sanitize.** The value came from an external system and ends up as a file name on someone's
