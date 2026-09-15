@@ -1,7 +1,7 @@
 Smint.io Portals backend component recipes
 ==========================================
 
-Current version of this document is: 2.2.0 (as of 15th of September, 2026)
+Current version of this document is: 2.2.1 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other backend documents describe *what exists*; this one shows *how it is used*.
@@ -39,7 +39,7 @@ in.
 
 ## How do I validate credentials during setup?
 
-*basic.* `PerformPostConfigurationChecksAsync` is the one moment where a wrong credential reaches
+*Basic.* `PerformPostConfigurationChecksAsync` is the one moment where a wrong credential reaches
 the person who can fix it. Call something cheap against the external system, and turn a failure
 into an `ExternalDependencyException` with a reason that says what went wrong.
 
@@ -113,7 +113,7 @@ A working example: `Connector-HelloWorld/HelloWorldConnector.cs`, and
 
 ## How do I fill a configuration dropdown from the external system?
 
-*basic.* Never ask an administrator to paste an identifier they have to look up. A dynamic
+*Basic.* Never ask an administrator to paste an identifier they have to look up. A dynamic
 allowed values provider turns the field into a dropdown the component fills.
 
 ```C#
@@ -219,7 +219,7 @@ the SharePoint connector's `AllowedValues/` folder for providers that support se
 
 ## How do I make one dropdown depend on another?
 
-*basic.* A site has lists, a list has folders. There are two different situations here, and they
+*Basic.* A site has lists, a list has folders. There are two different situations here, and they
 are solved differently.
 
 **The parent is another configuration property** — site, then the lists *of that site*. The
@@ -302,7 +302,7 @@ list → folder this way.
 
 ## How do I turn the external system's errors into something usable?
 
-*basic.* Without a request failed handler, a rate-limit response and a wrong password look the
+*Basic.* Without a request failed handler, a rate-limit response and a wrong password look the
 same to everyone downstream. The handler is what tells the platform which of the two happened.
 
 ```C#
@@ -363,7 +363,7 @@ A working example: `Connector-HelloWorld/Client/Impl/HelloWorldDefaultRequestFai
 
 ## How do I survive rate limiting?
 
-*basic.* Every call goes through the base client's execute helpers, which apply the backoff and
+*Basic.* Every call goes through the base client's execute helpers, which apply the backoff and
 hand failures to your request failed handler. Getting this wrong is the most common cause of a
 connector that works in testing and collapses under a real portal.
 
@@ -400,7 +400,7 @@ public async Task<CreateResult> CreateAssetAsync(CreateAssetRequest body)
 
 ## How do I cache an expensive lookup?
 
-*basic.* `ICache` is a constructor parameter on the connector, which forwards it into the client.
+*Basic.* `ICache` is a constructor parameter on the connector, which forwards it into the client.
 Use it for anything stable that you would otherwise fetch on every request — a schema, a field
 list, a channel list, a display name.
 
@@ -473,7 +473,7 @@ Pitfalls:
 
 ## How do I report that an asset does not exist?
 
-*basic.* Not with `null`, and not with an empty result — both read as "the source has nothing to
+*Basic.* Not with `null`, and not with an empty result — both read as "the source has nothing to
 say", and the portal cannot tell the visitor anything useful.
 
 ```C#
@@ -503,7 +503,7 @@ them differently.
 
 ## How do I implement a paged search?
 
-*advanced.* A search takes a page and a page size, and reports the paging state back in
+*Advanced.* A search takes a page and a page size, and reports the paging state back in
 `Details`. Page numbers start at 0.
 
 ```C#
@@ -552,7 +552,7 @@ portal renders as filters.
 
 ## How do I page a source that has no random access?
 
-*advanced.* Many systems return a cursor instead of an offset. Put the cursor in
+*Advanced.* Many systems return a cursor instead of an offset. Put the cursor in
 `SearchResultSetId`; the caller passes it back as `SearchAssetsParameters.SearchResultSetUuid`,
 and you continue from there.
 
@@ -596,7 +596,7 @@ A working example: `DataAdapter-Picturepark/Assets/Search/PictureparkAssetsSearc
 
 ## How do I offer downloads?
 
-*advanced.* **Not by implementing `IAssetsDownload`.** That interface is the portal-facing
+*Advanced.* **Not by implementing `IAssetsDownload`.** That interface is the portal-facing
 two-step flow — collect the options across everything the visitor selected, then produce one
 download — and Smint.io owns it, because it spans data adapters, applies the permission gates and
 delivers the file. Your data adapter contributes the *options* for its own assets, and serves the
@@ -689,7 +689,7 @@ Pitfalls:
 
 ## How do I accept uploads?
 
-*advanced.* An upload data adapter is a **second data adapter** on an existing connector, and it
+*Advanced.* An upload data adapter is a **second data adapter** on an existing connector, and it
 implements one method. The settings the upload form obeys — how many files, which types, which
 size limits — come from your configuration class, and the base class publishes them for you.
 
@@ -805,7 +805,7 @@ Pitfalls:
 
 ## How do I feed the Smint.io integration layer?
 
-*advanced.* In indexed mode Smint.io walks your source once, then asks repeatedly for what
+*Advanced.* In indexed mode Smint.io walks your source once, then asks repeatedly for what
 changed. Three methods do it, and the contract is `IAssetsIntegrationLayerApiProvider`.
 
 This is also **where a folder structure is served from**. `IAssetsFolderNavigation` is the
@@ -911,7 +911,7 @@ A working example: `DataAdapter-SharePoint/Assets/IntegrationLayer/SharepointAss
 
 ## How do I keep state the external system cannot hold?
 
-*advanced.* A flag saying that a one-time action already happened, a mapping between the source's
+*Advanced.* A flag saying that a one-time action already happened, a mapping between the source's
 ids and someone else's, a cursor of your own. It does **not** go into a status or comment field
 of the external system, where that system's own processes will overwrite it.
 
@@ -1012,7 +1012,7 @@ Pitfalls:
 
 ## How do I stop two requests from colliding?
 
-*advanced.* Two visitors act on the same objects at the same moment, and both writes reach the
+*Advanced.* Two visitors act on the same objects at the same moment, and both writes reach the
 external system interleaved — one overwrites the other's status, or both pass a "is it still
 free?" check that only one of them should have passed. A `lock` statement does nothing about
 this: your component is short-lived, there are many instances of it, and they do not share a
@@ -1146,7 +1146,7 @@ Pitfalls:
 
 ## How do I resolve a meta-model entity key at runtime?
 
-*advanced.* Entity keys are rewritten to be unique per connector configuration, so the same
+*Advanced.* Entity keys are rewritten to be unique per connector configuration, so the same
 connector configured twice yields two different key sets. Anything that needs to find an entity
 has to resolve it.
 
@@ -1184,7 +1184,7 @@ take a `MetadataAttributeModel` configuration property instead and let the admin
 
 ## How do I publish my own public API interface?
 
-*advanced.* A **custom** component publishes its own interface for one UI component to consume.
+*Advanced.* A **custom** component publishes its own interface for one UI component to consume.
 The interface *is* the data model — there is no meta-model and no `AssetDataObject`.
 
 ```C#
@@ -1258,7 +1258,7 @@ Pitfalls:
 
 ## How do I declare a custom permission?
 
-*advanced.* Three coordinated steps. Missing the third makes the method permanently denied, and
+*Advanced.* Three coordinated steps. Missing the third makes the method permanently denied, and
 nothing reports it.
 
 ```C#
@@ -1293,7 +1293,7 @@ rather than hard-coding it, so the component is not tied to one data adapter.
 
 ## How do I accept a callback from the external system?
 
-*advanced.* A source system that can tell you what changed is worth far more than one you have to
+*Advanced.* A source system that can tell you what changed is worth far more than one you have to
 poll. The contract is `IWebhooksApiProvider`, it has two methods, and the split between them is
 the whole design: **validate cheaply, then queue; never do the work in the callback.**
 
@@ -1440,7 +1440,7 @@ and lower bound when it comes back.
 
 ## How do I add a second data adapter to an existing connector?
 
-*basic.* The cheapest useful thing in this whole SDK: a different view of a system that is
+*Basic.* The cheapest useful thing in this whole SDK: a different view of a system that is
 already integrated — upload, collections, products, a customer-specific variant. The connector is
 reused **unchanged**.
 
@@ -1485,7 +1485,7 @@ users adapter on one connector.
 
 ## How do I write a data processor that renames a download?
 
-*basic.* A data processor hooks into a data adapter's operations without the data adapter
+*Basic.* A data processor hooks into a data adapter's operations without the data adapter
 knowing. Renaming a download is the smallest useful one: a `Post` phase, changing the response.
 
 A processor is four files — startup, configuration, the processor, and a resource file — plus a
@@ -1727,7 +1727,7 @@ Pitfalls:
 
 ## How do I write an identity provider?
 
-*advanced.* Less work than it sounds, because **you never write the login flow**. The platform
+*Advanced.* Less work than it sounds, because **you never write the login flow**. The platform
 does the OpenID Connect or SAML dance; your component's job is to validate the tenant's identity
 server during configuration and write what the platform needs onto the authorization values.
 
@@ -1855,7 +1855,7 @@ Pitfalls:
 
 ## How do I ship a resource?
 
-*basic.* A resource is a typed piece of portal content — a string, an image, a menu item, an
+*Basic.* A resource is a typed piece of portal content — a string, an image, a menu item, an
 email — that an administrator maintains once and components point at. The plain kind has **no
 code at all**: a startup that declares it and a configuration class that *is* the content.
 
@@ -1996,7 +1996,7 @@ Pitfalls:
 
 ## How do I write a task handler?
 
-*advanced.* A task handler is a **state machine** for the task framework — an approval, a
+*Advanced.* A task handler is a **state machine** for the task framework — an approval, a
 request, a review. It does not store the tasks; a data adapter publishing the task management
 interfaces does that, and the handler names it.
 
@@ -2157,7 +2157,7 @@ Pitfalls:
 
 ## How do I build a portal template?
 
-*basic.* Almost always: **build the portal you want, then have Smint.io turn it into a template.**
+*Basic.* Almost always: **build the portal you want, then have Smint.io turn it into a template.**
 A portal template component is then nearly empty — it names a real portal per environment and the
 platform clones it.
 
@@ -2216,7 +2216,7 @@ Pitfalls:
 
 ## How do I change stored state without breaking a rollout?
 
-*advanced.* During a rollout both versions of your component run at once, against the same
+*Advanced.* During a rollout both versions of your component run at once, against the same
 stored state: cache entries, persistent storage records, a continuation token. Whatever you
 store will be read by the *other* version.
 
