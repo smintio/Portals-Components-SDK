@@ -222,7 +222,11 @@ state the environment in the question.
 
 Target `net8.0`. Start `<Version>` at `1.0.0` for a new component, or at whatever the existing
 one is on. Follow the project layout and the partial-class split of the example you copied.
-Name the resource keys `c_<key>_…` for a connector and `da_<key>_…` for a data adapter. Put the
+Name every resource key — in `ConfigurationMessages` and in `MetamodelMessages` alike —
+`<kind>_<component key with hyphens as underscores>_…`, where the kind is `c` connector,
+`da` data adapter, `dp` data processor, `idp` identity provider, `th` task handler,
+`pot` portal template, `r` resource. Every component's resource file is loaded alongside every
+other one and the SDK's own, so the prefix is what stops two components' keys colliding. Put the
 `Private="false" ExcludeAssets="runtime"` flags on the data adapter's project reference to the
 connector. Structure the test project as `Harness/` and `Integration/`, and inherit the shared
 test suite rather than writing the basic tests.

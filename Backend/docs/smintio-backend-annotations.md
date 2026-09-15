@@ -1,7 +1,7 @@
 Smint.io Portals backend component annotations
 =============================================
 
-Current version of this document is: 1.5.0 (as of 15th of September, 2026)
+Current version of this document is: 1.6.0 (as of 15th of September, 2026)
 
 Annotations describe a backend component's configuration to Smint.io Portals: what fields the
 portal administrator sees when configuring your connector, data adapter, data processor,
@@ -27,6 +27,7 @@ annotation, or if you need a new one.
 1. [The property type is the data type](#user-content-the-property-type-is-the-data-type)
 1. [Labels and help text](#user-content-labels-and-help-text)
 1. [Translating with resource files](#user-content-translating-with-resource-files)
+1. [How a resource key has to be named](#user-content-how-a-resource-key-has-to-be-named)
 1. [Three ways to turn a resource key into a localized string](#user-content-three-ways-to-turn-a-resource-key-into-a-localized-string)
 1. [Values and validation](#user-content-values-and-validation)
 1. [Editor hints on string properties](#user-content-editor-hints-on-string-properties)
@@ -233,10 +234,52 @@ for the other meaning.
    public string ServiceUrl { get; set; }
    ```
 
-Resource keys start with a short component-kind prefix followed by your component's `Key`:
-`c_` for a connector, `da_` for a data adapter. So a connector whose key is `myconnector` names
-its access token key `c_myconnector_access_token_display_name`. The prefix keeps keys unique
-once resource files from several components are loaded side by side.
+### How a resource key has to be named
+
+Resource keys are **not free-form**. Every key in `ConfigurationMessages` and in
+`MetamodelMessages` starts with a prefix built from two things — the kind of component, and the
+component's own `Key`:
+
+```
+<component kind>_<your component Key, hyphens replaced by underscores>_<what it labels>
+```
+
+The kind is a fixed abbreviation:
+
+| Component | Prefix |
+|---|---|
+| Connector | `c` |
+| Data adapter | `da` |
+| Data processor | `dp` |
+| Identity provider | `idp` |
+| Task handler | `th` |
+| Portal template | `pot` |
+| Resource | `r` |
+| Page template | `pgt` |
+| UI component | `uic` |
+
+So a connector whose `Key` is `hello-world` names its keys `c_hello_world_name`,
+`c_hello_world_description`, `c_hello_world_setup_documentation_url`, and a data adapter whose
+`Key` is `assets` names its keys `da_assets_name`, `da_assets_description`. Note the **hyphens of
+the component key become underscores** — a data processor keyed `asset-download-change-file-name`
+prefixes its keys `dp_asset_download_change_file_name_`.
+
+The remainder is yours: `_display_name` and `_description` for a configuration property,
+`_form_group_display_name` for a form group, whatever reads well for a meta-model entity.
+
+The prefix is not decoration. The resource files of every registered component are loaded **side
+by side with each other and with the SDK's own**, and a key is looked up by its bare name. Two
+components that both ship a `service_url_display_name` collide, and one silently wins — which is
+exactly what the prefix prevents. It also means:
+
+- **Get the prefix right before you ship.** Renaming a resource key later is safe in itself, but
+  every annotation, every `ResourceLocalizedStringsModel` and every
+  `FullyResolveToLocalizedStringsModel` call that names it has to move with it.
+- **The component `Key` is issued by Smint.io** and cannot change after release, so the prefix
+  cannot either. Ask for the key before you write the resource file, not after.
+- **One prefix per component, not per project.** A project that ships a connector and two data
+  adapters has three prefixes — `c_<connector key>_`, `da_<first adapter key>_`,
+  `da_<second adapter key>_` — normally in three separate resource files, one per component.
 
 There is a second resource file with the same mechanics, `MetamodelMessages`, pointed at by
 `IConnectorStartup.MetamodelMessages` (and `IDataAdapterStartup.MetamodelMessages`). It carries
