@@ -69,12 +69,18 @@ Do not infer the conventions from a single file — they are written down.
 - **The meta-model is a filter.** A value whose property was never declared is dropped on
   conversion, silently. If data is missing in the portal, check the declaration before debugging
   the conversion.
-- **The meta-model is a snapshot** taken when the connector configuration is set up — not per
-  request. A schema change in the external system does not appear until it is set up again.
+- **The meta-model refreshes on its own** — when the configuration is set up and regularly
+  afterwards, as well as per admin action. Ordinary schema evolution in the external system is picked
+  up automatically, and the re-indexing it implies is scheduled for you. Do not tell anyone they
+  have to set the connector configuration up again for a new field to appear.
 - **Never hard-code a meta-model entity key.** Keys are rewritten to be unique per connector
   configuration, so the same connector configured twice yields two different key sets.
-- **Make the meta-model identifier vary with the configuration**, or two differently scoped
-  configurations share one cached schema.
+- **The meta-model identifier is the index identity, and changing it triggers a full re-index.**
+  Keep it stable while the source is the same — never derive it from a timestamp, a token, a
+  build number or the connector's version — and make it differ when the configuration points at
+  genuinely different content. Changing it deliberately is the lever for "rebuild everything",
+  correct when a meta-model change makes indexed data uninterpretable; it is expensive, so it is
+  agreed with Smint.io on a production source and stated in the release notes, never slipped in.
 - **Renaming a configuration property orphans every saved configuration.** The C# property name
   *is* the persisted name, and there is no annotation that decouples them. Start with few
   properties: you can add, you cannot remove.

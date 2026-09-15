@@ -1,7 +1,7 @@
 The Smint.io Portals connector meta-model
 =========================================
 
-Current version of this document is: 1.1.0 (as of 15th of September, 2026)
+Current version of this document is: 2.0.0 (as of 15th of September, 2026)
 
 How a connector describes the external system's own schema, so that Smint.io Portals can interpret
 the data your data adapter delivers.
@@ -27,6 +27,7 @@ against a real system, see the
 1. [Translating a meta-model](#user-content-translating-a-meta-model)
 1. [The converter — where the meta-model does its work](#user-content-the-converter--where-the-meta-model-does-its-work)
 1. [Lifecycle: when your meta-model is built, and what happens to it](#user-content-lifecycle-when-your-meta-model-is-built-and-what-happens-to-it)
+1. [The identifier, and forcing a full re-index](#user-content-the-identifier-and-forcing-a-full-re-index)
 1. [Things that are easy to get wrong](#user-content-things-that-are-easy-to-get-wrong)
 
 ## Why there is a meta-model at all
@@ -408,22 +409,72 @@ the cases it does not special-case.
 
 ## Lifecycle: when your meta-model is built, and what happens to it
 
-`GetConnectorMetamodelAsync` is called **when a connector configuration is set up or set up again**
-— not per request, and not per search. What happens to the result, in order:
+`GetConnectorMetamodelAsync` is called **when a connector configuration is set up, and regularly
+thereafter** — but not per request and not per search. What happens to the result, in order:
 
 1. it passes through any data processors registered for this hook, which may add or alter entities;
 2. every `ResourceLocalizedStringsModel` is resolved into real localized strings and cached;
 3. every entity key is rewritten to be unique to this connector configuration;
-4. the result is persisted on the connector configuration record.
+4. the result is persisted on the connector configuration record;
+5. it is compared with the previously stored meta-model, and whatever follows from the difference
+   — re-indexing an indexed source, for instance — is scheduled automatically.
 
-Two things follow, and they surprise people:
+Three things follow:
 
-- **Your meta-model is a snapshot.** A schema change in the external system — a new column, a
-  renamed field, a new enum value — does not appear in Smint.io until the connector configuration is
-  set up again. If a customer adds a field and cannot see it, that is the first thing to check.
-- **Building it can be expensive, and that is acceptable.** Because it happens at configuration
-  time, a builder is allowed to make several calls to the external system to read its schema. Do not
-  contort the builder to be fast; do make it correct.
+- **Your meta-model keeps up with the external system.** A new column, a renamed field or a new
+  enum value is picked up by a later refresh; nobody has to set the connector configuration up
+  again for an ordinary schema change to arrive.
+- **You do not have to schedule the consequences.** A meaningful difference between the new
+  meta-model and the stored one is detected, and the index work it implies is triggered for you.
+  Write the builder so that it describes the current schema correctly, and let the platform work
+  out what that costs.
+- **Building it can be expensive, and that is acceptable.** Because it does not happen per
+  request, a builder is allowed to make several calls to the external system to read its schema.
+  Do not contort the builder to be fast; do make it correct.
+
+The one thing that is **not** automatic is the case where the schema has changed so fundamentally
+that everything already indexed is wrong rather than merely incomplete. That is what the
+identifier is for — see below.
+
+## The identifier, and forcing a full re-index
+
+`ConnectorMetamodel`'s first constructor argument is an identifier, and it is more consequential
+than it looks. **It identifies the indexed content**, and it is stored alongside the data adapter
+configuration.
+
+```C#
+_metamodel = new ConnectorMetamodel(
+    identifier,
+    isRandomAccessSupported: true,
+    isFullTextSearchProposalsSupported: true,
+    isFolderNavigationSupported: false);
+```
+
+Two rules, and they pull in opposite directions:
+
+**Keep it stable while the source is the same.** Ordinary schema evolution — adding a field,
+renaming a label, adding an enum value — must *not* change it. Those changes are handled
+incrementally on their own. An identifier that churns (because it embeds a timestamp, a token, a
+build number or your connector's version) forces needless re-indexing of the entire source every
+time it changes.
+
+**Change it when the identity of the content changes.** If the same connector configuration now
+points somewhere genuinely different — another tenant, another channel, another saved search,
+another folder scope — then what is indexed no longer describes the same thing, and a fresh index
+is the correct answer. That is why shipped connectors compose the identifier from the connector
+key plus the configured values that determine *what* is being read:
+
+```C#
+var identifier = $"{MyConnectorStartup.MyConnector}-{_configuration.ClientId}-{_configuration.Channel}";
+```
+
+**Changing the identifier triggers a full re-index.** For an indexed source that is the deliberate
+lever for "throw everything away and rebuild", and it is the right move when a change to your
+meta-model makes previously indexed data uninterpretable rather than just out of date.
+
+It is also expensive. A full re-index of a large customer source takes real time and real
+capacity, so on a production source, agree it with Smint.io before you ship a version that changes
+the identifier — say plainly in the release notes that it will trigger one.
 
 ## Things that are easy to get wrong
 
@@ -438,6 +489,10 @@ Two things follow, and they surprise people:
   and one where nothing is found.
 - **`Relationship` needs the converter half too**, or it silently produces unusable IDs.
 - **`FormItemModel.DataType` is a `ValueTypeEnum`**, not a metamodel `DataType`.
+- **Do not let the identifier churn.** It identifies the indexed content, so a value that changes
+  on its own — a timestamp, a token, your connector's version — forces a full re-index every time.
+- **Do change the identifier when the content identity changes**, or when a meta-model change
+  makes what is already indexed uninterpretable. That is what a full re-index is for.
 - **Your meta-model is the filter.** If data is missing in the portal, check the declaration before
   you debug the conversion — an undeclared property is dropped without a word.
 

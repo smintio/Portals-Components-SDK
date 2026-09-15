@@ -1,7 +1,7 @@
 The Smint.io Portals connector contract
 =======================================
 
-Current version of this document is: 1.1.0 (as of 15th of September, 2026)
+Current version of this document is: 1.2.0 (as of 15th of September, 2026)
 
 Every member a connector declares, the order in which the platform calls them, the
 authentication flows you can start from, and how the API client underneath is built.
@@ -133,10 +133,12 @@ Afterwards, in steady state: `RefreshAuthorizationValuesAsync` before the token 
 `WarmCachesAsync` on restart and every fifteen minutes, and
 `ConfigureServicesForDataAdapter` each time a data adapter instance is built.
 
-**`GetConnectorMetamodelAsync` runs at configuration time, not per request.** Which means two
-things: your meta-model is a snapshot that only refreshes when the configuration is set up
-again, and building it is allowed to be slow. Read the external system's schema properly rather
-than cutting corners for speed.
+**`GetConnectorMetamodelAsync` runs when the configuration is set up and regularly thereafter —
+not per request.** So your meta-model keeps up with the external system on its own: a new field
+or a renamed label is picked up by a later refresh, and whatever that implies for an indexed
+source is scheduled automatically. And because it is not on the request path, building it is
+allowed to be slow. Read the external system's schema properly rather than cutting corners for
+speed.
 
 ## Choosing an authentication flow
 
@@ -310,18 +312,33 @@ dependency injection failure at runtime with nothing visible at compile time.
 
 ## The meta-model identifier
 
-`ConnectorMetamodel`'s first constructor argument is an identifier, and it is the cache key for
-the whole meta-model. **It must vary with everything that changes the schema.**
+`ConnectorMetamodel`'s first constructor argument is an identifier, and it is more consequential
+than it looks. **It identifies the indexed content, and changing it triggers a full re-index.**
 
 ```C#
-var identifier = $"{MyConnectorStartup.MyConnector}-{_configuration.ClientId}";
+var identifier = $"{MyConnectorStartup.MyConnector}-{_configuration.ClientId}-{_configuration.Channel}";
 ```
 
-The connector key alone is not enough. Two configurations of the same connector pointing at
-different tenants, different channels or different folder scopes have different schemas, and an
-identifier that does not distinguish them makes them share one cached meta-model. Include every
-configured value that changes what the schema looks like — the tenant, the channel, the saved
-search, a hash of the selected folders.
+Ordinary schema evolution does **not** go through it. A new field, a renamed label, a new enum
+value: the meta-model is refreshed regularly, the difference is detected, and the index work it
+implies happens on its own. The identifier is for the case that cannot be handled incrementally —
+when what is already indexed is *wrong*, not merely incomplete.
+
+So it has to satisfy two rules at once:
+
+- **Stable while the source is the same.** Never derive it from anything that moves on its own —
+  a timestamp, a token, a build number, your connector's version. An identifier that churns
+  re-indexes the customer's entire source every time it changes, for nothing.
+- **Different when the content is different.** The connector key alone is not enough: two
+  configurations of the same connector pointing at different tenants, channels, saved searches or
+  folder scopes are indexing different content and should not share an index identity. Compose it
+  from the connector key plus the configured values that decide *what* is read.
+
+**Changing it deliberately is the lever for "rebuild everything from scratch"** — the right move
+when a meta-model change makes previously indexed data uninterpretable. It is also expensive: a
+full re-index of a large customer source costs real time and capacity, so agree it with Smint.io
+before shipping a version that changes the identifier on a production source, and say so plainly
+in the release notes.
 
 ## Project layout
 
@@ -373,8 +390,10 @@ they paste an id.
   functionally wrong is the single most common support case, and this is the one moment where it
   can be caught in front of the person who can fix it.
 - **Whatever you correct in a form field values model is not revalidated.** Write valid data.
-- **Make the meta-model identifier vary with the configuration**, or two differently scoped
-  configurations will share a cached schema.
+- **The meta-model identifier is the index identity, not a cache key.** Keep it stable while the
+  source is the same — never derive it from a timestamp, a token or a version — and make it
+  differ when the configuration points at different content. Changing it triggers a full
+  re-index.
 - **Set `MetamodelMessages` when you have translatable meta-model labels.** Leaving it `null`
   makes those translations fail silently — which looks exactly like a translation you forgot to
   write.

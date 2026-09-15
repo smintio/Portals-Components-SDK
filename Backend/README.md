@@ -1,7 +1,7 @@
 Developing Smint.io Portals backend components
 ==============================================
 
-Current version of this document is: 3.1.0 (as of 15th of September, 2026)
+Current version of this document is: 3.2.0 (as of 15th of September, 2026)
 
 This is the guide to building the server-side half of Smint.io Portals: connectors, data
 adapters, data processors, task handlers, portal templates, resources and identity providers.
@@ -300,14 +300,20 @@ one per type. Entities and their properties are fully translatable.
 
 You build one in an `IMetamodelBuilder` and return it from `GetConnectorMetamodelAsync`.
 
-Four things about it are worth knowing before you start, because each of them produces a portal
-that renders nothing rather than an error message:
+Five things about it are worth knowing before you start:
 
 - **The meta-model is a filter, not just a description.** A value whose property was never
   declared is dropped on conversion. If a field does not appear in the portal, check the
   declaration before you debug the conversion.
-- **It is a snapshot, taken when the connector configuration is set up** — not per request. A
-  schema change in the external system does not appear until the configuration is set up again.
+- **It keeps up with the external system on its own.** `GetConnectorMetamodelAsync` runs when the
+  connector configuration is set up and regularly afterwards, or on admin action. A new field, a
+  renamed label or a new enum value is picked up by a later refresh, and whatever that implies for
+  an indexed source, such as re-indexing, is scheduled automatically. Nobody has to set the
+  configuration up again for an ordinary schema change to arrive.
+- **The meta-model identifier is the index identity.** Ordinary schema evolution does not go
+  through it, and it must not churn. But **changing it triggers a full re-index**, which is
+  exactly what you want when a change makes everything already indexed uninterpretable — and it
+  is expensive, so it is agreed rather than slipped in.
 - **Your entity keys are rewritten** to be unique per connector configuration, so the same
   connector configured twice yields two different key sets. Never hard-code an entity key.
 - **Every entity automatically gets three properties**, an id and a list and a detail display
@@ -316,7 +322,8 @@ that renders nothing rather than an error message:
 **The full reference is [the connector meta-model](docs/smintio-connector-metamodel.md)**: the
 data types, the `EntityModel` and `PropertyModel` members, entity types and inheritance, enum
 entities, full-text indexing, semantic types, form groups, translation, the converter that
-applies the meta-model to a source payload, and the lifecycle in detail.
+applies the meta-model to a source payload, the lifecycle, and
+[the identifier and forcing a full re-index](docs/smintio-connector-metamodel.md#user-content-the-identifier-and-forcing-a-full-re-index).
 
 For a worked example against a real system, read the
 [SharePoint meta-model walkthrough](Connectors/Connector-SharePoint/README.md#meta-model-structure).
@@ -572,7 +579,9 @@ suite, what the review looks at, and versioning — is in
 *Additionally, for a productized component:*
 
 - [ ] `MetamodelMessages` declared if the component ships translatable meta-model labels
-- [ ] the meta-model identifier varies with everything that changes the schema
+- [ ] the meta-model identifier distinguishes differently scoped configurations, derives from
+      nothing that moves on its own, and — if this version changes it — you have said so, because
+      it triggers a full re-index
 - [ ] every property emitted into `rawData` is declared in the meta-model — anything else is
       dropped
 - [ ] both feature-support methods answer truthfully, and unsupported methods throw

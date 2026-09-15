@@ -1,7 +1,7 @@
 Building, testing and delivering a backend component
 ===================================================
 
-Current version of this document is: 2.0.0 (as of 15th of September, 2026)
+Current version of this document is: 2.1.0 (as of 15th of September, 2026)
 
 How a Smint.io Portals backend component gets from a C# project to something running in a
 portal: the project setup, the test drivers that let you run a connector and a data adapter
@@ -379,9 +379,13 @@ to `PublicApiInterfaces` are all safe.
 
 Two things to say out loud when you hand over a new version:
 
-- **A connector meta-model is a snapshot taken when the connector configuration is set up.** A
-  version that changes the meta-model changes nothing for existing configurations until they are
-  set up again.
+- **Whether it changes the meta-model identifier.** An ordinary meta-model change reaches existing
+  configurations on its own, at the next refresh, and the platform schedules whatever re-indexing
+  it implies. **Changing the identifier is different: it triggers a full re-index** of every
+  configuration using the connector. That is the right answer when a change makes what is already
+  indexed uninterpretable, and it is expensive on a large customer source — so it is agreed in
+  advance and stated in the release notes, never discovered afterwards. See
+  [the identifier, and forcing a full re-index](smintio-connector-metamodel.md#user-content-the-identifier-and-forcing-a-full-re-index).
 - **Anything your component keeps outside itself** — a cache entry, a stored cursor, a file —
   may be read by both the old and the new version around a rollout. Version it, or make it
   tolerant.
@@ -408,7 +412,9 @@ Two things to say out loud when you hand over a new version:
 *Additionally, for a productized component:*
 
 - [ ] `MetamodelMessages` is declared if you build a meta-model with translatable labels
-- [ ] the meta-model identifier varies with the configuration
+- [ ] the meta-model identifier distinguishes differently scoped configurations and derives from
+      nothing that moves on its own — and if this version changes it, the full re-index that
+      causes is flagged in the hand-over
 - [ ] both feature-support methods answer truthfully
 - [ ] `PermissionUuids` set on every asset and folder
 - [ ] the inherited shared test suite runs green
@@ -428,8 +434,9 @@ Two things to say out loud when you hand over a new version:
   apply, and the noise hides the failures that do matter.
 - **Skipping the shared test suite for a productized component.** It asserts things that are easy
   to get wrong and hard to notice, and inheriting it costs a class.
-- **Expecting a meta-model change to reach existing configurations.** It does not, until they are
-  set up again.
+- **Changing the meta-model identifier without saying so.** It forces a full re-index of every
+  configuration using the connector. Deriving it from anything that moves on its own — a
+  timestamp, a token, your connector's version — does that on every release.
 - **Treating a configuration property rename as cosmetic.** It is a breaking change, silently.
 
 ## Questions
