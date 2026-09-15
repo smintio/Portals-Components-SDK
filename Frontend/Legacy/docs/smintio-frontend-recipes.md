@@ -1,7 +1,7 @@
 Smint.io Portals frontend component recipes
 ===========================================
 
-Current version of this document is: 1.2.0 (as of 15th of September, 2026)
+Current version of this document is: 2.0.0 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other frontend documents describe *what exists*; this one shows *how it is used*.
@@ -38,6 +38,14 @@ Two imports appear throughout:
 1. [How do I write a component for the asset details page?](#user-content-how-do-i-write-a-component-for-the-asset-details-page) — advanced
 1. [How do I consume my own data adapter interface?](#user-content-how-do-i-consume-my-own-data-adapter-interface) — advanced
 1. [How do I wrap other components in a section?](#user-content-how-do-i-wrap-other-components-in-a-section) — advanced
+1. [How do I let visitors upload files?](#user-content-how-do-i-let-visitors-upload-files) — advanced
+1. [How do I work with collections?](#user-content-how-do-i-work-with-collections) — advanced
+1. [How do I submit a request or an approval?](#user-content-how-do-i-submit-a-request-or-an-approval) — advanced
+1. [How do I build a search form with facets?](#user-content-how-do-i-build-a-search-form-with-facets) — advanced
+1. [How do I ship and render an image or a video?](#user-content-how-do-i-ship-and-render-an-image-or-a-video) — basic
+1. [How do I read the payload of a dialog page?](#user-content-how-do-i-read-the-payload-of-a-dialog-page) — basic
+1. [How do I track an event, and respect the visitor's consent?](#user-content-how-do-i-track-an-event-and-respect-the-visitors-consent) — advanced
+1. [How do I render an asset preview?](#user-content-how-do-i-render-an-asset-preview) — advanced
 1. [How do I react to navigation and to live editor changes?](#user-content-how-do-i-react-to-navigation-and-to-live-editor-changes) — advanced
 1. [How do I behave properly on a phone?](#user-content-how-do-i-behave-properly-on-a-phone) — basic
 
@@ -1311,6 +1319,588 @@ Pitfalls:
 - **Sections nest.** The runtime matches each section start to its own section end, so do not
   assume your section is the outermost one and do not build your own end marker.
 - **A section is still a component**: it fills its box and adds no white space of its own.
+
+## How do I let visitors upload files?
+
+*advanced.* Uploading is two halves that meet in a form: the **files** go to Smint.io's file
+storage one by one and come back as identifiers, and the **request** — the metadata, the
+requester, the approval — is a task carrying those identifiers. Your component drives the first
+half and hands the identifiers to the second.
+
+```typescript
+@Implements("IAssetsUpload")
+@ComponentProperty({ name: "assetsUpload" })
+@FormGroup("my-upload")
+public readonly assetsUpload?: IAssetsUpload;
+
+public uploadSettings: IGetAssetUploadSettingsResult | null = null;
+
+public async created(): Promise<void> {
+    if (!this.assetsUpload) {
+        return;
+    }
+
+    // The limits the visitor's browser should enforce before anything is sent.
+    this.uploadSettings = await this.assetsUpload.getAssetUploadSettingsAsync({});
+}
+```
+
+The settings carry `maxFiles`, `contentTypes`, `allowedFormats`, a general `maxFileSize` and one
+per content type, the image dimension bounds, and the id of a custom metadata form. **Check them
+in the browser before uploading** — the server checks again, but a file rejected after a
+two-minute upload is a bad experience.
+
+The upload itself goes through the portal's file service, one file at a time:
+
+```typescript
+public async uploadOne(file: File): Promise<string | undefined> {
+    const upload = this.portalsContext?.services?.files?.upload;
+
+    if (!upload) {
+        return undefined;
+    }
+
+    try {
+        const result = await upload.uploadFileAsync(
+            file,
+            // A progress monitor: the platform calls this as the bytes go out.
+            { reportProgressAsync: async (percentage: number) => { this.progress = percentage; } },
+            // A cancel callback: return true and the upload is abandoned.
+            { cancel: async () => this.cancelled }
+        );
+
+        return result.fileUuid;
+    } catch (error) {
+        // One file failing must not stop the queue — mark it and carry on.
+        this.errors.push({ fileName: file.name, message: this.uploadFailedText });
+
+        return undefined;
+    }
+}
+
+public destroyed(): void {
+    // An in-flight upload otherwise outlives the component.
+    this.cancelled = true;
+}
+```
+
+Collect the identifiers as they arrive and submit them with the task:
+
+```typescript
+public fileUuidsFormFieldValues: IFormFieldValuesModel = {
+    values: [{ id: "FileUuids", dataType: ValueType.StringArray, subComponentFormFieldValues: {}, stringArrayValue: [] }]
+};
+
+public onUploaded(fileUuid: string): void {
+    this.fileUuidsFormFieldValues.values![0].stringArrayValue!.push(fileUuid);
+}
+```
+
+Pitfalls:
+
+- **Upload strictly one at a time.** Several at once compete for bandwidth, make progress
+  meaningless, and multiply the failure modes.
+- **The third argument is a cancel *callback*, not a token.** The platform asks it repeatedly;
+  return `true` to stop.
+- **Set the cancel flag when the component is destroyed**, or a visitor who navigates away keeps
+  uploading.
+- **A file is not an asset yet.** The identifiers are meaningless until the task that carries them
+  is submitted and approved, so keep the submit button disabled until at least one file is in.
+- **Anonymous visitors need a captcha.** The portals context carries the site key; use it when the
+  visitor is not signed in.
+
+## How do I work with collections?
+
+*advanced.* Collections are the visitor's own groupings. Everything goes through the portal's
+collection services, and **every change is announced twice** — once to your parent slot, once on
+the event bus for components elsewhere on the page.
+
+```typescript
+public async searchCollections(): Promise<void> {
+    const search = this.portalsContext?.services?.collections?.search;
+
+    if (!search) {
+        return;
+    }
+
+    const result = await search.searchCollectionsAsync({
+        queryString: this.queryString,
+        page: this.page,           // collections page from 1, not 0
+        pageSize: 16,
+        sortBy: "createdAt",
+        sortDirection: SortDirection.Desc,
+    });
+
+    this.collections = result?.collections ?? [];
+
+    // maxPages is not always populated — compute the fallback.
+    this.maxPages = result?.details?.maxPages
+        ?? Math.ceil((result?.details?.totalResults ?? 1) / 16);
+}
+
+public async createCollection(name: string): Promise<void> {
+    const result = await this.portalsContext!.services!.collections!.create!
+        .createCollectionAsync({ definition: { name } }, {});
+
+    this.$emit("collection-created", result.collection);
+    this.eventBus.emitCollectionCreated(result.collection!);
+}
+
+public async addToCollection(collectionId: string, assetIds: IAssetIdentifier[]): Promise<void> {
+    await this.portalsContext!.services!.collectionsAndAssets!.modify!
+        .addAssetsToCollectionAsync({ collectionId, assetIds }, {});
+
+    this.$emit("assets-collected", { collectionId, assetIds: assetIds.map((a) => a.id) });
+    this.eventBus.emitAssetsCollected(collectionId, assetIds.map((a) => a.id));
+}
+```
+
+**The "collect without asking" path.** The portals context remembers which collection the visitor
+last worked with; when there is one, add straight to it, and only open the collection chooser when
+there is not:
+
+```typescript
+public onCollectClicked(asset: IAssetDataObject): void {
+    const assetIds = [{ id: asset.smintIoId! }];
+    const currentCollectionId = this.portalsContext?.storage?.currentSelectedCollectionId;
+
+    if (!currentCollectionId) {
+        this.openRememberDialog(assetIds);      // from SRememberProps
+
+        return;
+    }
+
+    this.addAssetsToCollection(currentCollectionId, assetIds);
+}
+```
+
+Pitfalls:
+
+- **Announce every change on both channels.** A parent slot listens to your event; a quick-view
+  panel in another slot listens to the bus. Emitting only one leaves half the page stale.
+- **The mutation methods take a second, empty options argument.** It is positional, and leaving it
+  out is a runtime error, not a compile error.
+- **`currentSelectedCollectionId` is read-only and not reactive.** Read it at the moment you need
+  it; do not cache it in a computed property.
+- **Replace array items with `$set`.** Assigning by index does not trigger a re-render.
+- **Collections page from 1.** Asset searches page from 0. They really are different.
+
+## How do I submit a request or an approval?
+
+*advanced.* Access requests, download requests, upload reviews — all of them are **tasks**, and a
+component does not build one by hand. It points at a task management data adapter, names the task
+handler, and renders the shared task action component, which builds the form from the handler's
+own definition.
+
+```typescript
+@Implements("ITaskManagement")
+@ComponentProperty({ name: "taskManagement" })
+@FormGroup("my-request")
+public readonly taskManagement!: ITaskManagement;
+
+/// The list of handlers comes from the data source above — note the first argument is the
+/// name of another property, not a global service.
+@ComponentProperty({ name: "requestTaskHandlerId" })
+@DynamicAllowedValuesProvider("taskManagement", "RequestDownloadTaskHandlerAllowedValuesProvider")
+@FormGroup("my-request")
+public readonly requestTaskHandlerId!: string;
+
+/// An optional portal-defined metadata form to collect alongside the request.
+@ComponentProperty({ name: "requestCustomFormId" })
+@DynamicAllowedValuesProvider(PortalsGlobalServices.PortalsContext.toString(), "CustomFormAllowedValuesProvider")
+@FormItemVisibility(FormItemVisibilityEnum.Expert)
+@FormGroup("my-request")
+public readonly requestCustomFormId!: string;
+```
+
+```vue
+<s-task-action-descriptor
+    :task-management="taskManagement"
+    :task-handler-id="requestTaskHandlerId"
+    :custom-form-id="requestCustomFormId"
+    :task-id="downloadId"
+    :pre-set-form-values="preSetFormValues"
+    :button-cancel-text="buttonCancelText"
+    @click:cancel="closeDialog"
+/>
+```
+
+Values your component already knows are handed in as pre-set form values rather than asked for
+again:
+
+```typescript
+public get preSetFormValues(): IFormFieldValuesModel {
+    return {
+        values: [{
+            id: "DownloadUuid",
+            dataType: ValueType.String,
+            subComponentFormFieldValues: {},
+            stringValue: this.dialogData?.urlData?.downloadUuid as string,
+        }],
+    };
+}
+```
+
+Pitfalls:
+
+- **The handler id is configuration, never a constant.** Different portals have different task
+  handlers configured; a hard-coded id works in your tenant only.
+- **Do not build the form yourself.** The fields come from the task handler's definition, so a
+  hand-built form breaks the moment the handler changes.
+- **The form field id has to match what the handler reads.** It is a string contract on both
+  sides, and a typo simply yields an empty value at approval time.
+
+## How do I build a search form with facets?
+
+*advanced.* The page hands your component the **filter definition** — the groups, the items, their
+data types and current values — and expects one event back when the visitor changes something.
+Your component renders the definition; it does not invent filters.
+
+```typescript
+@Prop() public readonly formGroupsDefinition!: IFormGroupsDefinitionModel | undefined;
+@Prop({ default: false }) public readonly initialLoading!: boolean;
+@Prop() public readonly isSearching?: boolean;
+@Prop({ default: "" }) public readonly searchUuid!: string;
+@Prop({ default: null }) public readonly errors!: IErrorModel[] | null;
+
+public get formGroupDefinitions(): IFormGroupDefinitionModel[] {
+    return this.formGroupsDefinition?.formGroupDefinitions ?? [];
+}
+
+public onSearchChanged(newSearch?: IFormFieldValuesModel): void {
+    this.$emit("search-changed", newSearch);
+}
+```
+
+**The one rule that decides whether this works**: a form field value does not have a generic
+`value` — the property to read and write is derived from the item's data type, in camel case with
+`Value` appended. `string` becomes `stringValue`, `string_array` becomes `stringArrayValue`,
+`date_time` becomes `dateTimeValue`:
+
+```typescript
+private getValueKey(dataType: ValueType): string {
+    const camelCased = dataType.replace(/([-_][a-z])/g, (group) =>
+        group.toUpperCase().replace("-", "").replace("_", ""));
+
+    return `${camelCased}Value`;
+}
+
+public buildSearch(changed: IFormFieldValueModel): IFormFieldValuesModel {
+    const values: IFormFieldValueModel[] = [];
+
+    for (const group of this.formGroupDefinitions) {
+        for (const item of group.formItemDefinitions ?? []) {
+            const value = { id: item.id, dataType: item.dataType } as IFormFieldValueModel;
+            const valueKey = this.getValueKey(item.dataType!);
+
+            // The changed item takes the new value; every other item keeps its current one.
+            const source = item.id === changed.id ? changed : item.currentValue;
+
+            if (source?.[valueKey] !== undefined && source?.[valueKey] !== null) {
+                this.$set(value, valueKey, source[valueKey]);
+                values.push(value);
+            }
+        }
+    }
+
+    return { values };
+}
+```
+
+Pitfalls:
+
+- **Send the whole filter state, not the delta.** The page replaces its filters with what you
+  emit, so an event carrying only the changed facet clears everything else.
+- **Key the rendered filter on the search id.** When a new search starts, the definition is
+  replaced; without a key on `searchUuid` Vue reuses the old inputs and the visitor sees stale
+  selections.
+- **`errors` is a partial failure, not a total one.** Some facets may be unavailable while the
+  rest work; show them rather than blanking the form.
+- **Debounce the change event.** A visitor ticking four boxes should cause one search, not four.
+
+## How do I ship and render an image or a video?
+
+*basic.* Text you ship as an **embedded** resource in `resources/definition.ts`. Images, videos,
+audio and documents are **file** resources: they live in your package's resources folder and are
+loaded from there.
+
+```typescript
+// resources/definition.ts
+export default (builder: IResourceDefinitionBuilder): Promise<void> =>
+    builder.buildUIComponentResourceDefinition(async (uiComponentBuilder) => {
+        uiComponentBuilder.setDefaultSettings(uiComponentBuilder.createDefaultSettings());
+
+        await uiComponentBuilder.defineResources(async (resourceBuilder) => {
+            await resourceBuilder.loadFileResources(async (fileResources) => {
+                await fileResources.verifyLoadedResources(async (resource) => resource);
+            });
+        });
+    });
+```
+
+The property is typed by what it holds, and gets the matching picker:
+
+```typescript
+@DisplayName("en", "Image to display", true)
+@Implements("IImage")
+@ComponentProperty({ name: "image" })
+@DynamicAllowedValuesProvider(
+    PortalsGlobalServices.PortalsContext.toString(),
+    "ImageResourceAllowedValuesProvider"
+)
+@FormGroup(SImageProps.FormGroupId)
+public readonly image!: IImage;
+```
+
+Rendering means picking the visitor's language out of the resource and reading a URL off it:
+
+```typescript
+public imageSrc = "";
+
+@Watch("image", { deep: true, immediate: true })
+public setImageSrc(): void {
+    if (!this.image) {
+        return;
+    }
+
+    // Always pass the localized resource assets, never the resource itself.
+    const localized = this.translator.localizeResourceAsset(this.image.localizedResourceAssets);
+
+    this.imageSrc = localized?.highResUrl ?? "";
+}
+```
+
+| Field on the localized resource | Use |
+|---|---|
+| `highResUrl` | the image itself, and the video source |
+| `largeThumbnailUrl`, `smallThumbnailUrl` | previews, and a video poster when none was configured |
+| `playbackLargeUrl`, `playbackSmallUrl` | playback renditions |
+| `originalWidth`, `originalHeight` | aspect ratio, before the file has loaded |
+| the `is…Available` flags | whether the rendition exists at all |
+
+Pitfalls:
+
+- **Watch deeply and immediately.** A resource is a deep object that arrives after the first
+  render; a plain computed property misses the update.
+- **`localizeResourceAsset` returns `undefined`** when the resource has nothing for this language.
+  Fall back rather than rendering an empty `src`.
+- **Offer a placeholder.** A component configured with no image yet should show something in the
+  page composer, not collapse.
+- **Pair the type with its provider.** `IImage` with the image provider, `IVideo` with the video
+  one — mismatched, the administrator gets a picker that offers the wrong resources.
+
+## How do I read the payload of a dialog page?
+
+*basic.* A dialog page has no URL of its own, so everything a full page would read from the query
+string arrives in a **prop**. Its presence is also how you know you are in a dialog at all.
+
+```typescript
+@Prop()
+public readonly dialogData!: IPageDialogData;
+
+public get isDialog(): boolean {
+    return !!this.dialogData;
+}
+
+public get downloadId(): string {
+    // What would have been $route.query.downloadUuid on a full page.
+    return this.dialogData?.urlData?.downloadUuid as string;
+}
+
+public closeDialog(): void {
+    this.eventBus.emitClosePageDialog();
+}
+```
+
+```vue
+<template>
+    <v-card v-if="isDialog">
+        <!-- dialog chrome: title bar, close button -->
+        <slot />
+    </v-card>
+
+    <div v-else>
+        <slot />
+    </div>
+</template>
+```
+
+`dialogData` carries `url` (what opened the dialog), `urlData` (the query parameters), `anyData`
+(a free-form payload when something opened the dialog programmatically), and
+`setMaxDialogWidth()` so a component can size its own host.
+
+Pitfalls:
+
+- **Everything in `urlData` is a string or an array of strings.** Cast deliberately; there is no
+  typing to protect you.
+- **Close through the event bus.** The payload also exposes a close method, but the bus is what
+  every shipped form uses, and it works from anywhere in the dialog's component tree.
+- **The same component often has to work both ways.** A form used as a dialog *and* as a page
+  should switch its wrapper on `isDialog` rather than being written twice.
+
+## How do I track an event, and respect the visitor's consent?
+
+*advanced.* Analytics are optional at runtime — a visitor who declined tracking has no analytics
+provider — so the injection is optional and every call is guarded:
+
+```typescript
+@PortalsInject(PortalsGlobalServices.AnalyticsProvider)
+public readonly analyticsProvider?: IAnalyticsProvider;
+
+public onPlaybackStarted(): void {
+    if (this.trackedPlay) {
+        return;           // once per asset, not once per render
+    }
+
+    this.trackedPlay = true;
+
+    this.analyticsProvider?.sendAnalyticsEvent("Video", "Playback started", this.asset.smintIoId);
+}
+
+@Watch("asset", { deep: true, immediate: true })
+public resetTracking(): void {
+    this.trackedPlay = false;
+    this.tracked25Percent = false;
+    // …
+}
+```
+
+`sendAnalyticsEvent(category, action, label?, value?)` is the whole surface: a category, what
+happened, usually the asset id, and an optional number for a milestone.
+
+**Consent** is its own service, and the important thing about it is that **it is not reactive**.
+Register for the two events and copy what you need into your own state:
+
+```typescript
+@PortalsInject(PortalsGlobalServices.ConsentProvider)
+public readonly consentProvider!: IConsentProvider;
+
+public consentGiven = false;
+
+public mounted(): void {
+    this.consentProvider.registerConsentAcceptedEventListener(this);
+    this.consentProvider.registerConsentDeclinedEventListener(this);
+
+    this.refresh();
+}
+
+public unmounted(): void {
+    this.consentProvider.unregisterConsentAcceptedEventListener(this);
+    this.consentProvider.unregisterConsentDeclinedEventListener(this);
+}
+
+// Called by the provider — the names are the contract.
+public consentAccepted(consentVersion: number): void { this.refresh(); }
+public consentDeclined(): void { this.refresh(); }
+
+public refresh(): void {
+    const version = this.consentProvider.getConsentVersion();
+    const required = this.consentProvider.getRequiredConsentVersion() ?? 1;
+
+    // undefined or null: not decided yet. -1: explicitly declined.
+    this.consentGiven = version !== undefined && version !== null && version >= required;
+}
+
+public get consentNecessary(): boolean {
+    // Only one tracking mode collects personal information; below that there is nothing to ask.
+    return this.consentProvider.getTrackingMode() === 3;
+}
+```
+
+Pitfalls:
+
+- **Never gate rendering on an un-refreshed consent value.** Without the listeners your component
+  shows the consent state from the moment it mounted, forever.
+- **"Not decided" and "declined" are different.** A missing version means you have not asked yet;
+  a version below the required one means the visitor declined or the terms changed.
+- **Do not track before consent.** Embeds, pixels and video players that start reporting before
+  the answer is in are exactly what the consent step exists to prevent.
+- **Guard every analytics call with `?.`** — the provider is legitimately absent.
+
+## How do I render an asset preview?
+
+*advanced.* Do not build a media player. The shared library ships a preview component per media
+kind; your component's job is to pick the right one and pass the asset through.
+
+```vue
+<template>
+    <component
+        :is="previewComponentName"
+        :asset="asset"
+        :can-navigate-previous-result-item="canNavigatePreviousResultItem"
+        :can-navigate-next-result-item="canNavigateNextResultItem"
+        :previous-is-loading="previousIsLoading"
+        :next-is-loading="nextIsLoading"
+        :is-quick-view-active.sync="isQuickViewActive"
+        @previous-item="$emit('previous-item')"
+        @next-item="$emit('next-item')"
+    />
+</template>
+
+<script lang="ts">
+import { Mixins, Prop } from "vue-property-decorator";
+import type { IAssetDataObject } from "@smintio/portals-component-sdk";
+import { PortalsUiComponent } from "@smintio/portals-component-sdk";
+import {
+    SAudioPreview,
+    SCssProps,
+    SImagePreview,
+    SPdfPreview,
+    SQuickViewProps,
+    SVideoPreview,
+} from "@smintio/portals-components";
+
+@PortalsUiComponent({
+    type: "ui-type-asset-details-preview",
+    key: "mypartner-ui-asset-preview-1",
+    displayName: { [DefaultCulture]: "Asset preview" },
+    components: { SImagePreview, SAudioPreview, SVideoPreview, SPdfPreview },
+})
+export default class PortalsUiComponentImplementation extends Mixins(SQuickViewProps, SCssProps) {
+    @Prop() public readonly asset!: IAssetDataObject;
+
+    public isQuickViewActive = false;
+
+    public get previewComponentName(): string {
+        switch (this.asset?.contentType?.smintIoId) {
+            case "video": return "SVideoPreview";
+            case "audio": return "SAudioPreview";
+            case "document": return "SPdfPreview";
+            default: return "SImagePreview";
+        }
+    }
+
+    public mounted(): void {
+        window.onkeyup = (event: KeyboardEvent) => {
+            if (event.key === "ArrowLeft" && this.canNavigatePreviousResultItem) {
+                this.$emit("previous-item");
+            }
+
+            if (event.key === "ArrowRight" && this.canNavigateNextResultItem) {
+                this.$emit("next-item");
+            }
+        };
+    }
+}
+</script>
+```
+
+`SQuickViewProps` contributes the quick-view settings — the large-file warning texts and the size
+limit above which a preview is not opened automatically. `GalleryAssetConverterMixin` converts an
+asset into the shape the gallery components expect, with `convertToItemAsset()`,
+`convertToImageAsset()`, `convertToVideoAsset()` and the `isVideoAsset()` / `isAudioAsset()`
+tests.
+
+Pitfalls:
+
+- **Dispatch on the content type, not the file extension.** A source system's extension is
+  unreliable; the content type is what the data adapter determined.
+- **Check the availability flag before offering a rendition.** A playback URL can be present while
+  the rendition is still being generated.
+- **Release the keyboard handler.** Assigning `window.onkeyup` replaces whatever else was there —
+  clear it when the component is destroyed, or the next page inherits your shortcuts.
+- **Quick view is synced, not owned.** Bind it with `.sync` so the preview component and your
+  component agree on whether it is open.
 
 ## How do I react to navigation and to live editor changes?
 

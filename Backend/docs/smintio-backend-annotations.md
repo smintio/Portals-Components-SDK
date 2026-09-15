@@ -71,10 +71,12 @@ A **data adapter's** configuration is the right home for:
   [the configuration marker interfaces](smintio-data-adapter-interfaces.md#user-content-configuration-marker-interfaces);
 - **customer- or deployment-specific settings** that only this adapter interprets — a limit, a
   naming scheme, a behaviour one customer wants and another does not;
-- **secrets the adapter itself needs**, most commonly the key it verifies a signed, time-limited
-  link with. That is not a contradiction of "a data adapter never holds a credential": that rule
-  is about authenticating to the *external system*, which stays inside the connector. See
-  [two kinds of security](smintio-data-adapter-interfaces.md#user-content-two-kinds-of-security-and-which-one-is-yours).
+- **secrets the adapter itself needs**, most commonly the key it verifies an inbound callback
+  with, or the key it signs a time-limited link with. That is not a contradiction of "a data
+  adapter never holds a credential": that rule is about authenticating to the *external system*,
+  which stays inside the connector. See
+  [two kinds of security](smintio-data-adapter-interfaces.md#user-content-two-kinds-of-security-and-which-one-is-yours)
+  and [accepting a callback](smintio-backend-recipes.md#user-content-how-do-i-accept-a-callback-from-the-external-system).
 
 The practical test is **one connector, several data adapters**. A property on the connector
 forces the same value on every data adapter configured against it, and changing it can trigger a

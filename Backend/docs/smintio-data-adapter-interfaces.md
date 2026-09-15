@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.4.0 (as of 15th of September, 2026)
+Current version of this document is: 1.5.0 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -503,12 +503,17 @@ The data adapter never authenticates to the external system — that is the conn
 the client it hands you must not expose a credential. It is easy to read that as "security does
 not belong in a data adapter". There is a second kind that does.
 
-When your component is reached through a **link handed to someone outside the portal** — a
-tokenised URL granting one person one action on one object for a limited time — validating that
-link is the *data adapter's* responsibility, and nothing else validates it for you. Verify the
-signature before anything else, reject an expired link, and treat every value carried in it as
-untrusted until the signature has checked out. In particular, never read an object identifier out
-of a link and fetch it before verifying the signature over it.
+When something reaches your component **from outside the portal**, validating it is the *data
+adapter's* responsibility and nothing else does it for you. The everyday case is a **callback from
+the external system**: it arrives with a signature over its own body, and your adapter decides
+whether to believe it — see
+[accepting a callback](smintio-backend-recipes.md#user-content-how-do-i-accept-a-callback-from-the-external-system).
+The same applies to a tokenised link granting one person one action for a limited time.
+
+The discipline is identical either way. Verify the signature before anything else, reject anything
+outside the accepted time window, and treat every value carried in the request as untrusted until
+the signature has checked out. In particular, never read an object identifier out of such a
+request and fetch it before verifying the signature over it.
 
 Keep signing and verification together even when only the verifier ships: you need the signer to
 test the verifier, and a test that mints its links through the same code is the only way to know
