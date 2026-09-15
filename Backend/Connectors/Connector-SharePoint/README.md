@@ -1,7 +1,7 @@
 How-to implement the `Connector`
 ================================
 
-Current version of this document is: 1.0.3 (as of 14th of September, 2026)
+Current version of this document is: 1.0.4 (as of 15th of September, 2026)
 
 ## SharePoint `Connector` Basics
 
@@ -166,7 +166,7 @@ spf.AddProperty("Owner", DataType.DataObject, userEntityModel.Key, ...);
 ```
 By passing `userEntityModel.Key` as third parameter we specify that the model for `"Owner"` is defined in another entity model, namely `userEntityModel`.  
 
-Similarily to the `MetamodelMessages` examples from [Connector description & flow](../../README.md#user-content-connector-description--flow)
+Similarily to the `MetamodelMessages` examples from [translating with resource files](../../docs/smintio-backend-annotations.md#user-content-translating-with-resource-files)
 
 `EntityModel`, `EnumEntityModel` and their properties support resource localized translations by using `ResourceLocalizedStringsModel` instance instead of `LocalizedStringsModel`.
 

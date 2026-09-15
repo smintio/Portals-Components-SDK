@@ -1,7 +1,12 @@
 How-to implement the `DataAdapter`
 ==================================
  
-Current version of this document is: 1.1.0 (as of 11th of September, 2026)
+Current version of this document is: 1.2.0 (as of 15th of September, 2026)
+
+This is the short orientation. **The full catalogue of public API interfaces, the base classes
+and what they leave abstract, parameters and results, long-running methods, permissions, the
+configuration marker interfaces and how to publish an interface of your own are in
+[the data adapter public API interfaces](../docs/smintio-data-adapter-interfaces.md).**
 
 ## `DataAdapter` basics
 
@@ -30,6 +35,11 @@ component framework discovers them by reflection.
 
 Which methods you have to fill, what the objects you return have to look like, and which of them you may leave out, is
 described in [the asset data model](../docs/smintio-asset-data-model.md).
+
+Deriving from `AssetsDataAdapterBaseImpl` gives you the whole of `IAssets` with eleven members
+left abstract — that list is the work. Everything else the base class supplies is `virtual`, so
+override the smallest thing that expresses your difference rather than reimplementing a method
+wholesale.
 
 Smint.io offers two different integration modes. Based on the functionality supported by the external system.
 

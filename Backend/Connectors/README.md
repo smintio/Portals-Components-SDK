@@ -1,7 +1,12 @@
 How-to implement the `Connector`
 ================================
 
-Current version of this document is: 1.1.0 (as of 11th of September, 2026)
+Current version of this document is: 1.2.0 (as of 15th of September, 2026)
+
+This is the short orientation. **The full contract — every member of `IConnectorStartup` and
+`IConnector`, the setup methods, the call order, the four authentication flows with worked code,
+the API client base classes and the project layout — is in
+[the connector contract](../docs/smintio-connector-reference.md).**
 
 ## `Connector` Basics
 
@@ -22,7 +27,13 @@ system. While a text document has a `ModifiedDate`, a `Creator` and so on, an im
 `Height` property etc.
 
 Regarding authorization a connector class can inherit from one the prefabricated flows that we support `OAuth2AuthenticationCodeFlowWithPKCEConnector` and `OAuth2Connector`.
-An alternative to that would be to implement `IConnector`. This is in case the external system is using another flow or custom authorization.
+An alternative to that would be to implement `IConnector`. This is in case the external system is using another flow or custom authorization — which is the common case, not the exception.
+
+Note that deriving from `OAuth2Connector` does **not** imply the `Redirect` setup method. Most
+OAuth2 connectors use `Setup`, because the credentials are typed into the configuration form and
+the connector fetches its own tokens. Choose the setup method from what the *user* has to do, not
+from the grant type — see
+[choosing an authentication flow](../docs/smintio-connector-reference.md#user-content-choosing-an-authentication-flow).
 
 For `OAuth2AuthenticationCodeFlowWithPKCEConnector` examples see [here](Connector-Picturepark/PictureparkConnector.cs) and [here](Connector-SharePoint/SharepointConnector.cs).
 A more detailed description of the OAuth2 authentication code flow with PKCE (pixy) can be found [here](Connector-SharePoint/README.md#authentication-process).

@@ -1,179 +1,213 @@
 Developing Smint.io Portals backend components
 ==============================================
 
-Current version of this document is: 2.3.2 (as of 14th of September, 2026)
+Current version of this document is: 3.0.0 (as of 15th of September, 2026)
 
-This repository contains examples for Smint.io Portals backend components, which is connectors, data adapters, data processors, task handlers, portal templates and identity providers.
+This is the guide to building the server-side half of Smint.io Portals: connectors, data
+adapters, data processors, task handlers, portal templates, resources and identity providers.
+It explains what each component type is for, which one you actually need, the questions to
+settle before you write anything, and how a component is built, tested and published.
 
-Documentation on data processors, portal templates, task handlers and identity providers will follow. Please get in touch if you want to leverage that functionality.
+The examples in this repository are working components you can copy. Start from
+[Hello World](Connectors/Connector-HelloWorld/) for the shape of a connector and a data adapter,
+then read [Picturepark](Connectors/Connector-Picturepark/) or
+[SharePoint](Connectors/Connector-SharePoint/) for how a real source system is handled.
 
-Please note that at any time you can build your own connector or data adapter components based
-on our *Smint.io Portals SDKs*. Access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io)
-and request access. Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals
-Enterprise plan customers.
+Please note that at any time you can build your own backend components based on our *Smint.io
+Portals SDKs*. Access to the SDKs is restricted. Get in contact with
+[Smint.io](https://www.smint.io) and request access. Access will be granted to either Smint.io
+Solution Partners or to all our Smint.io Portals Enterprise plan customers.
 
-You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
+You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the
+SDKs are hosted there.
 
-1. [Examples](#examples)
-1. [Connector description & flow](#user-content-connector-description--flow)
+1. [The backend component types](#user-content-the-backend-component-types)
+1. [Which component do you actually need?](#user-content-which-component-do-you-actually-need)
+1. [Every component has the same three parts](#user-content-every-component-has-the-same-three-parts)
+1. [Reference documents](#user-content-reference-documents)
+1. [Examples in this repository](#user-content-examples-in-this-repository)
+1. [Before you start: the questions to answer](#user-content-before-you-start-the-questions-to-answer)
+1. [Connectors](#user-content-connectors)
+1. [Data adapters](#user-content-data-adapters)
+1. [Live connection or internal index](#user-content-live-connection-or-internal-index)
 1. [Data adapter public API interfaces](#user-content-data-adapter-public-api-interfaces)
 1. [Custom public API interfaces](#user-content-custom-public-api-interfaces)
-1. [The connector meta-model: describing the external system's schema](docs/smintio-connector-metamodel.md)
-1. [The asset data model: what a data adapter returns](docs/smintio-asset-data-model.md)
-1. [Overview of Smint.io annotations](../Frontend/Legacy/docs/smintio-annotations.md)
+1. [Building, testing and publishing](#user-content-building-testing-and-publishing)
+1. [Checklist before you ship](#user-content-checklist-before-you-ship)
+1. [Questions](#user-content-questions)
 
-## Examples
+## The backend component types
 
-#### Hello World Connector
+| Component type | What it does | Reference |
+|---|---|---|
+| **Connector** | establishes and maintains the trust context to an external system, and describes that system's schema | [the connector contract](docs/smintio-connector-reference.md) |
+| **Data adapter** | reads — and where applicable writes — the external system's data, and publishes it to the platform as public API interfaces | [the public API interfaces](docs/smintio-data-adapter-interfaces.md) |
+| **Data processor** | hooks into a data adapter's operations and changes what goes in or what comes out | [data processors](docs/smintio-data-processors.md) |
+| **Task handler** | a state machine for the task framework — approval workflows, requests, reviews | [task handlers](docs/smintio-task-handlers.md) |
+| **Portal template** | describes a whole portal, so a new one can be created from it | [portal templates and resources](docs/smintio-portal-templates-and-resources.md) |
+| **Resource** | a typed piece of portal content or styling — a string, a text, an image, a menu item, an email, a font, a style | [portal templates and resources](docs/smintio-portal-templates-and-resources.md) |
+| **Identity provider** | federates the authentication of portal end users to an external identity system | [identity providers](docs/smintio-identity-providers.md) |
 
-- [Root directory](Connectors/Connector-HelloWorld/)
+UI components and page templates are **frontend** components and are built quite differently —
+see [developing frontend components](../Frontend/Legacy/).
 
-#### Hello World Data Adapter
+A connector and a data adapter are always two separate components. The connector holds the
+credentials and the schema; the data adapter reads or writes the data. They are separate because several
+data adapters routinely share one connector — an asset adapter, an upload adapter, a collections
+adapter and a customer-specific variant can all sit on the same authenticated connection.
 
-This data adapter implements the *IAssets* data adapter interface.
+## Which component do you actually need?
 
-- [Root directory](DataAdapters/DataAdapter-HelloWorld/)
-- [Test driver](DataAdapters/Portals-HelloWorld-TestDriver)
+The most expensive mistake in this area is building a connector when something smaller was the
+answer. Work down this list and stop at the first that fits:
 
-#### Microsoft SharePoint Connector
+1. **Nothing.** The external system speaks a protocol one of the shipped connectors already
+   handles, and what you need is configuration. Ask before you build.
+2. **A data processor.** The data already reaches the portal, and something about its shape, its
+   naming or its reachability is wrong. A data processor is one class and one interface.
+3. **A second data adapter on an existing connector.** The source system is already integrated
+   and you need a different view of it — upload, collections, products, a different mapping. The
+   connector is reused unchanged and hands you its API client by injection.
+4. **A custom public API interface on an existing data adapter.** The data is there; only the
+   operation is missing.
+5. **A new connector and data adapter.** A source system nothing integrates yet.
 
-- [Root directory](Connectors/Connector-SharePoint/)
-- [Connector README.md](Connectors/Connector-SharePoint/README.md)
+## Every component has the same three parts
 
-#### Microsoft SharePoint Data Adapter
+Whatever the type, a backend component is three classes:
 
-This data adapter implements the *IAssets* data adapter interface.
+| | |
+|---|---|
+| **The startup** | a stateless, long-lived singleton implementing `IComponentStartup` (or the type-specific interface deriving from it). It carries the component's key, its localized name and description, its logo and icon, and the types of the other two classes. The platform reads it without instantiating anything |
+| **The configuration** | a plain settings class implementing `IComponentConfiguration`, whose properties become the form a Smint.io Portals administrator fills in. See [the annotations](docs/smintio-backend-annotations.md) |
+| **The component** | the short-lived, stateful thing that actually does the work, constructed by dependency injection with the configuration injected |
 
-- [Root directory](DataAdapters/DataAdapter-SharePoint/)
-- [Test driver README.md](DataAdapters/Portals-Sharepoint-TestDriver/README.md)
+Plus **translatable resources** — a `ConfigurationMessages.resx` per culture, and a
+`MetamodelMessages.resx` when the component describes a schema.
 
-#### Picturepark Connector
+`IComponentStartup.Key` is worth its own paragraph. **Component keys are globally unique and
+issued by Smint.io**, much as port numbers are issued by IANA: they are how the platform finds
+your implementation, and they cannot be changed once a portal has been configured against your
+component. Ask for yours at the start of the work. A brand new backend component also has to be
+enabled on the Smint.io side before its first publish is accepted, so raise it early rather than
+when you are ready to ship.
 
-- [Root directory](Connectors/Connector-Picturepark/)
+## Reference documents
 
-#### Picturepark Data Adapter
+| Document | What it covers |
+|---|---|
+| [The connector contract](docs/smintio-connector-reference.md) | every member of `IConnectorStartup` and `IConnector`, the setup methods, the call order, the authentication flows, the API client, the project layout |
+| [The connector meta-model](docs/smintio-connector-metamodel.md) | describing the external system's schema: data types, entities, properties, enums, indexing, semantic types, form groups, translation, the converter, the lifecycle |
+| [The data adapter public API interfaces](docs/smintio-data-adapter-interfaces.md) | the full catalogue, the base classes and what they leave abstract, parameters and results, long-running methods, permissions, configuration marker interfaces, custom interfaces |
+| [The asset data model](docs/smintio-asset-data-model.md) | what a data adapter returns and what the portal does with it: content types, binaries, identifiers, folders, references, composites, raw data, paging, filters |
+| [Backend component annotations](docs/smintio-backend-annotations.md) | the configuration form: data types, labels, resource files, validation, layout, visibility, dynamic allowed values |
+| [Building, testing and publishing](docs/smintio-backend-component-delivery.md) | the project setup, the test drivers, the shared test suite, the publish CLI, versioning |
+| [Data processors](docs/smintio-data-processors.md) | the contract, the types, every lifecycle hook point, how a processor is attached |
+| [Identity providers](docs/smintio-identity-providers.md) | the contract, OIDC and SAML starting points, external user groups, pass-through authentication |
+| [Portal templates and resources](docs/smintio-portal-templates-and-resources.md) | the two templating component types, the live-clone pattern, resource types, resource assets |
+| [Task handlers](docs/smintio-task-handlers.md) | the state machine contract, task types, states and actions, the call sequence |
+| [Frontend component annotations](../Frontend/Legacy/docs/smintio-annotations.md) | the TypeScript counterpart, when you are also building a UI component |
 
-- [Root directory](DataAdapters/DataAdapter-Picturepark/)
-- [Test driver](DataAdapters/Portals-Picturepark-TestDriver/)
+## Examples in this repository
 
-#### Root
+All of them build from `Portals-SmintIo-BackendComponents.sln`.
 
-- [Data adapter README.md](DataAdapters/README.md)
+#### Hello World — the minimal pair
 
-## Connector description & flow
+Backed by artificial data, heavily commented, and the only example whose tests run anywhere
+immediately, because it needs no credentials. **Start here.**
 
-The purpose of a connector is to provide a way to communicate with an external provider via a client, expose user interface configurations, authentication processing, verify settings and build a translatable meta-model.
+- [Connector](Connectors/Connector-HelloWorld/) · [Data adapter](DataAdapters/DataAdapter-HelloWorld/) · [Test driver](DataAdapters/Portals-HelloWorld-TestDriver/)
 
-Each connector is system dedicated. See [SharePoint](Connectors/Connector-SharePoint/) or [Picturepark](Connectors/Connector-Picturepark/). 
+#### Picturepark — a live connection
 
-Please note that in the case of `Picturepark`, the connector uses a live connection (data is requested on the fly).
+Data is requested from the external system on the fly. Shows a real meta-model builder, search
+facets derived from the source schema, a dynamic allowed-values provider for the channel, and a
+second data adapter — for external users — sharing the same connector.
 
-For `SharePoint` this is done using our own index. We call it the integration layer.
+- [Connector](Connectors/Connector-Picturepark/) · [Data adapter](DataAdapters/DataAdapter-Picturepark/) · [Test driver](DataAdapters/Portals-Picturepark-TestDriver/)
 
-When developing a new connector, [HelloWorld](Connectors/Connector-HelloWorld/) serves as a good starting point.
+#### Microsoft SharePoint — indexed through the integration layer
 
-The `SmintIo.Portals.ConnectorSDK` NuGet Smint.io package makes it possible to build a connector.
+Content is analysed and indexed by Smint.io rather than queried live. The only example
+implementing the integration layer provider, and the clearest walkthrough of an OAuth2
+authorization code flow.
 
-`IConnectorStartup` is the main interface to be implemented, so that at a later stage Smint.io knows how to use the newly built connector.
+- [Connector](Connectors/Connector-SharePoint/) · [Connector README](Connectors/Connector-SharePoint/README.md) · [Data adapter](DataAdapters/DataAdapter-SharePoint/) · [Test driver README](DataAdapters/Portals-Sharepoint-TestDriver/README.md)
 
-This interface describes the process of starting the connector, includes information such as its name, description, logo/icon, setup, documentation and more.
-Points to configuration settings used by the user interface and which component is responsible for bootstrapping the connector itself.
+Also: [how to implement a connector](Connectors/README.md) and
+[how to implement a data adapter](DataAdapters/README.md).
 
-When implementing `IComponentConfiguration`, the added properties must be the minimum settings for the connector configuration.
-```C#
-[DisplayName("en", "Your Picturepark URL", IsDefault = true)]
-[DisplayName("de", "Ihre Picturepark URL")]
-...
-[Required]
-[IsUri(EnforceHttps = true, RemovePathAndQueryString = true)]
-public string PictureparkUrl { get; set; }
+## Before you start: the questions to answer
 
-[DisplayName("en", "Your access token", IsDefault = true)]
-[DisplayName("de", "Ihr Zugriffs-Token")]
-[MaxLength(100)]
-[Required]
-public string AccessToken { get; set; }
-```
-Smint.io Portals understands the definition of annotations that allow to change the look and feel of the user interface.
-Please note that multiple cultures are supported.
+A backend component is quick to write and expensive to change once it is out. The component
+`Key`, the persisted names of its configuration properties, and the integration mode are all
+effectively permanent as soon as a portal has been configured against it.
 
-An alternative method for handling translations involves the use of resource files.
-By adding `ConfigurationMessages.resx`, `ConfigurationMessages.de.resx`, or other culture-specific files under a `Resources` folder within the project.
+So please settle the following before you create the first file. If you are building the
+component for a customer, for a colleague or for a project team, ask them all of it in one go —
+it is a short conversation, and it saves a rewrite.
 
-Then, in the `PictureparkConnectorStartup` implementation, the type of the resoure file should be registered like this: 
+*Identity*
 
-```C#
-public Type ConfigurationMessages => typeof(ConfigurationMessages);
-```
+| Question | What it decides | If it is wrong |
+|---|---|---|
+| Which component type is this, and what does it do in one sentence? | the SDK you reference, the contract you implement, and the document you work from | a different contract is a rewrite, not an edit. The most common error is building a connector where a data processor was the answer — see [which component do you actually need](#user-content-which-component-do-you-actually-need) |
+| Has Smint.io issued the component key? | the value of `IComponentStartup.Key` | it is globally unique and permanent, and a new component has to be enabled on the Smint.io side before its first publish. Ask for it at the start |
+| Is this a new component or a change to an existing one? | whether you start a fresh project or add to one | never rename a released component. Portals in the field are configured against the old key |
 
-This ensures that the resource files are processed, validated and plugged into the Smint.io component system.
+*How the integration works* — for a connector and data adapter
 
-Note that resource keys should start with `c_` followed by the `Key` of the `IConnectorStartup`.
-An example for the `AccessToken` resource key look like this `c_picturepark_access_token`.
+| Question | What it decides |
+|---|---|
+| Live connection, or indexed through the Smint.io integration layer? | which configuration marker interfaces your data adapter implements, whether you write an integration layer provider, and how the data stays current — see [live connection or internal index](#user-content-live-connection-or-internal-index) |
+| How does the external system authenticate? | the connector's base class and its setup method. Note that an OAuth2 connector usually still uses the `Setup` method, not `Redirect` — see [choosing an authentication flow](docs/smintio-connector-reference.md#user-content-choosing-an-authentication-flow) |
+| Which public API interfaces does the data adapter publish? | the reachable surface, and how much you have to implement. Declare what you support, not the widest interface that compiles — see [the catalogue](docs/smintio-data-adapter-interfaces.md#user-content-the-catalogue) |
+| Can the external system's schema be read through its API, and is its metadata translated? | how the [meta-model](docs/smintio-connector-metamodel.md) is built — and, occasionally, whether the integration is viable at all |
 
-Modified version for the example from above, utilizing a single attribute and referencing keys from the resource file:
+*Configuration and language*
 
-```C#
-[DisplayName(translationKey: nameof(ConfigurationMessages.c_picturepark_picturepark_url_display_name))]
-[Description(translationKey: nameof(ConfigurationMessages.c_picturepark_picturepark_url_description))]
-[Required]
-[IsUri(EnforceHttps = true, RemovePathAndQueryString = true)]
-public string PictureparkUrl { get; set; }
+| Question | What it decides |
+|---|---|
+| Which settings must the administrator be able to change, and which are advanced? | your configuration properties. **The C# property name is the persisted name**, so a rename after release orphans every saved configuration. Start with few — you can add, you cannot remove |
+| Which of those should be a dropdown the component fills rather than a text field? | your dynamic allowed-values providers. A configuration where the administrator picks the channel or the site from a list is a different product from one where they paste an identifier |
+| Which languages? | whether labels stay on attributes or move into resource files. More than two languages means resource files from the start; retrofitting them touches every property |
+| Does the component describe a schema with translatable labels? | whether you ship a `MetamodelMessages.resx`. Leaving it out when you need it makes those translations fail silently |
 
-[DisplayName(translationKey: nameof(ConfigurationMessages.c_picturepark_access_token_display_name))]
-[Description(translationKey: nameof(ConfigurationMessages.c_picturepark_access_token_description))]
-[MaxLength(100)]
-[Required]
-public string AccessToken { get; set; }
-```
+*Delivery*
 
-Similarly, the same approach can be applied to `MetamodelMessages` which are dedicated for classes implementing `IMetamodelBuilder`.
+| Question | What it decides |
+|---|---|
+| Which environment and which Smint.io instance? | where the component lands. **Nothing in the component's source decides this** — it is whatever the publish CLI's `appsettings.<Env>.json` points at. Agree it up front, because it is the one thing that cannot be checked by looking at the code |
+| How will it be tested against the real system? | whether the test drivers are useful. They need real credentials to be worth anything, and a redirect-flow connector needs its redirect URI registered on the external side |
 
-```C#
-public Type MetamodelMessages => typeof(MetamodelMessages);
-```
+## Connectors
 
-A valid example can be found in the `SharepointMetamodelBuilder`
+A connector has exactly two jobs: **establish and maintain a trust context** to the external
+system, and **describe that system's schema**. It does not read assets, and it should not hold
+network connections open — a connector instance is short-lived and there will be many of them.
 
-```C#
-var rootEntityLabels = new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_sharepoint_root_entity));
+`IConnectorStartup` is the entry point the platform discovers. It declares the connector's key,
+its name and description, its logo and icon, which configuration class to present, which
+component class to instantiate, the resource files, and the connector-specific members: the data
+adapters to create by default, the setup method, whether setting it up needs an IT
+administrator, and a link to your setup documentation.
 
-var rootEntityModel = CreateEntityModel(RootEntityKey, rootEntityLabels);
-```
+`IConnector` is the connector itself. The methods, in the order the platform calls them when an
+administrator configures it:
 
-`ResourceLocalizedStringsModel` is an efficient way of adding a localized label to a metamodel, later resolved by the Smint.io component framework.
+| Method | What you do |
+|---|---|
+| `PerformPostConfigurationChecksAsync` | validate the configuration against the external system, and put what the rest of the flow needs onto the authorization values — the identity server URL, a discovered API URL, values in the key-value store. Throw `ExternalDependencyException` when the configuration does not hold up |
+| `GetRedirectUrlAsync` | build the authorization URL. Only for the `Redirect` setup method |
+| `InitializeAuthorizationValuesAsync` | produce the authorization values used from now on |
+| `PerformPostAuthorizationChecksAsync` | now that you can call the external system, confirm it works |
+| `GetConnectorMetamodelAsync` | build and return the meta-model |
 
-This is crucial because metamodel translations must be fully resolved and cached for future use.
+and, in steady state, `RefreshAuthorizationValuesAsync` before a token expires, `WarmCachesAsync`
+on restart and every fifteen minutes, and `ConfigureServicesForDataAdapter` each time a data
+adapter is constructed.
 
-Data adapters can leverage the metamodel messages as well. 
-`SearchAssetsAsync` demostrates this in `PictureparkAssetsSearch.cs`
-
-```C#
-new ValueForJsonUiDetailsModel()
-{
-	Value = new ValueForJson() {
-		StringValue = "Advanced"
-	},
-	Name = MetamodelMessages.c_picturepark_advanced.Localize()
-}
-```
-
-The key difference is that here, `MetamodelMessages.c_picturepark_advanced` resolves the string value from the resource file and then it is converted to LocalizedStringsModel using the `Localize` extension method.
-
-This is done because before the execution of SearchAssetsAsync, the correct culture is set for the request and `MetamodelMessages` will resolve culture specific literal value or fall back to the default one.
-
-In this case the `Name` property of `ValueForJson` does not have to be fully localized.
-
-The full list of supported Smint.io Portals annotations can be found [here](../Frontend/Legacy/docs/smintio-annotations.md).
-
-The `IConnector` implementation should specify the authentication mechanism. Smint.io supports `OAuth2Connector` and `OAuth2AuthenticationCodeFlowWithPKCEConnector`, which should serve as a starting point in the form of a base class.
-However, it is also possible to implement your own authentication mechanism at any time.
-
-Several things need to be done depending on the authentication flow for instantiating a client.
-
-### In case of connector setup method - `Setup`
-#### Perform post configuration checks
-Set the necessary configuration values to the authorizationValuesModel
 ```C#
 public override async Task PerformPostConfigurationChecksAsync(AuthorizationValuesModel authorizationValuesModel)
 {
@@ -185,145 +219,123 @@ public override async Task PerformPostConfigurationChecksAsync(AuthorizationValu
     ...
 }
 ```
-#### Initialize authorization
-Sets authorization value. 
-Please note that network call is possible as well.
+
 ```C#
-public override Task<AuthorizationValuesModel> InitializeAuthorizationValuesAsync(string originalSecret, string secret, AuthorizationValuesModel bootstrapAuthorizationValuesModel)
+public override Task<AuthorizationValuesModel> InitializeAuthorizationValuesAsync(
+    string originalSecret, string secret, AuthorizationValuesModel bootstrapAuthorizationValuesModel)
 {
     bootstrapAuthorizationValuesModel.AccessToken = _configuration.AccessToken;
 
     return Task.FromResult(bootstrapAuthorizationValuesModel);
 }
 ```
-#### Post authorization check
-Confirms whether we can communicate successfully with the third party.
-```C#
-public override async Task PerformPostAuthorizationChecksAsync(FormFieldValuesModel formFieldValuesModel)
-{
-    var channelFormFieldValueModel = formFieldValuesModel.Values.FirstOrDefault(FormFieldValueModel => string.Equals(FormFieldValueModel.Id, nameof(PictureparkConnectorConfiguration.Channel)));
 
-    string configuredChannelId = null;
+For authorization, `OAuth2Connector` and `OAuth2AuthenticationCodeFlowWithPKCEConnector` are
+prefabricated base classes to start from; implementing `IConnector` directly is equally normal
+and is what most connectors against API-key systems do. **The full contract, the four
+authentication flows with worked code, the API client base classes and the project layout are in
+[the connector contract](docs/smintio-connector-reference.md).**
 
-    if (channelFormFieldValueModel != null)
-    {
-        configuredChannelId = channelFormFieldValueModel.StringValue;
-    }            
-    ...
-	    
-    if (!string.IsNullOrEmpty(configuredChannelId))
-    {
-	var channelId = await ValidateChannelIdAsync(configuredChannelId).ConfigureAwait(false);
+### The connector meta-model
 
-	if (!string.Equals(channelId, configuredChannelId))
-	{
-	    channelFormFieldValueModel.StringValue = channelId;
-	}
-     }	
-     ...
-}
-```
-#### Refresh authorization
-Time-controlled self refreshing authorization.
-```C#
-public override async Task<AuthorizationValuesModel> RefreshAuthorizationValuesAsync(AuthorizationValuesModel authorizationValuesModel)
-{
-	authorizationValuesModel.AccessToken = _configuration.AccessToken;
-	...
-	...
-	return authorizationValuesModel;
-}
-```
-#### Wire-up dependencies
-```C#
-public override void ConfigureServicesForDataAdapter(ServiceCollection services)
-{
-    services.AddSingleton((serviceProvider) =>
-    {
-        return CreatePictureparkClient();
-    });
-}
-```
-#### Build meta-model
-```C#
-public override async Task<ConnectorMetamodel> GetConnectorMetamodelAsync()
-{
-    var pictureparkClient = CreatePictureparkClient();
+Building the meta-model is the connector's second job. Generally speaking, it describes what
+types of *object* exist in the external system and what properties they have — in other words,
+the _custom data_ that is delivered. Smint.io Portals uses it to interpret everything your data
+adapter returns.
 
-    var pictureparkMetamodelBuilder = new PictureparkMetamodelBuilder(pictureparkClient);
+Each type of object is represented by one `EntityModel`, and each of its fields by one
+`PropertyModel`. How many entities you end up with depends entirely on the system: a simple file
+store may need only one, while a system that distinguishes images, videos and products will have
+one per type. Entities and their properties are fully translatable.
 
-    var pictureparkMetamodel = await pictureparkMetamodelBuilder.BuildAsync();
+You build one in an `IMetamodelBuilder` and return it from `GetConnectorMetamodelAsync`.
 
-    return pictureparkMetamodel;
-}
-```
-### In case of connector setup method - `Redirect`
-A similar flow to `Setup` with an additional step after `PerformPostConfigurationChecksAsync()`.
-##### Compute redirect url
-```C#
-public override Task<string> GetRedirectUrlAsync(string targetRedirectUri, string secret, AuthorizationValuesModel authorizationValuesModel, CultureInfo currentCulture)
-{
-    ...
-    var authorizeEndpoint = $"{idSrvUrl}/{encodedTenant}/oauth2/v2.0/authorize?client_id={encodedClientId}&response_type=code&redirect_uri={encodedRedirectUri}&response_mode=query&scope={encodedScopes}&state={HttpUtility.UrlEncode(secret)}";
+Four things about it are worth knowing before you start, because each of them produces a portal
+that renders nothing rather than an error message:
 
-    authorizationValuesModel.OriginalRedirectUrl = targetRedirectUri;
+- **The meta-model is a filter, not just a description.** A value whose property was never
+  declared is dropped on conversion. If a field does not appear in the portal, check the
+  declaration before you debug the conversion.
+- **It is a snapshot, taken when the connector configuration is set up** — not per request. A
+  schema change in the external system does not appear until the configuration is set up again.
+- **Your entity keys are rewritten** to be unique per connector configuration, so the same
+  connector configured twice yields two different key sets. Never hard-code an entity key.
+- **Every entity automatically gets three properties**, an id and a list and a detail display
+  name.
 
-    return Task.FromResult(authorizeEndpoint);
-}
-```
-***Between steps, the connector can create a provider's client that will later be used by the `Data Adapter` instance.***
-
-### Provider's client
-Acts as a facade in front of provider's concrete SDK as a means of communication.
-
-Smint.io has a set of retry strategy helpers that live under SmintIo.Portals.ConnectorSDK.Clients.Prefab
-
-A client can inherit from `BaseHttpClientApiClient`, `BaseDynamicApiClient<TDynamicApiClient>` or `BaseRestSharpApiClient`
-
-See `SharepointClient.cs` for reference.
-
-### Meta-model
-Generally speaking the meta-model describes what types of *objects* exist in the external provider and what properties they have. In other words: the meta-model describes the _custom data_ that is delivered.
-
-This meta-model is then used throughout Smint.io Portals to interpret the external metadata delivered by the external provider (e.g. also custom metadata).
-
-Each type of object in the external system is represented by one `EntityModel`, and each of its fields by one
-`PropertyModel` on that entity. How many entities you end up with depends entirely on the system you are integrating: a
-simple file store may need only one, while a system that distinguishes images, videos and products will have one per
-type. Entities and their properties are fully translatable.
-
-You build one in an `IMetamodelBuilder` and return it from `GetConnectorMetamodelAsync`, as `HelloWorldMetamodelBuilder`
-does.
-
-Four things about it are worth knowing before you start, because each of them produces a portal that renders nothing
-rather than an error message:
-
-- **The meta-model is a filter, not just a description.** A value whose property was never declared is dropped on
-  conversion. If a field does not appear in the portal, check the declaration before you debug the conversion.
-- **It is a snapshot, taken when the connector configuration is set up** — not per request. A schema change in the
-  external system does not appear until the configuration is set up again.
-- **Your entity keys are rewritten** to be unique per connector configuration, so the same connector configured twice
-  yields two different key sets. Never hard-code an entity key.
-- **Every entity automatically gets three properties**, an id and a list and a detail display name.
-
-**The full reference is [the connector meta-model](docs/smintio-connector-metamodel.md)**: the data types, the
-`EntityModel` and `PropertyModel` members, entity types and inheritance, enum entities, full-text indexing, semantic
-types, form groups, translation, the converter that applies the meta-model to a source payload, and the lifecycle in
-detail.
+**The full reference is [the connector meta-model](docs/smintio-connector-metamodel.md)**: the
+data types, the `EntityModel` and `PropertyModel` members, entity types and inheritance, enum
+entities, full-text indexing, semantic types, form groups, translation, the converter that
+applies the meta-model to a source payload, and the lifecycle in detail.
 
 For a worked example against a real system, read the
 [SharePoint meta-model walkthrough](Connectors/Connector-SharePoint/README.md#meta-model-structure).
 
+## Data adapters
+
+A data adapter is a *facade* for the external system. It uses the connector's authenticated
+client to read — and where applicable write — data, and it maps that data into the platform's
+own model.
+
+The connecting point between the two is `ConfigureServicesForDataAdapter`:
+
+```C#
+// in the connector
+public override void ConfigureServicesForDataAdapter(ServiceCollection services)
+{
+    services.AddTransient(_ => CreateMyClient());     // returns an IMyClient
+}
+```
+
+which lets the data adapter take `IMyClient` as a constructor parameter.
+
+`IDataAdapterStartup` adds four members to the common startup contract: the `ConnectorKey` it
+belongs to, the `Permissions` it declares (normally `null`), the `PublicApiInterfaces` it
+publishes, and the `MetamodelMessages` resource file when it has one.
+
+Derive the adapter itself from `AssetsDataAdapterBaseImpl` for an asset source, or
+`DataAdapterBaseImpl` for anything else. The base class implements most of the surface and
+leaves eleven members abstract — that list is the work.
+
+Most implementations split the class across `partial` files by capability, in folders named
+`Search`, `Read`, `Random`, `Download` and `IntegrationLayer`, with the constructor and the
+feature-support methods in the file named after the class. It is not required and it is worth
+doing.
+
+**Which methods you have to fill, what the objects you return have to look like, and which of
+them you may leave out** is in [the asset data model](docs/smintio-asset-data-model.md). **Which
+interfaces exist and how to publish your own** is in
+[the public API interfaces](docs/smintio-data-adapter-interfaces.md).
+
+## Live connection or internal index
+
+Smint.io offers two integration modes, and the choice is structural.
+
+**Live connection.** Data is fetched on demand. This requires the external system to be
+feature-rich — a fully translatable meta-model, faceted search, acceptable latency — because
+every portal request becomes a request to it. Picturepark is the example in this repository.
+
+**Internal index.** Selected data is analysed and its metadata captured; thumbnails and video,
+audio and document renditions are generated and stored by Smint.io for offline use. Further
+synchronisation happens through tokens, webhooks or timed intervals. Please note that Smint.io
+does not store original assets. SharePoint is the example in this repository.
+
+Choose the live connection when the external system can keep up, and the index when it cannot,
+or when renditions have to be generated. The decision shows up in your configuration class as
+one of the integration layer marker interfaces, and in your adapter as whether you implement
+`IAssetsIntegrationLayerApiProvider`.
+
 ## Data adapter public API interfaces
 
-Each Smint.io Portals backend or frontend component can tie itself to public API interfaces published by Smint.io Portals data adapters.
+Each Smint.io Portals backend or frontend component can tie itself to public API interfaces
+published by Smint.io Portals data adapters. Data adapters can also define *custom permissions*
+to facilitate fine-grained access management by the Smint.io Portals administrator.
 
-Data adapters can also define *custom permissions* to facilitate fine-grained access management by the Smint.io Portals admin.
-
-This can be done by requesting a data adapter public API interface through the configuration of the Smint.io Portals backend or 
-frontend component:
+This is done by requesting a data adapter public API interface through the configuration of the
+backend or frontend component:
 
 #### .NET example (for Smint.io Portals backend components)
+
 ```C#
 using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets;
 
@@ -335,9 +347,10 @@ using SmintIo.Portals.DataAdapterSDK.DataAdapters.Interfaces.Assets;
 [Description("de", "Die Daten-Quelle, aus der die Vorschläge für die Auto-Vervollständigung für die Such-Eingabeleiste geladen werden.")]
 [FormGroup("s-search-bar")]
 public IAssetsSearch SearchBarAutoCompletion { get; set; }
-
 ```
-Once the Smint.io Portals UI component is instanciated, you can easily call methods of that public API interface.
+
+Once the component is instantiated, you can call methods of that public API interface:
+
 ```C#
 var searchAssetsResult = await _portalsContext.PublicApiInterfaceExecutionWrapper
 	.WrapPublicApiInterfaceExecutionAsync<SearchAssetsParameters, SearchAssetsResult, IAssetsSearch>(
@@ -347,11 +360,13 @@ var searchAssetsResult = await _portalsContext.PublicApiInterfaceExecutionWrappe
 	.ConfigureAwait(false);
 ```
 
-*Side note: you could also invoke the method of the targets public API interface directly. However, we ask you to use this way of calling other public API interfaces, as
-this method performs permission checks, script executions and other potentially required operations. In the future we will introduce some facet-based approach to avoid
-this issue.*
+*Side note: you could also invoke the method of the target's public API interface directly.
+However, we ask you to use this way of calling other public API interfaces, as this method
+performs permission checks, script executions and other potentially required operations. In the
+future we will introduce some facet-based approach to avoid this issue.*
 
-### Typescript example (for Smint.io Portals UI components)
+### TypeScript example (for Smint.io Portals UI components)
+
 ```typescript
 import type {
     IAssetsSearch,
@@ -368,7 +383,9 @@ import type {
 @FormGroup("s-search-bar")
 public readonly searchBarAutoCompletion!: IAssetsSearch;
 ```
-Once the Smint.io Portals UI component is instanciated, you can easily call methods of that public API interface.
+
+Once the UI component is instantiated, you can call methods of that public API interface:
+
 ```typescript
 this.searchBarAutoCompletion.getFullTextSearchProposalsAsync({ queryString: this.searchQuery })
 	.catch((e) => {
@@ -381,33 +398,42 @@ this.searchBarAutoCompletion.getFullTextSearchProposalsAsync({ queryString: this
 		...
 	});
 ```
+
 *All the wiring from frontend to backend is done for you, without any further work involved.*
+
+**The full catalogue of interfaces is in
+[the data adapter public API interfaces](docs/smintio-data-adapter-interfaces.md).**
 
 ## Custom public API interfaces
 
-In the above example, the `IAssetsSearch` is a standard public API interface provided by Smint.io Portals. 
+In the above example, `IAssetsSearch` is a standard public API interface provided by Smint.io
+Portals.
 
-*The great thing is*: if you develop your own Smint.io Portals data adapter, you can easily publish your own custom 
-public API interfaces as well. This enables you to easily develop any custom functionality required using the Smint.io 
-Portals component framework and runtime.
+*The great thing is*: if you develop your own Smint.io Portals data adapter, you can publish your
+own custom public API interfaces as well. This enables you to develop any custom functionality
+required using the Smint.io Portals component framework and runtime.
 
-However, for use of your custom public API interfaces in a Smint.io Portals UI component you'll need its Typescript 
-public API interface definition.
+The pieces involved — the interface deriving from `IDataAdapterInterface`, the parameter and
+result objects, the custom permission, and the declaration on the startup — are described in
+[custom public API interfaces](docs/smintio-data-adapter-interfaces.md#user-content-custom-public-api-interfaces).
 
-Use the [Smint.io Portals Data Adapter Exporter CLI tool](../Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/) 
-to generate the Typescript public API interface definition directly from your Smint.io Portals data adapter assembly. 
+For use of your custom public API interfaces in a Smint.io Portals UI component you will need its
+TypeScript public API interface definition. Use the
+[Smint.io Portals Data Adapter Exporter CLI tool](../Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/)
+to generate it directly from your data adapter assembly:
 
-You can then simple use that Typescript public API interface definition file in your Smint.io Portals UI component.
-
-Invoke the tool as follows:
 ```console
 SmintIo.Portals.DataAdapterSDK.DataAdapterExporter.CLI.exe -s [Data-Adapter-Assembly-DLL] -t [Output-Filename]
 ```
-This is an example on how to invoke the tool:
+
+For example:
+
 ```console
 SmintIo.Portals.DataAdapterSDK.DataAdapterExporter.CLI.exe -s SmintIo.Portals.DataAdapter.Picturepark.MyCustomPictureparkInterfaces.dll -t .\IMyCustomPictureparkInterfaces.ts
 ```
-This is how the result might look like:
+
+This is how the result might look:
+
 ```typescript
 import type { IDataAdapterInterface } from '@smintio/portals-component-sdk';
 import type { IAssetIdsParameters } from '@smintio/portals-component-sdk';
@@ -426,15 +452,66 @@ export interface IMarkAssetsAsDeletedResult extends IDataAdapterResult
 {
 }
 ```
-*You see that this is just a Typescript interface definition file (in this case even a very simple one) that you can directly use in your Smint.io Portals UI component.
-You may also publish the interface as a NPM package for further comfort.*
 
-TODOs
-=====
+*You see that this is just a TypeScript interface definition file (in this case even a very
+simple one) that you can directly use in your Smint.io Portals UI component. You may also publish
+the interface as an npm package for further comfort.*
 
-- Documentation for portal templates
-- Documentation for task handlers
-- Documentation for identity providers
+## Building, testing and publishing
+
+A backend component is an ordinary .NET 8 class library referencing the Smint.io SDK packages.
+
+**Test it outside the platform first.** The test drivers construct your real connector and data
+adapter against the real external system, with in-memory stand-ins for everything the platform
+normally provides — no server, no database, no portal. A connector that fails in the test driver
+would have failed in the platform.
+
+**Inherit the shared test suite** rather than writing the basic tests. `SmintIo.Portals.Connector.Test`
+and `SmintIo.Portals.DataAdapter.Test` ship abstract test classes that already assert what a
+correct component does; you supply a fixture and the sample data.
+
+**Publish with the CLI.** From the component folder:
+
+```console
+%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env development
+```
+
+It finds the project, builds it, packages the build output and uploads it. The running platform
+picks the component up without a deployment.
+
+**The full detail — the project file, getting the packages, the test drivers, the shared test
+suite, the publish CLI, versioning and upgrades — is in
+[building, testing and publishing](docs/smintio-backend-component-delivery.md).**
+
+## Checklist before you ship
+
+- [ ] the component `Key` is the one Smint.io issued, and unchanged from the released version
+- [ ] `<Version>` bumped in the project file
+- [ ] `TargetFramework` is `net8.0`, and the SDK package versions match across your projects
+- [ ] every configuration property has a `DisplayName` with exactly one default culture, and a
+      `ConfigurationMessages` resource file backs them
+- [ ] `MetamodelMessages` declared if the component ships translatable meta-model labels
+- [ ] no configuration property renamed since the last release
+- [ ] the meta-model identifier varies with everything that changes the schema
+- [ ] every property emitted into `rawData` is declared in the meta-model — anything else is
+      dropped
+- [ ] `PublicApiInterfaces` lists exactly what you implement and want reachable
+- [ ] both feature-support methods answer truthfully, and unsupported methods throw
+      `NotImplementedException`
+- [ ] `PermissionUuids` set on every asset and folder
+- [ ] custom permissions, if any, declared in all three places: the constant, the interface
+      method, the startup
+- [ ] the external client registered in the connector's `ConfigureServicesForDataAdapter`, not in
+      the startup's `ConfigureServices`
+- [ ] the solution builds, the test driver runs green against the real system, and the inherited
+      test suite passes
+- [ ] no credentials committed, and nothing read out of an `appsettings.<Env>.json`
+- [ ] you know which environment and which Smint.io instance you are publishing to
+
+## Questions
+
+Please do not hesitate to contact us at [support@smint.io](mailto:support@smint.io) if you run
+into any issues.
 
 Contributors
 ============

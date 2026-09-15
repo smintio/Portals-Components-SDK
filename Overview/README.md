@@ -3,7 +3,7 @@ What are Smint.io Portals components?
 
 This README.md serves to clarify the general concept of Smint.io Portals components.
 
-Current version of this document is: 1.0.1 (as of 14th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 ## Overview
 
@@ -122,12 +122,22 @@ You may wonder why the portal template is a backend component, and not a fronten
 instantiating a new Smint.io Portals portal instance runs in the backend. So, this component type needs to be implemented
 using a backend SDK, and not a frontend SDK.
 
+### Resources
+
+A resource is a typed piece of portal content or styling that exists once per portal and is referred to by many components —
+a string, a rich text, an image, a video, a menu item, an email, a category, a font or a style. A portal template ships the resources
+a portal starts with, and a component configuration points at one instead of duplicating the content.
+
+A resource can additionally be published as an *asset*, so that it appears in searches and is rendered by the ordinary asset components.
+
 ### Identity providers
 
 Identity providers implement authentication scenarios for use within Smint.io.
 
 There are default identity provider implementations for OIDC and SAML, but if there is specific authentication workflows required
 to authenticate a user, those can be implemented using the *identity provider* component type.
+
+Please note that this component type authenticates *portal end users*. It is not how Smint.io Portals administrators sign in.
 
 ## Questions
 
