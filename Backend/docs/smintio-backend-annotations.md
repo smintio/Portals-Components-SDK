@@ -1,7 +1,7 @@
 Smint.io Portals backend component annotations
 =============================================
 
-Current version of this document is: 1.1.0 (as of 15th of September, 2026)
+Current version of this document is: 1.2.0 (as of 15th of September, 2026)
 
 Annotations describe a backend component's configuration to Smint.io Portals: what fields the
 portal administrator sees when configuring your connector, data adapter, data processor,
@@ -22,6 +22,8 @@ Please get in touch at [support@smint.io](mailto:support@smint.io) if you are mi
 annotation, or if you need a new one.
 
 1. [How a backend configuration differs from a frontend one](#user-content-how-a-backend-configuration-differs-from-a-frontend-one)
+1. [Which component's configuration a setting belongs in](#user-content-which-components-configuration-a-setting-belongs-in)
+1. [Configuration is stored encrypted](#user-content-configuration-is-stored-encrypted)
 1. [The property type is the data type](#user-content-the-property-type-is-the-data-type)
 1. [Labels and help text](#user-content-labels-and-help-text)
 1. [Translating with resource files](#user-content-translating-with-resource-files)
@@ -46,6 +48,75 @@ Three differences, and they account for most of the confusion:
 The backend also has annotations the frontend does not: `FormItemLayout`,
 `LocalizedStringsDefaultValue`, `IsCss`, `IsCssDimension`, `IsCssGradient`, `IsCssShadow`,
 `IsFont`, `IsLiquid`, `IsJavascript` and `RequiredPermissions`.
+
+## Which component's configuration a setting belongs in
+
+**Every backend component type has its own configuration class.** A connector has one, and so
+does *each data adapter*, each data processor, each identity provider, each portal template,
+each resource and each task handler action — a class implementing `IComponentConfiguration`,
+pointed at by that component's `IComponentStartup.ConfigurationImplementation`, rendered as its
+own form when an administrator configures that component. Nothing has to be piled onto the
+connector, and a setting on the wrong component is one of the harder things to undo, because
+[the property name is persisted permanently](#user-content-how-a-backend-configuration-differs-from-a-frontend-one).
+
+The connector's configuration is for what the *connector* does: the credentials and the service
+endpoint that establish the trust context, and the tenant, channel or site that decides which
+content its schema describes. Everything else belongs to the component that actually reads it.
+
+A **data adapter's** configuration is the right home for:
+
+- **settings that differ per adapter**, even when both adapters sit on the same connector — the
+  output format allow-lists, the metadata attributes to preserve, the integration mode, upload
+  settings, an AI search setting. These come from
+  [the configuration marker interfaces](smintio-data-adapter-interfaces.md#user-content-configuration-marker-interfaces);
+- **customer- or deployment-specific settings** that only this adapter interprets — a limit, a
+  naming scheme, a behaviour one customer wants and another does not;
+- **secrets the adapter itself needs**, most commonly the key it verifies a signed, time-limited
+  link with. That is not a contradiction of "a data adapter never holds a credential": that rule
+  is about authenticating to the *external system*, which stays inside the connector. See
+  [two kinds of security](smintio-data-adapter-interfaces.md#user-content-two-kinds-of-security-and-which-one-is-yours).
+
+The practical test is **one connector, several data adapters**. A property on the connector
+forces the same value on every data adapter configured against it, and changing it can trigger a
+re-validation of the connection and a re-index. A property on a data adapter is set once per
+configured adapter, which is what an administrator expects of a setting that only changes how
+*that* adapter behaves.
+
+## Configuration is stored encrypted
+
+Component configurations are **persisted encrypted at rest** in the Smint.io database — for
+connectors, for data adapters and for every other component type alike. A password, an API key
+or a signing secret typed into a configuration form is stored securely, so a setting of that
+kind is a legitimate configuration property and not something to work around.
+
+**A secret is never shown again either.** Once it has been saved, a configured secret is not
+transmitted back to the administration user interface — the administrator sees a placeholder and
+can replace the value, but cannot read it back. There is no annotation for this and no scheme of
+your own is needed; what decides it is **the name of the property**.
+
+A `string` property is treated as a secret when its name contains any of these, case-insensitively:
+
+| | |
+|---|---|
+| `password` | `secret` |
+| `key` | `token` |
+| `credential` | `authconfig` |
+| `sasuri` | |
+
+So `ClientSecret`, `ApiKey`, `LinkSigningKey`, `AccessToken` and `ServicePassword` are all
+protected without you doing anything. A property holding a secret under a name that contains
+none of them — `Signature`, `Passphrase`, `Salt` — is **not**, and is shown back like any other
+value. Name the property so that it is covered; it is the only control you have over this.
+
+Two limits worth knowing: the rule applies to single `string` properties, not to `string[]`, so
+do not keep a list of secrets in one; and the rule matches on a *substring*, so an innocent
+property whose name happens to contain one of the words — `KeyboardShortcut`, `MonkeyName` —
+becomes unreadable for the administrator after saving. Rename it if that happens.
+
+The one thing this does not cover is what *your component* does with the value. Once you have
+read it out of the configuration it is a string like any other: never log it, never put it into
+an exception message, and never return it from a public API interface method, where it would
+travel to a browser.
 
 ## The property type is the data type
 
@@ -354,6 +425,14 @@ the order you want the administrator to see them.
   an identifier, and they keep working when the underlying identifier format changes.
 - **`IsUri(RemovePathAndQueryString = true)` on every service base URL.** Administrators paste
   the URL they happen to be looking at, complete with a path and a query string.
+- **A secret is recognised by the property's name**, so a secret under a name that carries none
+  of the recognised words is shown back to the administrator, and an ordinary property whose
+  name happens to contain one of them is not. See
+  [configuration is stored encrypted](#user-content-configuration-is-stored-encrypted).
+- **Put a setting on the component that interprets it.** A data adapter has its own
+  configuration, and a property put on the connector instead is forced on every data adapter
+  configured against it. See
+  [which component's configuration a setting belongs in](#user-content-which-components-configuration-a-setting-belongs-in).
 - **Start with few properties.** You can add a setting in a later version; you cannot remove one
   without breaking the portals that set it.
 

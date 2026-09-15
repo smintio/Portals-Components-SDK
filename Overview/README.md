@@ -3,7 +3,7 @@ What are Smint.io Portals components?
 
 This README.md serves to clarify the general concept of Smint.io Portals components.
 
-Current version of this document is: 2.0.0 (as of 15th of September, 2026)
+Current version of this document is: 2.1.0 (as of 15th of September, 2026)
 
 ## Overview
 
@@ -36,6 +36,10 @@ Please note that there is no separate *Startup* class for Smint.io Portals front
 The *Configuration* class of a Smint.io Portals component contains all settings that a user can adjust during component configuration in the Smint.io Portals backend.
 
 When Smint.io Portals instantiates a component, it reads the user provided component configuration from the database and provides the component with a fully initialized instance of the *Configuration* class.
+
+*Every* component has its own *Configuration* class — a connector has one, and so does each data adapter, data processor, identity provider, portal template and resource. Settings do not all have to sit on the connector: a connector's configuration is for what the connector itself needs, and anything only one data adapter interprets — a customer-specific setting, a limit, or a secret that data adapter uses, such as a key for signing links — belongs in that data adapter's own configuration, where it can also differ between the data adapters that share one connector.
+
+All component configurations are stored *encrypted at rest* in the Smint.io database, so credentials, API keys and other secrets an administrator enters into a configuration form are held securely. A saved secret is also never transmitted back for display: an administrator can replace it, but cannot read it out again. Which values are treated that way follows from the property name — see the [backend component annotations](../Backend/docs/smintio-backend-annotations.md#user-content-configuration-is-stored-encrypted).
 
 Please note that there is no separate *Configuration* class for Smint.io Portals frontend components. Smint.io Portals frontend components contain all the necessary information directly in the component's source code, added as annotations. When a Smint.io Portals frontend component is loaded, the system then generates the frontend component's *Configuration* class on the fly.
 

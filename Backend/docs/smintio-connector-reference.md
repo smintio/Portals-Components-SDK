@@ -1,7 +1,7 @@
 The Smint.io Portals connector contract
 =======================================
 
-Current version of this document is: 1.2.1 (as of 15th of September, 2026)
+Current version of this document is: 1.3.0 (as of 15th of September, 2026)
 
 Every member a connector declares, the order in which the platform calls them, the
 authentication flows you can start from, and how the API client underneath is built.
@@ -43,6 +43,15 @@ form.
 
 Plus a third, your `IComponentConfiguration` implementation, which is a plain settings class —
 see [the annotations](smintio-backend-annotations.md).
+
+**Put into it only what the connector needs.** The credentials, the service endpoint, and the
+tenant, channel or site that decides which content the meta-model describes — those are the
+connector's. A setting only one data adapter interprets goes into *that adapter's* configuration
+class, because a data adapter has one too: several adapters can share one connector, so a
+connector property forces the same value on all of them. Customer-specific settings and an
+adapter's own secret, such as a link signing key, belong on the data adapter. All component
+configurations are stored encrypted at rest. See
+[which component's configuration a setting belongs in](smintio-backend-annotations.md#user-content-which-components-configuration-a-setting-belongs-in).
 
 The split exists because the platform publishes connector methods by reflection. Everything that
 is *management* rather than *operation* is on the startup, so the platform can read it without
