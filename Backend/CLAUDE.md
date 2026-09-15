@@ -100,6 +100,15 @@ Do not infer the conventions from a single file — they are written down.
 - **Renaming a configuration property orphans every saved configuration.** The C# property name
   *is* the persisted name, and there is no annotation that decouples them. Start with few
   properties: you can add, you cannot remove.
+- **A required property the setup wizard does not show needs a `DefaultValue`.** The wizard shows
+  `Basic` items only yet still enforces what is required, so a required `Advanced` or `Expert`
+  property with no default makes the component impossible to create, and the error names a field
+  nobody was offered. `Required` plus `Advanced` is fine *with* a default. A non-nullable value
+  type reaches the same wall with the word `Required` nowhere in the code — it is implicitly
+  required, so an `Advanced` `bool` needs a `DefaultValue` too. Where no default is safe, such as
+  a signing key, make the property optional and give its absence a defined, safe behaviour
+  instead — see
+  [visibility and the setup wizard](docs/smintio-backend-annotations.md#user-content-visibility-and-the-component-setup-wizard).
 - **Validate against the external system in `PerformPostConfigurationChecksAsync`** and throw
   `ExternalDependencyException`. It is the one moment where a wrong credential reaches the person
   who can fix it.

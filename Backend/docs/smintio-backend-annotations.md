@@ -1,7 +1,7 @@
 Smint.io Portals backend component annotations
 =============================================
 
-Current version of this document is: 1.3.0 (as of 15th of September, 2026)
+Current version of this document is: 1.4.0 (as of 15th of September, 2026)
 
 Annotations describe a backend component's configuration to Smint.io Portals: what fields the
 portal administrator sees when configuring your connector, data adapter, data processor,
@@ -30,6 +30,7 @@ annotation, or if you need a new one.
 1. [Values and validation](#user-content-values-and-validation)
 1. [Editor hints on string properties](#user-content-editor-hints-on-string-properties)
 1. [Form layout and visibility](#user-content-form-layout-and-visibility)
+1. [Visibility and the component setup wizard](#user-content-visibility-and-the-component-setup-wizard)
 1. [Dynamic allowed values](#user-content-dynamic-allowed-values)
 1. [Permissions on a public API interface method](#user-content-permissions-on-a-public-api-interface-method)
 1. [Recommended annotation order](#user-content-recommended-annotation-order)
@@ -352,6 +353,35 @@ public class MyConnectorConfiguration : IComponentConfiguration
 Use `FormItemVisibility` rather than leaving a rarely needed setting in the basic form. An
 administrator who never opens the advanced section is the intended reader of the basic one.
 
+### Visibility and the component setup wizard
+
+**The setup wizard shows `Basic` items only.** It is the short form an administrator fills in
+when first creating the component; `Advanced`, `Expert` and `Hidden` items are reached afterwards,
+in the component's full configuration form. A visibility level is therefore also a statement about
+*when* a value can first be supplied, and that has one consequence:
+
+**A required property that the wizard does not show must be able to supply its own value.** The
+requirement is still enforced there, on a field the administrator never sees, so without a value
+the component cannot be created at all and the error names a property nobody was offered. A
+`DefaultValue` settles it: **`Required` together with `Advanced` or `Expert` is fine as long as
+the property has a default**, which is why that combination appears throughout the shipped
+components.
+
+There are two ways for a property to be required, and only one of them is visible in the code:
+
+- **explicitly**, with `Required`;
+- **implicitly**, because
+  [a non-nullable value type](#user-content-the-property-type-is-the-data-type) has no way to
+  express "not answered". This is the one that gets missed — the word `Required` appears nowhere,
+  and an `Advanced` `bool` without a `DefaultValue` breaks the wizard exactly as an explicit
+  `Required` would.
+
+The fix is the same either way: give the property a `DefaultValue`. Where no default is safe — a
+signing key or a password has no sensible one, and inventing a default secret would be worse than
+the problem — drop `Required`, make the property optional, and give its absence a defined,
+safe behaviour that the component logs clearly. Refusing to serve is usually that behaviour; say
+so in the property's description, because it is the administrator who has to act on it.
+
 ## Dynamic allowed values
 
 When the permitted values are not known until the external system is asked — a channel, a site,
@@ -427,6 +457,11 @@ the order you want the administrator to see them.
 - **`Required` is not the same as a check against the external system.** It only proves the
   administrator typed something. Whether that access token works belongs in
   `PerformPostConfigurationChecksAsync`.
+- **A required property the setup wizard does not show needs a `DefaultValue`.** The wizard shows
+  `Basic` items only but still enforces the requirement, so without a default the component cannot
+  be created and the error names a field nobody was offered. `Required` plus `Advanced` is fine
+  *with* a default; where no default is safe, make the property optional instead. See
+  [visibility and the component setup wizard](#user-content-visibility-and-the-component-setup-wizard).
 - **A non-nullable value type is already required, so give it a `DefaultValue`.** A `bool` with
   neither a default nor a nullable type cannot express "not answered", and on an `Advanced` or
   `Expert` property the setup wizard then fails on a field it never showed. See
