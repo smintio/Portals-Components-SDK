@@ -1,7 +1,7 @@
 Smint.io Portals frontend component recipes
 ===========================================
 
-Current version of this document is: 2.1.0 (as of 15th of September, 2026)
+Current version of this document is: 2.1.1 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other frontend documents describe *what exists*; this one shows *how it is used*.
@@ -51,7 +51,7 @@ Two imports appear throughout:
 
 ## How do I call a data adapter method and render the result?
 
-*basic.* The single most common thing a component does, and the one thing no other document
+*Basic.* The single most common thing a component does, and the one thing no other document
 shows end to end.
 
 A component does not open connections. It declares a configuration property of a **public API
@@ -205,7 +205,7 @@ Pitfalls:
 
 ## How do I use the portal's own data sources instead of asking for one?
 
-*basic.* Sometimes the component should read whatever the *portal* reads, without the
+*Basic.* Sometimes the component should read whatever the *portal* reads, without the
 administrator picking anything. The portals context carries the portal's own configured
 adapters.
 
@@ -251,7 +251,7 @@ is already showing.
 
 ## How do I turn an assets reference setting into real assets?
 
-*basic.* An *assets reference* lets the administrator choose assets in the way that suits them
+*Basic.* An *assets reference* lets the administrator choose assets in the way that suits them
 — by picking assets, by folder, by a saved search, or by a relationship to the asset the page
 is showing — and it is one property. `AssetsReferenceMixin` resolves whichever of those they
 chose.
@@ -338,7 +338,7 @@ Pitfalls:
 
 ## How do I page through a search result?
 
-*advanced.* A search takes `page` and `pageSize`, and the result carries the paging state in
+*Advanced.* A search takes `page` and `pageSize`, and the result carries the paging state in
 `details`. Two rules matter: page numbers start at **0**, and every page after the first must
 repeat the **search result set id** so the platform serves a stable result set rather than
 re-running the query.
@@ -416,7 +416,7 @@ Pitfalls:
 
 ## How do I show progress for a long-running call?
 
-*advanced.* Several methods — downloads, uploads, collection operations — take an
+*Advanced.* Several methods — downloads, uploads, collection operations — take an
 `IProgressMonitor` as a required argument. The notification dialog service makes one that shows
 progress to the visitor, and lets them cancel.
 
@@ -466,7 +466,7 @@ this.notificationDialog.displayNotification({
 
 ## How do I change what happens when something fails?
 
-*basic.* **Usually nothing.** A failure you do not catch is already handled for you: the runtime
+*Basic.* **Usually nothing.** A failure you do not catch is already handled for you: the runtime
 reports it and shows the visitor an error. You do not have to forward anything, and a `try`/`catch`
 whose only job is to call the error handler adds nothing.
 
@@ -548,7 +548,7 @@ Pitfalls:
 
 ## How do I localize text from script, with placeholders and plurals?
 
-*basic.* In a template, the `resolve_localized` filter is all you need:
+*Basic.* In a template, the `resolve_localized` filter is all you need:
 
 ```vue
 {{ headerText | resolve_localized }}
@@ -604,7 +604,7 @@ Pitfalls:
 
 ## How do I make one setting depend on another?
 
-*basic.* Three annotations shape the form the administrator sees. They are what turns twelve
+*Basic.* Three annotations shape the form the administrator sees. They are what turns twelve
 settings into a form that looks like three.
 
 ```typescript
@@ -665,7 +665,7 @@ condition takes the property name, and a typo simply means the field is always v
 
 ## How do I restrict my component to certain portal types?
 
-*basic.* Not every component makes sense in every portal. `allowedPortalTypes` keeps yours out
+*Basic.* Not every component makes sense in every portal. `allowedPortalTypes` keeps yours out
 of the composer where it does not belong, and `mdiIcon` and `illustrationUrls` are how it
 presents itself there.
 
@@ -688,7 +688,7 @@ anything generic. Set it when the component depends on something only one kind o
 
 ## How do I render nothing without leaving the editor guessing?
 
-*basic.* A component that renders nothing is normal — no data source picked yet, an empty
+*Basic.* A component that renders nothing is normal — no data source picked yet, an empty
 result, a visitor without permission. A component that renders nothing *silently* is a support
 ticket.
 
@@ -723,7 +723,7 @@ Three more rules that go with it:
 
 ## How do I hide my component completely, leaving no gap behind?
 
-*basic.* Returning an empty template is not enough. The page has already laid out a slot element
+*Basic.* Returning an empty template is not enough. The page has already laid out a slot element
 for your component — a column, its content gaps, possibly a background band — so an empty
 component leaves a visible hole in the page.
 
@@ -834,7 +834,7 @@ Pitfalls:
 
 ## How do I check a permission before offering an action?
 
-*basic.* Permissions are per asset, and a permission check in the frontend is about the
+*Basic.* Permissions are per asset, and a permission check in the frontend is about the
 *experience*: the platform enforces the real thing server-side. Never treat a frontend check as
 security — but do use it, because an action that fails after the visitor clicks it is worse than
 one that was never offered.
@@ -883,7 +883,7 @@ before you debug the template.
 
 ## How do I react to the signed-in user?
 
-*basic.* `AuthMixin` answers the questions a component actually asks, and the portals context
+*Basic.* `AuthMixin` answers the questions a component actually asks, and the portals context
 carries the user.
 
 ```vue
@@ -939,7 +939,7 @@ Pitfalls:
 
 ## How do I offer a download?
 
-*basic.* Mix in `SDownloadProps` and you get the configuration properties (all the dialog
+*Basic.* Mix in `SDownloadProps` and you get the configuration properties (all the dialog
 texts), the dialog component, and the methods. You bind the dialog once and call a method.
 
 ```vue
@@ -999,7 +999,7 @@ of them.
 
 ## How do I talk to another component on the same page?
 
-*advanced.* Normally components talk through props and events, with the page in the middle. When
+*Advanced.* Normally components talk through props and events, with the page in the middle. When
 two components sit in different slots and one has to know what the other did, the event bus is
 the sanctioned way.
 
@@ -1043,7 +1043,7 @@ Pitfalls:
 
 ## How do I write a component for the search page?
 
-*advanced.* A search page is a page template that owns the search and hands the state to whichever
+*Advanced.* A search page is a page template that owns the search and hands the state to whichever
 components sit in its slots. Your component declares the matching `ui-type-…`, takes the state as
 **props**, and asks for changes by **emitting events**. It does not search.
 
@@ -1149,7 +1149,7 @@ Pitfalls:
 
 ## How do I write a component for the asset details page?
 
-*advanced.* The asset details **page template** owns the asset and the navigation through the
+*Advanced.* The asset details **page template** owns the asset and the navigation through the
 search result — that is what `AssetDetailsPageNavigationMixin` is for, and it belongs in the page,
 not in your component. Your component receives the state as props and asks for a move by emitting
 an event, exactly as on the search page.
@@ -1251,7 +1251,7 @@ Pitfalls:
 
 ## How do I consume my own data adapter interface?
 
-*advanced.* A **custom** component pairs a data adapter that publishes its own interface with a
+*Advanced.* A **custom** component pairs a data adapter that publishes its own interface with a
 UI component that consumes it. The contract between them is a TypeScript file generated from the
 data adapter's own types.
 
@@ -1299,7 +1299,7 @@ Pitfalls:
 
 ## How do I wrap other components in a section?
 
-*advanced.* A *section* is the one sanctioned way for a component to contain other components.
+*Advanced.* A *section* is the one sanctioned way for a component to contain other components.
 The editor adds your section start, then any number of components, then the generic section end;
 the runtime collects everything between them and hands it to you.
 
@@ -1356,7 +1356,7 @@ Pitfalls:
 
 ## How do I let visitors upload files?
 
-*advanced.* Uploading is two halves that meet in a form: the **files** go to Smint.io's file
+*Advanced.* Uploading is two halves that meet in a form: the **files** go to Smint.io's file
 storage one by one and come back as identifiers, and the **request** — the metadata, the
 requester, the approval — is a task carrying those identifiers. Your component drives the first
 half and hands the identifiers to the second.
@@ -1450,7 +1450,7 @@ Pitfalls:
 
 ## How do I work with collections?
 
-*advanced.* Collections are the visitor's own groupings. Everything goes through the portal's
+*Advanced.* Collections are the visitor's own groupings. Everything goes through the portal's
 collection services, and **every change is announced twice** — once to your parent slot, once on
 the event bus for components elsewhere on the page.
 
@@ -1526,7 +1526,7 @@ Pitfalls:
 
 ## How do I submit a request or an approval?
 
-*advanced.* Access requests, download requests, upload reviews — all of them are **tasks**, and a
+*Advanced.* Access requests, download requests, upload reviews — all of them are **tasks**, and a
 component does not build one by hand. It points at a task management data adapter, names the task
 handler, and renders the shared task action component, which builds the form from the handler's
 own definition.
@@ -1591,7 +1591,7 @@ Pitfalls:
 
 ## How do I build a search form with facets?
 
-*advanced.* The page hands your component the **filter definition** — the groups, the items, their
+*Advanced.* The page hands your component the **filter definition** — the groups, the items, their
 data types and current values — and expects one event back when the visitor changes something.
 Your component renders the definition; it does not invent filters.
 
@@ -1659,7 +1659,7 @@ Pitfalls:
 
 ## How do I ship and render an image or a video?
 
-*basic.* Text you ship as an **embedded** resource in `resources/definition.ts`. Images, videos,
+*Basic.* Text you ship as an **embedded** resource in `resources/definition.ts`. Images, videos,
 audio and documents are **file** resources: they live in your package's resources folder and are
 loaded from there.
 
@@ -1730,7 +1730,7 @@ Pitfalls:
 
 ## How do I read the payload of a dialog page?
 
-*basic.* A dialog page has no URL of its own, so everything a full page would read from the query
+*Basic.* A dialog page has no URL of its own, so everything a full page would read from the query
 string arrives in a **prop**. Its presence is also how you know you are in a dialog at all.
 
 ```typescript
@@ -1779,7 +1779,7 @@ Pitfalls:
 
 ## How do I track an event, and respect the visitor's consent?
 
-*advanced.* Analytics are optional at runtime — a visitor who declined tracking has no analytics
+*Advanced.* Analytics are optional at runtime — a visitor who declined tracking has no analytics
 provider — so the injection is optional and every call is guarded:
 
 ```typescript
@@ -1858,7 +1858,7 @@ Pitfalls:
 
 ## How do I render an asset preview?
 
-*advanced.* Do not build a media player. The shared library ships a preview component per media
+*Advanced.* Do not build a media player. The shared library ships a preview component per media
 kind; your component's job is to pick the right one and pass the asset through.
 
 ```vue
@@ -1943,7 +1943,7 @@ Pitfalls:
 
 ## How do I react to navigation and to live editor changes?
 
-*advanced.* Two things change under a running component: the visitor navigates, and — in the
+*Advanced.* Two things change under a running component: the visitor navigates, and — in the
 page composer — the administrator edits the settings and expects to see the result.
 
 The page context is injected **reactively**, because it changes as the visitor moves:
@@ -1985,7 +1985,7 @@ Three rules that follow from this:
 
 ## How do I behave properly on a phone?
 
-*basic.* Portals are used on phones at least as much as on desktops, and the page cannot fix a
+*Basic.* Portals are used on phones at least as much as on desktops, and the page cannot fix a
 component that ignores the viewport.
 
 ```vue
