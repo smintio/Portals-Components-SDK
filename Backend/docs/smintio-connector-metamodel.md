@@ -1,7 +1,7 @@
 The Smint.io Portals connector meta-model
 =========================================
 
-Current version of this document is: 2.1.0 (as of 15th of September, 2026)
+Current version of this document is: 2.1.1 (as of 15th of September, 2026)
 
 How a connector describes the external system's own schema, so that Smint.io Portals can interpret
 the data your data adapter delivers.
@@ -332,9 +332,10 @@ Remember that `FormItemModel.DataType` is a `ValueTypeEnum`, not a metamodel `Da
 ## Download sizes
 
 `AddDownloadSize(key, labels)` advertises a rendition format the external system offers. It is part
-of the container for completeness, but note that download options actually reach the portal through
-the data adapter's `IAssetsDownload` interface, not from here — so treat this as declarative only,
-and put your real effort into the download interface.
+of the container for completeness, but note that download options actually reach the portal from the
+data adapter, through `GetCustomAssetDownloadItemMappingsAsync` — not from here. Treat this as
+declarative only, and put your real effort into
+[offering downloads](smintio-backend-recipes.md#user-content-how-do-i-offer-downloads).
 
 ## Translating a meta-model
 

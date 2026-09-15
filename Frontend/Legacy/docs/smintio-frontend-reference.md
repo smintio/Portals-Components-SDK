@@ -1,7 +1,7 @@
 Smint.io Portals frontend reference
 ==================================
 
-Current version of this document is: 1.2.0 (as of 15th of September, 2026)
+Current version of this document is: 1.2.2 (as of 15th of September, 2026)
 
 Lookup tables for building Smint.io Portals frontend components: the services you can inject,
 the template filters and CSS classes the runtime provides, the shared property mixins you
@@ -13,15 +13,15 @@ component and page types see
 [smintio-frontend-component-types.md](smintio-frontend-component-types.md); for the asset
 action mixins see [smintio-mixins.md](smintio-mixins.md).
 
-- [Global services](#global-services)
-- [Events a component can emit](#events-a-component-can-emit)
-- [Global filters](#global-filters)
-- [Configuration property mixins](#configuration-property-mixins)
-- [Shared components](#shared-components)
-- [Dynamic allowed values providers](#dynamic-allowed-values-providers)
-- [`Implements` type names](#implements-type-names)
-- [Data types](#data-types)
-- [Global CSS classes](#global-css-classes)
+1. [Global services](#user-content-global-services)
+1. [Events a component can emit](#user-content-events-a-component-can-emit)
+1. [Global filters](#user-content-global-filters)
+1. [Configuration property mixins](#user-content-configuration-property-mixins)
+1. [Shared components](#user-content-shared-components)
+1. [Dynamic allowed values providers](#user-content-dynamic-allowed-values-providers)
+1. [`Implements` type names](#user-content-implements-type-names)
+1. [Data types](#user-content-data-types)
+1. [Global CSS classes](#user-content-global-css-classes)
 
 ---
 
@@ -179,9 +179,9 @@ same group:
 | `SContentWidthProps` | `s-layout-props` | `slotWidthPixelsDesktop`, `slotWidthPixelsMobile`, `contentWidthDesktop`, `contentWidthMobile` — for page templates |
 | `SHtmlProps` | `s-html-props` | `className`, `anchorName` |
 | `SCssProps` | `s-html-props` | `className` only |
-| `SDownloadProps` | `s-download-props` | 15 download dialog texts, plus the download behaviour |
-| `SRememberProps` | `s-remember-props` | 7 collect dialog texts, plus the collect behaviour |
-| `SShareProps` | `s-share-props` | 27 share dialog texts, plus the share behaviour |
+| `SDownloadProps` | `s-download-props` | 15 download dialog texts. The methods, the `downloadDialogProps` getter and the `<s-download-dialog>` registration come from the dialog mixin it mixes in |
+| `SRememberProps` | `s-remember-props` | 7 collect dialog texts, plus the dialog mixin it mixes in |
+| `SShareProps` | `s-share-props` | 27 share dialog texts, plus the dialog mixin it mixes in |
 | `SQuickViewProps` | `s-quick-view-props` | large file warning texts and the size limit |
 | `SCiHubProps` | `s-ci-hub-props` | CI Hub publishing settings |
 

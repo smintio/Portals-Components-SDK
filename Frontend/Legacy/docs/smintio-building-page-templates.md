@@ -1,17 +1,7 @@
 Building a Smint.io Portals page template
 =========================================
 
-1. [What differs from a UI component](#user-content-what-differs-from-a-ui-component)
-1. [Skeleton](#user-content-skeleton)
-1. [Declaring slots](#user-content-declaring-slots)
-1. [Rendering slots](#user-content-rendering-slots)
-1. [Page types](#user-content-page-types)
-1. [Configuration properties](#user-content-configuration-properties)
-1. [Resources](#user-content-resources)
-1. [Build, run, publish](#user-content-build-run-publish)
-1. [Checklist](#user-content-checklist)
-
-Current version of this document is: 1.1.0 (as of 15th of September, 2026)
+Current version of this document is: 1.1.1 (as of 15th of September, 2026)
 
 A **page template** is the second level of structure in a Smint.io Portal. It defines the
 *slots* of a page — header, left, content, right, footer — decides which UI component types each
@@ -23,6 +13,16 @@ applies identically here. This document covers only what differs.
 
 > Note: *slot* here means a **Smint.io Portals slot**, not a Vue slot. They are unrelated
 > concepts that happen to share a word.
+
+1. [What differs from a UI component](#user-content-what-differs-from-a-ui-component)
+1. [Skeleton](#user-content-skeleton)
+1. [Declaring slots](#user-content-declaring-slots)
+1. [Rendering slots](#user-content-rendering-slots)
+1. [Page types](#user-content-page-types)
+1. [Configuration properties](#user-content-configuration-properties)
+1. [Resources](#user-content-resources)
+1. [Build, run, publish](#user-content-build-run-publish)
+1. [Checklist](#user-content-checklist)
 
 ## What differs from a UI component
 

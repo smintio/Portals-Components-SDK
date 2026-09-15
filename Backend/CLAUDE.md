@@ -82,6 +82,13 @@ Do not infer the conventions from a single file — they are written down.
   client in the wrong one fails at runtime with nothing at compile time.
 - **`PublicApiInterfaces` on the data adapter startup is the boundary.** A method not declared
   on one of the interfaces listed there is unreachable from a portal, with no error anywhere.
+- **Downloads and folder navigation are not yours to implement.** `IAssetsDownload` and
+  `IAssetsFolderNavigation` are portal-facing, and Smint.io implements them across data adapters.
+  A connector's adapter contributes download options from
+  `GetCustomAssetDownloadItemMappingsAsync`, serves the bytes from `GetAssetDownloadStreamAsync`,
+  and serves folders from `GetFolderContentsForIntegrationLayerAsync`. For upload it is the
+  reverse trap: implement `HandleAssetUploadsAsync` and **do not** override
+  `GetAssetUploadSettingsAsync`, which the base class projects from your configuration.
 - **The meta-model is a filter.** A value whose property was never declared is dropped on
   conversion, silently. If data is missing in the portal, check the declaration before debugging
   the conversion.
@@ -167,7 +174,7 @@ Ask these of both kinds:
 | Ask | Offer | Why |
 |---|---|---|
 | **Live connection or indexed through the integration layer?** | recommend **live** when the external system has faceted search and translated metadata and is fast enough to sit in front of a portal; recommend **indexed** when it does not, or when renditions have to be generated | it decides which configuration marker interfaces the data adapter implements, whether you write an `IAssetsIntegrationLayerApiProvider`, and how synchronisation works. It is the single most structural decision after the component type |
-| Which standard public API interfaces does the data adapter publish? | recommend `IAssets`; add `IAssetsFolderNavigation` only if folders are genuinely browsable, `IAssetsDownload` for downloads, `IAssetsUpload` for upload, `ICollections…`, `IShares…`, `IResourceAssets…`, `IProductAssets…` as they apply | this is the reachable surface. Declaring more than you implement means the portal calls methods you have not written |
+| Which standard public API interfaces does the data adapter publish? | recommend `IAssets`; add `IAssetsUpload` for upload, `ICollections…`, `IShares…`, `IResourceAssets…`, `IProductAssets…` as they apply. **Do not offer `IAssetsDownload` or `IAssetsFolderNavigation`** — both are portal-facing and Smint.io implements them across data adapters | this is the reachable surface. Declaring more than you implement means the portal calls methods you have not written |
 | What does the external system's schema look like, and how do you read it? | ask whether the schema is discoverable through an API, and whether metadata is translated on that side | the meta-model builder is a substantial part of a productized connector, and whether the schema can be read at all decides whether the connector is even viable |
 
 **If custom**, additionally:

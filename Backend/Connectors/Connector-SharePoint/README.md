@@ -1,11 +1,11 @@
-How-to implement the `Connector`
-================================
+The SharePoint connector, worked through
+========================================
 
-Current version of this document is: 1.0.5 (as of 15th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 ## SharePoint `Connector` Basics
 
-For Sharepoint (or rather: the Microsoft Graph API) offers OAuth2 authorization with several flows. In order to
+SharePoint (or rather: the Microsoft Graph API) offers OAuth2 authorization with several flows. In order to
 leverage user-specific access rules and to provide a fine-grained security context, we opted for the OAuth2 Authorization
 Code Flow.
 
@@ -19,11 +19,11 @@ that low level details at all.
 This section describes how to set up the `Connector` to use the OAuth2's Authorization Code flow. It is easiest to
 extend the pre-existing `OAuth2AuthenticationCodeFlowWithPKCEConnector` and customize it to your specific needs.
 
-The Authorization Code Flow consists of two main steps:
+The Authorization Code Flow consists of three steps:
 
 1. obtain an Authorization Code
 2. use the Authorization Code to obtain an Access Token and a Refresh Token
-3. (use the refresh token to get a new access token)
+3. use the Refresh Token to obtain a new Access Token when the old one expires
 
 The Smint.io Portals framework does all that for you. You just need to provide the detailed implementation of the
 specific external system you're integrating to.
@@ -56,7 +56,7 @@ var originalRedirectUrl = GetOriginalRedirectUrl(bootstrapAuthorizationValuesMod
 var tenantId = GetTenantId(); // stored in the Configuration
 
 var restSharpClient = new RestSharpClient(new Uri(identityServerUrl)); //stored in the Configuration
-var request = new RestRequest($"/{tenantId}/oauth2/v2.0/token", Method.POST);
+var request = new RestRequest($"/{tenantId}/oauth2/v2.0/token", Method.Post);
 
 // Microsoft Identity Platform requires that the redirect_uri be present
 request.AddParameter("client_id", clientId, ParameterType.GetOrPost);
@@ -67,7 +67,12 @@ request.AddParameter("client_secret", GetClientIdAndSecret(bootstrapAuthorizatio
 
 request.AcceptApplicationJson();
 
-var postResponse = await restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenResponse>(request)
+// Every call to the external system goes through a retry policy, with a hint that
+// identifies it in the logs.
+var postResponse = await new RestSharpRetryPolicy(
+        Key, "Get access token by authorization code", isGet: false,
+        requestFailedHandler: null, portalsContextModel: null, _logger, maxRequestRetryCount: 0)
+    .ExecuteAsync((_) => restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenResponse>(request))
     .ConfigureAwait(false);
 ```
 
@@ -88,20 +93,23 @@ return bootstrapAuthorizationValuesModel
 ```c#
 var refreshToken = GetRefreshToken(authorizationValuesModel);
 
-var request = new RestRequest($"/{tenantId}/oauth2/v2.0/token", Method.POST);
+var request = new RestRequest($"/{tenantId}/oauth2/v2.0/token", Method.Post);
 request.AddParameter("client_id", clientId, ParameterType.GetOrPost);
 request.AddParameter("refresh_token", refreshToken, ParameterType.GetOrPost);
 request.AddParameter("grant_type", "refresh_token", ParameterType.GetOrPost);
 request.AddParameter("redirect_uri", redirectUri, ParameterType.GetOrPost);
 request.AddParameter("client_secret", secret);
-request.AddParameter("scope", "sites.read.all offline_access");
+request.AddParameter("scope", $"offline_access {MicrosoftGraphUrl}/Sites.Read.All");
 
 var restSharpClient = new RestSharpClient(new Uri(identityServerUrl));
 
 request.AcceptApplicationJson();
 
-var postResponse = await restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenResponse>(request)
-                .ConfigureAwait(false);
+var postResponse = await new RestSharpRetryPolicy(
+        Key, "Get access token by refresh token", isGet: false,
+        requestFailedHandler: null, portalsContextModel: null, _logger, maxRequestRetryCount: 0)
+    .ExecuteAsync((_) => restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenResponse>(request))
+    .ConfigureAwait(false);
 ```
 
 ## The connector meta-model
@@ -110,7 +118,7 @@ This section is a **worked example**: how the meta-model concepts apply to one r
 entity and property members, enum entities, indexing, semantic types, form groups, the lifecycle — is
 [the connector meta-model](../../docs/smintio-connector-metamodel.md).
 
-Each type of object in the external system is represented by one `EntityModel`. Sharepoint is rather simple in that
+Each type of object in the external system is represented by one `EntityModel`. SharePoint is rather simple in that
 regard, because it only has one type of object, the `File` (similar to a desktop file system), so there is only one
 `EntityModel`. Columns (i.e. custom fields) affect all files equally: if we were to add a custom choice field "Mood",
 indicating the mood prevalent in an image, it would also be possible for a `*.docx` file to have a "Mood" field.
@@ -118,7 +126,7 @@ indicating the mood prevalent in an image, it would also be possible for a `*.do
 ### Meta-model structure
 
 The meta-model consists of a collection of `EntityModel` objects, and each `EntityModel` has a list of `Properties`. It could be compared to a C# class definition where each `EntityModel` would be one
-class, each `Property` a class member. So if we were to model a Sharepoint file in C#, we could write it as
+class, each `Property` a class member. So if we were to model a SharePoint file in C#, we could write it as
 
 ```c#
 public class SharepointFile {
@@ -177,19 +185,19 @@ spf.AddProperty("LikeCount", DataType.Int32, ..., labels: new ResourceLocalizedS
 // ...
 ```
 
-### Get metadata from Sharepoint
+### Get metadata from SharePoint
 
-The Sharepoint datatype for a metadata field is called `ColumnDefinition`, since all metadata fields are called columns:
+The SharePoint datatype for a metadata field is called `ColumnDefinition`, since all metadata fields are called columns:
 
 ```c#
 IEnumerable<ColumnDefinition> colDefs = await _sharepointClient.GetMetadataAsync(_siteId)
 ```
 
-It should be noted that even at this point, Sharepoint metadata is a fair bit more detailed than what is currently implemented in Smint.io Portals. For example, Sharepoint has `Text` columns,
+It should be noted that even at this point, SharePoint metadata is a fair bit more detailed than what is currently implemented in Smint.io Portals. For example, SharePoint has `Text` columns,
 that have attributes like `MaxLength`, `AllowMultiline` etc. which we cannot model in Portals at the moment. This is no problem though, as long as data is only read, and no input
 validation is required. Please get in touch if you need more capabilities here.
 
-Sharepoint only knows one "root entity model", but other more complex systems may distinguish between images, video files, thus have an `EntityModel` for each one of them.
+SharePoint only knows one "root entity model", but other more complex systems may distinguish between images, video files, thus have an `EntityModel` for each one of them.
 
 Contributors
 ============

@@ -1,7 +1,7 @@
 Smint.io Portals backend component annotations
 =============================================
 
-Current version of this document is: 1.4.0 (as of 15th of September, 2026)
+Current version of this document is: 1.4.1 (as of 15th of September, 2026)
 
 Annotations describe a backend component's configuration to Smint.io Portals: what fields the
 portal administrator sees when configuring your connector, data adapter, data processor,
@@ -248,7 +248,7 @@ separate files. Use `ResourceLocalizedStringsModel` to reference one from a meta
 var rootEntityLabels = new ResourceLocalizedStringsModel(nameof(MetamodelMessages.c_myconnector_root_entity));
 ```
 
-A data adapter can also resolve a metamodel message to a plain localized string at request time,
+A data adapter can also resolve a meta-model message to a plain localized string at request time,
 which is what you want for a value that is displayed but does not have to be fully translatable
 in the meta-model:
 

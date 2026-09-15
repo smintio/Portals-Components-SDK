@@ -1,4 +1,4 @@
-// NR: a stub to use TypeScript with rollup
+// A stub that lets rollup read the shared TypeScript config
 import tsNode from "ts-node";
 import pkg from "./package.json";
 import rollupConfig from "../../config/rollup/rollup-config.ts";

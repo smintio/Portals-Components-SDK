@@ -1567,7 +1567,7 @@ Pitfalls:
   template for *each* culture present in the source attributes, and give up — returning the
   original untouched — unless the result carries the default culture. Rendering once against the
   current culture produces a file name in whichever language happened to be active.
-- **Cache parsed metadata paths against the configuration version.** Parsing a metamodel path is
+- **Cache parsed metadata paths against the configuration version.** Parsing a meta-model path is
   expensive and the result is only valid for one configuration version, so the cache key is your
   own prefix plus `Context.ConfigurationVersion` — and give each distinct set of paths its own
   prefix, or one lookup serves the other's result.

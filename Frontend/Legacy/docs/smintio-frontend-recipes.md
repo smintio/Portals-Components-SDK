@@ -1,7 +1,7 @@
 Smint.io Portals frontend component recipes
 ===========================================
 
-Current version of this document is: 2.0.0 (as of 15th of September, 2026)
+Current version of this document is: 2.0.1 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other frontend documents describe *what exists*; this one shows *how it is used*.
@@ -108,7 +108,7 @@ import {
 import { SCssProps } from "@smintio/portals-components";
 
 @PortalsUiComponent({
-    type: "ui-type-generic",
+    type: "ui-type-assets-preview",
     key: "mypartner-ui-latest-assets-1",
     displayName: { [DefaultCulture]: "Latest assets" },
     description: { [DefaultCulture]: "Shows the newest assets of a data source." },
@@ -186,7 +186,7 @@ What the pieces are:
 | | |
 |---|---|
 | `@Implements("IAssetsSearch")` | makes the property a **data source picker** in the editor. The string is the interface name from [the data adapter reference](smintio-data-adapter-reference.md) |
-| `searchAssetsAsync(parameters)` | every data adapter method takes exactly one parameter object and returns a promise |
+| `searchAssetsAsync(parameters)` | a data adapter method takes one parameter object and returns a promise. A few — the long-running ones and the collection mutations — take a second positional argument for progress or options; the generated TypeScript shows which |
 | `result.assetDataObjects` | the assets. Results are shaped `I…Result`; the assets always arrive under `assetDataObjects` |
 | `asset.smintIoId` | the asset's id, inherited from `IDataObject`. Use it as the `:key` and wherever an `IAssetIdentifier` is asked for: `{ id: asset.smintIoId }` |
 
@@ -644,7 +644,7 @@ presents itself there.
 
 ```typescript
 @PortalsUiComponent({
-    type: "ui-type-generic",
+    type: "ui-type-custom",
     key: "mypartner-ui-press-contact-1",
     displayName: { [DefaultCulture]: "Press contact", de: "Pressekontakt" },
     description: { [DefaultCulture]: "Shows the press contact for the current release." },
@@ -1045,7 +1045,13 @@ drives the next search.
 
 <script lang="ts">
 import { Mixins, Prop } from "vue-property-decorator";
-import type { IAssetDataObject, IFormFieldValuesModel } from "@smintio/portals-component-sdk";
+import type {
+    IAssetDataObject,
+    IFolderIdentifier,
+    IFormFieldValuesModel,
+    IFormGroupsDefinitionModel,
+    ILocalizedStringsModel,
+} from "@smintio/portals-component-sdk";
 import { DefaultCulture, PortalsUiComponent } from "@smintio/portals-component-sdk";
 import { SCssProps } from "@smintio/portals-components";
 
@@ -1111,7 +1117,7 @@ Pitfalls:
   are the same data and the wrong name silently yields `undefined`.
 - **`currentSearch` is the *current filter state*, not a query string.** Pass it on to anything
   that needs to stay in sync — a search bar asking for proposals takes it as `currentFilters`.
-- **Declare the type that matches the slot.** A `ui-type-generic` component cannot be placed in
+- **Declare the type that matches the slot.** A `ui-type-custom` component cannot be placed in
   the search result slot, and a `ui-type-search-result` one gets props nowhere else.
 
 ## How do I write a component for the asset details page?
@@ -1260,8 +1266,9 @@ Pitfalls:
   of the release. A stale definition compiles and fails at runtime.
 - **Name the fields for the consumer.** The generated types are your published API — renaming a
   field later breaks every portal already configured.
-- **A custom interface still returns one parameter object and one result object.** Do not try to
-  pass positional parameters.
+- **A custom interface takes one parameter object and returns one result object.** Do not design
+  it around positional parameters — the only positional argument the platform adds is the
+  progress monitor on a long-running method.
 
 ## How do I wrap other components in a section?
 
@@ -1784,7 +1791,7 @@ public mounted(): void {
     this.refresh();
 }
 
-public unmounted(): void {
+public beforeDestroy(): void {
     this.consentProvider.unregisterConsentAcceptedEventListener(this);
     this.consentProvider.unregisterConsentDeclinedEventListener(this);
 }

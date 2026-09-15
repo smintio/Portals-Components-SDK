@@ -1,7 +1,7 @@
 Page type contracts
 ===================
 
-Current version of this document is: 1.0.0 (as of 11th of September, 2026)
+Current version of this document is: 1.0.1 (as of 15th of September, 2026)
 
 What a UI component receives from the page that hosts it, per page type — generated from
 the `ui-slot-data` bindings in every Smint.io page template.
@@ -315,7 +315,7 @@ difference between them in the tables below is worth treating as a bug in one of
 
 ## `page-type-assets-search`
 
-### Search assets (Media center - Imagination)
+### Search assets (media center)
 
 `smintio-page-media-gallery-assets-search-1`
 

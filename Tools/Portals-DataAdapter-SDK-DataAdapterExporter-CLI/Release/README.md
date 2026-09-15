@@ -1,12 +1,12 @@
 The Portals-DataAdapter-SDK-DataAdapterExporter-CLI tool
 ========================================================
 
-1. [Description](#description)
-1. [Download](#download)
-1. [Parameters](#parameters)
-1. [Usage](#usage)
+1. [Description](#user-content-description)
+1. [Download](#user-content-download)
+1. [Parameters](#user-content-parameters)
+1. [Usage](#user-content-usage)
 
-Current version of this document is: 1.0.2 (as of 15th of September, 2026)
+Current version of this document is: 1.0.3 (as of 15th of September, 2026)
 
 ## Description
 

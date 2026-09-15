@@ -1,7 +1,7 @@
 Smint.io Portals page templates
 ===============================
 
-Current version of this document is: 2.0.0 (as of 10th of September, 2026)
+Current version of this document is: 2.0.1 (as of 15th of September, 2026)
 
 This is the full list of page templates delivered and maintained by Smint.io, generated
 from the page template sources.
@@ -360,11 +360,11 @@ This is an asset details page to show a preview of an asset and its associated m
 
 ---
 
-### Search assets (Media center - Imagination)
+### Search assets (media center)
 
-This assets search page template is best suited for media centers. It was originally designed for the Imagination media center.
+This assets search page template is best suited for media centers. It was originally designed for a media center portal.
 
-![Search assets (Media center - Imagination)](./images/page-templates/search-page.png "Search assets (Media center - Imagination)")
+![Search assets (media center)](./images/page-templates/search-page.png "Search assets (media center)")
 
 | Key | Type |
 |---|---|

@@ -1,16 +1,18 @@
-DataAdapter Unit Tests
-======================
+The SharePoint test driver
+==========================
 
-Current version of this document is: 1.0.0 (as of 2nd of March, 2023)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 ## Basics
 
 The `DataAdapter` can be understood as a _facade_ for the external system. It is used to read, search (and potentially write) data from (and to) an external system.
 
-It uses the `Connector` to establish a connection to the external system such as Sharepoint. 
+It uses the `Connector` to establish a connection to the external system such as SharePoint. 
 
-In order to ensure that both the DataAdapter and Connector function correctly, Smint.io created a set of unit tests.
-This documentation briefly explains how does the Smint.io test framework works.
+To check that both the data adapter and the connector work against a real tenant, Smint.io ships a set of shared
+integration tests. This document walks through how this example wires them up; the full contract — the fixture base
+class, the whole set of shared test classes and what each expects — is in
+[building, testing and publishing](../../docs/smintio-backend-component-delivery.md).
 
 ## Folder Structure
 
@@ -18,19 +20,21 @@ We have two folders in the test suite, `Harness` and `Integration` Here's a brie
 
 ### Harness
 
-The files in this folder are used to configure the data adapter fixture. In our case, the `SharePointFixture` first creates a Connector test drive instance using `OAuth2AuthenticationCodeFlowWithPKCETestDriver` which we call `connectorTestDriver`. The test driver accepts `typeof(SharepointConnectorStartup)` and the startup settings. Then the connector test driver know how to create a valid `Connector` instance and obtain access and refresh tokens.
+The files in this folder are used to configure the data adapter fixture. In our case, the `SharePointFixture` first creates a connector test driver instance using `OAuth2AuthenticationCodeFlowWithPKCETestDriver` which we call `connectorTestDriver`. The test driver accepts `typeof(SharepointConnectorStartup)` and the startup settings. Then the connector test driver know how to create a valid `Connector` instance and obtain access and refresh tokens.
 
-Next is the initialization of the data adapter instance using a `DataAdapterTestDriver`. This test drive instantiates an in-memory corresponding representation for the given startup type parameter `typeof(SharepointAssetsDataAdapterStartup)` for the given configurations.
+Next is the initialization of the data adapter instance using a `DataAdapterTestDriver`. This test driver instantiates an in-memory corresponding representation for the given startup type parameter `typeof(SharepointAssetsDataAdapterStartup)` for the given configurations.
 
 Having both the connector and data adapter initialized, we can proceed and test them.
 
-Please note that we use the term "fixture" to describe the configuration of a DataAdapter.
+Please note that we use the term "fixture" for the harness that builds the connector and the data adapter together and
+hands both to the tests.
 
 ### Integration
 
-The integration folder contains all the unit tests for SharePoint. Since Smint.io has a set of generic unit tests, we can leverage them by inheriting some of the base classes. 
+The integration folder contains the tests for SharePoint. They run against a real tenant, so they are integration tests
+rather than unit tests. Smint.io ships a set of shared test classes, and this example inherits the ones that apply: 
 
-* ConnectorMetamodelTests - will test connector's metamodel
+* ConnectorMetamodelTests - will test the connector's meta-model
 * ConnectorTests - will test the connector itself
 * DataAdapterIntegrationLayerStartupTests - will test basic data adapter integration layer startup integrity
 * DataAdapterIntegrationLayerTests - will test the data adapter using an in-memory representation of the integration layer

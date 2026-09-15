@@ -1,7 +1,7 @@
 Smint.io Portals identity providers
 ===================================
 
-Current version of this document is: 1.0.1 (as of 15th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 An identity provider component federates the authentication of a portal's **end users** to an
 external identity system. It is what stands behind single sign-on into a Smint.io Portal.
@@ -151,8 +151,12 @@ the rest:
 | Member | |
 |---|---|
 | `ExternalUserGroupResolutionEnabled` | the administrator's switch. Group resolution only runs when this is on |
-| `ExternalUsersRead` | an `IExternalUsersRead` data adapter — the component that actually asks the external system. **A data adapter picker in the configuration form**, because the lookup is an integration concern, not an authentication one |
+| `ExternalUsersRead` | an `IExternalUsersRead` data adapter — the component that actually asks the external system |
 | `ExternalUserLookupRetries` | how many times to retry. A user who has just been created in the external system is often not visible to the API for a few seconds |
+
+Declare these three **bare, with no annotations**: the platform fills them in, so they are not
+fields the administrator edits. And do not implement the group lookup yourself — the base class
+does it, including the retry above. You supply the data adapter that answers it.
 
 So group resolution is a collaboration: the identity provider authenticates, and a data adapter
 implementing

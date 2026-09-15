@@ -1,12 +1,12 @@
 Smint.io Portals frontend component types
 =========================================
 
-* [UI component types](#ui-component-types)
-* [UI component types for the login system](#ui-component-types-for-the-login-system)
-* [Page types](#page-types)
-* [Page types for the login system](#page-types-for-the-login-system)
+Current version of this document is: 1.1.2 (as of 15th of September, 2026)
 
-Current version of this document is: 1.1.1 (as of 14th of September, 2026)
+1. [UI component types](#user-content-ui-component-types)
+1. [UI component types for the login system](#user-content-ui-component-types-for-the-login-system)
+1. [Page types](#user-content-page-types)
+1. [Page types for the login system](#user-content-page-types-for-the-login-system)
 
 ## UI component types
 

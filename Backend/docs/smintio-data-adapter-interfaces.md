@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.5.0 (as of 15th of September, 2026)
+Current version of this document is: 1.5.1 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -221,7 +221,7 @@ of their own except, for products, `IProductAssetsSearchRelated.SearchProductAss
 | `IAiSemanticAnalysis` | `GetFileAnalysisAsync`, `GetSemanticAnalysisAsync` |
 | `IAiEmbeddings` | vector embeddings for semantic and natural-language search |
 | `IExternalUsersRead` | `GetUserGroupMembershipAsync` — resolves a portal user's groups in the external system, which is how external group membership drives portal permissions |
-| `IWebhooksApiProvider` | `ValidateWebhookAsync` — validates an inbound callback before the platform acts on it |
+| `IWebhooksApiProvider` | `ValidateWebhookAsync` — decide whether to believe an inbound callback — and `ProcessWebhookAsync` — queue the payload. Validate cheaply, then queue; never do the work in the callback |
 
 Search-shaped interfaces follow one convention throughout: a `Search…Async` paired with
 `Get…FilterValuesAsync` and `Get…SortValuesAsync`, so the client can build the filter and sort
@@ -523,8 +523,8 @@ the two halves agree.
 connector's — it is this adapter's secret, it has nothing to do with authenticating to the
 external system, and it is often different per customer. Configurations are stored encrypted at
 rest and a saved secret is never displayed back to the administrator, so putting it there is
-safe — **provided you name the property so that it is recognised as a secret**, which a name
-containing `key`, `secret` or `password` is. See
+safe — **provided you name the property so that it is recognised as a secret**, which depends on
+the name containing one of a fixed set of words. See
 [configuration is stored encrypted](smintio-backend-annotations.md#user-content-configuration-is-stored-encrypted)
 and [the data adapter's own configuration](#user-content-the-data-adapters-own-configuration).
 

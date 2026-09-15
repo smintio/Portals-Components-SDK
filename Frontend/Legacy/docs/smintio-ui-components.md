@@ -1,7 +1,7 @@
 Smint.io Portals UI components
 ==============================
 
-Current version of this document is: 2.0.0 (as of 10th of September, 2026)
+Current version of this document is: 2.0.1 (as of 15th of September, 2026)
 
 This is the full list of UI components delivered and maintained by Smint.io, generated
 from the component sources.
@@ -22,7 +22,7 @@ component type that decides which page template slots accept the component. See
 
 **Login and account components** — Accept terms form, Access denied display, Confirm email address form, Cookie consent banner, Email confirmation message sent display, Email address not yet confirmed display, Forgot password form, Password reset message sent display, Accept or decline invitation to collection form, Login form, Logout confirmation form, Manage account form, Change password form, Manage cookie consent, Registration form, Reset password form, Password has been reset display
 
-**Media gallery components** — Action bar for asset details view, Metadata viewer for side panels, Form based metadata viewer, Asset preview for asset details view, Metadata-based tag viewer for asset details view, Metadata-based text block for asset details view, Collections quickview (Media center - Imagination), Facet based search form (Media center - Imagination), Search result display (Media center - Imagination)
+**Media gallery components** — Action bar for asset details view, Metadata viewer for side panels, Form based metadata viewer, Asset preview for asset details view, Metadata-based tag viewer for asset details view, Metadata-based text block for asset details view, Collections quickview (media center), Facet based search form (media center), Search result display (media center)
 
 **Press portal components** — Metadata based banner for asset details view, Metadata-based link block for asset details view, Metadata-based quote block for asset details view, Press releases overview
 
@@ -1711,11 +1711,11 @@ This component displays a metadata-based text block with header, sub header and 
 
 ---
 
-### Collections quickview (Media center - Imagination)
+### Collections quickview (media center)
 
-This collections quickview component is best suited for media centers. It was originally designed for the Imagination media center.
+This collections quickview component is best suited for media centers. It was originally designed for a media center portal.
 
-![Collections quickview (Media center - Imagination)](./images/ui-components/collections-quickview.png "Collections quickview (Media center - Imagination)")
+![Collections quickview (media center)](./images/ui-components/collections-quickview.png "Collections quickview (media center)")
 
 | Key | Type |
 |---|---|
@@ -1783,11 +1783,11 @@ This collections quickview component is best suited for media centers. It was or
 
 ---
 
-### Facet based search form (Media center - Imagination)
+### Facet based search form (media center)
 
-This facet based search form is best suited for media centers. It was originally designed for the Imagination media center.
+This facet based search form is best suited for media centers. It was originally designed for a media center portal.
 
-![Facet based search form (Media center - Imagination)](./images/ui-components/search-facet-form.png "Facet based search form (Media center - Imagination)")
+![Facet based search form (media center)](./images/ui-components/search-facet-form.png "Facet based search form (media center)")
 
 | Key | Type |
 |---|---|
@@ -1814,11 +1814,11 @@ This facet based search form is best suited for media centers. It was originally
 
 ---
 
-### Search result display (Media center - Imagination)
+### Search result display (media center)
 
-This search result display component is best suited for media centers. It was originally designed for the Imagination media center.
+This search result display component is best suited for media centers. It was originally designed for a media center portal.
 
-![Search result display (Media center - Imagination)](./images/ui-components/search-result.png "Search result display (Media center - Imagination)")
+![Search result display (media center)](./images/ui-components/search-result.png "Search result display (media center)")
 
 | Key | Type |
 |---|---|

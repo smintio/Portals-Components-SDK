@@ -24,17 +24,24 @@ Access to them is restricted and is arranged with Smint.io — see
 1. [Data adapter reference: every public API interface and model](docs/smintio-data-adapter-reference.md)
 1. [Page type contracts: what a page hands to the components it hosts](docs/smintio-page-type-contracts.md)
 1. [Building a page template: slots, contracts and the page skeleton](docs/smintio-building-page-templates.md)
-1. [Reference sources: the components Smint.io ships, for Certified Partners](Reference/)
-1. [How to develop your own custom component](#user-content-how-to-develop-your-own-frontend-component)
+1. [Reference sources: the components Smint.io ships, for Certified Partners](Reference/README.md)
+1. [How to develop your own frontend component](#user-content-how-to-develop-your-own-frontend-component)
 1. [Before you start: the questions to answer](#user-content-before-you-start-the-questions-to-answer)
+1. [Getting started](#user-content-getting-started)
 1. [Anatomy of a component package](#user-content-anatomy-of-a-component-package)
+1. [Things to do for Mac or Linux users](#user-content-things-to-do-for-mac-or-linux-users)
+1. [The example frontend component](#user-content-the-example-frontend-component)
 1. [Crafting a page template instead](#user-content-crafting-a-page-template-instead)
 1. [Building a section component](#user-content-building-a-section-component)
+1. [Build your custom frontend component](#user-content-build-your-custom-frontend-component)
+1. [Publish your custom frontend component](#user-content-publish-your-custom-frontend-component)
+1. [Local development](#user-content-local-development)
+1. [Common problems](#user-content-common-problems)
 1. [Checklist before you ship](#user-content-checklist-before-you-ship)
 1. [How we built our own components](#user-content-how-we-built-our-own-components)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.8.0 (as of 15th of September, 2026)
+Current version of this document is: 1.9.0 (as of 15th of September, 2026)
 
 ## UI components
 
@@ -238,8 +245,10 @@ asset, which is what most components end up rendering.
 Two things to keep in mind when calling a data adapter public API interface:
 
 - The property can be `undefined`, because the portal editor may not have configured a data source for it. Guard for it.
-- Each data adapter will implement all the methods of the interfaces it supports. If functionality is not supported,
-  the data adapter does not declare the interface, and it can then not be selected for the purpose requested by you.
+- A data adapter implements the methods of the interfaces it declares, and one that does not support a capability
+  does not declare its interface — so it cannot be selected for that purpose. An *optional* capability within a
+  declared interface, such as search proposals, can still be unsupported at runtime: catch the failure, switch that
+  feature off for the session, and carry on rendering.
 
 *The great thing is*: if you develop your own Smint.io Portals data adapter, you can easily publish your own custom
 public API interfaces as well. This enables you to easily develop any custom functionality required using the Smint.io
@@ -344,7 +353,7 @@ Steps to follow:
 always-auth=true
 ```
 
-7. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our NPM SDK  repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
+7. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our NPM SDK repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
 8. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
 
 ```
@@ -431,7 +440,7 @@ The source follows established Vue.js structure practices by containing a templa
         },
         description: {
             [DefaultCulture]: "This component displays a message with an optional color.",
-            de: "Diese Komponente dient zur Darstellung eines Banners mit optionalem Titel und einer Suchleiste.",
+            de: "Diese Komponente zeigt einen Text mit optionaler Farbe an.",
         },
     })
 ```
@@ -673,7 +682,7 @@ Prefer `DefaultValue` unless you specifically need the persisted write. A `setFo
 entry is effectively permanent for every component instance created while it was in place.
 
 Adding or changing a resource is an **annotation level change** — see the table under
-[What the dev server covers, and what still needs publishing](#what-the-dev-server-covers-and-what-still-needs-publishing).
+[What the dev server covers, and what still needs publishing](#user-content-what-the-dev-server-covers-and-what-still-needs-publishing).
 It will not show up in the page editor until you publish your component.
 
 Page templates ship string resources in exactly the same way, through
@@ -968,30 +977,17 @@ Please remember that a section start component still follows all the usual UI co
 
 Please note that [access to the SDKs is restricted](../../Overview/README.md#user-content-getting-access-to-the-sdks).
 
-1. In the component folder open a command prompt or terminal window
-2. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
-3. Make sure that your component .npmrc file contains the proper references to our NPM SDK repo:
+The npm feed setup — the node version, the two `.npmrc` files and the two feed authorizations — is
+the same one you did once in
+[getting started](#user-content-getting-started); it is not repeated here.
 
-```
-@smintio:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Public/npm/registry/
-always-auth=true
-```
+1. In the component folder open a command prompt or terminal window, on node 12.22.10
+2. Run `npm i` the first time, and whenever you change dependencies
 
-4. Authorize your NPM for use of our `Portals-Components-Public` NPM SDK repo. You will find more info by accessing the [Azure DevOps location of our NPM SDK repo](https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Public) and by then clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
-5. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
-
-```
-@[partner-id]:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Partners-[partner-id]/npm/registry/
-always-auth=true
-```
-
-6. If applicable, authorize your NPM for use of your partner NPM repo. You will find more info by accessing the Azure DevOps location of your partner repo (https://smintio.visualstudio.com/SmintIo-UIComponents/_artifacts/feed/Portals-Components-Partners-[partner-id]) and by then clicking `Connect to feed` -> `npm` -> select `Windows` or `Other` for instructions)
-7. Run `npm i` at the first time, or when you update dependencies
-
-	- If there is any authorization issues you are running into, you will have done something wrong in step 3-6. Please revisit your settings
+	- Any authorization failure here means something is wrong in the feed setup above. Revisit it
 	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
 	
-8. Run `npm run build` or `npm run watch` to build your frontend component
+3. Run `npm run build` or `npm run watch` to build your frontend component
 
 `npm run build` runs two steps: `build:dist` (rollup, producing the bundle under `lib/`) and `build:resources`
 (the `portals-resource-builder-cli`, producing `portals-ui-component.json` or `portals-page-template.json` from
@@ -1230,13 +1226,13 @@ form, that is the publishing boundary described above — build and publish, and
 | Publishing fails right away | the `version` in `package.json` was not increased, or `SMINT_IO_SDK_HOME` is not set |
 | `npm publish` succeeded but the component was not registered | publishing is two steps and they fail independently. **Do not raise the version and publish again** — that version is already on the feed. Rerun only the registration: `npm info --json \| %SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env <environment>` |
 | Registration fails with a permissions error seconds after a successful `npm publish` | the feed may not have made the new version visible yet. Retry the registration step once before treating it as a permissions problem |
-| Every link in your list highlights after you follow one of them | they all resolve to the same route and differ only in the query — add `exact` to the link, see [Many links to the same search page](#many-links-to-the-same-search-page-use-exact) |
+| Every link in your list highlights after you follow one of them | they all resolve to the same route and differ only in the query — add `exact` to the link, see [Many links to the same search page](#user-content-many-links-to-the-same-search-page-use-exact) |
 | A filtered search link opens the search page but finds nothing | check the filter *value*, not your code: compare the value your link sends with the values the search page offers in its own facet list for that field |
 | Your component does not appear in the page editor of the portal you expected | it was published against a different `SmintIo.ApiUrl` — the tenant comes from the CLI's `appsettings.<Env>.json`, not from the component |
 | Unexpected rollup or babel errors when building | the wrong node version — see the build chapter above |
 | Two identical `CSS class` fields in the configuration form | `SCssProps` and `SHtmlProps` were mixed in together; use only one of them |
 | Your component renders **nothing at all**, with no error in the console | it decided to render nothing. A link that could not be built, a lookup that returned empty, a guard that skipped every item — log the reason at the point where your component gives up, then read the console |
-| A link built from a page reference goes nowhere | a page reference resolves to a *named* route with no `path`; use `this.$router.resolve(location).href` when you need a URL string, see [A page reference resolves to a named route](#a-page-reference-resolves-to-a-named-route-so-it-has-no-path) |
+| A link built from a page reference goes nowhere | a page reference resolves to a *named* route with no `path`; use `this.$router.resolve(location).href` when you need a URL string, see [A page reference resolves to a named route](#user-content-a-page-reference-resolves-to-a-named-route-so-it-has-no-path) |
 | `TS2610: ... is defined as an accessor ... but is overridden here as an instance property` | you extended another component and re-declared one of its members. The base ships its own type definitions — use the member, do not declare it again |
 | `E404 ... is not in the npm registry` followed by `info: Missing component name` | the registration step read the wrong registry: your component folder has no `.npmrc`. Add it, then rerun only the registration |
 | A page shows your latest change although you never published | that is the dev server serving your working folder. It says nothing about what is registered — read the version out of the component's script URL |
