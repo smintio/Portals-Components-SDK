@@ -19,6 +19,7 @@ Please find guides about Smint.io Portals component development here:
 	- Data processors
 	- Task handlers
 	- Portal templates
+	- Resources
 	- Identity providers
 
 This is the tools you need for developing Smint.io Portals components:
@@ -29,7 +30,7 @@ This is the tools you need for developing Smint.io Portals components:
 
 Please note that future tools may be added or existing ones may be updated based on user feedback.
 
-Current version of this document is: 1.2.2 (as of 14th of September, 2026)
+Current version of this document is: 1.3.0 (as of 15th of September, 2026)
 
 Contributors
 ============

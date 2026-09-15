@@ -22,7 +22,7 @@ Four things live here:
 | **Reference implementations** (~158 `.cs`) | `Backend/` — paired connectors and data adapters: `Connector-HelloWorld` + `DataAdapter-HelloWorld` as the minimal skeleton, plus `Picturepark` (live connection) and `SharePoint` (indexed through the integration layer) as realistic ones, each with a test driver. `Frontend/Legacy/Example/ui-example-hello-world-1` is the UI component starter, and `Frontend/Legacy/config/` holds the shared rollup and TypeScript config it extends. |
 | **Frontend reference sources** (`Frontend/Legacy/Reference/`) | **not in this repository.** The sources behind the components Smint.io ships — 64 UI components, 34 page templates, the shared `portals-components` library and the gallery view — are made available to Smint.io Certified Partners on request, and copied into this directory by the partner. The directory ships with a README and a `.gitignore` that hides anything copied in, so the sources can never be committed here by accident. Never describe them as part of this repository, and never link into `Reference/<folder>` from another document — refer to a package by name instead, because the path does not exist for most readers. |
 | **Partner-facing documentation** (~500 KB of Markdown) | `Overview/`, `Backend/README.md` + `Backend/docs/`, `Frontend/Legacy/README.md` + `Frontend/Legacy/docs/` (nine reference documents), and a README per tool under `Tools/`. |
-| **Agent guidance** | `Frontend/Legacy/CLAUDE.md` carries the partner-facing working rules for building a frontend component — the four-round interview for a new component, extend-don't-copy, resources, search links, verification and publishing. It is the public counterpart of the UI component library's own CLAUDE.md. |
+| **Agent guidance** | `Frontend/Legacy/CLAUDE.md` and `Backend/CLAUDE.md` carry the partner-facing working rules for building a component of each kind — the four-round interview, what is most often got wrong, verification and publishing. They are the public counterparts of the UI component library's and the backend SDKs' own CLAUDE.md files. |
 
 `Tools/` ships three tools as release zips: `Portals-SDK-PublishComponent-CLI` (publish and register
 a component), `Legacy/Portals-DevServer` (serve local frontend component builds to a development portal),
@@ -91,10 +91,29 @@ The two generated documents — `Frontend/Legacy/docs/smintio-data-adapter-refer
 of the component library, which are not in this repository. Regenerate them here, from those
 sources, rather than copying a second copy in.
 
+## This repository is also the home of the backend component documentation
+
+`Backend/` — the README, `docs/`, `CLAUDE.md` and the example projects — is the single
+description of how a Smint.io Portals backend component is built, for Smint.io and for partners
+alike, and it covers all seven backend component types: connectors, data adapters, data
+processors, task handlers, portal templates, resources and identity providers. The same rule
+applies as on the frontend side: **when you learn something about building one, write it down
+here**, anonymised, and add a pointer on the internal side only if the internal specifics change
+it.
+
 The backend material has internal authorities too: the connector SDK's and data adapter SDK's own
 CLAUDE.md files describe the metamodel and the asset data model in full, and the SDK core types
 under `Models/Metamodel/Data` are the last word on what an asset actually carries.
-`Backend/docs/smintio-asset-data-model.md` is the partner-facing rendering of that
-material. When the SDK changes, update it from the source types rather than from memory — and keep
-it free of the internal detail the internal documents carry (wire encodings, the execute routes,
-the platform's own resolver classes).
+`Backend/docs/smintio-asset-data-model.md` and `smintio-connector-metamodel.md` are the
+partner-facing rendering of that material. When the SDK changes, update these from the source
+types rather than from memory — and keep them free of the internal detail the internal documents
+carry (wire encodings, the execute routes, the platform's own resolver classes).
+
+The line to hold for every backend document: the **SDK types a partner writes against** —
+`IConnectorStartup`, `AssetsDataAdapterBaseImpl`, `DataAdapterPermission`, the data processor
+lifecycle phase interfaces — belong here and should be named precisely. The **platform's own
+implementation** — the classes that execute a method, resolve a component, load an assembly or
+persist a configuration — does not belong here at all. Describe what the platform does; never
+name what does it. The same goes for the shipped components' own class names, which live in an
+internal repository partners cannot read: describe a shipped data processor by what it does, not
+by its type name.

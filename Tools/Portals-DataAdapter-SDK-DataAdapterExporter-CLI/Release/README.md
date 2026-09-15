@@ -6,7 +6,7 @@ The Portals-DataAdapter-SDK-DataAdapterExporter-CLI tool
 1. [Parameters](#parameters)
 1. [Usage](#usage)
 
-Current version of this document is: 1.0.1 (as of 14th of September, 2026)
+Current version of this document is: 1.0.2 (as of 15th of September, 2026)
 
 ## Description
 
@@ -20,7 +20,7 @@ This tool produces it: point it at your compiled data adapter assembly, and it w
 TypeScript interface definitions, including the parameter and result types they refer to.
 
 The concept, and a worked example of the generated output, is described under
-[custom public API interfaces](../../../Backend/#user-content-custom-public-api-interfaces).
+[custom public API interfaces](../../../Backend/docs/smintio-data-adapter-interfaces.md#user-content-custom-public-api-interfaces).
 
 ## Download
 
