@@ -211,6 +211,36 @@ State which of these you concluded and why, in one line, before you start. If th
 say what you ruled out — and then say whether it is **productized or custom**, because that
 decides how large 5 actually is.
 
+## Probing the external system before you design against it
+
+You will work the external API out by hand — a script, a REST client, the vendor's own explorer —
+before any of it is C#. Four rules, each of which has cost someone a day.
+
+- **Authenticate as the principal your connector will be.** With the client-credentials grant an
+  identity server will happily issue a valid token for a request that asked for no scopes, and
+  every call then fails as unauthorized. Send the same scopes the connector declares in
+  `RequiredScopes`. A token that is issued is not a token that is authorized, and the failure
+  surfaces at the wrong end: credentials, token and account all look correct and the external
+  system looks broken.
+- **Do not conclude a capability is missing from a schema you introspected.** Where the API
+  describes its own schema, that description may be filtered to your principal, and a narrowed
+  schema is indistinguishable from a small one. Call the operation anyway and read the error —
+  "not authorized" and "no such field" are different answers, and only one means the capability
+  does not exist.
+- **Confirm the API accepts the kind of data you intend to send**, rather than inferring it from
+  an operation's name. Create and update operations that look complete are often metadata-only,
+  with binary content moving through a separate channel or through none — uploading is frequently
+  a user-interface capability that was never exposed for API use. Settle this before designing a
+  feature around it: a field the external system cannot store is not a smaller feature, it is a
+  different design.
+- **Never build on an endpoint you found by watching the vendor's own web application.** It is
+  not a supported integration point and it will break. If the documented API cannot do it, that
+  is a finding to report, not an obstacle to route around.
+
+Report what you actually established, and separate it from what you assumed. "The documented API
+has no upload path" and "I could not find an upload path" are different claims, and the second one
+is not a reason to invent one.
+
 ## Writing the component
 
 ### A connector
@@ -263,6 +293,16 @@ too if the component is productized.
 
 **Both:** take the connector's client as a constructor parameter; pull the platform's own
 services off the injected `IServiceProvider`; and never hold a credential.
+
+Two things partners reach for and get wrong, both covered in the data adapter document:
+
+- State the external system has no field for — that a one-time action already happened, say —
+  goes in `IIdPersistentStorage` or `ITemporalPersistentStorage`, **not** in a status or comment
+  field of the external system, where that system's own processes will overwrite it.
+- "Never hold a credential" is about authenticating to the external system. It does **not** mean a
+  data adapter has no security to write: when your component is reached by a signed, time-limited
+  link handed to someone outside the portal, verifying that link is yours to do and nothing else
+  does it. Verify the signature before you act on anything the link carries.
 
 ### Anything else
 

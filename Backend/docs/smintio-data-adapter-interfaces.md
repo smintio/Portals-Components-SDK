@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.1.1 (as of 15th of September, 2026)
+Current version of this document is: 1.2.0 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -27,6 +27,8 @@ which lists the same surface as TypeScript.
 1. [Permissions](#user-content-permissions)
 1. [Configuration marker interfaces](#user-content-configuration-marker-interfaces)
 1. [Getting to the connector's client](#user-content-getting-to-the-connectors-client)
+1. [Keeping state the external system does not keep](#user-content-keeping-state-the-external-system-does-not-keep)
+1. [Two kinds of security, and which one is yours](#user-content-two-kinds-of-security-and-which-one-is-yours)
 1. [Custom public API interfaces](#user-content-custom-public-api-interfaces)
 1. [Things that are easy to get wrong](#user-content-things-that-are-easy-to-get-wrong)
 
@@ -438,6 +440,42 @@ practice every shipped adapter leaves it empty. Registering your client there in
 connector's `ConfigureServicesForDataAdapter` produces a dependency injection failure at runtime
 with nothing to see at compile time.
 
+## Keeping state the external system does not keep
+
+Some interactions need to remember something the external system has no field for — that a
+one-time action has already been performed, that a step was completed, what a caller was shown
+last time. Two services off the injected `IServiceProvider` cover this:
+
+| | |
+|---|---|
+| `IIdPersistentStorage` | keyed records. `GetAsync(uuid)`, `AddOrUpdateAsync(uuid, data, groupUuid)`, `GetGroupAsync`, `RemoveAsync` and their bulk forms, over an `IdPersistentStorageData { Uuid, GroupUuid, Data }` |
+| `ITemporalPersistentStorage` | an append-ordered log. `AddAsync` returns the identifier, `GetRangeAsync(lastKnownId, pageSize)` reads forward from one |
+
+Use the keyed store when you have an identifier from the external system to key on, and the
+temporal one when you need to replay a sequence in order. Neither is a cache — the cache is for
+that, and persistent storage is not the way to avoid a call you could simply make.
+
+Do not keep this state in a field of the external system instead. A status text, a comment or a
+description field belongs to that system's own processes: a workflow there reads it, a user edits
+it, and your marker is gone without anything failing loudly.
+
+## Two kinds of security, and which one is yours
+
+The data adapter never authenticates to the external system — that is the connector's job, and
+the client it hands you must not expose a credential. It is easy to read that as "security does
+not belong in a data adapter". There is a second kind that does.
+
+When your component is reached through a **link handed to someone outside the portal** — a
+tokenised URL granting one person one action on one object for a limited time — validating that
+link is the *data adapter's* responsibility, and nothing else validates it for you. Verify the
+signature before anything else, reject an expired link, and treat every value carried in it as
+untrusted until the signature has checked out. In particular, never read an object identifier out
+of a link and fetch it before verifying the signature over it.
+
+Keep signing and verification together even when only the verifier ships: you need the signer to
+test the verifier, and a test that mints its links through the same code is the only way to know
+the two halves agree.
+
 ## Custom public API interfaces
 
 If the standard interfaces do not describe what your component needs, publish your own. The
@@ -529,6 +567,13 @@ generated for you, and you call the method on the injected interface.
   your own UI component, `IAssets` and the meta-model behind it have no purpose.
 - **Never let a credential out through the client.** The data adapter calls the external system
   through the client; it does not authenticate to it.
+- **But do validate a link your component was reached by.** Authenticating to the external system
+  is the connector's job; verifying a signed, time-limited link handed to an outside party is
+  yours, and nothing else does it — see
+  [two kinds of security](#user-content-two-kinds-of-security-and-which-one-is-yours).
+- **Do not stash your component's state in a field of the external system.** A status text or a
+  comment field belongs to that system's processes and will be overwritten. Use
+  [persistent storage](#user-content-keeping-state-the-external-system-does-not-keep).
 - **Throw `NotImplementedException` for what you do not support**, and make the feature-support
   methods agree with it. A feature flagged `true` and then unimplemented is the worst of both.
 - **`Permissions => null` is right for standard interfaces.** Only a custom interface needs
