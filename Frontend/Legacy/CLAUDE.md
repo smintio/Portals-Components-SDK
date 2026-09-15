@@ -65,6 +65,10 @@ short. If they have not, say so rather than guessing at what a component does.
   authorization header.
 - **A new package needs its own `.npmrc`**, or the registration half of a publish fails while
   `npm publish` has already succeeded. See *The two steps fail independently* in `README.md`.
+- **Do not assume there is a Smint.io npm feed to publish into.** Smint.io hosts one for itself
+  and for its Solution Partners. For a customer-specific project, or a self-hosted VPC
+  deployment, the registry is the partner's own — ask which registry the components are published
+  to before writing the `.npmrc` or `publishConfig`, and never guess a feed URL.
 - **Copy a component only when it is a different component.** If yours is "the generic one plus
   something", extend it instead — see below.
 
@@ -117,6 +121,7 @@ The same questions, written for a human rather than as an asking protocol, are i
 |---|---|---|
 | **Which tenant is it published for?** | ask for the tenant by name; offer "not decided yet" as an explicit option | **nothing in the component's code decides this.** The tenant is whatever `SmintIo.ApiUrl` the publish CLI's `appsettings.<Env>.json` points at, so a publish registers the component for that one tenant — and the wrong one registers it in the wrong tenant's page editor. Record the answer and repeat it back before any publish |
 | Which environment? | `development` / `staging` / `production` | picks which `appsettings.<Env>.json` applies, i.e. which `npm run smint-io-pc*` script. Each environment has its own tenant URL, so confirm the tenant per environment |
+| Which npm registry is the component published to, and under which scope? | a Smint.io partner feed / the customer's or deployment's own registry | Smint.io hosts a feed for itself and its Solution Partners only; a customer-specific project or a self-hosted VPC deployment publishes to its own. The answer decides the second `@scope:registry` line in `.npmrc` and `publishConfig` in `package.json`, and the scope becomes part of the package name, which does not change afterwards |
 | Is there a ticket or issue id? | the id, or none | the commit message and the pull request |
 
 Making a component available to more than one tenant is arranged with Smint.io — it is not an
