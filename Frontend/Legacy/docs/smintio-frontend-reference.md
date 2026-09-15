@@ -1,7 +1,7 @@
 Smint.io Portals frontend reference
 ==================================
 
-Current version of this document is: 1.2.2 (as of 15th of September, 2026)
+Current version of this document is: 1.3.0 (as of 15th of September, 2026)
 
 Lookup tables for building Smint.io Portals frontend components: the services you can inject,
 the template filters and CSS classes the runtime provides, the shared property mixins you
@@ -51,7 +51,7 @@ public readonly pageContext!: IPortalsPageContext;
 | `PortalsContext` | `IPortalsContext` | the portal: `currentPortalUuid`, `portalsName`, `locale`, `tenant`, `user`, `storage`, `services`, `backendWebUrl`, `recaptchaSiteKey`, `notificationStatus` |
 | `PageContext` | `IPortalsPageContext` | the current page: `pageType`, `title`, `description`, `path`, `canonicalUrls`, `uiDesignSpecification`, `getUIComponentsForSlot(slotId)` |
 | `Translator` | `ITranslator` | `localizeStrings()`, `localizeResourceAsset()`, `getVueI18N()` |
-| `ErrorHandler` | `IErrorHandler` | `captureExceptionAndDisplayMessage()` — route every caught failure here |
+| `ErrorHandler` | `IErrorHandler` | changes what happens when something fails. A failure you do not catch is reported and shown to the visitor already; use this to substitute your own message (`captureExceptionAndDisplayMessage`), to report without showing anything (`captureException`), or to take the failure over entirely (`suppressReporting`, attached first) |
 | `NotificationDialog` | | show a notification dialog |
 | `EventBus` | `IEventBus` | events between components |
 | `AnalyticsProvider` | `IAnalyticsProvider` | tracking |

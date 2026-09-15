@@ -1,7 +1,7 @@
 Smint.io Portals frontend component recipes
 ===========================================
 
-Current version of this document is: 2.0.1 (as of 15th of September, 2026)
+Current version of this document is: 2.1.0 (as of 15th of September, 2026)
 
 Task-shaped answers to "how do I …?", each one complete enough to paste into a component and
 adapt. The other frontend documents describe *what exists*; this one shows *how it is used*.
@@ -24,7 +24,7 @@ Two imports appear throughout:
 1. [How do I turn an assets reference setting into real assets?](#user-content-how-do-i-turn-an-assets-reference-setting-into-real-assets) — basic
 1. [How do I page through a search result?](#user-content-how-do-i-page-through-a-search-result) — advanced
 1. [How do I show progress for a long-running call?](#user-content-how-do-i-show-progress-for-a-long-running-call) — advanced
-1. [How do I report an error?](#user-content-how-do-i-report-an-error) — basic
+1. [How do I change what happens when something fails?](#user-content-how-do-i-change-what-happens-when-something-fails) — basic
 1. [How do I localize text from script, with placeholders and plurals?](#user-content-how-do-i-localize-text-from-script-with-placeholders-and-plurals) — basic
 1. [How do I make one setting depend on another?](#user-content-how-do-i-make-one-setting-depend-on-another) — basic
 1. [How do I restrict my component to certain portal types?](#user-content-how-do-i-restrict-my-component-to-certain-portal-types) — basic
@@ -166,12 +166,9 @@ export default class PortalsUiComponentImplementation extends Mixins(SCssProps) 
 
             this.assets = result?.assetDataObjects ?? [];
         } catch (error) {
-            this.loadFailed = true;
+            // We catch because we want our own empty-ish state instead of a broken component.
 
-            this.errorHandler.captureExceptionAndDisplayMessage(
-                error as Error,
-                "The assets could not be loaded.",
-                { origin: "mypartner-ui-latest-assets-1" }
+            this.loadFailed = true;
             );
         } finally {
             this.isLoading = false;
@@ -197,8 +194,10 @@ Pitfalls:
   every use.
 - **Do not call in `mounted()` if the result decides whether you render at all** — `created()`
   runs before the first render, so the loading state is shown instead of an empty flash.
-- **Never swallow the failure.** `console.log` is not error handling; route it to the
-  [error handler](#user-content-how-do-i-report-an-error) so it reaches the portal's monitoring.
+- **Never swallow a failure silently.** You do not have to forward it — an uncaught failure is
+  reported and displayed for you — but a `catch` that logs to the console and carries on hides it
+  from the portal's monitoring entirely. Either let it through, or use
+  [the error handler](#user-content-how-do-i-change-what-happens-when-something-fails).
 - **Do not assume a method exists.** A data adapter declares which interfaces it publishes, and
   the administrator can point your property at any adapter that publishes the one you asked
   for — but an *optional* capability (search proposals, folder navigation) can still be
@@ -465,11 +464,21 @@ this.notificationDialog.displayNotification({
 });
 ```
 
-## How do I report an error?
+## How do I change what happens when something fails?
 
-*basic.* Every caught failure goes to the error handler, which reports it to the portal's
-monitoring. Whether the *visitor* is told is a separate decision, and it is the difference
-between the two methods.
+*basic.* **Usually nothing.** A failure you do not catch is already handled for you: the runtime
+reports it and shows the visitor an error. You do not have to forward anything, and a `try`/`catch`
+whose only job is to call the error handler adds nothing.
+
+The error handler is how you *change* that default, and there are three ways to want to:
+
+| You want | Use |
+|---|---|
+| your own message instead of the standard one | `captureExceptionAndDisplayMessage(error, message)` |
+| the failure reported but **not** shown to the visitor, because your component can carry on without it | `captureException(error)` |
+| to handle the failure entirely yourself, with nothing reported | `suppressReporting` as the **first** `catch` on the promise |
+
+So you reach for these when a bare failure would be worse than what you can do instead.
 
 ```typescript
 import type { IErrorHandler } from "@smintio/portals-component-sdk";
@@ -478,7 +487,7 @@ import { PortalsGlobalServices, PortalsInject } from "@smintio/portals-component
 @PortalsInject(PortalsGlobalServices.ErrorHandler)
 public readonly errorHandler!: IErrorHandler;
 
-// The visitor asked for something and it failed — tell them, and report it.
+// A better message than the standard one, because this component knows what was being loaded.
 try {
     await this.dataSource.getAssetAsync({ assetId: { id } });
 } catch (error) {
@@ -489,7 +498,9 @@ try {
     );
 }
 
-// Something failed that the visitor did not ask for — report it, stay silent, degrade.
+// The visitor did not ask for this and can carry on without it — report it, show nothing,
+// and switch the optional feature off for the session. This is the case where the default
+// (an error on screen) would be actively wrong.
 try {
     this.searchProposals = (await this.dataSource.getFullTextSearchProposalsAsync({ searchQueryString })).fullTextProposals ?? [];
 } catch (error) {
@@ -512,10 +523,26 @@ this.dataSource
 The message is a **translation key or a plain string**, not a localized strings model — prefer a
 key that exists in your resources, so the visitor sees their own language.
 
+To take a failure over completely — retry it, fall back to something else, decide for yourself
+whether the visitor hears about it — put `suppressReporting` first in the chain, and everything
+after it is yours:
+
+```typescript
+this.dataSource
+    .searchAssetsAsync({ page: 0, pageSize: 12 })
+    .catch(this.errorHandler.suppressReporting)
+    .then((result) => { /* … */ })
+    .catch((error) => { /* your own handling; nothing was reported or displayed */ });
+```
+
 Pitfalls:
 
+- **Do not catch just to report.** The default already reports and displays; a `catch` that calls
+  the error handler and nothing else turns one message into two, and buries the original stack.
 - **Do not report the same failure twice.** An error that has already been handled arrives with
   `isAlreadyHandled` set; re-reporting it shows the visitor two messages for one problem.
+- **`suppressReporting` has to be first.** Attached after another `catch`, it suppresses nothing —
+  the failure has already been reported by then.
 - **Do not put values into the message.** An identifier, a URL or anything out of the asset
   belongs in the tags or extra data, not in what the visitor reads.
 
@@ -798,7 +825,7 @@ Pitfalls:
 - **Emit it, and still render nothing.** The emit takes effect on the page's next render pass;
   your own template must already be guarded, or the component flashes before it disappears.
 - **Do not use it for an error.** A failure the visitor caused should be
-  [reported](#user-content-how-do-i-report-an-error); silently vanishing makes a broken data
+  [reported](#user-content-how-do-i-change-what-happens-when-something-fails); silently vanishing makes a broken data
   source indistinguishable from an empty one.
 - **Log why, first.** A hidden component is invisible in the page *and* in the editor; the
   console line is all a support engineer has.
@@ -1378,7 +1405,12 @@ public async uploadOne(file: File): Promise<string | undefined> {
 
         return result.fileUuid;
     } catch (error) {
-        // One file failing must not stop the queue — mark it and carry on.
+        // One file failing must not stop the queue. The per-file list below is how the visitor
+        // hears about it, so report without displaying rather than letting the default show a
+        // page-level error for one failed file.
+
+        this.errorHandler.captureException(error as Error, { origin: "mypartner-ui-upload-1" });
+
         this.errors.push({ fileName: file.name, message: this.uploadFailedText });
 
         return undefined;
