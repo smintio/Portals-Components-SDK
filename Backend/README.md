@@ -1,7 +1,7 @@
 Developing Smint.io Portals backend components
 ==============================================
 
-Current version of this document is: 3.4.0 (as of 15th of September, 2026)
+Current version of this document is: 3.5.0 (as of 15th of September, 2026)
 
 This is the guide to building the server-side half of Smint.io Portals: connectors, data
 adapters, data processors, task handlers, portal templates, resources and identity providers.
@@ -153,6 +153,7 @@ See [getting a component into a Smint.io Portals system](../Overview/README.md#u
 
 | Document | What it covers |
 |---|---|
+| [Recipes: how do I …?](docs/smintio-backend-recipes.md) | worked answers to the common tasks — validating credentials, dropdowns, rate limiting, paging, the integration layer, persistent state, custom interfaces, permissions, signed links, data processors |
 | [The connector contract](docs/smintio-connector-reference.md) | every member of `IConnectorStartup` and `IConnector`, the setup methods, the call order, the authentication flows, the API client, the project layout |
 | [The connector meta-model](docs/smintio-connector-metamodel.md) | describing the external system's schema: data types, entities, properties, enums, indexing, semantic types, form groups, translation, the converter, the lifecycle |
 | [The data adapter public API interfaces](docs/smintio-data-adapter-interfaces.md) | the full catalogue, the base classes and what they leave abstract, parameters and results, long-running methods, permissions, configuration marker interfaces, custom interfaces |

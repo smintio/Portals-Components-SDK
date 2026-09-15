@@ -24,6 +24,7 @@ Do not infer the conventions from a single file — they are written down.
 | Document | Read it when |
 |---|---|
 | `README.md` | always, first — it is the full guide |
+| `docs/smintio-backend-recipes.md` | you know *what* to build and need *how*: worked, copy-able answers to the common tasks. Check it before writing a mechanism from scratch |
 | `docs/smintio-connector-reference.md` | you are writing a **connector**: the contract, the setup methods, the authentication flows, the API client, the call order |
 | `docs/smintio-connector-metamodel.md` | you are describing the external system's schema — which every connector does |
 | `docs/smintio-data-adapter-interfaces.md` | you are writing a **data adapter**: which interface to implement, the base classes, permissions, custom interfaces |

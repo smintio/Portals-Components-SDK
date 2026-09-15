@@ -14,6 +14,7 @@ Access to them is restricted and is arranged with Smint.io — see
 1. [Page templates](#user-content-page-templates)
 1. [Portal templates](#user-content-portal-templates)
 1. [Data adapter public API interfaces](#user-content-data-adapter-public-api-interfaces)
+1. [Recipes: how do I …? — worked answers to the common tasks](docs/smintio-frontend-recipes.md)
 1. [Overview of Smint.io UI components](docs/smintio-ui-components.md)
 1. [Overview of Smint.io page templates](docs/smintio-page-templates.md)
 1. [Overview of Smint.io mixins](docs/smintio-mixins.md)
@@ -33,7 +34,7 @@ Access to them is restricted and is arranged with Smint.io — see
 1. [How we built our own components](#user-content-how-we-built-our-own-components)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.6.0 (as of 15th of September, 2026)
+Current version of this document is: 1.7.0 (as of 15th of September, 2026)
 
 ## UI components
 

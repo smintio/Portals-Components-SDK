@@ -11,6 +11,7 @@ Please find guides about Smint.io Portals component development here:
 
 	- Page templates
 	- UI components
+	- [Recipes: how do I …?](Frontend/Legacy/docs/smintio-frontend-recipes.md)
 
 - [Developing backend components](Backend/)
 
@@ -21,6 +22,7 @@ Please find guides about Smint.io Portals component development here:
 	- Portal templates
 	- Resources
 	- Identity providers
+	- [Recipes: how do I …?](Backend/docs/smintio-backend-recipes.md)
 
 This is the tools you need for developing Smint.io Portals components:
 
@@ -30,7 +32,7 @@ This is the tools you need for developing Smint.io Portals components:
 
 Please note that future tools may be added or existing ones may be updated based on user feedback.
 
-Current version of this document is: 1.3.0 (as of 15th of September, 2026)
+Current version of this document is: 1.4.0 (as of 15th of September, 2026)
 
 Contributors
 ============

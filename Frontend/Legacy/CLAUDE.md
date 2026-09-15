@@ -22,6 +22,7 @@ Do not infer the conventions from a single file — they are written down.
 | Document | Read it when |
 |---|---|
 | `README.md` | always, first — it is the full guide |
+| `docs/smintio-frontend-recipes.md` | you know *what* to build and need *how*: worked, copy-able answers to the common tasks — fetching and rendering data, paging, permissions, downloads, page contracts, sections |
 | `docs/smintio-annotations.md` | you are declaring a configuration property or component metadata |
 | `docs/smintio-frontend-reference.md` | you need services, filters, `S*Props` mixins, shared components, allowed-values providers, `@Implements` names, data types or the global CSS classes |
 | `docs/smintio-mixins.md` | the component downloads, shares or collects assets, or needs routing, permissions, metadata or asset references |
