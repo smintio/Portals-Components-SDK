@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.2.0 (as of 15th of September, 2026)
+Current version of this document is: 1.3.0 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -25,6 +25,7 @@ which lists the same surface as TypeScript.
 1. [Parameters and results](#user-content-parameters-and-results)
 1. [Short-running and long-running methods](#user-content-short-running-and-long-running-methods)
 1. [Permissions](#user-content-permissions)
+1. [The data adapter's own configuration](#user-content-the-data-adapters-own-configuration)
 1. [Configuration marker interfaces](#user-content-configuration-marker-interfaces)
 1. [Getting to the connector's client](#user-content-getting-to-the-connectors-client)
 1. [Keeping state the external system does not keep](#user-content-keeping-state-the-external-system-does-not-keep)
@@ -374,6 +375,28 @@ Permissions are also carried per object: set `PermissionUuids` on each asset and
 converter produces. The interface-level check passing is not enough — an asset with no
 permissions on it has its actions hidden in the portal, silently.
 
+## The data adapter's own configuration
+
+**A data adapter has its own configuration class, exactly as a connector does** — a plain class
+implementing `IComponentConfiguration`, pointed at by `ConfigurationImplementation` on your
+`IDataAdapterStartup`, rendered as its own form when an administrator configures the adapter and
+injected into the constructor. Two kinds of thing go into it: the marker interfaces below, and
+**properties of your own**.
+
+The properties of your own are the part most often left out, with everything pushed onto the
+connector instead. Anything only this adapter interprets belongs here — a customer-specific
+setting, a limit, a naming scheme, a behaviour one customer wants switched off, or the signing
+key for [a signed link](#user-content-two-kinds-of-security-and-which-one-is-yours). The
+HelloWorld adapter's `MultiSelectItemCount` is exactly that: an ordinary annotated property
+sitting next to the marker interface members.
+
+Why it matters which component carries the setting: one connector can serve several data
+adapters, so a property on the connector forces the same value on all of them, while a property
+on the adapter is set once per configured adapter. Configurations are stored encrypted at rest,
+so a secret is a legitimate property here — see
+[which component's configuration a setting belongs in](smintio-backend-annotations.md#user-content-which-components-configuration-a-setting-belongs-in)
+and [configuration is stored encrypted](smintio-backend-annotations.md#user-content-configuration-is-stored-encrypted).
+
 ## Configuration marker interfaces
 
 Your configuration class opts into platform behaviour by implementing marker interfaces from
@@ -475,6 +498,15 @@ of a link and fetch it before verifying the signature over it.
 Keep signing and verification together even when only the verifier ships: you need the signer to
 test the verifier, and a test that mints its links through the same code is the only way to know
 the two halves agree.
+
+**The signing key is a property of the data adapter's own configuration**, not of the
+connector's — it is this adapter's secret, it has nothing to do with authenticating to the
+external system, and it is often different per customer. Configurations are stored encrypted at
+rest and a saved secret is never displayed back to the administrator, so putting it there is
+safe — **provided you name the property so that it is recognised as a secret**, which a name
+containing `key`, `secret` or `password` is. See
+[configuration is stored encrypted](smintio-backend-annotations.md#user-content-configuration-is-stored-encrypted)
+and [the data adapter's own configuration](#user-content-the-data-adapters-own-configuration).
 
 ## Custom public API interfaces
 

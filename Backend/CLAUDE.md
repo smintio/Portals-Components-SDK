@@ -56,6 +56,21 @@ Do not infer the conventions from a single file — they are written down.
   refresh token, no client secret, no API key, no prepared authorization header, no raw HTTP
   client. Design the interface in terms of operations the adapter wants. A credential the
   adapter never holds cannot leak into a log line, an exception or a response.
+- **Every component has its own configuration — do not pile everything onto the connector.** A
+  data adapter has a configuration class exactly as a connector does. The connector's is for
+  establishing the trust context and pointing at the right tenant; anything only one data adapter
+  interprets belongs to that adapter — a customer-specific setting, a limit, a naming scheme, or
+  a secret of its own such as a link signing key. One connector can serve several data adapters,
+  so a property on the connector forces the same value on all of them. **All component
+  configurations are stored encrypted at rest, and a saved secret is never displayed back to the
+  administrator**, so a secret is a legitimate configuration property and needs no scheme of your
+  own; "never hold a credential" is about authenticating to the *external system*, not a ban on
+  the adapter having settings of its own.
+- **What makes a configuration property a secret is its name.** A `string` property whose name
+  contains `password`, `secret`, `key`, `token`, `credential`, `authconfig` or `sasuri` is never
+  transmitted back for display. There is no annotation for it, so name the property accordingly —
+  `LinkSigningKey`, not `Signature` — and never put a secret in a `string[]`, which is not
+  covered.
 - **A backend component does not reach production self-service.** Publishing directly to a
   Smint.io production system is not supported for third parties: every backend component goes
   through Smint.io and through a code review, because it runs as trusted server-side code.
@@ -161,6 +176,7 @@ model.** They do not apply. State that you are skipping them and why.
 | Ask | Offer | Why |
 |---|---|---|
 | Which settings must the administrator be able to change, and which are advanced? | list them, and mark which are `Advanced` or `Expert` | each becomes a configuration property whose **name is persisted permanently**. Start with few. Ask which of them the administrator should pick from a dropdown the component fills — a channel, a site, a list — because that is a dynamic allowed-values provider rather than a text field |
+| For each setting: does it belong on the connector or on the data adapter? | propose the split yourself and have it confirmed | connector = what the connection itself needs; data adapter = anything only that adapter interprets, including customer-specific settings and its own secrets. Several adapters share one connector, so a connector property forces the same value on all of them. Configurations are stored encrypted at rest, so a secret is fine in either |
 | Which languages? | English only / English plus one more / more | English only can stay on `[DisplayName("en", …)]` attributes; more than two means resource files from the start, and retrofitting them touches every property |
 | Does the component need translatable meta-model labels? | yes / no — and skip the question entirely for a custom component | it decides whether you ship a `MetamodelMessages.resx` and point `MetamodelMessages` at it. Leaving it `null` when you need it makes translations fail silently |
 | Which permissions apply? | the standard ones (the default — declare none) / a custom interface needing its own | custom permissions are three coordinated steps, and missing the third makes the method permanently denied |
@@ -302,7 +318,9 @@ Two things partners reach for and get wrong, both covered in the data adapter do
 - "Never hold a credential" is about authenticating to the external system. It does **not** mean a
   data adapter has no security to write: when your component is reached by a signed, time-limited
   link handed to someone outside the portal, verifying that link is yours to do and nothing else
-  does it. Verify the signature before you act on anything the link carries.
+  does it. Verify the signature before you act on anything the link carries. The signing key is a
+  property of **the data adapter's own configuration**, which is stored encrypted at rest — not
+  something to push onto the connector or hard-code.
 
 ### Anything else
 

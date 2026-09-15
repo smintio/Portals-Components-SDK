@@ -1,7 +1,7 @@
 Developing Smint.io Portals backend components
 ==============================================
 
-Current version of this document is: 3.3.0 (as of 15th of September, 2026)
+Current version of this document is: 3.4.0 (as of 15th of September, 2026)
 
 This is the guide to building the server-side half of Smint.io Portals: connectors, data
 adapters, data processors, task handlers, portal templates, resources and identity providers.
@@ -126,6 +126,19 @@ Whatever the type, a backend component is three classes:
 Plus **translatable resources** — a `ConfigurationMessages.resx` per culture, and a
 `MetamodelMessages.resx` when the component describes a schema, which a
 [custom component](#user-content-productized-or-custom) does not.
+
+**Each component has its own configuration** — the connector has one, and so does every data
+adapter, data processor, identity provider, portal template and resource. Nothing has to be
+piled onto the connector: the connector's configuration is for establishing the trust context
+and pointing at the right tenant, and anything only one data adapter interprets — a
+customer-specific setting, a limit, a naming scheme, the key it verifies a signed link with —
+belongs in *that adapter's* configuration class, where it can also differ from adapter to
+adapter. All component configurations are stored encrypted at rest in the Smint.io database, and
+a saved secret is never transmitted back for display — so a credential or a signing secret is a
+legitimate configuration property, as long as the property is
+[named so that it is recognised as a secret](docs/smintio-backend-annotations.md#user-content-configuration-is-stored-encrypted).
+See
+[which component's configuration a setting belongs in](docs/smintio-backend-annotations.md#user-content-which-components-configuration-a-setting-belongs-in).
 
 This is the same three-part shape every Smint.io Portals component has, described in general in
 [what are Smint.io Portals components](../Overview/README.md#user-content-the-startup-class) —
@@ -352,6 +365,14 @@ connector and inside the client's own implementation. Do not put them on the cli
 do not return them from a method, and do not hand out a raw authorization header for the caller
 to attach itself. The data adapter should be able to do its job without ever holding a
 credential, and anything it does hold can end up in a log line, an exception or a response.
+
+That rule is about authenticating to the external system, and it is not a reason to leave the
+data adapter without settings of its own. **A data adapter has its own configuration class**,
+pointed at by `ConfigurationImplementation` on its startup and injected into its constructor:
+the output formats and metadata attributes an administrator picks, plus any property you add —
+a customer-specific setting, a limit, a naming scheme, or the key the adapter verifies a signed,
+time-limited link with. Configurations are stored encrypted at rest, so a secret of the
+adapter's own belongs there rather than on the connector.
 
 `IDataAdapterStartup` adds four members to the common startup contract: the `ConnectorKey` it
 belongs to, the `Permissions` it declares (normally `null`), the `PublicApiInterfaces` it
