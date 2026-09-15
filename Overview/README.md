@@ -3,7 +3,7 @@ What are Smint.io Portals components?
 
 This README.md serves to clarify the general concept of Smint.io Portals components.
 
-Current version of this document is: 2.3.1 (as of 15th of September, 2026)
+Current version of this document is: 2.4.0 (as of 15th of September, 2026)
 
 1. [Overview](#user-content-overview)
 1. [Getting access to the SDKs](#user-content-getting-access-to-the-sdks)
@@ -59,7 +59,7 @@ For each of the Smint.io Portals component types, there is a *Smint.io Portals S
 Access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io) or [support@smint.io](mailto:support@smint.io) and request access.
 Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals Enterprise plan customers.
 
-You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
+You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there. The credentials an Azure DevOps feed issues expire, so an `npm` command that worked last month can fail with a `401` without anything having changed — on Windows, `vsts-npm-auth -config .npmrc -force` refreshes the token in place. See [when npm cannot authenticate](../Frontend/Legacy/README.md#user-content-when-npm-cannot-authenticate-azure-devops-feeds-on-windows).
 
 That covers reading the SDK. **Publishing your own frontend components is a separate question**, because a built frontend component is an npm package and has to live in an npm registry a Smint.io system can install it from. Smint.io hosts such a registry for itself and for the Solution Partners it works with. If you are building components for a single customer of your own, or you run your own VPC deployment of Smint.io Portals, plan on hosting that registry yourself — see [where your own components are published](../Frontend/Legacy/README.md#user-content-where-your-own-components-are-published). Backend components are not affected: they do not go through npm, and they reach a Smint.io system only through Smint.io in any case.
 

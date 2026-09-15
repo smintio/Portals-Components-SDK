@@ -28,6 +28,7 @@ Access to them is restricted and is arranged with Smint.io — see
 1. [How to develop your own frontend component](#user-content-how-to-develop-your-own-frontend-component)
 1. [Before you start: the questions to answer](#user-content-before-you-start-the-questions-to-answer)
 1. [Getting started](#user-content-getting-started)
+1. [When npm cannot authenticate](#user-content-when-npm-cannot-authenticate-azure-devops-feeds-on-windows)
 1. [Anatomy of a component package](#user-content-anatomy-of-a-component-package)
 1. [Things to do for Mac or Linux users](#user-content-things-to-do-for-mac-or-linux-users)
 1. [The example frontend component](#user-content-the-example-frontend-component)
@@ -41,7 +42,7 @@ Access to them is restricted and is arranged with Smint.io — see
 1. [How we built our own components](#user-content-how-we-built-our-own-components)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.11.0 (as of 15th of September, 2026)
+Current version of this document is: 1.12.0 (as of 15th of September, 2026)
 
 ## UI components
 
@@ -366,10 +367,41 @@ always-auth=true
 
 10. Run `npm i` at the first time, or when you update dependencies
 
-	- If there is any authorization issues you are running into, you will have done something wrong in step 6-9. Please revisit your settings
+	- If there is any authorization issues you are running into, you will have done something wrong in step 6-9. Please revisit your settings. If the feed is hosted on Azure DevOps and you are on Windows, the token may simply have expired — see [when npm cannot authenticate](#user-content-when-npm-cannot-authenticate-azure-devops-feeds-on-windows)
 	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
 	
 11. Please adjust `src/PortalsUiComponent.vue` accordingly
+
+#### When npm cannot authenticate (Azure DevOps feeds on Windows)
+
+The credentials an Azure DevOps npm feed issues are **tokens that expire**, so a setup that
+worked last month fails today with a `401` on `npm i` or on `npm publish` — and nothing about
+your `.npmrc` has changed. You do not have to walk through *Connect to feed* again.
+
+On Windows, `vsts-npm-auth` refreshes the token in place. Run it in the directory that holds the
+`.npmrc`:
+
+```console
+vsts-npm-auth -config .npmrc -force
+```
+
+It reads the registries named in that `.npmrc`, acquires a fresh token for each, and writes it
+into your user-level `.npmrc` — leaving the component's own file untouched. `-force` refreshes
+even when the existing token has not visibly expired, which is what you want when you are
+diagnosing an authorization failure.
+
+Install it once with `npm install -g vsts-npm-auth` if it is not already on your machine.
+
+Notes:
+
+- **Windows only.** On macOS and Linux, follow the *Connect to feed* → `Other` instructions for
+  the feed, which produce a base64 personal access token you paste into your user-level `.npmrc`.
+  Those tokens expire too, so the same symptom has the same cause.
+- **Run it in the component directory**, not in the root folder — the `.npmrc` that names your
+  registries is the component's.
+- It applies to **any** Azure DevOps-hosted feed, so it covers both the Smint.io SDK feed and a
+  partner or customer feed hosted there. For a registry hosted elsewhere, use whatever that
+  registry's own authentication flow is.
 
 #### Where your own components are published
 
@@ -1081,7 +1113,7 @@ Partners; for a customer-specific project or your own VPC deployment you host it
 	- You did not properly provide the SMINT_IO_SDK_HOME environment variable
 	- You did not adjust the package.json scripts to handle Mac or Linux - note the default scripts are tuned for Windows users
 	- You did not use the proper tool builds for your operating system
-	- There is authorization issues with your NPM setup (see previous chapter for more instructions)
+	- There is authorization issues with your NPM setup (see previous chapter for more instructions). On Windows with an Azure DevOps feed, run `vsts-npm-auth -config .npmrc -force` in the component directory to refresh an expired token — see [when npm cannot authenticate](#user-content-when-npm-cannot-authenticate-azure-devops-feeds-on-windows)
 	- If you absolutely cannot manage to get going, please get in touch at [support@smint.io](mailto:support@smint.io)
 	
 1. A browser window will open for you to authenticate to allow the component to be published
@@ -1268,6 +1300,7 @@ form, that is the publishing boundary described above — build and publish, and
 | Your local change does not show up **and the dev server log stays empty** | the portal never asked for your local build: *Basic settings > Development mode* is off for that portal, or the logged-in user has not been cleared as a developer by Smint.io — anonymous visitors never are |
 | A setting you added is not in the configuration form, or your new component is not offered in the editor | the component has not been published since you changed its annotations — the configuration form lives on the Smint.io server, not in your bundle |
 | Publishing fails right away | the `version` in `package.json` was not increased, or `SMINT_IO_SDK_HOME` is not set |
+| `npm i` or `npm publish` fails with a `401`, and nothing in your setup changed | the feed token expired. On Windows with an Azure DevOps feed, run `vsts-npm-auth -config .npmrc -force` in the component directory — see [when npm cannot authenticate](#user-content-when-npm-cannot-authenticate-azure-devops-feeds-on-windows) |
 | `npm publish` succeeded but the component was not registered | publishing is two steps and they fail independently. **Do not raise the version and publish again** — that version is already on the feed. Rerun only the registration: `npm info --json \| %SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe -env <environment>` |
 | Registration fails with a permissions error seconds after a successful `npm publish` | the feed may not have made the new version visible yet. Retry the registration step once before treating it as a permissions problem |
 | Every link in your list highlights after you follow one of them | they all resolve to the same route and differ only in the query — add `exact` to the link, see [Many links to the same search page](#user-content-many-links-to-the-same-search-page-use-exact) |

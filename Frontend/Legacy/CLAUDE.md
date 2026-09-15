@@ -65,10 +65,19 @@ short. If they have not, say so rather than guessing at what a component does.
   authorization header.
 - **A new package needs its own `.npmrc`**, or the registration half of a publish fails while
   `npm publish` has already succeeded. See *The two steps fail independently* in `README.md`.
+- **A `401` from npm is usually an expired token, not a broken `.npmrc`.** On Windows with an
+  Azure DevOps-hosted feed, `vsts-npm-auth -config .npmrc -force` in the component directory
+  acquires a fresh one. Suggest that before sending anyone back through *Connect to feed*, and
+  never edit the component's `.npmrc` to work around an authorization failure.
 - **Do not assume there is a Smint.io npm feed to publish into.** Smint.io hosts one for itself
   and for its Solution Partners. For a customer-specific project, or a self-hosted VPC
   deployment, the registry is the partner's own — ask which registry the components are published
   to before writing the `.npmrc` or `publishConfig`, and never guess a feed URL.
+- **A build is not a verification.** The component packages carry no tests, so `npm run build`
+  proves only that your code compiles — it says nothing about whether the component renders,
+  reads its configuration, or survives real data. The **only** way to find that out is to look at
+  it in a development portal through the dev server. Do that before you report the work done, and
+  if you cannot, say so explicitly instead of reporting a green build as if it were a result.
 - **Copy a component only when it is a different component.** If yours is "the generic one plus
   something", extend it instead — see below.
 
@@ -122,6 +131,7 @@ The same questions, written for a human rather than as an asking protocol, are i
 | **Which tenant is it published for?** | ask for the tenant by name; offer "not decided yet" as an explicit option | **nothing in the component's code decides this.** The tenant is whatever `SmintIo.ApiUrl` the publish CLI's `appsettings.<Env>.json` points at, so a publish registers the component for that one tenant — and the wrong one registers it in the wrong tenant's page editor. Record the answer and repeat it back before any publish |
 | Which environment? | `development` / `staging` / `production` | picks which `appsettings.<Env>.json` applies, i.e. which `npm run smint-io-pc*` script. Each environment has its own tenant URL, so confirm the tenant per environment |
 | Which npm registry is the component published to, and under which scope? | a Smint.io partner feed / the customer's or deployment's own registry | Smint.io hosts a feed for itself and its Solution Partners only; a customer-specific project or a self-hosted VPC deployment publishes to its own. The answer decides the second `@scope:registry` line in `.npmrc` and `publishConfig` in `package.json`, and the scope becomes part of the package name, which does not change afterwards |
+| **Where will this be verified in a running portal?** | ask for the development portal and confirm all three: the portal has *Basic settings > Development mode* on, there is a login Smint.io has cleared as a developer, and the dev server is available. Offer "nothing set up yet" as an explicit option | **a build proves nothing about a UI component.** Without these three the dev server is never queried, so the component cannot be looked at before it is published — and you will be reporting a compile as if it were a result. If the answer is "nothing set up yet", say so in the final report rather than quietly skipping the check |
 | Is there a ticket or issue id? | the id, or none | the commit message and the pull request |
 
 Making a component available to more than one tenant is arranged with Smint.io — it is not an
@@ -277,9 +287,23 @@ so in a comment, or someone tidies it away.
 
 ## Verifying your work
 
-**Build.** It is the only automatic check that exists — the component packages carry no tests.
-`npm run build` runs both halves (`build:dist` and `build:resources`); `npm run lint` is the
-other one worth running before you report done.
+Verifying a frontend component takes **two** steps, and the first one is the weaker of the two.
+The component packages carry no tests, so a green build tells you the code compiles and nothing
+else. **The work is not done until you have looked at the component in a running portal.**
+
+**1. Build.** `npm run build` runs both halves (`build:dist` and `build:resources`);
+`npm run lint` is worth running with it. This catches syntax, types and the resource definition —
+and no behaviour at all.
+
+**2. Look at it in a real portal, through the dev server.** The dev server reroutes a development
+portal's component requests to your working tree, so your local build runs against real data and
+a real configuration form. The full loop is in `README.md` under *Local development*. This is the
+step that tells you whether the component renders, whether its settings arrive, and whether it
+survives an asset that is missing the field you assumed.
+
+If you cannot run it — no development portal, *Development mode* off, no developer-cleared login —
+**say so in the final report**, in those words. Do not present a green build as verification; it
+is a different claim, and someone will act on it.
 
 **A new package needs a lock file, and the right one is the sibling's.** A component pins its
 direct dependencies but not their transitive ones, so a fresh `npm install` in a brand-new package
@@ -299,9 +323,7 @@ More generally: **before concluding a build failure is yours, build an untouched
 If that one is green the difference is in your tree, and if it is red you were never the cause. It
 is a one-minute check that decides which half of the problem to look at.
 
-**Then look at it in a real portal.** The dev server reroutes a development portal's component
-requests to your working tree, so your local build runs against real data. The full loop is in
-`README.md` under *Local development*. Two things about it decide most of the confusion:
+**Two things about the dev server loop decide most of the confusion:**
 
 - **What needs a publish and what does not.** Markup and behaviour: rebuild and reload.
   Anything that changes the settings surface — a new or renamed property, a changed
@@ -347,6 +369,31 @@ Four things that cost time in practice:
 - **Confirm a hypothesis with a count, not a screenshot.** "All buttons go grey" became
   `23 of 23 carry v-btn--active`, and `1` after the fix. Cheaper than catching a transient state
   in an image.
+
+## Before you report the work done
+
+Walk this list, and state the outcome of each line in the final report. Anything you could not do
+is reported as not done — never omitted, and never rounded up.
+
+- [ ] `npm run build` is green, and `npm run lint` with it
+- [ ] `portals-ui-component.json` (or `portals-page-template.json`) regenerated from
+      `resources/definition.ts` — `npm run watch` does not do this
+- [ ] the dev server's `ComponentMappings` entry added, and the dev server restarted
+- [ ] **the component seen rendering in a development portal**, with its configuration form
+      opened and each setting you added actually changed once — or an explicit statement of why
+      this was not possible
+- [ ] every configuration property has a data type and a pinned `@ComponentProperty({ name })`
+- [ ] the shared `S*Props` mixins used rather than re-declared properties, `SBottomGapProps`
+      among them
+- [ ] `version` bumped in `package.json`
+- [ ] nothing published unless it was explicitly asked for, with the tenant and environment
+      named in the question
+
+The fourth line is the one that gets skipped. A build that compiles and a component that works
+are different claims, and only the second is what was asked for.
+
+The full partner-facing version, including the packaging and licence items, is
+*Checklist before you ship* in `README.md`.
 
 ## Publishing is two steps, and they fail independently
 
