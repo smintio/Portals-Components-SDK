@@ -1,7 +1,7 @@
 The Smint.io Portals asset data model
 =====================================
 
-Current version of this document is: 1.1.0 (as of 15th of September, 2026)
+Current version of this document is: 1.1.1 (as of 15th of September, 2026)
 
 What a Smint.io Portals data adapter has to return, and what the frontend does with it.
 
@@ -151,7 +151,7 @@ produces nothing at all.
 **opaque to Smint.io**: whatever you put in is carried through the generated URL and handed back to
 `GetAssetThumbnailDownloadStreamAsync` as its `thumbnailSpec` argument. It is the way to remember,
 per asset and per rendition, what your data adapter will need in order to produce that rendition —
-a rendition key from the source system, a format name, a derivative id — without looking it up
+a rendition key from the external system, a format name, a derivative id — without looking it up
 again on every request.
 
 Two constraints on a spec, both of which fail silently:
@@ -181,7 +181,7 @@ assetDataObject.InternalMetadata = new DataObjectInternalMetadata
 
 `GetAssetThumbnailDownloadStreamAsync` in `Assets/Read/HelloWorldAssetsRead.cs` is the other half:
 it switches on `assetThumbnailSize` and, for the four thumbnail sizes, passes the spec it gets back
-into the source system's own resizing URL. Read the two together before writing your own.
+into the external system's own resizing URL. Read the two together before writing your own.
 
 The remaining fields are for data adapters that feed the Smint.io index rather than serving a live
 connection: a `*ETag` per rendition, which lets the indexer tell whether a rendition has changed and

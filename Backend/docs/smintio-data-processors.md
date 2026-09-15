@@ -1,7 +1,7 @@
 Smint.io Portals data processors
 ===============================
 
-Current version of this document is: 1.0.0 (as of 15th of September, 2026)
+Current version of this document is: 1.0.1 (as of 15th of September, 2026)
 
 A data processor hooks into a data adapter's operations and changes what goes in or what comes
 out. It is the component type to reach for when the data is right but its *shape*, its *naming*
@@ -30,7 +30,7 @@ The kinds of thing the shipped processors do, as a guide to what the type is goo
 - rename a downloaded file or folder from the asset's own metadata, or from a Liquid template an
   administrator writes;
 - override the displayed name of an asset, or add an indicator to it, without touching the
-  source system;
+  external system;
 - inject or adjust metadata attributes after an asset is read;
 - assemble several assets into one generated download, such as a presentation;
 - add columns to a download-event report;

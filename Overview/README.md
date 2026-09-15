@@ -3,11 +3,11 @@ What are Smint.io Portals components?
 
 This README.md serves to clarify the general concept of Smint.io Portals components.
 
-Current version of this document is: 1.2.0 (as of 15th of September, 2026)
+Current version of this document is: 2.0.0 (as of 15th of September, 2026)
 
 ## Overview
 
-When you create a Smint.io Portals portal, you're not just creating static HTML/JavaScript pages. 
+When you create a Smint.io Portals portal, you're not just creating static HTML/JavaScript pages.
 
 Each Smint.io Portals portal is a *fully-fledged portal application* that runs on the *Smint.io Portals component framework*. Each portal consists of numerous *Smint.io Portals components* that can be configured and assembled like a Lego puzzle. The *Smint.io Portals component framework* provides administrators and users with a highly functional portal application that can be *customized to individual customer needs* at any time, without the need to hard-code content into a generic codebase.
 
@@ -41,14 +41,30 @@ Please note that there is no separate *Configuration* class for Smint.io Portals
 
 [Here](../Backend/Connectors/Connector-Picturepark/PictureparkConnectorConfiguration.cs) you find an example of a component's *Configuration* class (this one is part of our *Picturepark connector)
 
-## SDKs
+## Getting access to the SDKs
 
 For each of the Smint.io Portals component types, there is a *Smint.io Portals SDK* that you can use to implement that component type yourself.
 
-Access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io) and request access.
+Access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io) or [support@smint.io](mailto:support@smint.io) and request access.
 Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals Enterprise plan customers.
 
 You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
+
+*This is the single statement of how SDK access works; the frontend and backend guides link here rather than repeating it.*
+
+## Getting a component into a Smint.io Portals system
+
+However you build a component, it has to be registered with Smint.io before a portal can use it, and two things about that are the same for every component type:
+
+- **Your component key is issued by Smint.io.** Component keys are globally unique across the whole platform, much as port numbers are issued by IANA, and they cannot be changed once a portal has been configured against your component. Ask for yours when you *start* the component.
+- **Nothing in a component's source decides where it is deployed.** That is decided by the environment configuration of the [publishing tool](../Tools/Portals-SDK-PublishComponent-CLI/Release/) — its `appsettings.<Env>.json` files, one per environment, selected with the `-env` argument. Those files hold credentials: never commit them, and never read values out of them. Ask for the environment by name instead.
+
+What differs is who may deploy, and where:
+
+| | How it reaches a portal |
+|---|---|
+| **Frontend components** | self-service. You publish the package and register it with the CLI, for the environment you choose — see [publishing a frontend component](../Frontend/Legacy/README.md#user-content-publish-your-custom-frontend-component) |
+| **Backend components** | **not self-service.** A backend component runs as trusted server-side code inside the Smint.io platform, so every one of them reaches production through Smint.io, after a code review — see [how a component reaches a Smint.io system](../Backend/docs/smintio-backend-component-delivery.md#user-content-how-a-component-reaches-a-smintio-system) |
 
 ## Smint.io Portals component diagram
 
@@ -92,23 +108,23 @@ Each connector is dedicated to a certain external system, e.g. Microsoft SharePo
 
 Each Smint.io Portals backend or frontend component can tie itself to public API interfaces published by Smint.io Portals data adapters.
 
-This can be done by requesting a data adapter public API interface through the configuration of the Smint.io Portals backend or 
+This can be done by requesting a data adapter public API interface through the configuration of the Smint.io Portals backend or
 UI component.
 
-Data adapters can also define *custom permissions* to facilitate fine-grained access management by the Smint.io Portals admin.
+Data adapters can also define *custom permissions* to facilitate fine-grained access management by the Smint.io Portals administrator.
 
-There are two quite different things you can build here. A *productized* connector and data adapter integrate a source system for
-the standard portal experience: they implement the standard interfaces, above all `IAssets`, and the connector describes the source
+There are two quite different things you can build here. A *productized* connector and data adapter integrate an external system for
+the standard portal experience: they implement the standard interfaces, above all `IAssets`, and the connector describes the external
 system's schema as a *meta-model* so that the portal can interpret the data generically. A *custom* connector and data adapter publish
 interfaces of their own that only a custom UI component consumes: there the interface itself is the data model, the component
 deserializes against a generated TypeScript declaration, and no meta-model is needed at all.
 
 ### Data processors
 
-Data processors can hook into data adapter interfaces and/or can use other specific lifecycle hooks of a data adapter, and can then 
+Data processors can hook into data adapter interfaces and/or can use other specific lifecycle hooks of a data adapter, and can then
 manipulate the input or the output of data adapter operations.
 
-This can be used for a multitude of creative purposes, e.g., to modify file names when downloading files, or to check specific access 
+This can be used for a multitude of creative purposes, e.g., to modify file names when downloading files, or to check specific access
 conditions when accessing assets (we use this for our Dynamic Content Routing feature).
 
 ### Task handlers

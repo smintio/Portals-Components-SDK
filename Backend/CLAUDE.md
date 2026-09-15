@@ -70,7 +70,7 @@ Do not infer the conventions from a single file — they are written down.
   conversion, silently. If data is missing in the portal, check the declaration before debugging
   the conversion.
 - **The meta-model refreshes on its own** — when the configuration is set up and regularly
-  afterwards, as well as per admin action. Ordinary schema evolution in the external system is picked
+  afterwards, and on an administrator action. Ordinary schema evolution in the external system is picked
   up automatically, and the re-indexing it implies is scheduled for you. Do not tell anyone they
   have to set the connector configuration up again for a new field to appear.
 - **Never hard-code a meta-model entity key.** Keys are rewritten to be unique per connector
@@ -119,7 +119,7 @@ under *Before you start: the questions to answer*. Keep the two in step.
 
 | Ask | Offer | Why it cannot wait |
 |---|---|---|
-| Which component type is this? | recommend from the one-sentence description: **connector + data adapter** for a new source system; **data adapter only** when a connector for that system already exists; **data processor** when the data is right but its shape, naming or reachability is not; **identity provider** for a non-standard SSO workflow; **task handler** for an approval workflow; **portal template** or **resource** for the templating stack | each is a different contract, a different SDK package and a different document. Getting this wrong is a rewrite, and the most common error is reaching for a connector when a data processor was the answer |
+| Which component type is this? | recommend from the one-sentence description: **connector + data adapter** for a new external system; **data adapter only** when a connector for that system already exists; **data processor** when the data is right but its shape, naming or reachability is not; **identity provider** for a non-standard SSO workflow; **task handler** for an approval workflow; **portal template** or **resource** for the templating stack | each is a different contract, a different SDK package and a different document. Getting this wrong is a rewrite, and the most common error is reaching for a connector when a data processor was the answer |
 | Which external system, and what does the component do, in one sentence? | — | it decides the folder name, the assembly name and everything below |
 | **Productized or custom?** | *productized* — it serves the standard portal experience, implements `IAssets` and needs a meta-model / *custom* — it publishes its own interfaces for one custom UI component and needs no meta-model. Recommend from the one-sentence description: if the answer names a UI component that will call it, it is custom; if it names "our DAM in the portal", it is productized | it decides whether there is a meta-model, an integration mode, an `AssetDataObject` mapping and a shared test suite at all — the difference between a large piece of work and a small one. Retrofitting a meta-model later is not a small change |
 | **Has Smint.io issued the component key?** | the key, or "not yet — ask Smint.io" as an explicit option | keys are globally unique and issued, like port numbers. **If the answer is "not yet", say so in the final report and use a clearly provisional placeholder** — do not invent something that looks real |
@@ -199,13 +199,13 @@ answer. Work down this list and stop at the first that fits:
 2. **A data processor.** The data is reaching the portal and something about its shape, naming or
    reachability is wrong. A processor is a class and a lifecycle phase interface; a connector is
    a project.
-3. **A second data adapter on an existing connector.** The source system is already integrated
+3. **A second data adapter on an existing connector.** The external system is already integrated
    and this is a different view of it — upload, collections, products, a customer-specific
    mapping. Adapters outnumber connectors for exactly this reason. The connector is reused
    unchanged, and its client comes to you by injection.
 4. **A custom public API interface on an existing data adapter.** The data is there and only the
    operation is missing.
-5. **A new connector and data adapter.** A source system nothing integrates yet.
+5. **A new connector and data adapter.** An external system nothing integrates yet.
 
 State which of these you concluded and why, in one line, before you start. If the answer is 5,
 say what you ruled out — and then say whether it is **productized or custom**, because that

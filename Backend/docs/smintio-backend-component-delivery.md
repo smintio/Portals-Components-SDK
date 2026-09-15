@@ -1,7 +1,7 @@
 Building, testing and delivering a backend component
 ===================================================
 
-Current version of this document is: 2.1.0 (as of 15th of September, 2026)
+Current version of this document is: 2.1.1 (as of 15th of September, 2026)
 
 How a Smint.io Portals backend component gets from a C# project to something running in a
 portal: the project setup, the test drivers that let you run a connector and a data adapter
@@ -72,10 +72,9 @@ copying.
 
 ## Getting the SDK packages
 
-The SDK packages are **not public**. Access is granted to Smint.io Solution Partners and to
-Smint.io Portals Enterprise plan customers — get in touch at
-[support@smint.io](mailto:support@smint.io) to request it. You will need an account with
-Microsoft Visual Studio cloud offerings (Azure DevOps), as the packages are hosted there.
+The SDK packages are **not public** — see
+[getting access to the SDKs](../../Overview/README.md#user-content-getting-access-to-the-sdks)
+for how access is arranged. These are the packages you will reference:
 
 | Package | For |
 |---|---|

@@ -1,7 +1,7 @@
 Smint.io Portals identity providers
 ===================================
 
-Current version of this document is: 1.0.0 (as of 15th of September, 2026)
+Current version of this document is: 1.0.1 (as of 15th of September, 2026)
 
 An identity provider component federates the authentication of a portal's **end users** to an
 external identity system. It is what stands behind single sign-on into a Smint.io Portal.
@@ -177,7 +177,7 @@ accepts tokens from. Both halves are needed.
 
 It is the right answer when the external system's own permission model should govern, and the
 wrong one when the portal is meant to present a curated view that differs from what users see in
-the source system.
+the external system.
 
 ## Things that are easy to get wrong
 

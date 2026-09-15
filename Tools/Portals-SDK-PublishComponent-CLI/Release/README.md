@@ -8,18 +8,19 @@ The Portals-SDK-PublishComponent-CLI tool
 1. [Parameters](#user-content-parameters)
 1. [Publish and deploy](#user-content-publish-and-deploy)
 
-Current version of this document is: 1.3.0 (as of 15th of September, 2026)
+Current version of this document is: 1.4.0 (as of 15th of September, 2026)
 
 ## Description
 
-The purpose of the Portals-SDK-PublishComponent-CLI tool is to enable developers with a short cycle to publish and deploy frontend and backend components to Smint.io.
+The purpose of the Portals-SDK-PublishComponent-CLI tool is to enable developers with a short cycle to publish and deploy components to Smint.io.
 
 This document contains all the steps needed to configure and run the Smint.io component publishing tool.
 
-Please note that at any time you can build your own components based on our *Smint.io Portals SDKs*. Access to the SDKs is restricted.
-Get in touch with [Smint.io](https://www.smint.io) or [support@smint.io](mailto:support@smint.io) to request access.
-Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals.
-Enterprise plan customers.
+**The tool covers frontend and backend components, but they are not delivered the same way.** Publishing a *frontend*
+component is self-service. Publishing a *backend* component directly to a Smint.io **production** system is not
+supported for third parties — see [Backend components](#user-content-backend-components) below.
+
+Please note that [access to the SDKs is restricted](../../../Overview/README.md#user-content-getting-access-to-the-sdks).
 
 
 ## Download
@@ -70,7 +71,7 @@ The `AuthorizationHeader` value is used during publishing of a frontend componen
 
 Keep in mind that the `AuthorizationHeader` value is not provided by Smint.io.
 
-*Note: by default, the authorization process needs to listen to port `43450` on your machine. In the unlikely case that this port is not 
+*Note: by default, the authorization process needs to listen to port `43450` on your machine. In the unlikely case that this port is not
 available on your machine, you can override the `RedirectUrl` setting inherited from `appsettings.json` and set another port there. Please
 also note that in this case you will also need to contact us at [support@smint.io](mailto:support@smint.io) and tell us the new redirect
 URL, because we need to whitelist the new redirect URL on our side before you can use it.*
@@ -93,7 +94,7 @@ Example: `%SMINT_IO_SDK_HOME%\SmintIo.Portals.SDK.PublishComponent.CLI.exe /?`
 
 ## Publish and deploy
 
-### Frontend components 
+### Frontend components
 
 The target component's npm "package.json" file can be extended with additional "scripts" properties.
 

@@ -1,7 +1,7 @@
 Developing Smint.io Portals backend components
 ==============================================
 
-Current version of this document is: 3.2.0 (as of 15th of September, 2026)
+Current version of this document is: 3.3.0 (as of 15th of September, 2026)
 
 This is the guide to building the server-side half of Smint.io Portals: connectors, data
 adapters, data processors, task handlers, portal templates, resources and identity providers.
@@ -11,15 +11,11 @@ settle before you write anything, and how a component is built, tested and deliv
 The examples in this repository are working components you can copy. Start from
 [Hello World](Connectors/Connector-HelloWorld/) for the shape of a connector and a data adapter,
 then read [Picturepark](Connectors/Connector-Picturepark/) or
-[SharePoint](Connectors/Connector-SharePoint/) for how a real source system is handled.
+[SharePoint](Connectors/Connector-SharePoint/) for how a real external system is handled.
 
-Please note that at any time you can build your own backend components based on our *Smint.io
-Portals SDKs*. Access to the SDKs is restricted. Get in contact with
-[Smint.io](https://www.smint.io) and request access. Access will be granted to either Smint.io
-Solution Partners or to all our Smint.io Portals Enterprise plan customers.
-
-You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the
-SDKs are hosted there.
+You can build your own backend components at any time, based on our *Smint.io Portals SDKs*.
+Access to them is restricted and is arranged with Smint.io — see
+[getting access to the SDKs](../Overview/README.md#user-content-getting-access-to-the-sdks).
 
 1. [The backend component types](#user-content-the-backend-component-types)
 1. [Which component do you actually need?](#user-content-which-component-do-you-actually-need)
@@ -66,12 +62,12 @@ answer. Work down this list and stop at the first that fits:
    handles, and what you need is configuration. Ask before you build.
 2. **A data processor.** The data already reaches the portal, and something about its shape, its
    naming or its reachability is wrong. A data processor is one class and one interface.
-3. **A second data adapter on an existing connector.** The source system is already integrated
+3. **A second data adapter on an existing connector.** The external system is already integrated
    and you need a different view of it — upload, collections, products, a different mapping. The
    connector is reused unchanged and hands you its API client by injection.
 4. **A custom public API interface on an existing data adapter.** The data is there; only the
    operation is missing.
-5. **A new connector and data adapter.** A source system nothing integrates yet.
+5. **A new connector and data adapter.** An external system nothing integrates yet.
 
 ## Productized or custom?
 
@@ -80,7 +76,7 @@ it decides how much work the whole thing is. **Settle it before you write anythi
 
 | | **Productized** | **Custom** |
 |---|---|---|
-| What it is | a general integration with a source system, usable by any portal | a purpose-built interface that one custom frontend component consumes |
+| What it is | a general integration with an external system, usable by any portal | a purpose-built interface that one custom UI component consumes |
 | Public API interfaces | the standard ones, above all **`IAssets`** — the main asset interaction interface | **your own**, published only for your own UI component |
 | Who consumes it | the standard portal experience: search pages, asset detail, download, collections | your custom UI component, and nothing else |
 | Connector meta-model | **required** | **not required** |
@@ -91,7 +87,7 @@ it decides how much work the whole thing is. **Settle it before you write anythi
 
 The meta-model exists so that **a portal administrator can point a component at a metadata
 attribute in the editor**, and so that the platform can then interpret, index, filter, format
-and translate that value without knowing anything about your source system. It is the schema
+and translate that value without knowing anything about your external system. It is the schema
 that turns an untyped bag of values into something the *generic* parts of the portal can work
 with.
 
@@ -131,10 +127,14 @@ Plus **translatable resources** — a `ConfigurationMessages.resx` per culture, 
 `MetamodelMessages.resx` when the component describes a schema, which a
 [custom component](#user-content-productized-or-custom) does not.
 
+This is the same three-part shape every Smint.io Portals component has, described in general in
+[what are Smint.io Portals components](../Overview/README.md#user-content-the-startup-class) —
+including why a *frontend* component has no separate startup or configuration class. What is
+written above is the backend rendering of it.
+
 `IComponentStartup.Key` is worth its own paragraph. **Component keys are globally unique and
-issued by Smint.io**, much as port numbers are issued by IANA: they are how the platform finds
-your implementation, and they cannot be changed once a portal has been configured against your
-component. Ask for yours at the start of the work — not when you are ready to ship.
+issued by Smint.io**, so ask for yours at the start of the work — not when you are ready to ship.
+See [getting a component into a Smint.io Portals system](../Overview/README.md#user-content-getting-a-component-into-a-smintio-portals-system).
 
 ## Reference documents
 
@@ -173,7 +173,7 @@ second data adapter — for external users — sharing the same connector.
 
 #### Microsoft SharePoint — indexed through the integration layer
 
-Content is analysed and indexed by Smint.io rather than queried live. The only example
+Content is analyzed and indexed by Smint.io rather than queried live. The only example
 implementing the integration layer provider, and the clearest walkthrough of an OAuth2
 authorization code flow.
 
@@ -306,7 +306,7 @@ Five things about it are worth knowing before you start:
   declared is dropped on conversion. If a field does not appear in the portal, check the
   declaration before you debug the conversion.
 - **It keeps up with the external system on its own.** `GetConnectorMetamodelAsync` runs when the
-  connector configuration is set up and regularly afterwards, or on admin action. A new field, a
+  connector configuration is set up, regularly afterwards, and on an administrator action. A new field, a
   renamed label or a new enum value is picked up by a later refresh, and whatever that implies for
   an indexed source, such as re-indexing, is scheduled automatically. Nobody has to set the
   configuration up again for an ordinary schema change to arrive.
@@ -379,7 +379,7 @@ Smint.io offers two integration modes, and the choice is structural.
 feature-rich — a fully translatable meta-model, faceted search, acceptable latency — because
 every portal request becomes a request to it. Picturepark is the example in this repository.
 
-**Internal index.** Selected data is analysed and its metadata captured; thumbnails and video,
+**Internal index.** Selected data is analyzed and its metadata captured; thumbnails and video,
 audio and document renditions are generated and stored by Smint.io for offline use. Further
 synchronisation happens through tokens, webhooks or timed intervals. Please note that Smint.io
 does not store original assets. SharePoint is the example in this repository.
@@ -417,53 +417,26 @@ Once the component is instantiated, you can call methods of that public API inte
 
 ```C#
 var searchAssetsResult = await _portalsContext.PublicApiInterfaceExecutionWrapper
-	.WrapPublicApiInterfaceExecutionAsync<SearchAssetsParameters, SearchAssetsResult, IAssetsSearch>(
-		_configuration.SearchBarAutoCompletion, 
-		nameof(IAssetsSearch.SearchAssetsAsync), 
-		parameters)
-	.ConfigureAwait(false);
+    .WrapPublicApiInterfaceExecutionAsync<SearchAssetsParameters, SearchAssetsResult, IAssetsSearch>(
+        _configuration.SearchBarAutoCompletion,
+        nameof(IAssetsSearch.SearchAssetsAsync),
+        parameters)
+    .ConfigureAwait(false);
 ```
 
 *Side note: you could also invoke the method of the target's public API interface directly.
 However, we ask you to use this way of calling other public API interfaces, as this method
-performs permission checks, script executions and other potentially required operations. In the
-future we will introduce some facet-based approach to avoid this issue.*
+performs permission checks, script executions and other potentially required operations. We are
+looking at ways to make this less manual in future; until then, please use the wrapper.*
 
-### TypeScript example (for Smint.io Portals UI components)
+### Calling the same interface from a UI component
 
-```typescript
-import type {
-    IAssetsSearch,
-} from "@smintio/portals-component-sdk";
-
-...
-
-@DisplayName("en", "Data source for auto completion", true)
-@DisplayName("de", "Daten-Quelle für die Auto-Vervollständigung")
-@Description("en", "The data source to query the search bar auto completion suggestions from.", true)
-@Description("de", "Die Daten-Quelle, aus der die Vorschläge für die Auto-Vervollständigung für die Such-Eingabeleiste geladen werden.")
-@Implements("IAssetsSearch")
-@ComponentProperty({ name: "searchBarAutoCompletion" })
-@FormGroup("s-search-bar")
-public readonly searchBarAutoCompletion!: IAssetsSearch;
-```
-
-Once the UI component is instantiated, you can call methods of that public API interface:
-
-```typescript
-this.searchBarAutoCompletion.getFullTextSearchProposalsAsync({ queryString: this.searchQuery })
-	.catch((e) => {
-		...
-	})
-	.then((searchProposals?: IGetFullTextSearchProposalsResult) => {
-		...
-	})
-	.finally(() => {
-		...
-	});
-```
-
-*All the wiring from frontend to backend is done for you, without any further work involved.*
+A Smint.io Portals **UI component** ties itself to the same public API interfaces, with the
+TypeScript equivalent of the annotations above — and all the wiring from frontend to backend
+is done for you, without any further work involved. The TypeScript side is shown in
+[data adapter public API interfaces](../Frontend/Legacy/README.md#user-content-data-adapter-public-api-interfaces)
+in the frontend guide, and every interface, parameter, result and enumeration is listed as
+TypeScript in [the frontend data adapter reference](../Frontend/Legacy/docs/smintio-data-adapter-reference.md).
 
 **The full catalogue of interfaces is in
 [the data adapter public API interfaces](docs/smintio-data-adapter-interfaces.md).**

@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.1.0 (as of 15th of September, 2026)
+Current version of this document is: 1.1.1 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.
@@ -448,7 +448,7 @@ and result handling, and the generated TypeScript for a UI component to call it.
 the TypeScript declaration generated from these C# types, so the parameter and result classes
 are a contract in both directions — and **no meta-model describes them, because none is needed**.
 Design them as you would any published API: name the fields for the consumer rather than for the
-source system, keep them stable, and treat renaming or retyping a field as the breaking change
+external system, keep them stable, and treat renaming or retyping a field as the breaking change
 it is.
 
 You need four things:

@@ -1,7 +1,7 @@
 Smint.io Portals backend component annotations
 =============================================
 
-Current version of this document is: 1.0.0 (as of 15th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 Annotations describe a backend component's configuration to Smint.io Portals: what fields the
 portal administrator sees when configuring your connector, data adapter, data processor,
@@ -126,6 +126,12 @@ soon as you support more than two languages — see the next section.
 
 Instead of repeating a `DisplayName` per language on every property, put the strings in .NET
 resource files and reference them by key.
+
+These `.resx` files are **not** Smint.io Portals *resources* — the portal content type an
+administrator creates and components point at. These are ordinary .NET resource files, carrying
+the translated strings your own component's code ships with. See
+[portal templates and resources](smintio-portal-templates-and-resources.md#user-content-resources)
+for the other meaning.
 
 1. Add `ConfigurationMessages.resx` under a `Resources` folder in your project, plus one file
    per additional culture — `ConfigurationMessages.de.resx`, `ConfigurationMessages.fr.resx`
@@ -279,8 +285,8 @@ a list, an output format — declare a provider instead of a static `AllowedValu
 public string Channel { get; set; }
 ```
 
-The provider is a class implementing `IDynamicValueListProvider<T>`. It is called by the admin
-UI while the administrator is filling in the form, so it runs against a connector that is
+The provider is a class implementing `IDynamicValueListProvider<T>`. It is called while the
+administrator is filling in the configuration form, so it runs against a connector that is
 configured but not necessarily fully authorized yet — handle that case rather than throwing.
 
 `DynamicAllowedValuesProvider` has overloads that additionally take a parameter type, a

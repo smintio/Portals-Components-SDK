@@ -1,7 +1,7 @@
 Smint.io Portals portal templates and resources
 ==============================================
 
-Current version of this document is: 1.0.0 (as of 15th of September, 2026)
+Current version of this document is: 1.1.0 (as of 15th of September, 2026)
 
 Two component types that sit at the top of the templating stack. A **portal template** describes
 a whole portal, so that a new one can be created from it. A **resource** is a typed piece of
@@ -130,6 +130,19 @@ Extend it rather than replacing it when your template needs settings of its own.
 A resource is a piece of portal content that exists **once per portal** and is referred to by
 many components. The point is reuse: a button caption, a legal text, a logo or a colour scheme
 that appears on twenty pages is defined once and changed once.
+
+> **Four things in this documentation are called "resource". They are not the same.**
+>
+> | | What it is |
+> |---|---|
+> | **`Resource`** — the component type | what this section describes: a typed piece of portal content an administrator creates and components point at |
+> | **resource asset** | a `Resource` that is *also* published as an asset, so it appears in searches — see [resource assets](#user-content-resource-assets) |
+> | **`IResources…`** | a [data adapter public API interface family](smintio-data-adapter-interfaces.md#user-content-collections-shares-and-the-rest) for reading and searching those resources |
+> | **`ConfigurationMessages.resx` / `MetamodelMessages.resx`** | .NET *resource files* — the translated strings your own component's code ships with. Nothing to do with portal content; see [translating with resource files](smintio-backend-annotations.md#user-content-translating-with-resource-files) |
+>
+> Separately, `IResourceAssets…` is a third interface family, for reading resource assets through
+> the asset interfaces. If you are building a UI component, the portal resources you point a
+> property at are these same `Resource` components.
 
 `ResourceType` constants (`…ResourceSDK.Resources.Models`):
 

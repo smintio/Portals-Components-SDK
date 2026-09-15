@@ -6,11 +6,9 @@ Also it contains an overview of a lot of currently existing default Smint.io Por
 
 Finally, it will shed some light on how you can get started with developing your own custom Smint.io Portals frontend components.
 
-Please note that at any time you can build your own  page templates or UI components based on our Smint.io Portals SDKs.
-Access to the SDKs is restricted. Get in contact with Smint.io and request access.
-Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals Enterprise plan customers.
-
-You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
+You can build your own page templates or UI components at any time, based on our Smint.io Portals SDKs.
+Access to them is restricted and is arranged with Smint.io — see
+[getting access to the SDKs](../../Overview/README.md#user-content-getting-access-to-the-sdks).
 
 1. [UI components](#user-content-ui-components)
 1. [Page templates](#user-content-page-templates)
@@ -35,18 +33,13 @@ You will need an account with Microsoft Visual Studio cloud offerings (Azure Dev
 1. [How we built our own components](#user-content-how-we-built-our-own-components)
 1. [Problems](#user-content-problems)
 
-Current version of this document is: 1.5.0 (as of 14th of September, 2026)
+Current version of this document is: 1.6.0 (as of 15th of September, 2026)
 
 ## UI components
 
-The most atomic part of a Smint.io Portal is the *UI component*. A UI component could, for example, be:
-
-- A header bar
-- A text block
-- A search result display
-- And so on
-
-For sure you know this concept also from popular page builders like Wix.
+The most atomic part of a Smint.io Portal is the *UI component* — a header bar, a text block, a search result display
+and so on. [What are Smint.io Portals components?](../../Overview/README.md#user-content-ui-components) introduces the
+concept; this section is about building one.
 
 *Focus on simplicity*
 
@@ -101,7 +94,7 @@ nightmare because of not following this rule).
 
 *Settings*
 
-Your Smint.io Portals UI component should only have settings that actually work. Please do *NEVER* add settings to 
+Your Smint.io Portals UI component should only have settings that actually work. Please do *NEVER* add settings to
 your Smint.io Portals UI component that have no effect!
 
 *UI component ID and UI component type*
@@ -130,16 +123,10 @@ running our very simple *Smint.io Portals DevServer*.
 
 ## Page templates
 
-The second level of structure on top of UI components is the *page template*. A page template
-defines the structure of a Smint.io Portals page by defining and rendering so-called *slots* (do NOT confuse with Vue.js
-slots, which is a completely different concept to Smint.io Portals slots). The typical slots of a page could for example
-be:
-
-- Header slot
-- Left slot
-- Right slot
-- Content slot
-- Footer slot
+The second level of structure on top of UI components is the *page template*, which defines the structure of a page by
+declaring and rendering so-called *slots* — a header slot, a content slot, a footer slot and so on (do NOT confuse with
+Vue.js slots, which is a completely different concept to Smint.io Portals slots). See
+[what are Smint.io Portals components?](../../Overview/README.md#user-content-page-templates) for the concept.
 
 Each slot can optionally restrict or enforce the *UI component types* that fit into that slot (e.g. the header slot is
 only allowed to contain UI components of type "Header"). Also the *minimum or maximum number of UI components* that fit
@@ -155,7 +142,7 @@ padding and margins between all of their UI components.
 
 *Settings*
 
-Your Smint.io Portals page template should only have settings that actually work. Please do *NEVER* add settings to 
+Your Smint.io Portals page template should only have settings that actually work. Please do *NEVER* add settings to
 your Smint.io Portals page template that have no effect!
 
 *Page template ID and page type*
@@ -253,15 +240,15 @@ Two things to keep in mind when calling a data adapter public API interface:
 - Each data adapter will implement all the methods of the interfaces it supports. If functionality is not supported,
   the data adapter does not declare the interface, and it can then not be selected for the purpose requested by you.
 
-*The great thing is*: if you develop your own Smint.io Portals data adapter, you can easily publish your own custom 
-public API interfaces as well. This enables you to easily develop any custom functionality required using the Smint.io 
+*The great thing is*: if you develop your own Smint.io Portals data adapter, you can easily publish your own custom
+public API interfaces as well. This enables you to easily develop any custom functionality required using the Smint.io
 Portals component framework and runtime.
 
-However, for use of your custom public API interfaces in a Smint.io Portals UI component you'll need its Typescript 
+However, for use of your custom public API interfaces in a Smint.io Portals UI component you'll need its Typescript
 public API interface definition.
 
-Use the [Smint.io Portals Data Adapter Exporter CLI tool](../../Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/) 
-to generate the Typescript public API interface definition directly from your Smint.io Portals data adapter assembly. 
+Use the [Smint.io Portals Data Adapter Exporter CLI tool](../../Tools/Portals-DataAdapter-SDK-DataAdapterExporter-CLI/Release/)
+to generate the Typescript public API interface definition directly from your Smint.io Portals data adapter assembly.
 
 You can then simple use that Typescript public API interface definition file
 in your Smint.io Portals UI component.
@@ -321,11 +308,7 @@ than trying to configure it in the component.
 
 ### Getting started
 
-Please note that access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io)
-and request access. Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals
-Enterprise plan customers.
-
-You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
+Please note that [access to the SDKs is restricted](../../Overview/README.md#user-content-getting-access-to-the-sdks).
 
 Steps to follow:
 
@@ -364,7 +347,7 @@ always-auth=true
 8. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
 
 ```
-@[partner-id]:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Partners-[partner-id]/npm/registry/ 
+@[partner-id]:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Partners-[partner-id]/npm/registry/
 always-auth=true
 ```
 
@@ -430,7 +413,7 @@ For Mac or Linux users, you have to change your `package.json`. Please change th
 
 ### The example frontend component
 
-The [example Vue.js component itself](Example/ui-example-hello-world-1/src/PortalsUiComponent.vue) is pretty basic. 
+The [example Vue.js component itself](Example/ui-example-hello-world-1/src/PortalsUiComponent.vue) is pretty basic.
 It can display colored static text once added to a page.
 
 The source follows established Vue.js structure practices by containing a template, typescript, and css sections.
@@ -957,11 +940,7 @@ Please remember that a section start component still follows all the usual UI co
 
 ### Build your custom frontend component
 
-Please note that access to the SDKs is restricted. Get in contact with [Smint.io](https://www.smint.io)
-and request access. Access will be granted to either Smint.io Solution Partners or to all our Smint.io Portals
-Enterprise plan customers.
-
-You will need an account with Microsoft Visual Studio cloud offerings (Azure DevOps), as the SDKs are hosted there.
+Please note that [access to the SDKs is restricted](../../Overview/README.md#user-content-getting-access-to-the-sdks).
 
 1. In the component folder open a command prompt or terminal window
 2. Make sure you use node version 12.22.10 (use [NVM](https://github.com/nvm-sh/nvm) if you use different node versions)
@@ -976,7 +955,7 @@ always-auth=true
 5. If applicable, make sure that your component .npmrc file contains the proper reference to your partner NPM repo (replace `partner-id` by your partner ID):
 
 ```
-@[partner-id]:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Partners-[partner-id]/npm/registry/ 
+@[partner-id]:registry=https://smintio.pkgs.visualstudio.com/_packaging/Portals-Components-Partners-[partner-id]/npm/registry/
 always-auth=true
 ```
 
@@ -1020,6 +999,12 @@ folder:
 Those two commands are exactly what `build:dist` and `build:resources` do.
 
 ### Publish your custom frontend component
+
+Publishing a frontend component is **self-service**: you publish the package and register it, for whichever environment
+you are set up for, and there is no Smint.io review step in between. That is specific to frontend components — a
+*backend* component runs as trusted server-side code inside the Smint.io platform and reaches production only through
+Smint.io, after a code review. See
+[getting a component into a Smint.io Portals system](../../Overview/README.md#user-content-getting-a-component-into-a-smintio-portals-system).
 
 1. In the component folder open a command prompt or terminal window
 1. Run `npm run build` to ensure the latest version will be published

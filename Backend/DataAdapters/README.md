@@ -1,7 +1,7 @@
 How-to implement the `DataAdapter`
 ==================================
  
-Current version of this document is: 1.3.0 (as of 15th of September, 2026)
+Current version of this document is: 1.4.0 (as of 15th of September, 2026)
 
 This is the short orientation. **The full catalogue of public API interfaces, the base classes
 and what they leave abstract, parameters and results, long-running methods, permissions, the
@@ -21,11 +21,9 @@ public override void ConfigureServicesForDataAdapter(ServiceCollection services)
 ```
 this enables the `DataAdapter` to inject the `ISharepointClient`, which is a wrapper around the Microsoft Graph API.
 
-**That client is how the data adapter calls the external system, and it must expose no secrets.**
-Access tokens, refresh tokens, client secrets and API keys stay inside the connector and inside
-the client's implementation — never on the client interface, never returned from a method, never
-handed over as a prepared authorization header. A credential the data adapter never holds cannot
-end up in a log line, an exception or a response.
+**That client is how the data adapter calls the external system, and it must expose no secrets** —
+no token, no key, no prepared authorization header. The rules, and why they matter, are in
+[the client must not expose secrets](../docs/smintio-connector-reference.md#user-content-the-client-must-not-expose-secrets).
 
 ## Compartmentalized features
 There are several interfaces, each of which provides the front end with a set of method calls. In most cases you'll need `IAssetsRead` and `IAssetsSearch`.
@@ -54,17 +52,12 @@ needs none of it: the interface is the data model, and there is no meta-model, n
 mode and no `AssetDataObject` mapping. See
 [productized or custom](../README.md#user-content-productized-or-custom) before you start.
 
-Smint.io offers two different integration modes. Based on the functionality supported by the external system.
-
-- Live connection
-
-The data is fetched on demand. This will mean that the external system must support feature-rich functionality (e.g. fully translatable metamodel, faceted search and etc)
-
-- Internal index
-
-Selected data is analyzed and metadata is captured. Thumbnails, video, audio and document renditions are generated and stored by Smint.io  for offline usage.
-Further data synchronization is required via tokens, webhooks or time based intervals.
-Please note that Smint.io does not store original assets.
+Smint.io offers two different integration modes — a **live connection**, where every request goes
+to the external system, and an **internal index**, where Smint.io analyzes and indexes the content
+and serves searches from its own index. Which one is right depends on what the external system can
+do, and the choice shows up in the marker interfaces your configuration class implements. It is
+described in
+[live connection or internal index](../README.md#user-content-live-connection-or-internal-index).
 
 Contributors
 ============

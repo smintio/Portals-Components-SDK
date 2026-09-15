@@ -1,12 +1,12 @@
 How-to implement the `Connector`
 ================================
 
-Current version of this document is: 1.0.4 (as of 15th of September, 2026)
+Current version of this document is: 1.0.5 (as of 15th of September, 2026)
 
 ## SharePoint `Connector` Basics
 
-For Sharepoint (or rather: the Microsoft Graph API) offers OAuth2 authorization with several flows. In order to 
-leverage user-specific access rules and to provide a fine-grained security context, we opted for the OAuth2 Authorization 
+For Sharepoint (or rather: the Microsoft Graph API) offers OAuth2 authorization with several flows. In order to
+leverage user-specific access rules and to provide a fine-grained security context, we opted for the OAuth2 Authorization
 Code Flow.
 
 The `OAuth2AuthenticationCodeFlowWithPKCEConnector` can be used for a scaffolding a OAuth2 flow. Note, that you can implement
@@ -17,7 +17,7 @@ that low level details at all.
 ## Authentication process
 
 This section describes how to set up the `Connector` to use the OAuth2's Authorization Code flow. It is easiest to
-extend the pre-existing `OAuth2AuthenticationCodeFlowWithPKCEConnector` and customize it to your specific needs. 
+extend the pre-existing `OAuth2AuthenticationCodeFlowWithPKCEConnector` and customize it to your specific needs.
 
 The Authorization Code Flow consists of two main steps:
 
@@ -72,7 +72,7 @@ var postResponse = await restSharpClient.ExecuteTaskAsync<OAuth2GetAccessTokenRe
 ```
 
 Since the `ExecuteTaskAsync` is parameterized, the `response.Data` object will hold the model-bound token response. We simply need to populate the `bootstrapAuthorizationValuesModel`
-with that data and return it: 
+with that data and return it:
 ```c#
 // error handling omitted for legibility
 bootstrapAuthorizationValuesModel.AccessToken = postResponse.Data.AccessToken;
@@ -83,7 +83,7 @@ return bootstrapAuthorizationValuesModel
 
 ### Refresh the Access Token
 **Step 3** is only necessary once the access token has expired resulting in the GraphAPI returning HTTP 401 errors. If you need some custom handling, simply override the
-`RefreshAuthorizationValuesAsync` method: 
+`RefreshAuthorizationValuesAsync` method:
 
 ```c#
 var refreshToken = GetRefreshToken(authorizationValuesModel);
@@ -117,7 +117,7 @@ indicating the mood prevalent in an image, it would also be possible for a `*.do
 
 ### Meta-model structure
 
-The meta-model consists of a collection of `EntityModel` objects, and each `EntityModel` has a list of `Properties`. It could be compared to a C# class definition where each `EntityModel` would be one 
+The meta-model consists of a collection of `EntityModel` objects, and each `EntityModel` has a list of `Properties`. It could be compared to a C# class definition where each `EntityModel` would be one
 class, each `Property` a class member. So if we were to model a Sharepoint file in C#, we could write it as
 
 ```c#
@@ -127,7 +127,7 @@ public class SharepointFile {
     public bool IsReadOnly {get;set;}
 }
 ```
-The above code would correspond to the following `EntityModel`: 
+The above code would correspond to the following `EntityModel`:
 
 ```c#
 var spf = new EntityModel("SharepointFile",...);
@@ -138,7 +138,7 @@ _entityModel.AddEntity(spf);
 ```
 Note that all the "`...`" are placeholders for a `LocalizedStringsModel` and are omitted for legibility.
 
-The meta-model could also have more complex fields, for example, imagine it having an `Owner` field: 
+The meta-model could also have more complex fields, for example, imagine it having an `Owner` field:
 ```c#
 public class SharepointFile {
     // ...
@@ -179,13 +179,13 @@ spf.AddProperty("LikeCount", DataType.Int32, ..., labels: new ResourceLocalizedS
 
 ### Get metadata from Sharepoint
 
-The Sharepoint datatype for a metadata field is called `ColumnDefinition`, since all metadata fields are called columns: 
+The Sharepoint datatype for a metadata field is called `ColumnDefinition`, since all metadata fields are called columns:
 
 ```c#
 IEnumerable<ColumnDefinition> colDefs = await _sharepointClient.GetMetadataAsync(_siteId)
 ```
 
-It should be noted that even at this point, Sharepoint metadata is a fair bit more detailed than what is currently implemented in Smint.io Portals. For example, Sharepoint has `Text` columns, 
+It should be noted that even at this point, Sharepoint metadata is a fair bit more detailed than what is currently implemented in Smint.io Portals. For example, Sharepoint has `Text` columns,
 that have attributes like `MaxLength`, `AllowMultiline` etc. which we cannot model in Portals at the moment. This is no problem though, as long as data is only read, and no input
 validation is required. Please get in touch if you need more capabilities here.
 

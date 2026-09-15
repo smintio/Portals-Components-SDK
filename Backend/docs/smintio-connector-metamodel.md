@@ -1,7 +1,7 @@
 The Smint.io Portals connector meta-model
 =========================================
 
-Current version of this document is: 2.0.0 (as of 15th of September, 2026)
+Current version of this document is: 2.1.0 (as of 15th of September, 2026)
 
 How a connector describes the external system's own schema, so that Smint.io Portals can interpret
 the data your data adapter delivers.
@@ -37,7 +37,7 @@ Everything that flows through Smint.io Portals — an asset, a folder, a metadat
 be rendered, indexed, filtered or translated, because nothing says what the keys mean.
 
 The meta-model is what says. It is the schema that turns `{"cf_0042": "Sunset"}` into a labelled,
-typed, translatable, indexable field that a portal editor can point a component at.
+typed, translatable, indexable field that a portal administrator can point a component at, in the editor.
 
 Smint.io defines the meta-model for its own objects. **You define the meta-model for everything that
 comes out of the external system** — which in practice means everything that ends up in an asset's
@@ -45,14 +45,9 @@ comes out of the external system** — which in practice means everything that e
 
 ## When you do not need one
 
-The meta-model exists to serve **generic** consumers. It is what lets a portal administrator point
-a component at one of your metadata attributes in the editor, and what lets the platform then
-index, filter, format and translate that value without anyone having written code that knows your
-source system.
-
-So a meta-model is required for a **productized** connector — one whose data adapter implements
-the standard interfaces, above all `IAssets`, and whose data is consumed by the standard portal
-experience.
+Everything above assumes a **generic** consumer, and that is the whole point: a meta-model is
+required for a **productized** connector — one whose data adapter implements the standard
+interfaces, above all `IAssets`, and whose data is consumed by the standard portal experience.
 
 **A custom connector does not need one.** If your data adapter publishes its own public API
 interfaces, and the only thing that calls them is your own custom UI component, then the
@@ -122,7 +117,7 @@ A container holds four kinds of thing:
 |---|---|
 | `AddEntity(...)` | the object types — `EntityModel` |
 | `AddFormGroup(...)` | the search facets you offer — `FormGroupModel` |
-| `AddDownloadSize(...)` | rendition formats the source system offers — `DownloadSizeModel` |
+| `AddDownloadSize(...)` | rendition formats the external system offers — `DownloadSizeModel` |
 | — | the three feature flags above |
 
 ## `EntityModel` — an object type
@@ -317,7 +312,7 @@ or by building the group first and calling `AddFormItem(key, labels, dataType)` 
 | `FormGroupModel` | |
 |---|---|
 | `Key` | unique within the meta-model |
-| `SourceId` | your own reference back to the source system's facet |
+| `SourceId` | your own reference back to the external system's facet |
 | `Labels` | localized display name |
 | `FormItems` | the `FormItemModel`s |
 | `IsIntegrationLayer` | set by Smint.io for index-backed groups; leave it alone in a connector |
@@ -409,8 +404,9 @@ the cases it does not special-case.
 
 ## Lifecycle: when your meta-model is built, and what happens to it
 
-`GetConnectorMetamodelAsync` is called **when a connector configuration is set up, and regularly
-thereafter** — but not per request and not per search. What happens to the result, in order:
+`GetConnectorMetamodelAsync` is called **when a connector configuration is set up, regularly
+thereafter, and whenever an administrator asks for it** — but not per request and not per search.
+What happens to the result, in order:
 
 1. it passes through any data processors registered for this hook, which may add or alter entities;
 2. every `ResourceLocalizedStringsModel` is resolved into real localized strings and cached;

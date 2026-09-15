@@ -1,7 +1,7 @@
 The Smint.io Portals connector contract
 =======================================
 
-Current version of this document is: 1.2.0 (as of 15th of September, 2026)
+Current version of this document is: 1.2.1 (as of 15th of September, 2026)
 
 Every member a connector declares, the order in which the platform calls them, the
 authentication flows you can start from, and how the API client underneath is built.
@@ -133,8 +133,9 @@ Afterwards, in steady state: `RefreshAuthorizationValuesAsync` before the token 
 `WarmCachesAsync` on restart and every fifteen minutes, and
 `ConfigureServicesForDataAdapter` each time a data adapter instance is built.
 
-**`GetConnectorMetamodelAsync` runs when the configuration is set up and regularly thereafter —
-not per request.** So your meta-model keeps up with the external system on its own: a new field
+**`GetConnectorMetamodelAsync` runs when the configuration is set up, regularly thereafter, and
+on an administrator action — not per request.** So your meta-model keeps up with the external
+system on its own: a new field
 or a renamed label is picked up by a later refresh, and whatever that implies for an indexed
 source is scheduled automatically. And because it is not on the request path, building it is
 allowed to be slow. Read the external system's schema properly rather than cutting corners for
@@ -358,7 +359,7 @@ Connector-MyService/
   Metamodel/
     MyServiceMetamodelBuilder.cs        IMetamodelBuilder
     MyServiceFormGroupsModelBuilder.cs  the search facets, when you offer any
-    MyServiceTranslationLinker.cs       when the source system carries its own translations
+    MyServiceTranslationLinker.cs       when the external system carries its own translations
   Models/                               request and response DTOs
   Extensions/                           mapping helpers
   AllowedValues/                        IDynamicValueListProvider for configuration dropdowns
