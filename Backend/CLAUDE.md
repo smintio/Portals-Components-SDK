@@ -353,6 +353,31 @@ connector that fails there would have failed in the platform. The full setup is 
   directly and assert the happy path, the shape of the result, identifier round-tripping, the
   failure paths and the authentication lifecycle.
 
+**Inheriting the shared suite couples your test project to the SDK's test surface**, which is a
+cost worth knowing before you opt in. Its base classes are abstract, and a later SDK version can
+add a member to them; when that happens your test project stops compiling, in a repository nobody
+has touched. Expect it on an SDK upgrade, and read it as one more reason a custom component
+should not inherit the suite.
+
+Where a component does inherit it for the checks that *do* apply, the ones that do not are
+`virtual` — that is the intended escape hatch. Override them and assert the absence deliberately
+("this component serves no assets, so it has no output-format configuration"), so that the day it
+gains one of those markers the override fails and gets reconsidered. An override with an empty
+body passes while asserting nothing, which is worse than the failure it replaced.
+
+**A component's tests live with the component.** A second data adapter — a customer-specific
+variant, say — gets its own test project beside it, with its own fixture and its own settings
+section, rather than extending the fixture of the component it was modelled on. A shared fixture
+makes two components depend on each other at build time and hands one of them a base class it can
+break for the other; the twenty lines of connector setup you duplicate are much the cheaper half
+of that trade.
+
+**Write a round-trip test for every value your component writes back.** Reads are easy to eyeball;
+writes are not, because the external system may normalise, truncate or reinterpret what you sent.
+Dates are the classic: a value standing for a month, converted to UTC on the way out, lands in the
+*previous* month for any positive offset — and that passes on a developer machine running UTC and
+is wrong everywhere else. Assert the value you read back, not that the call succeeded.
+
 **Then look at it in a real portal**, if there is a development environment for it. Two things
 only a portal shows you: whether the configuration form is usable, and whether the data renders.
 A productized component that passes its tests and produces a portal page showing nothing is

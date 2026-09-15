@@ -1,7 +1,7 @@
 Smint.io Portals data adapter public API interfaces
 ===================================================
 
-Current version of this document is: 1.3.0 (as of 15th of September, 2026)
+Current version of this document is: 1.4.0 (as of 15th of September, 2026)
 
 Which public API interfaces exist, what each one publishes, how you declare the ones your data
 adapter supports, and how to publish an interface of your own.

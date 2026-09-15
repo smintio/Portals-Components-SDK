@@ -276,6 +276,24 @@ so in a comment, or someone tidies it away.
 `npm run build` runs both halves (`build:dist` and `build:resources`); `npm run lint` is the
 other one worth running before you report done.
 
+**A new package needs a lock file, and the right one is the sibling's.** A component pins its
+direct dependencies but not their transitive ones, so a fresh `npm install` in a brand-new package
+resolves a different tree from the one every existing component is built against. The failure does
+not look like a dependency problem: the TypeScript step silently stops transpiling, rollup parses
+the decorator in the `.vue` script block itself, and you get
+
+```
+Error: Unexpected character '@' (Note that you need plugins to import files that are not JavaScript)
+```
+
+pointing at `@PortalsUiComponent` — which reads as a broken `tsconfig` and sends you editing
+`include` patterns that were never wrong. Copy `package-lock.json` from the component you started
+from, change only its `name` and `version`, delete `node_modules`, and install again.
+
+More generally: **before concluding a build failure is yours, build an untouched sibling package.**
+If that one is green the difference is in your tree, and if it is red you were never the cause. It
+is a one-minute check that decides which half of the problem to look at.
+
 **Then look at it in a real portal.** The dev server reroutes a development portal's component
 requests to your working tree, so your local build runs against real data. The full loop is in
 `README.md` under *Local development*. Two things about it decide most of the confusion:
