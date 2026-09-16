@@ -1,7 +1,7 @@
 Smint.io Portals data processors
 ===============================
 
-Current version of this document is: 1.1.0 (as of 15th of September, 2026)
+Current version of this document is: 1.2.0 (as of 16th of September, 2026)
 
 A data processor hooks into a data adapter's operations and changes what goes in or what comes
 out. It is the component type to reach for when the data is right but its *shape*, its *naming*
@@ -39,6 +39,12 @@ The kinds of thing the shipped processors do, as a guide to what the type is goo
 Two things they are *not* for. They are not a place to work around a data adapter that returns
 the wrong data — fix the adapter. And they are not a substitute for the connector meta-model: a
 field that was never declared has already been dropped before any processor runs.
+
+The last item on that list is worth a pointer of its own. **Dynamic Content Routing** is a
+shipped data processor of the scripting type that narrows an asset search and validates asset
+access per user, from rules an administrator writes as JavaScript. If your problem is "this
+audience should only see these assets", you very likely want to configure that rather than build
+a processor — see [Dynamic Content Routing](../../Admin/DynamicContentRouting/README.md).
 
 ## The contract
 
