@@ -76,8 +76,9 @@ short. If they have not, say so rather than guessing at what a component does.
 - **A build is not a verification.** The component packages carry no tests, so `npm run build`
   proves only that your code compiles — it says nothing about whether the component renders,
   reads its configuration, or survives real data. The **only** way to find that out is to look at
-  it in a development portal through the dev server. Do that before you report the work done, and
-  if you cannot, say so explicitly instead of reporting a green build as if it were a result.
+  it in a development portal through the dev server. Set that loop up **before** you write the
+  component, not after — see *Set the loop up before you write the component*. If you cannot run
+  it, say so explicitly instead of reporting a green build as if it were a result.
 - **Copy a component only when it is a different component.** If yours is "the generic one plus
   something", extend it instead — see below.
 
@@ -143,13 +144,58 @@ environment in the question.
 
 ### Decide these yourself — do not ask
 
-Start `version` at whatever you are currently on, or `1.0.0` for a first component. Regenerate
+Start `version` at whatever you are currently on, or `1.0.0` for a first component. Generate
 `licenses.json` rather than inheriting the one from the component you copied. Generate
-`portals-ui-component.json` from `resources/definition.ts`. Add the dev server's
-`ComponentMappings` entry in the same change, and restart the dev server.
+`portals-ui-component.json` from `resources/definition.ts`.
+
+The dev server mapping is not one of these end-of-work chores — it belongs at the **start**, with
+the rest of the loop. See the next section.
 
 If something stays unanswered, pick the sensible default, build the component, and say in the
 final report which assumption you made and where it is easy to change.
+
+## Set the loop up before you write the component
+
+**Get the component visible in a portal while it still does nothing, then write it.** This is the
+single highest-value habit here.
+
+Done in this order, checking the component costs one browser reload. Done at the end, it costs
+setting up the whole loop at the moment you are most inclined to skip it — which is how a
+component ends up reported as finished on the strength of a green build.
+
+1. **Scaffold and build the skeleton.** Copy the starter, rename it, change `name`,
+   `description`, `version`, `author` and `publishConfig`, and run `npm run build` once. This
+   produces the bundle under `lib/` that the mapping has to point at — the mapping is a path to a
+   file, so it cannot be written before the file exists.
+2. **Publish it once, if the component is new.** A brand-new component is unknown to the portal,
+   and the dev server can only reroute a request the portal already makes — so there is nothing to
+   reroute until the component has been registered once. This is the one publish that has to
+   happen before any real work. **Ask first, as always**, and name the tenant and the environment
+   in the question. A component you are *changing* rather than creating needs none of this.
+3. **Add the `ComponentMappings` entry** in the dev server's `appsettings.json`, mapping the
+   component id to the built bundle relative to `RootDirectory`. The path has to match the `main`
+   entry in your `package.json`. The dev server reads that file only at startup, so **restart it**
+   if it was already running.
+4. **Start the dev server, and confirm the portal actually reaches it.** Open the page the
+   component sits on with *Development mode* on and a developer-cleared login, and watch the dev
+   server log. A request for your bundle means the loop is live. **An empty log means it is
+   not** — and the cause is one of the two portal-side switches, not your mapping. Fix that now,
+   while the component is still empty and there is nothing else to blame.
+5. **Now write the component**, with `npm run watch` running. From here each change is a rebuild
+   and a reload.
+
+Two things doing this at the start buys beyond not forgetting:
+
+- **You find out on day one whether you can verify at all.** If *Development mode* is off, or no
+  developer-cleared login exists, you learn it while the component is empty — not after a day's
+  work, when the honest report is "I could not check any of this".
+- **Every later failure has one new cause.** When the loop was proven with an empty component, a
+  page that breaks afterwards broke because of what you just wrote. That is worth more than it
+  sounds.
+
+`npm run watch` rebuilds the bundle but **does not** regenerate
+`portals-ui-component.json` — so anything that changes the settings surface still needs
+`npm run build:resources` and a publish before the portal shows it. See *Verifying your work*.
 
 ## Extend a generic component — do not copy it
 
@@ -295,15 +341,16 @@ else. **The work is not done until you have looked at the component in a running
 `npm run lint` is worth running with it. This catches syntax, types and the resource definition —
 and no behaviour at all.
 
-**2. Look at it in a real portal, through the dev server.** The dev server reroutes a development
-portal's component requests to your working tree, so your local build runs against real data and
-a real configuration form. The full loop is in `README.md` under *Local development*. This is the
-step that tells you whether the component renders, whether its settings arrive, and whether it
-survives an asset that is missing the field you assumed.
+**2. Look at it in a real portal, through the dev server.** This is the step that tells you
+whether the component renders, whether its settings arrive, and whether it survives an asset that
+is missing the field you assumed. If you set the loop up first — see
+*Set the loop up before you write the component* — this costs one browser reload, because the
+portal is already pointed at your working tree.
 
-If you cannot run it — no development portal, *Development mode* off, no developer-cleared login —
-**say so in the final report**, in those words. Do not present a green build as verification; it
-is a different claim, and someone will act on it.
+If the loop was never set up, this is where you pay for it, and the two portal-side switches are
+outside your control. If you cannot run it at all — no development portal, *Development mode*
+off, no developer-cleared login — **say so in the final report**, in those words. Do not present a
+green build as verification; it is a different claim, and someone will act on it.
 
 **A new package needs a lock file, and the right one is the sibling's.** A component pins its
 direct dependencies but not their transitive ones, so a fresh `npm install` in a brand-new package
@@ -378,7 +425,7 @@ is reported as not done — never omitted, and never rounded up.
 - [ ] `npm run build` is green, and `npm run lint` with it
 - [ ] `portals-ui-component.json` (or `portals-page-template.json`) regenerated from
       `resources/definition.ts` — `npm run watch` does not do this
-- [ ] the dev server's `ComponentMappings` entry added, and the dev server restarted
+- [ ] the dev server loop was live **before** the component was written, and still is
 - [ ] **the component seen rendering in a development portal**, with its configuration form
       opened and each setting you added actually changed once — or an explicit statement of why
       this was not possible
