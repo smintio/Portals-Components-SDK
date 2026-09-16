@@ -137,7 +137,7 @@ configurations it should govern.
 |---|---|
 | **Prepare asset search script** | the JavaScript that narrows the search |
 | **Validate asset access script** | the JavaScript that enforces access |
-| **Enable extended logging** | writes the full decision context to the log on every denial |
+| **Enable extended logging** | writes the full decision context to the Smint.io platform log on every denial. **For Smint.io support** — the log is not accessible to portal administrators, so turn this on only when support asks you to |
 
 Two consequences of how it is attached:
 
@@ -195,19 +195,43 @@ the user may see a cached answer from either side of the flip.
 
 ## Testing and troubleshooting
 
-**Extended logging** is the tool. With it enabled, every denial writes the full decision context
-to the log: the method, which script fired, the user's UUID and anonymity, the custom form values
-that were in play at user, page and data adapter scope, the script's instance key and
-configuration version, and the request input. Page redirects arising from
-`setRequestPageConfigurationUuid` are logged the same way.
+**`error()` is your tool.** A routing script has no console and no log you can read, but the
+message you pass to `error()` is carried into the error the portal displays — so you can force any
+value into view:
 
-Leave it **off in steady state**. It logs on every denial, and a portal doing its job denies
-constantly — a routed portal's normal operation is a stream of refusals to callers who never see
-them.
+```javascript
+var regions = getUserStringArrayCustomFormFieldValues("regions");
 
-`debug(value)` writes a single value to the log from inside a script, for the case where you need
-to see what an accessor actually returned. It costs a statement out of a small budget; remove
-these before the script goes live.
+error(JSON.stringify(regions));
+return;
+```
+
+That is almost always the whole diagnosis. When a script denies an asset you believe it should
+allow, the answer is nearly always that the user's groups do not carry the value the script
+expects, or carry it under a different id — and printing the value settles it in one round trip.
+
+Two properties to respect, because this is an *error*, not logging:
+
+- **It fails the request.** The search returns nothing, or the asset will not open, while the line
+  is in place. It is a probe, not instrumentation.
+- **Everyone sees it.** The message reaches whoever triggered the request, including ordinary
+  portal visitors.
+
+Add the probe, reproduce once, read the message, remove the line. Never leave one in a script real
+users are hitting.
+
+`debug()` exists but writes to the Smint.io platform log, which portal administrators cannot read.
+It is of no use to you; reach for `error()` instead.
+
+**Extended logging** is likewise for Smint.io support, not for you. With it enabled, every denial
+writes the full decision context — the method, which script fired, the user's UUID and anonymity,
+the custom form values in play at user, page and data adapter scope, the script's instance key and
+configuration version, and the request input — to the platform log. Turn it on when Smint.io
+support asks you to, and turn it off again afterwards: a portal doing its job denies constantly,
+so it produces a great deal of logging for no benefit you can see.
+
+If `error()` has not answered the question, that is the point to raise it with
+[support@smint.io](mailto:support@smint.io).
 
 The failure modes worth knowing on sight:
 
@@ -219,9 +243,8 @@ The failure modes worth knowing on sight:
 | A page that reads several assets shows nothing at all | one asset in the batch is denied, and a denial fails the whole call |
 | Intermittent execution errors under load | the statement or time budget is being exceeded |
 
-When a script is denying an asset you believe it should allow, enable extended logging, reproduce
-once, and read the logged custom form values — the answer is almost always that the user's groups
-do not carry the value the script expects, or carry it under a different id.
+Each of these can be confirmed in one round trip by printing the value in question with
+`error(JSON.stringify(…))` at the point the script reads it.
 
 ## Limits
 

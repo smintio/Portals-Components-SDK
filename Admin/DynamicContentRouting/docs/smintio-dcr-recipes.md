@@ -795,24 +795,49 @@ Hiding only the fragment the branch happened to set.
 
 ## How do I work out why an asset is being denied?
 
-Enable **extended logging** on the Dynamic Content Routing configuration, reproduce the request
-once, and read the log entry. It records the method, which of the two scripts fired, the user's
-UUID and whether they are anonymous, the custom form values in play at user, page and data adapter
-scope, the script's instance key and configuration version, and the request input.
-
-Nine times in ten the answer is in the logged custom form values: the user's groups do not carry
-the value the script expects, or carry it under a different id, or the id in the script does not
-match the one in the form.
-
-For anything the log does not answer, `debug(value)` writes a single value from inside the script:
+Print the value you are unsure about with `error()`. The message it carries is shown in the error
+the portal displays, which is the only channel a script has back to you:
 
 ```javascript
 var regions = getUserStringArrayCustomFormFieldValues("regions");
-debug(regions);
+
+error(JSON.stringify(regions));
+return;
 ```
 
-Turn extended logging **off** again once you are done. A routed portal denies constantly in normal
-operation — that is the feature working — and each denial writes a full entry.
+Nine times in ten that settles it: the user's groups do not carry the value the script expects, or
+carry it under a different id, or the id in the script does not match the one in the form.
+
+The same probe answers "which branch did it take?" without stringifying anything:
+
+```javascript
+error("reached the editorial branch");
+return;
+```
+
+And it works in either script. In the validate script, put it just above the `permissionDenied()`
+you are investigating and print both sides of the comparison:
+
+```javascript
+var assetRegions = dataObject.getEnumKeyArrayValueByPath(["rawData", "c101___CloudinaryResource", "region"]);
+
+error(JSON.stringify({ user: regions, asset: assetRegions }));
+return;
+```
+
+That one line distinguishes all three of the usual causes at once — the user has no values, the
+asset has none because the path is wrong, or both are present and simply do not overlap.
+
+**Remove the probe when you are done.** `error()` fails the request: while the line is there the
+search returns nothing or the asset will not open, and the message is shown to whoever triggered
+the request, including ordinary portal visitors. It is a probe, not logging.
+
+`debug()` looks like the tool for this and is not — it writes to the Smint.io platform log, which
+portal administrators cannot read. The same goes for the **extended logging** setting on the
+routing configuration: it records the full decision context on every denial, but into that same
+log. Enable it when Smint.io support asks you to, and turn it off again afterwards. If `error()`
+has not answered the question, that is the point to write to
+[support@smint.io](mailto:support@smint.io).
 
 Two symptoms with specific causes worth checking first:
 

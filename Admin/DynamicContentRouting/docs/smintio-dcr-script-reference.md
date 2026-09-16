@@ -115,7 +115,7 @@ script, with the access script mirroring it as the enforcement backstop.
 | *(fall through, or `return;`)* | Continue. The request proceeds with whatever the script changed. |
 | `permissionDenied()` | The request fails with an access-denied result. |
 | `redirectToLogin()` | The request fails with a redirect-to-login result. Validate script only. |
-| `error(message)` | The request fails with an execution error carrying `message`. |
+| `error(message)` | The request fails with an execution error, and `message` is carried into the error the portal displays. |
 
 **These functions record the outcome; they do not stop the script.** Execution continues at the
 next statement, and a later call overwrites the outcome that an earlier one recorded. Always
@@ -133,8 +133,39 @@ signing in would plausibly grant access — it sends the visitor to the login fl
 showing a refusal. Reach for it only when the distinction is real; for an authenticated user who
 simply lacks the permission, `permissionDenied()` is correct.
 
-`debug(value)` writes to the platform log. It is a development aid, not a channel back to the
-caller, and it costs a statement out of the budget. Remove debug calls before a script goes live.
+### `error()` is how you see inside a running script
+
+`error(message)` is the only channel a script has back to the person looking at the portal, and
+it is therefore the practical way to debug one. The message you pass is carried into the error the
+portal displays, so a value you cannot otherwise inspect can be forced into view:
+
+```javascript
+var regions = getUserStringArrayCustomFormFieldValues("regions");
+
+error(JSON.stringify(regions));
+return;
+```
+
+`JSON.stringify` is available, and is what makes this useful for arrays and objects. A plain
+string works too — `error("reached the editorial branch"); return;` answers a question about which
+path a script took.
+
+Two things follow from the fact that this is an *error*:
+
+- **It fails the request.** This is a deliberate probe, not logging. The search returns nothing, or
+  the asset fails to open, for as long as the line is in place.
+- **Everyone sees it.** The message reaches whoever triggered the request, including ordinary
+  portal visitors. A diagnostic left in a live script both breaks the portal and shows your
+  internals to its users.
+
+So: add the probe, reproduce once, read the message, remove the line. Never leave one in a script
+that real users are hitting.
+
+### `debug()` writes where you cannot read
+
+`debug(value)` writes to the Smint.io platform log. **Portal administrators have no access to
+those logs**, so unless you are Smint.io support this call produces nothing you can see — it just
+costs a statement out of the budget. Use `error()` instead.
 
 ## Request context
 
@@ -522,7 +553,10 @@ if (getMethodName() !== "GetAssetsDownloadItemMappingsAsync") {
   avoid nested iteration, and remember the validate script already runs once per asset.
 - **Hard-coding a portal, page or connector identifier.** It ties the script to one environment
   and breaks silently when the object is rebuilt. Prefer a custom form value.
-- **Leaving `debug()` calls in a live script.** They cost statements and fill the log.
+- **Leaving an `error()` probe in a live script.** It fails every request that reaches it and
+  shows your diagnostic to portal visitors. Add it, reproduce once, remove it.
+- **Reaching for `debug()`.** It writes to a log only Smint.io support can read. `error()` is the
+  channel you can actually see.
 
 ## Questions
 

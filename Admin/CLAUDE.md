@@ -117,11 +117,24 @@ There is no test harness. Verify by reasoning and by observation, in this order:
    If the answer is "everything", the scheme is wrong.
 3. **Trace the asset with no metadata.** An asset missing the routed field: is it denied? If not,
    the scheme is wrong.
-4. **Enable extended logging, reproduce once, read the logged custom form values**, then turn it
-   off again. A routed portal denies constantly in normal operation, and each denial writes a full
-   entry.
+4. **Print the values with `error(JSON.stringify(…)); return;`**, reproduce once, read the message
+   in the portal, then **remove the probe**. This is the only diagnostic channel an administrator
+   has, and it works by failing the request — see below.
 5. **Check a direct asset link and a download**, not only the search page. That is the half of the
    scheme a search test cannot exercise.
+
+On diagnostics, because it is easy to advise the wrong thing here:
+
+- **`error(message)` is the administrator's channel.** The message is carried into the error the
+  portal displays. `JSON.stringify` is available, so any value can be forced into view. It is the
+  right answer whenever someone asks how to debug a routing script.
+- **It fails the request and it is public.** The search returns nothing while the line is there,
+  and the message is shown to whoever triggered the request, including ordinary portal visitors.
+  Always tell the user to remove it, and never leave one in a script you hand over.
+- **`debug()` and the extended logging setting both write to the Smint.io platform log, which
+  portal administrators cannot read.** Do not suggest either as a debugging step. Extended logging
+  is enabled at Smint.io support's request so that *support* can read the decision context; frame
+  it that way, as the escalation path after `error()` has not answered the question.
 
 ## Writing for this directory
 
