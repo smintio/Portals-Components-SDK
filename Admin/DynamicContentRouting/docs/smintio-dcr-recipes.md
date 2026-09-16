@@ -324,10 +324,10 @@ const connectorInstanceKey = getConnectorInstanceKey();
 
 let entity;
 switch (connectorInstanceKey) {
-  case "c:101": entity = "c101___CE_layout"; break;
-  case "c:102": entity = "c102___CE_document"; break;
-  case "c:103": entity = "c103___CE_media"; break;
-  default: entity = "c104___CE_imageDatabase"; break;
+  case "c:101": entity = "c101___LayoutFile"; break;
+  case "c:102": entity = "c102___DocumentFile"; break;
+  case "c:103": entity = "c103___MediaFile"; break;
+  default: entity = "c104___ImageFile"; break;
 }
 
 setFormFieldValueStringArray(`rawData.${entity}.channel`, channels);
@@ -349,10 +349,10 @@ const connectorInstanceKey = getConnectorInstanceKey();
 
 let entity;
 switch (connectorInstanceKey) {
-  case "c:101": entity = "c101___CE_layout"; break;
-  case "c:102": entity = "c102___CE_document"; break;
-  case "c:103": entity = "c103___CE_media"; break;
-  default: entity = "c104___CE_imageDatabase"; break;
+  case "c:101": entity = "c101___LayoutFile"; break;
+  case "c:102": entity = "c102___DocumentFile"; break;
+  case "c:103": entity = "c103___MediaFile"; break;
+  default: entity = "c104___ImageFile"; break;
 }
 
 var assetChannel = dataObject.getEnumKeyValueByPath(["rawData", entity, "channel"]);
@@ -386,26 +386,26 @@ membership. The fragment is not under `rawData` — folder membership is a first
 ```javascript
 const folderIds = [];
 
-const accessLevels = getUserStringCustomFormFieldValues("repairCentreAccessLevel") ?? [];
+const courseLevels = getUserStringCustomFormFieldValues("courseLevel") ?? [];
 
-let hasAccessLevel = false;
+let hasCourseLevel = false;
 
-for (const accessLevel of accessLevels) {
-  if (accessLevel !== "none") {
-    folderIds.push(`Partner Portal/Service Centres/${accessLevel}`);
+for (const courseLevel of courseLevels) {
+  if (courseLevel !== "none") {
+    folderIds.push(`Training Library/Courses/${courseLevel}`);
 
-    hasAccessLevel = true;
+    hasCourseLevel = true;
   }
 }
 
-if (!hasAccessLevel) {
-  folderIds.push("Partner Portal/Public");
+if (!hasCourseLevel) {
+  folderIds.push("Training Library/Open Access");
 }
 
-const showConfidential = getUserBooleanCustomFormFieldValues("showConfidentialFiles")?.includes(true) ?? false;
+const showArchive = getUserBooleanCustomFormFieldValues("showArchivedCourses")?.includes(true) ?? false;
 
-if (showConfidential) {
-  folderIds.push("Partner Portal/Confidential");
+if (showArchive) {
+  folderIds.push("Training Library/Archive");
 }
 
 setFormFieldValueStringArray("parentFolderPaths.folderIds", folderIds);
@@ -418,26 +418,26 @@ it:
 ```javascript
 const folderIds = [];
 
-const accessLevels = getUserStringCustomFormFieldValues("repairCentreAccessLevel") ?? [];
+const courseLevels = getUserStringCustomFormFieldValues("courseLevel") ?? [];
 
-let hasAccessLevel = false;
+let hasCourseLevel = false;
 
-for (const accessLevel of accessLevels) {
-  if (accessLevel !== "none") {
-    folderIds.push(`Partner Portal/Service Centres/${accessLevel}`);
+for (const courseLevel of courseLevels) {
+  if (courseLevel !== "none") {
+    folderIds.push(`Training Library/Courses/${courseLevel}`);
 
-    hasAccessLevel = true;
+    hasCourseLevel = true;
   }
 }
 
-if (!hasAccessLevel) {
-  folderIds.push("Partner Portal/Public");
+if (!hasCourseLevel) {
+  folderIds.push("Training Library/Open Access");
 }
 
-const showConfidential = getUserBooleanCustomFormFieldValues("showConfidentialFiles")?.includes(true) ?? false;
+const showArchive = getUserBooleanCustomFormFieldValues("showArchivedCourses")?.includes(true) ?? false;
 
-if (showConfidential) {
-  folderIds.push("Partner Portal/Confidential");
+if (showArchive) {
+  folderIds.push("Training Library/Archive");
 }
 
 var dataObject = getDataObject();
@@ -459,7 +459,7 @@ Where folders are all you have, keep the list of paths in a custom form field so
 an administrator's edit rather than a script change.
 
 **Mistakes this invites.** Building the folder list twice and letting the two copies drift.
-Consuming most of the statement budget in the loop — keep the list of product folders short, or
+Consuming most of the statement budget in the loop — keep the list of folder paths short, or
 move it into a custom form value.
 
 ## How do I hide assets until a go-live date, with an early access exception?
@@ -517,7 +517,7 @@ branch that skips the filter.
 
 ```javascript
 let accessControls = getUserStringArrayCustomFormFieldValues("accessControl") ?? [];
-accessControls.push("s_public");
+accessControls.push("public");
 
 setFormFieldValueStringArray("rawData.c101___CR.access_control", accessControls);
 addNotAllowedSearchFragment("rawData.c101___CR.access_control");
@@ -529,7 +529,7 @@ addNotAllowedSearchFragment("rawData.c101___CR.access_control");
 var dataObject = getDataObject();
 
 let accessControls = getUserStringArrayCustomFormFieldValues("accessControl") ?? [];
-accessControls.push("s_public");
+accessControls.push("public");
 
 var assetAccessControls = dataObject.getStringArrayValueByPath(["rawData", "c101___CloudinaryResource", "access_control"]);
 
@@ -726,7 +726,7 @@ security classification may live on a different entity for each, and may not app
 ```javascript
 var restrictedTypes = ["certificate", "editorial", "billOfMaterials"];
 
-var assetTypes = getFormFieldValueStringArray("rawData.c101___RG.asset_type");
+var assetTypes = getFormFieldValueStringArray("rawData.c101___CatalogGeneral.asset_type");
 
 var applyRestriction = !assetTypes ||
   assetTypes.length === 0 ||
@@ -740,14 +740,14 @@ if (applyRestriction) {
   }
 
   if (assetTypes && assetTypes.indexOf("editorial") > -1) {
-    setFormFieldValueStringArray("rawData.c101___RE.security_classification", classifications);
+    setFormFieldValueStringArray("rawData.c101___CatalogEditorial.security_classification", classifications);
   } else {
-    setFormFieldValueStringArray("rawData.c101___RP.security_classification", classifications);
+    setFormFieldValueStringArray("rawData.c101___CatalogProduct.security_classification", classifications);
   }
 }
 
-addNotAllowedSearchFragment("rawData.c101___RE.security_classification");
-addNotAllowedSearchFragment("rawData.c101___RP.security_classification");
+addNotAllowedSearchFragment("rawData.c101___CatalogEditorial.security_classification");
+addNotAllowedSearchFragment("rawData.c101___CatalogProduct.security_classification");
 ```
 
 **Validate asset access** — the asset's own type is known here, so the branch is simpler and
@@ -756,7 +756,7 @@ exact:
 ```javascript
 var dataObject = getDataObject();
 
-const assetType = dataObject.getEnumKeyValueByPath(["rawData", "c101___RG", "asset_type"]);
+const assetType = dataObject.getEnumKeyValueByPath(["rawData", "c101___CatalogGeneral", "asset_type"]);
 
 const restrictedTypes = ["certificate", "editorial", "billOfMaterials"];
 
@@ -770,7 +770,7 @@ if (classifications.length === 0) {
   classifications = ["notRestricted"];
 }
 
-const entity = assetType === "editorial" ? "c101___RE" : "c101___RP";
+const entity = assetType === "editorial" ? "c101___CatalogEditorial" : "c101___CatalogProduct";
 
 var assetClassifications = dataObject.getEnumKeyArrayValueByPath(["rawData", entity, "security_classification"]);
 

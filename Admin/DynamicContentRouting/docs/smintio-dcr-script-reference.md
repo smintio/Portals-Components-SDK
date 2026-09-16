@@ -352,7 +352,7 @@ the asset:
 rawData.<connector instance>___<metamodel entity>.<property>
 ```
 
-for example `rawData.c1158___CR.dcr_access_control`. Properties that are not part of a connector's
+for example `rawData.c101___CR.access_control`. Properties that are not part of a connector's
 raw data sit at the top level instead, such as `parentFolderPaths.folderIds` for folder
 membership or `permissionSetIds` for a source system's own permission identifiers.
 
@@ -369,8 +369,8 @@ denied or everything is allowed depending on how the comparison is written.
 | `___CR.` | `___CloudinaryResource.` |
 | `___TC_` | `___ThronContent_` |
 
-So the same field is `rawData.c679___CR.usage_rights` to the prepare script and
-`["rawData", "c679___CloudinaryResource", "usage_rights"]` to the validate script. Entity keys
+So the same field is `rawData.c101___CR.region` to the prepare script and
+`["rawData", "c101___CloudinaryResource", "region"]` to the validate script. Entity keys
 that are not in this table are identical in both.
 
 ### Finding the id
@@ -395,7 +395,7 @@ route on passes every "is it in my list?" test vacuously if you write the test t
 round.** Write the test so that absence denies:
 
 ```javascript
-var assetRegions = dataObject.getEnumKeyArrayValueByPath(["rawData", "c679___CloudinaryResource", "region"]);
+var assetRegions = dataObject.getEnumKeyArrayValueByPath(["rawData", "c101___CloudinaryResource", "region"]);
 
 if (!assetRegions || assetRegions.filter((region) => allowedRegions.includes(region)).length === 0) {
   permissionDenied();
