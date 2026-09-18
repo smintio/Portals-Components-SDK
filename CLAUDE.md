@@ -8,11 +8,11 @@
 > Note: cross-repo dependencies are **relative `ProjectReference` paths**, so every
 > repo must be cloned side by side in the standard layout or this repo will not build.
 
-# Portals-Components-SDK
+# Portals-Development
 
-**This repository is public.** It is published at `github.com/smintio/Portals-Components-SDK` and is
-the front door for Smint.io Solution Partners and Enterprise-plan customers writing their own
-components. That governs everything written here — see "Writing for this repo" below before editing
+**This repository is public.** It is published at `github.com/smintio/Portals-Development` and is
+the front door for Smint.io Solution Partners and Enterprise-plan customers developing solutions
+for Smint.io Portals. That governs everything written here — see "Writing for this repo" below before editing
 a single file. It also governs this file: keep it free of internal repository names and paths.
 
 Four things live here:
